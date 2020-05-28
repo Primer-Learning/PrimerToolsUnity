@@ -4,7 +4,7 @@ Graph and scene direction tools used for [Primer YouTube videos](https://www.you
 [Tell me](https://docs.google.com/forms/d/1j39Rj-XF4y5sXLiYLkC-t5MdLOMu_JvDfJK4TGLlQTU/edit) about your experience with this tool.
 
 ## Getting started
-This is a Unity project. You'll need to download Unity separately. The version this project uses is [Unity 2019.2.8f1] (https://unity3d.com/unity/whats-new/2019.2.8)
+This is a Unity project. You'll need to download Unity separately. The version this project uses is [Unity 2019.2.8f1](https://unity3d.com/unity/whats-new/2019.2.8)
 
 If you think you might want to contribute code, clone the repo. This repo uses git-LFS to handle some .blend files, so cloning might not work if you don't have that configured. So either [get that set up](https://git-lfs.github.com/) or just dowload the repo as a zip file. If you run into other issues, [this might be helpful](https://thoughtbot.com/blog/how-to-git-with-unity).
 
