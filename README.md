@@ -8,7 +8,7 @@ This is a Unity project. You'll need to download Unity separately. The version t
 
 If you think you might want to contribute code, clone the repo. This repo uses git-LFS to handle some .blend files, so cloning might not work if you don't have that configured. So either [get that set up](https://git-lfs.github.com/) or just dowload the repo as a zip file. If you run into other issues, [this might be helpful](https://thoughtbot.com/blog/how-to-git-with-unity).
 
-If you don't think you'll contribute code, it's probably easiest to just download the unity package in the Releases folder and import that into a new or existing project.
+If you don't think you'll contribute code, it's probably easiest to just download the unity package in the [Releases](https://github.com/Helpsypoo/PrimerUnity/blob/master/Releases/primerTools.unitypackage) folder and import that into a new or existing project.
 
 Once you get it open, there are two sample scenes. SampleDirectedScene moves a spherical creature around a plane, and SampleGraphScene shows some features of the graph tool. If all goes well, you should be able to open the project, pick a scene, and hit play. Then, you can modify the scene director scripts (more on that below) or make your own.
 
