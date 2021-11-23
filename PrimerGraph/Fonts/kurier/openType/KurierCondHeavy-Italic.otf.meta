@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: ba81d20fcd8cac74e941517edd24fe12
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Kurier Cond Heavy
+  fontNames:
+  - Kurier Cond Heavy
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 49da0795609548e478f0344d649d2881, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,237 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Video;
+using UnityEditor;
+using TMPro;
+
+public class Director : SceneManager
+{
+    private bool paused;
+    internal bool animating = true;
+    internal float timeBehind; //For adjusting effective timing after events with flexible timing
+    [SerializeField] protected DirectorMode mode;
+    [SerializeField] bool lightBackground = false;
+
+    TextMeshProUGUI timeDisplay = null;
+    TextMeshProUGUI frameDisplay = null;
+    TextMeshProUGUI timeScaleDisplay = null;    
+    ReferenceScreen referenceScreenPrefab = null;
+    internal AudioSource voiceOverReference;
+    internal static List<SceneBlock> schedule = new List<SceneBlock>();
+    protected virtual void DefineSchedule() {}
+    internal AudioSource doneAlarm;
+
+    protected virtual void Start() {
+        // override in subclass
+        StartCoroutine(playScene());
+    }
+    internal IEnumerator playScene() {
+        for (int i = 0; i < schedule.Count; i++) {
+            SceneBlock sb = schedule[i];
+
+            yield return new WaitUntilSceneTime(sb.scheduledStartTime);
+
+            sb.actualStartTime = Time.time;
+
+            if (voiceOverReference != null && mode == DirectorMode.AnimationTesting) {
+                voiceOverReference.time = sb.scheduledStartTime;
+                voiceOverReference.Play();
+            }
+            if (schedule.Count > i + 1) {
+                sb.expectedDuration = schedule[i + 1].scheduledStartTime - sb.scheduledStartTime;
+            }
+            yield return sb.delegateIEnumerator();
+        }
+        List<PrimerObject> allPOs = Object.FindObjectsOfType<PrimerObject>().ToList();
+        foreach (PrimerObject po in allPOs) {
+            po.Disappear();
+        }
+        if (mode == DirectorMode.Recording) {
+            yield return new WaitForSeconds(1); // Extra second to hopefully avoid early cutoff mistakes.
+            camRig.StopRecording();
+        }
+        if (doneAlarm != null) {
+            doneAlarm.loop = false;
+            doneAlarm.Play();
+            while (doneAlarm.isPlaying) {
+                yield return null;
+            }
+        }
+        #if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+        #endif
+    }
+    internal ReferenceScreen MakeReferenceScreen(VideoClip clip = null) {
+        ReferenceScreen rs = Instantiate(referenceScreenPrefab);
+        if (clip != null) {
+            rs.screen.clip = clip;
+            rs.screen.gameObject.GetComponent<MeshRenderer>().material.SetFloat("_Glossiness", 0);
+        }
+        return rs;
+    }
+    public class SceneBlock {
+        //Define delegate type
+        public delegate IEnumerator DelegateIEnumerator();
+        //Declare instance of new delegate type, assigned in constructor
+        public DelegateIEnumerator delegateIEnumerator;
+        //Time management fields
+        public float scheduledStartTime; //When it's supposed to start
+
+        //Fields for managing the fact that some SceneBlocks will have flexible duration, mostly sims.
+        //This is probably more complex than strictly necessary, but I want to be able to
+        //mindlessly enter timing values based on a finished voiceover recording that already 
+        //leaves time for sims and then, during editing, insert or remove silence based on the actual 
+        //final duration of the sim.
+        //Some refactoring could probably help, in any case.
+        public bool flexible; //If true, Update() will wait for delegateIEnumerator to finish and then alter the sceneTime clock accordingly.
+        public float actualStartTime; //Assigned when delegateIEnumator is started
+        public float expectedDuration; //Assigned based on difference in scheduled times
+
+        //Constructor
+        public SceneBlock(float time, DelegateIEnumerator delegateIEnumerator, bool flexible = false) {
+            this.scheduledStartTime = time;
+            this.delegateIEnumerator = delegateIEnumerator;
+            this.flexible = flexible;
+            schedule.Add(this);
+        }
+        public SceneBlock(int m, float s, DelegateIEnumerator delegateIEnumerator, bool flexible = false) {
+            float time = m * 60 + s;
+            this.scheduledStartTime = time;
+            this.delegateIEnumerator = delegateIEnumerator;
+            this.flexible = flexible;
+            schedule.Add(this);
+        }
+    }
+    internal DirectorMode GetDirectorMode() {
+        return mode;
+    }
+    internal void SetDirectorMode(DirectorMode newMode, bool startRecording = true) {
+        mode = newMode;
+        switch (mode) 
+        {
+            case DirectorMode.SimTesting:
+                Time.captureFramerate = 0;
+                animating = false;
+                Debug.LogWarning("Animations may be messed up. This is a trial run.");
+                break;
+            case DirectorMode.AnimationTesting:
+                Time.captureFramerate = 0;
+                animating = true;
+                break;
+            case DirectorMode.Recording:
+                Time.captureFramerate = 60;
+                animating = true;
+                if (startRecording) {
+                    camRig.StartRecording();
+                }
+                break;
+        }
+        if (lightBackground) { backgroundColor = Color.gray; }
+    }
+
+    protected override void Awake() {   
+        base.Awake();
+        if (this.enabled) {
+            if (voiceOverReference == null) {
+                voiceOverReference = this.gameObject.AddComponent<AudioSource>();
+                voiceOverReference.clip = Resources.Load("voiceover", typeof(AudioClip)) as AudioClip;
+                voiceOverReference.playOnAwake = false;
+            }
+            if (doneAlarm == null) {
+                doneAlarm = this.gameObject.AddComponent<AudioSource>();
+                doneAlarm.clip = Resources.Load("zelda_secret", typeof(AudioClip)) as AudioClip;
+                doneAlarm.playOnAwake = false;
+            }
+
+            SetDirectorMode(mode);
+            DefineSchedule();
+            schedule.Sort((x,y) => x.scheduledStartTime.CompareTo(y.scheduledStartTime));
+
+            //Make scenes start right away without having to manually subtract the timing for each
+            if (schedule.Count > 0) {
+                float firstStart = schedule[0].scheduledStartTime;
+                timeBehind = -firstStart;
+            }
+        }
+    }
+
+    protected virtual void Update() {
+        if (timeDisplay != null) {
+            timeDisplay.text = (Time.time - timeBehind).ToString("0.0");
+        }
+        if (frameDisplay != null) {
+            //Frame count if no acceleration, for previewing where framecounts will be in final recording
+            frameDisplay.text = (Time.time * 60).ToString("0");
+        }
+        if (timeScaleDisplay != null) {
+            timeScaleDisplay.text = (Time.timeScale).ToString("0") + "x";
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            if (paused) {
+                Time.timeScale = 1;
+                paused = false;
+                if (((Director)SceneManager.instance).voiceOverReference != null) {
+                    ((Director)SceneManager.instance).voiceOverReference.Play();
+                }
+            }
+            else {
+                Time.timeScale = 0;
+                paused = true;
+                if (((Director)SceneManager.instance).voiceOverReference != null) {
+                    ((Director)SceneManager.instance).voiceOverReference.Pause();
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+            Time.timeScale /= 2;
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow)) {
+            Time.timeScale *= 2;
+        }
+    }
+
+    void SetUpTimeDisplays() {
+        // Maybe do this if it seems useful
+    }
+}
+
+public class WaitUntilSceneTime : CustomYieldInstruction {
+    float timeToWaitUntil;
+    public override bool keepWaiting
+    {
+        get
+        {   
+            bool toKeepWaiting = Time.time - ((Director)SceneManager.instance).timeBehind < timeToWaitUntil;
+            if (toKeepWaiting == false && ((Director)SceneManager.instance).voiceOverReference != null) {
+                ((Director)SceneManager.instance).voiceOverReference.time = timeToWaitUntil;
+            }
+            return toKeepWaiting;
+        }
+    }
+
+    public WaitUntilSceneTime(float t) // Scene time in seconds
+    {
+        timeToWaitUntil = t;
+        float lateAmount = Time.time - ((Director)SceneManager.instance).timeBehind - timeToWaitUntil;
+        if (lateAmount > 0) {
+            Debug.LogWarning($"Instruction to WaitUntilSceneTime({t}) comes too late by {lateAmount}s.");
+        }
+    }
+    public WaitUntilSceneTime(int m, float s) // Minutes and seconds because I'm tired of doing this mentally
+    {
+        timeToWaitUntil = m * 60 + s;
+        float lateAmount = Time.time - ((Director)SceneManager.instance).timeBehind - timeToWaitUntil;
+        if (lateAmount > 0) {
+            Debug.LogWarning($"Instruction to WaitUntilSceneTime({m}:{s}) comes too late by {lateAmount}s.");
+        }
+    }
+}
+
+public enum DirectorMode {
+    AnimationTesting, //Normal mode, keeps game time and real time close
+    SimTesting, //Skips some yield statements so we don't wait for animations
+    Recording //Sets captureFramerate ensure constant framerate output, real and game time diverge
+}

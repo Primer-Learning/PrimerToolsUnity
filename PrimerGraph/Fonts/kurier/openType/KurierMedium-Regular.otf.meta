@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 3bbb97e2fdcbf0649b8a7e5e863b17d3
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Kurier Medium
+  fontNames:
+  - Kurier Medium
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 1e8fb7d4de9da884b864987199a9584f, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
