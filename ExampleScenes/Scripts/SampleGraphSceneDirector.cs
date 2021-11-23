@@ -15,6 +15,10 @@ public class SampleGraphSceneDirector : Director
         base.Awake();
         //Do initialization stuff here
         //e.g., set object scale to zero if they're going to scale in
+        camRig.SetUp(solidColor: true);
+        camRig.cam.transform.localPosition = new Vector3(0, 0, -25);
+        camRig.transform.localPosition = 3 * Vector3.up;
+        camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
 
         text1 = Instantiate(textPrefab, camRig.transform);
         text1.transform.localScale = Vector3.zero;
@@ -124,7 +128,7 @@ public class SampleGraphSceneDirector : Director
     IEnumerator Disappear() {
         graph.ScaleDownToZero();
         text1.ScaleDownToZero();
-        yield return null;
+        yield return new WaitForSeconds(1);
     }
 
     //Example of a custom IEnumerator for kicking off common animations you might not want

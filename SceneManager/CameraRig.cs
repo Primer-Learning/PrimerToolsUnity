@@ -19,16 +19,17 @@ public class CameraRig : PrimerObject
     int resWidth = 2560;
     int resHeight = 1440;
 
-    internal void SetUp() {
+    internal void SetUp(bool solidColor = true) {
         if (cam == null) { 
             cam = Camera.main; 
         }
         cam.transform.parent = transform;
-        cam.clearFlags = CameraClearFlags.SolidColor;
-        Color bCol = SceneManager.instance.backgroundColor;
-        bCol.a = 0; //Ensure this for the recorder output
-        cam.backgroundColor = bCol;
-
+        if (solidColor) {
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            Color bCol = SceneManager.instance.backgroundColor;
+            bCol.a = 0; //Ensure this for the recorder output
+            cam.backgroundColor = bCol;
+        }
         camObject = cam.gameObject.AddComponent<PrimerObject>();
     }
     public void GoToStandardPositions() {

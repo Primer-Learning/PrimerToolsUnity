@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SampleSceneDirector : Director
+public class SimpleSceneDirector : Director
 {
     [SerializeField] PrimerObject ballCreaturePrefab = null;
+    [SerializeField] GameObject ground = null;
     PrimerObject ballCreature;
     protected override void Awake() {
         base.Awake();
         //Do initialization stuff here
-        camRig.SetUp();
+        camRig.SetUp(solidColor: false);
         camRig.GoToStandardPositions();
     }
 
     IEnumerator Appear() {
-        ballCreature = Instantiate(ballCreaturePrefab);
+        ballCreature = Instantiate(ballCreaturePrefab, ground.transform);
         ballCreature.transform.localPosition = Vector3.zero;
         ballCreature.transform.localRotation = Quaternion.Euler(0, 180, 0);
         ballCreature.transform.localScale = Vector3.zero;
