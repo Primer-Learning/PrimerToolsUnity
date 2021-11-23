@@ -57,6 +57,7 @@ public class SceneManager : PrimerObject
                 camSwivel = new GameObject("Cam Swivel");
             }
             camRig = camSwivel.AddComponent<CameraRig>();
+            camRig.SetUp();
         }
     }
 }
