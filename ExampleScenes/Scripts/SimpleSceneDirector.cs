@@ -15,12 +15,25 @@ public class SimpleSceneDirector : Director
     }
 
     IEnumerator Appear() {
+        // This is an example scene block.
+        // Technically, it's a coroutine that is used 
+        // to create a scene block in DefineSchedule() below,
+        // but conceptually, this is where you define 
+        // a scene block.
+
         ballCreature = Instantiate(ballCreaturePrefab, ground.transform);
         ballCreature.transform.localPosition = Vector3.zero;
         ballCreature.transform.localRotation = Quaternion.Euler(0, 180, 0);
         ballCreature.transform.localScale = Vector3.zero;
         ballCreature.ScaleUpFromZero();
+        
+        // This scene block doesn't wait for anything, 
+        // but IEnumerators need a yield statement no matter what.
+        // Most scene blocks wait for something, though.
         yield return null;
+        // You could put the whole scene into one scene block and just 
+        // use yield statements to control the timing, but I found it 
+        // useful to break things up when tring to time out more complex scenes.
     }
 
     //Define event actions
@@ -58,11 +71,10 @@ public class SimpleSceneDirector : Director
     //Construct schedule
     protected override void DefineSchedule() {
         /*
-        If flexible is true, blocks run as long (or not) as they need to,
-        with later blocks waiting until StopWaiting is called. Then,
+        If flexible is true, blocks run as long (or not) as they need to. Then,
         the next block starts on the next frame and all later block timings
         are shifted by the same amount.
-        Useful for simulations whose duration is not predetermined
+        Useful for simulations whose duration is not predetermined.
         */
         new SceneBlock(0f, Appear);
         new SceneBlock(3f, Zoom);
