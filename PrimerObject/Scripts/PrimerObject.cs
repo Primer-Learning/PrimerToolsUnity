@@ -118,7 +118,7 @@ public class PrimerObject : MonoBehaviour
     }
 
     internal virtual void Disappear(float duration = 0.5f, bool toPool = false, EaseMode ease = EaseMode.Cubic, float delay = 0) {
-        if (SceneManager.instance is Director && ((Director)SceneManager.instance).animating) {
+        if (!(SceneManager.instance is Director && ((Director)SceneManager.instance).animating)) {
             duration = 0;
         }
         StartCoroutine(disappear(duration, toPool, ease, delay));

@@ -43,9 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a19a6997ea524949a508de3e29a337f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flipperCharacterPrefab: {fileID: 2039235492216377114, guid: c72763c6d751c8049870fb0c9a443569,
-    type: 3}
-  floorPrefab: {fileID: 5831484937104165769, guid: 0c1ef190e7af0114da323b1d3f773f27,
-    type: 3}
-  coinPrefab: {fileID: 8813861977074371171, guid: c91f3dd690bd26740b058e2abec4dc73,
-    type: 3}
+  flipperCharacterPrefab: {fileID: 2039235492216377114, guid: c72763c6d751c8049870fb0c9a443569, type: 3}
+  floorPrefab: {fileID: 5831484937104165769, guid: 0c1ef190e7af0114da323b1d3f773f27, type: 3}
+  coinPrefab: {fileID: 8813861977074371171, guid: c91f3dd690bd26740b058e2abec4dc73, type: 3}

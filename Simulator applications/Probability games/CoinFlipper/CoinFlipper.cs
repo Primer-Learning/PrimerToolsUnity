@@ -32,7 +32,7 @@ public class CoinFlipper : Simulator
     internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
     internal PrimerCharacter flipperCharacter = null;
     PrimerObject coin = null;
-    [SerializeField] GameObject coinPrefab = null;
+    public GameObject coinPrefab = null;
     internal float headsRate = 0.5f;
     bool expectedHeads; // For testing whether the bias works properly.
     internal PrimerObject floor = null;

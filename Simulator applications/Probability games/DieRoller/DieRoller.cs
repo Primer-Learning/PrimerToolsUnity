@@ -86,7 +86,10 @@ public class DieRoller : PrimerObject
             SpawnDie();
             yield return new WaitForSeconds(rollDelay);
             TossDie();
-            yield return WaitUntilDieIsStopped();
+            while (!currentDie.GetComponent<Rigidbody>().IsSleeping()) {
+                yield return null;
+            }
+            // yield return WaitUntilDieIsStopped();
             if (RecordResult() == 0) {
                 group.rollsSoFar -= 1;
             }
@@ -101,7 +104,10 @@ public class DieRoller : PrimerObject
         SpawnDie();
         yield return new WaitForSeconds(rollDelay);
         TossDie();
-        yield return WaitUntilDieIsStopped();
+        while (!currentDie.GetComponent<Rigidbody>().IsSleeping()) {
+            yield return null;
+        }
+        // yield return WaitUntilDieIsStopped();
         if (RecordResult() == 0) {
             StartCoroutine(repeatedRolls());
         }

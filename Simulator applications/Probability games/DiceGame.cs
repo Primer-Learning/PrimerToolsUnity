@@ -33,13 +33,13 @@ public class DiceGame : MonoBehaviour
     }
 
     internal void Play(int numEntries = 1) {
+        StartCoroutine(play(numEntries));
+    }
+
+    internal IEnumerator play(int numEntries = 1) {
         isPlaying = true;
         rollerGroup.BeginUpdating();
         totalEntries += numEntries;
-        StartCoroutine(play());
-    }
-
-    IEnumerator play() {
         while (numCompleted < totalEntries) {
             // Stop the whole thing once the correct number of rolls have been completed
             // But only actually do another roll if there aren't enough other rolls happening.

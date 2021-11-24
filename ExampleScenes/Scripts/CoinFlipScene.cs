@@ -11,6 +11,7 @@ public class CoinFlipScene : Director
     float camAngle = 17;
     [SerializeField] CoinFlipSimManager flipperManager = null;
     [SerializeField] PrimerCharacter blobPrefab = null;
+    [SerializeField] GameObject blobCoin = null;
 
     protected override void Awake() {
         base.Awake();
@@ -29,12 +30,12 @@ public class CoinFlipScene : Director
     }
 
     //Define event actions
-    protected virtual IEnumerator Appear() {
+    IEnumerator Appear() {
         flipperManager.AddFlipper();
         flipperManager.ShowFlippers();
         yield return null;
     }
-    protected virtual IEnumerator MoreFlippers() {
+    IEnumerator MoreFlippers() {
         int totalFlippers = 25;
 
         CoinFlipper toSkip = flipperManager.flippers[0];
@@ -47,6 +48,7 @@ public class CoinFlipScene : Director
         camRig.RotateTo(Quaternion.Euler(40, 0, 0));
         yield return new WaitForSeconds(1);
         flipperManager.flippers[12].flipperCharacterPrefab = blobPrefab;
+        flipperManager.flippers[12].coinPrefab = blobCoin;
         flipperManager.ShowFlippers(skip: 1);
         yield return new WaitForSeconds(1);
 
