@@ -70,5 +70,5 @@ This tool makes extensive (excessive?) use of coroutines. The frame loop usually
 ### Simulations
 The only simulations in this repo so far are coin flipping and die rolling. Since I'm learning as I go, the tool has changed quite a lot over time, and my biology and econ sims aren't compatible with the current version (and are extreme spaghetti code that I'm not going to update, nor do I think it would be morally correct to inflict them on anyone as they are). But the basic identity of the tool feels pretty stable to me now, and I plan to build future sims in a way that will allow them to be shared publically.
 
-## Licence
+## License
 MIT License
