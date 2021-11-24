@@ -15,8 +15,8 @@ public class SampleGraphSceneDirector : Director
         base.Awake();
         //Do initialization stuff here
         //e.g., set object scale to zero if they're going to scale in
-        camRig.SetUp(solidColor: true);
-        camRig.cam.transform.localPosition = new Vector3(0, 0, -25);
+        camRig.SetUp(solidColor: false);
+        camRig.cam.transform.localPosition = new Vector3(0, 0, -11);
         camRig.transform.localPosition = 3 * Vector3.up;
         camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
 
@@ -51,7 +51,6 @@ public class SampleGraphSceneDirector : Director
         text1.transform.localPosition = new Vector3(4.5f, 2, 0);
         text1.SetIntrinsicScale(1f);
         text1.ScaleUpFromZero();
-
     }
 
     IEnumerator CurveExamples() {

@@ -21,6 +21,8 @@ public class SceneManager : PrimerObject
     internal PrimerObject sunLight;
     public Color backgroundColor;
 
+    [SerializeField] bool controlCamBackground = false;
+
     protected override void Awake() {
         base.Awake();
         if (this.enabled) {
@@ -57,7 +59,7 @@ public class SceneManager : PrimerObject
                 camSwivel = new GameObject("Cam Swivel");
             }
             camRig = camSwivel.AddComponent<CameraRig>();
-            camRig.SetUp();
+            camRig.SetUp(solidColor: controlCamBackground);
         }
     }
 }

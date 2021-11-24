@@ -48,9 +48,8 @@ public class CoinFlipSimManager : SimulationManager
         string path = Application.dataPath;
 
         // Todo: Figure out how to make this work if someone changed the directory name away from
-        // "PrimerUnity". Application.dataPath goes to the Assets folder.
-        // This is also a bit long.
-        path = Path.Combine(path, "PrimerUnity", "Simulator applications", "Probability games", "CoinFlipper", "coinFlipInitialConditions");
+        // "PrimerTools". Application.dataPath goes to the Assets folder.
+        path = Path.Combine(path, "PrimerTools", "Simulator applications", "Probability games", "CoinFlipper", "coinFlipInitialConditions");
         path = Path.Combine(path, "Resources");
         if (!Directory.Exists(path)) {
             Directory.CreateDirectory(path);

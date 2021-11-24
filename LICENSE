@@ -1,4 +1,40 @@
-MIT License
+This project has two licenses.
+
+All of the code is made available under the MIT license.
+
+The blob creature model, accessories, images, and related materials are made available under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC-BY-NC-SA) license. I tried to communicate which assets these are by putting the license abbreviation on the folder, but it still applies if any blob-related assets end up outside that folder at any point.
+
+================================================================================
+Commentary
+
+The point is for people to get as much use out of this as possible. 
+
+For the code, I chose the MIT license, since it protects from liability and only carries the constraint that people keep the license on copies of the code. Basically, you can go wild with it.
+
+For the blobs and blob-related material, there's a bit of a conflict. They are part of the YouTube channel's brand, and they aren't helpful for creating simulations or visualizations. They are mostly useful if you want to copycat the Primer brand somehow. But I also didn't want to keep them private since they might make it a lil more fun to try out the tool, and again, I want people to use it. So I settled on a less open license for them.
+
+Here's my quick summary of CC-BY-NC-SA, but official info is below.
+
+You can:
+- Use the blobs in personal or school projects without asking permission
+If publishing or sharing something that includes the blobs in any form, you must:
+- Attribute the blob to Primer
+- Include the same license on whatever you're sharing
+- Not use them in a project intended to generate money
+
+The main thing I'm trying to guard against is people posting videos with the blobs. If you do that and don't follow the license, I'm going to copyright claim it real quick like or otherwise HUNT YOU DOWN. D:<
+
+But seriously, you're better off developing your own aesthetic either way.
+
+================================================================================
+CC-BY-NC-SA details
+
+Human-readable summary from Creative Commons: https://creativecommons.org/licenses/by-nc-sa/4.0/
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+================================================================================
+
+MIT License details
 
 Copyright (c) 2021 Justin Helps
 

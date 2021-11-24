@@ -379,9 +379,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  controlCamBackground: 0
   mode: 0
   lightBackground: 0
   flipperManager: {fileID: 287199986}
+  blobPrefab: {fileID: 7222739926456098794, guid: 5b27ac516bad50a44a3719ba184633d3, type: 3}
 --- !u!4 &993854048
 Transform:
   m_ObjectHideFlags: 0

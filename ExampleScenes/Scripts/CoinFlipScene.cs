@@ -9,9 +9,8 @@ using TMPro;
 public class CoinFlipScene : Director
 {
     float camAngle = 17;
-    PrimerText p = null;
-    PrimerText d = null;
     [SerializeField] CoinFlipSimManager flipperManager = null;
+    [SerializeField] PrimerCharacter blobPrefab = null;
 
     protected override void Awake() {
         base.Awake();
@@ -33,17 +32,7 @@ public class CoinFlipScene : Director
     protected virtual IEnumerator Appear() {
         flipperManager.AddFlipper();
         flipperManager.ShowFlippers();
-        // p = Director.instance.NewPrimerText();
-        // d = Director.instance.NewPrimerText();
-
-        // List<int> factors = Helpers.GetPrimeFactorsOfFactorial(5);
-        // foreach (int f in factors) {
-        //     Debug.Log(f);
-        // }
-        // Debug.Log(Helpers.Choose(30, 7));
         yield return null;
-        // yield return new WaitForSeconds(2);
-        // flipper.FlipTest();
     }
     protected virtual IEnumerator MoreFlippers() {
         int totalFlippers = 25;
@@ -57,6 +46,7 @@ public class CoinFlipScene : Director
         camRig.MoveTo(Vector3.zero);
         camRig.RotateTo(Quaternion.Euler(40, 0, 0));
         yield return new WaitForSeconds(1);
+        flipperManager.flippers[12].flipperCharacterPrefab = blobPrefab;
         flipperManager.ShowFlippers(skip: 1);
         yield return new WaitForSeconds(1);
 

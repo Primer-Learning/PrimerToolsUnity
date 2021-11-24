@@ -248,7 +248,7 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   mode: 0
   lightBackground: 1
-  ballCreaturePrefab: {fileID: 7410055696088562293, guid: e796d89894311d246b4b6cbea63bb48d, type: 3}
+  blobCreaturePrefab: {fileID: 7222739926456098794, guid: 5b27ac516bad50a44a3719ba184633d3, type: 3}
   ground: {fileID: 2014881422}
 --- !u!4 &739953484
 Transform:

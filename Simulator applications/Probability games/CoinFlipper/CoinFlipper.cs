@@ -26,7 +26,7 @@ public class CoinFlipper : Simulator
     */
     internal PlayerType trueType = PlayerType.Fair;
     internal PlayerType labeledType = PlayerType.Unknown;
-    [SerializeField] PrimerCharacter flipperCharacterPrefab = null;
+    public PrimerCharacter flipperCharacterPrefab = null;
     [SerializeField] PrimerObject floorPrefab = null;
     
     internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
