@@ -8,6 +8,13 @@ using TMPro;
 
 public class DieRollScene : Director
 {
+    /*
+    This is a more involved scene director. It only uses one SceneBlock, though.
+    SceneBlocks are just for convenience.
+
+    The scene will break if the blobs run out of coins. I haven't handled that case yet.
+    */
+
     [Header("Scene parameters")]
     protected List<PrimerText> texts = new List<PrimerText>();
     protected Graph graph;
@@ -64,7 +71,7 @@ public class DieRollScene : Director
         yield return new WaitForSeconds(1);
         bucket.ScaleUpFromZero();
         yield return new WaitForSeconds(1);
-        bucket.AddCoins(10);
+        bucket.AddCoins(100);
         yield return new WaitForSeconds(2);
         camRig.RotateTo(Quaternion.Euler(75, 0, 0), duration: 2);
         yield return new WaitForSeconds(2);
@@ -74,10 +81,6 @@ public class DieRollScene : Director
 
         camRig.RotateTo(Quaternion.Euler(17, 0, 0));
         camRig.MoveTo(0.5f * Vector3.up);
-        // mainRoller.MoveTo(new Vector3(-2.5f, -1.5f, 0));
-        // mainRoller.ScaleTo(0.1f);
-        // bucket.MoveTo(new Vector3(-0.75f, -1.5f, 0));
-        // bucket.ScaleTo(0.1f);
         graph.transform.localPosition = new Vector3(-2.25f, 0.7f, 2);
         graph.ScaleTo(0.65f);
         yield return new WaitForSeconds(1);
@@ -105,6 +108,9 @@ public class DieRollScene : Director
         group.ScaleTo(Vector3.one * 0.15f);
         group.MoveTo(new Vector3(-1.4f, -0.25f, -0.8f));
         yield return AddRollerGridSpherical(5, 5, 5, group, 4, fade: true);
+
+        // This acceleration makes the preview pretty janky, but if the director is in 
+        // DirectorMode.ConstantFrameRate, the recording looks pretty smooth.
         yield return Accelerate(5, 3);
 
         while (game.IsPlaying()) {
@@ -178,10 +184,9 @@ public class DieRollScene : Director
 
     IEnumerator Accelerate(float target, float realtimeDuration) {
         int beginFrame = Time.frameCount;
-        // Debug.Log("Accel begin frame: " + Time.frameCount.ToString());
-        // Realtime duration in seconds assumes 60 fps
-        // target = current * rate ^ ( 60 * realtimeDuration )
-        float rate = Mathf.Pow(2, ( Mathf.Log(target / Time.timeScale, 2) / ( 60 * realtimeDuration ) ) );
+
+        // target = current * rate ^ ( videoFrameRate * realtimeDuration )
+        float rate = Mathf.Pow(2, ( Mathf.Log(target / Time.timeScale, 2) / ( videoFrameRate * realtimeDuration ) ) );
         if (rate > 1) {
             while (Time.timeScale < target) {
                 Time.timeScale *= rate;
@@ -195,7 +200,7 @@ public class DieRollScene : Director
             }
         }
         Time.timeScale = target;
-        Debug.Log($"Accel frame duration was {Time.frameCount - beginFrame}, should be {60 * realtimeDuration}");
+        Debug.Log($"Accel frame duration was {Time.frameCount - beginFrame}, should be {videoFrameRate * realtimeDuration}");
     }
 
     IEnumerator AddRollerGridSpherical(int width, int height, int depth, PrimerObject group, float duration, bool fade = false) {
@@ -255,7 +260,5 @@ public class DieRollScene : Director
     //Construct schedule
     protected override void DefineSchedule() {
         new SceneBlock(1, StartGame);
-        // new SceneBlock(2f, Go);
-        // new SceneBlock(3f, acceltest);
     }
 }

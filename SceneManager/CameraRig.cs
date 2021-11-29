@@ -10,7 +10,6 @@ public class CameraRig : PrimerObject
 
     internal Camera cam;
     internal PrimerObject camObject;
-    bool recording = false;
     RenderTexture rt = null;
     Texture2D image = null;
 

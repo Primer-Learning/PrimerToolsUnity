@@ -245,8 +245,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63d5bf909fd9b3c44b775263c189da13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  cam: {fileID: 0}
+  camRig: {fileID: 0}
+  useEditorVals: 1
   mode: 0
+  recordOnPlay: 0
+  videoFrameRate: 60
+  resolutionWidth: 1920
+  resolutionHeight: 1080
+  everyNFrames: 1
   lightBackground: 1
   blobCreaturePrefab: {fileID: 7222739926456098794, guid: 5b27ac516bad50a44a3719ba184633d3, type: 3}
   ground: {fileID: 2014881422}

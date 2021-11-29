@@ -9,7 +9,6 @@ using TMPro;
 public class CoinFlipScene : Director
 {
     [Header("Scene parameters")]
-    float camAngle = 17;
     [SerializeField] CoinFlipSimManager flipperManager = null;
     [SerializeField] PrimerCharacter blobPrefab = null;
     [SerializeField] GameObject blobCoin = null;
@@ -23,7 +22,7 @@ public class CoinFlipScene : Director
 
         camRig.cam.transform.localPosition = new Vector3(0, 0, -7.5f);
         camRig.transform.localPosition = new Vector3(0, 1, 0);
-        camRig.transform.localRotation = Quaternion.Euler(camAngle, 0, 0);
+        camRig.transform.localRotation = Quaternion.Euler(17, 0, 0);
 
         flipperManager.Initialize();
         base.Start();
@@ -31,6 +30,7 @@ public class CoinFlipScene : Director
 
     //Define event actions
     IEnumerator Appear() {
+        // Show the first flipper
         flipperManager.AddFlipper();
         flipperManager.ShowFlippers();
         yield return null;
@@ -38,6 +38,7 @@ public class CoinFlipScene : Director
     IEnumerator MoreFlippers() {
         int totalFlippers = 25;
 
+        // Add the other flippers
         CoinFlipper toSkip = flipperManager.flippers[0];
         flipperManager.AddFlippers(totalFlippers - 1);
         flipperManager.flippers.Remove(toSkip);
@@ -51,9 +52,11 @@ public class CoinFlipScene : Director
         flipperManager.flippers[12].coinPrefab = blobCoin;
         flipperManager.ShowFlippers(skip: 1);
         yield return new WaitForSeconds(1);
-
-        // Test!
-        yield return flipperManager.testFlippers(26, 18);
+        
+        // Do the flips
+        // This actually tries to judge whether they are cheaters, but that's
+        // irrelevant in this scene.
+        yield return flipperManager.testFlippers(24, 18);
         yield return new WaitForSeconds(1);
         flipperManager.WrapUp();
     }
@@ -72,7 +75,7 @@ public class CoinFlipScene : Director
     
     //Construct schedule
     protected override void DefineSchedule() {
-        new SceneBlock(0, 0f, Appear);
+        new SceneBlock(0, Appear);
         new SceneBlock(3, MoreFlippers, flexible: true);
         new SceneBlock(4, disappear);
     }

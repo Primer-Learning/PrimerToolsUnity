@@ -14,8 +14,6 @@ public class SampleGraphSceneDirector : Director
 
     protected override void Awake() {
         base.Awake();
-        //Do initialization stuff here
-        //e.g., set object scale to zero if they're going to scale in
         camRig.cam.transform.localPosition = new Vector3(0, 0, -11);
         camRig.transform.localPosition = 3 * Vector3.up;
         camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
@@ -46,15 +44,16 @@ public class SampleGraphSceneDirector : Director
         yield return new WaitForSeconds(1);
 
         text1.tmpro.text = "Sample text";
-        //text1.transform.parent = graph.transform;
         text1.tmpro.alignment = TextAlignmentOptions.Center;
         text1.transform.localPosition = new Vector3(4.5f, 2, 0);
         text1.SetIntrinsicScale(1f);
         text1.ScaleUpFromZero();
+        yield return new WaitForSeconds(1);
     }
 
     IEnumerator CurveExamples() {
         StartCoroutine(ChangeText(text1, "Curves"));
+        yield return new WaitForSeconds(1);
         float ExampleFunctionCurve(float x) => x * x / 10;
         float ExampleFunctionCurve2(float x) => 5 + 4 * Mathf.Sin(x);
         CurveData efc = graph.AddCurve(ExampleFunctionCurve, "EFC");
@@ -81,21 +80,24 @@ public class SampleGraphSceneDirector : Director
         efc.WipeCurveAnimation();
         yield return new WaitForSeconds(1f);
         edc.WipeCurveAnimation();
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1);
     }
 
     IEnumerator SurfaceExamples() {
         StartCoroutine(ChangeText(text1, "Surfaces"));
+        yield return new WaitForSeconds(1);
         float ExampleSurface(float x, float z) => 4 - x / 10f - z;
         SurfaceData es = graph.AddSurface(ExampleSurface, "ES");
-        es.AnimateX(duration: 0.5f);
+        es.AnimateX(duration: 1);
         yield return new WaitForSeconds(2);
 
         es.WipeSurfaceX();
+        yield return new WaitForSeconds(1);
     }
 
     IEnumerator PointExample() {
         StartCoroutine(ChangeText(text1, "Points"));
+        yield return new WaitForSeconds(1);
         Vector3 pointPos = new Vector3 (2, 5, 0);
         PointController point = graph.pointData.AddPoint(pointPos, "point", scale: 0.3f);
         point.ActivatePoint(duration: 0.5f);
@@ -106,12 +108,13 @@ public class SampleGraphSceneDirector : Director
 
         yield return new WaitForSeconds(1);
         point.DeactivatePoint(duration: 0.5f);
+        yield return new WaitForSeconds(1);
     }
 
     IEnumerator StackedAreasExample() {
         //Stacked areas are pretty janky, tbh
-
         StartCoroutine(ChangeText(text1, "Stacked Areas"));
+        yield return new WaitForSeconds(1);
         List<float> func1 = new List<float>() {1f, 2f, 1f, 2f, 1f, 2f};
         List<float> func2 = new List<float>() {1f, 2f, 3f, 4f, 5f, 6f};
         StackedAreaData stackedArea = graph.AddStackedArea();
@@ -121,7 +124,7 @@ public class SampleGraphSceneDirector : Director
         stackedArea.SetColors(c1, c2);
 
         stackedArea.AnimateX();
-        yield return null;
+        yield return new WaitForSeconds(2);
     }
     
     IEnumerator Disappear() {
@@ -141,12 +144,14 @@ public class SampleGraphSceneDirector : Director
     
     //Construct schedule
     protected override void DefineSchedule() {
-        new SceneBlock(0f, Appear);
-        new SceneBlock(2f, CurveExamples, flexible: true);
-        //When flexible is true, the following starts right after StopWaiting is called.
-        new SceneBlock(8f, SurfaceExamples);
-        new SceneBlock(13f, PointExample);
-        new SceneBlock(17f, StackedAreasExample);
-        new SceneBlock(20f, Disappear);
+        // in this case, I don't care about the exact timings.
+        // I just want them to happen one after another, so they 
+        // are all flexible.
+        new SceneBlock(0f, Appear, flexible: true);
+        new SceneBlock(1f, CurveExamples, flexible: true);
+        new SceneBlock(2f, SurfaceExamples, flexible: true);
+        new SceneBlock(3f, PointExample, flexible: true);
+        new SceneBlock(4f, StackedAreasExample, flexible: true);
+        new SceneBlock(5f, Disappear);
     }
 }
