@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class SimpleSceneDirector : Director
 {
+    [Header("Scene parameters")]
     [SerializeField] PrimerCharacter blobCreaturePrefab = null;
     [SerializeField] GameObject ground = null;
     PrimerCharacter blobCreature;
     protected override void Awake() {
         base.Awake();
         //Do initialization stuff here
-        camRig.SetUp(solidColor: false);
+        // camRig.SetUp(solidColor: false);
         camRig.GoToStandardPositions();
     }
 

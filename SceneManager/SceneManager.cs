@@ -9,19 +9,22 @@ using TMPro;
 public class SceneManager : PrimerObject 
 {
     public static SceneManager instance;
-    protected CameraRig camRig;
-    protected GameObject camSwivel;
+    
+    [Header("Camera default overrides")]
+    public Camera cam;
+    public CameraRig camRig;
+    public bool useEditorVals = false;
+
+    // RNG init
     internal static System.Random sceneRandom;
     internal static System.Random sceneRandom2; //Sometimes it's useful to have separate rng for visual purposes
 
+    // Prefab vars, probably not necessary to do this here
     internal PrimerArrow primerArrowPrefab;
     internal PrimerBracket primerBracketPrefab;
     internal PrimerText textPrefab;
     internal Graph graphPrefab;
     internal PrimerObject sunLight;
-    public Color backgroundColor;
-
-    [SerializeField] bool controlCamBackground = false;
 
     protected override void Awake() {
         base.Awake();
@@ -50,16 +53,22 @@ public class SceneManager : PrimerObject
                 if (sunLight == null) {
                     Debug.LogWarning("Cannot find light");
                 }
-                sunLight.GetComponent<Light>().color = Color.white;
             }
         
-            //Make Camera
-            camSwivel = GameObject.Find("Cam Swivel");
-            if (camSwivel == null) {
-                camSwivel = new GameObject("Cam Swivel");
+            //Make camera rig if it doesn't exist
+            if (camRig == null) {
+                camRig = new GameObject("Cam Swivel").AddComponent<CameraRig>();
             }
-            camRig = camSwivel.AddComponent<CameraRig>();
-            camRig.SetUp(solidColor: controlCamBackground);
+            if (cam == null) {
+                cam = Camera.main;
+            }
+            camRig.SetUp();
+            if (!useEditorVals) {
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = PrimerColor.Gray;
+                cam.backgroundColor = new Color(cam.backgroundColor.r, cam.backgroundColor.g, cam.backgroundColor.b, 0);
+                sunLight.GetComponent<Light>().color = Color.white;
+            }
         }
     }
 }

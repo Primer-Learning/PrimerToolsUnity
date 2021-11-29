@@ -8,6 +8,7 @@ using TMPro;
 
 public class DieRollScene : Director
 {
+    [Header("Scene parameters")]
     protected List<PrimerText> texts = new List<PrimerText>();
     protected Graph graph;
     PrimerText totalRolls = null;

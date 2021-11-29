@@ -8,6 +8,7 @@ using TMPro;
 
 public class CoinFlipScene : Director
 {
+    [Header("Scene parameters")]
     float camAngle = 17;
     [SerializeField] CoinFlipSimManager flipperManager = null;
     [SerializeField] PrimerCharacter blobPrefab = null;
@@ -20,7 +21,6 @@ public class CoinFlipScene : Director
         // When designing the coins, I set gravity to 2x for some reason (the reason is laziness!)
         Physics.gravity = new Vector3(0, -9.81f * 2, 0);
 
-        camRig.SetUp();
         camRig.cam.transform.localPosition = new Vector3(0, 0, -7.5f);
         camRig.transform.localPosition = new Vector3(0, 1, 0);
         camRig.transform.localRotation = Quaternion.Euler(camAngle, 0, 0);

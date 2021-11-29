@@ -334,8 +334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62c62a1fadc5431468e047494dd11d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backgroundColor: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0}
-  controlCamBackground: 1
+  cam: {fileID: 963194227}
+  camRig: {fileID: 0}
   mode: 0
   lightBackground: 0
   rollerGroup: {fileID: 1440431229}

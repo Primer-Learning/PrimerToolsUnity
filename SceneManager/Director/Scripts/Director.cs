@@ -1,29 +1,61 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEditor;
 using TMPro;
 
+public enum DirectorMode {
+    Normal, //Normal mode, keeps game time and real time close
+    SkipSimAnimations, //Skips some yield statements so we don't wait for animations
+    ConstantFrameRate //Sets captureFramerate ensure constant framerate output, real and game time diverge
+}
 public class Director : SceneManager
 {
     private bool paused;
     internal bool animating = true;
     internal float timeBehind; //For adjusting effective timing after events with flexible timing
+
+    [Header("Mode select")]
     [SerializeField] protected DirectorMode mode;
+
+    [Header("Recording options")]
+    [SerializeField] bool recordOnPlay;
+    public int videoFrameRate = 60;
+    public int resolutionWidth = 1920;
+    public int resolutionHeight = 1080;
+    public int everyNFrames = 1;
+    string frameOutDir = null;
+    bool recording = false;
+
+    [Header("Testing options")]
     [SerializeField] bool lightBackground = false;
 
+    [Header("Scene parameters")]
+    // So subclasses will have this header automatically
+    // But it doesn't work!
+
+    // Some reference displays that might be useful, but I rarely use anymore
     TextMeshProUGUI timeDisplay = null;
     TextMeshProUGUI frameDisplay = null;
     TextMeshProUGUI timeScaleDisplay = null;    
+
+    // Media references to test how animations sync with voice or other video
     ReferenceScreen referenceScreenPrefab = null;
     internal AudioSource voiceOverReference;
     internal static List<SceneBlock> schedule = new List<SceneBlock>();
-    protected virtual void DefineSchedule() {}
     internal AudioSource doneAlarm;
 
+    protected virtual void DefineSchedule() {}
+
     protected virtual void Start() {
+        if (lightBackground) { camRig.cam.backgroundColor = Color.gray; }
+        if (recordOnPlay) {
+            StartRecording();
+        }
+
         // override in subclass
         StartCoroutine(playScene());
     }
@@ -35,7 +67,7 @@ public class Director : SceneManager
 
             sb.actualStartTime = Time.time;
 
-            if (voiceOverReference != null && mode == DirectorMode.AnimationTesting) {
+            if (voiceOverReference != null && mode == DirectorMode.Normal) {
                 voiceOverReference.time = sb.scheduledStartTime;
                 voiceOverReference.Play();
             }
@@ -48,9 +80,8 @@ public class Director : SceneManager
         foreach (PrimerObject po in allPOs) {
             po.Disappear();
         }
-        if (mode == DirectorMode.Recording) {
-            yield return new WaitForSeconds(1); // Extra second to hopefully avoid early cutoff mistakes.
-            camRig.StopRecording();
+        if (mode == DirectorMode.ConstantFrameRate) {
+            StopRecording(delay: 1); //Delay by one second to give a buffer
         }
         if (doneAlarm != null) {
             doneAlarm.loop = false;
@@ -107,30 +138,25 @@ public class Director : SceneManager
     internal DirectorMode GetDirectorMode() {
         return mode;
     }
-    internal void SetDirectorMode(DirectorMode newMode, bool startRecording = true) {
+    internal void SetDirectorMode(DirectorMode newMode) {
         mode = newMode;
         switch (mode) 
         {
-            case DirectorMode.SimTesting:
+            case DirectorMode.SkipSimAnimations:
                 Time.captureFramerate = 0;
                 animating = false;
                 Debug.LogWarning("Animations may be messed up. This is a trial run.");
                 break;
-            case DirectorMode.AnimationTesting:
+            case DirectorMode.Normal:
                 Time.captureFramerate = 0;
                 animating = true;
                 break;
-            case DirectorMode.Recording:
-                Time.captureFramerate = 60;
+            case DirectorMode.ConstantFrameRate:
+                Time.captureFramerate = videoFrameRate;
                 animating = true;
-                if (startRecording) {
-                    camRig.StartRecording();
-                }
                 break;
         }
-        if (lightBackground) { backgroundColor = Color.gray; }
     }
-
     protected override void Awake() {   
         base.Awake();
         if (this.enabled) {
@@ -193,8 +219,64 @@ public class Director : SceneManager
         }
     }
 
-    void SetUpTimeDisplays() {
-        // Maybe do this if it seems useful
+    void StartRecording(int everyNFrames = 1) {
+        cam.enabled = false;
+
+        // In frameOutDir, make a folder with the director's name, if it doesn't exist
+        if (frameOutDir == null) {
+            frameOutDir = Directory.GetCurrentDirectory();
+            Debug.LogWarning($"Frame capture directory not set. Setting to {frameOutDir}.");
+        }
+        string path = Path.Combine(frameOutDir, "png", Director.instance.gameObject.name + "_recordings");
+        Directory.CreateDirectory(path);
+
+        // Make a new folder with a take number
+        string takeDir = "";
+        if (takeDir == "") {
+            int index = 0;
+            string basePath = path;
+            while (Directory.Exists(path)){
+                index++; // It starts with one...
+                                        // One thing. I don't know why.
+                                        // It doesn't even matter how hard you try.
+                                        // Keep that in mind, I designed this rhyme
+                                        // to explain in due time...
+                         // All I know...
+                path = Path.Combine(basePath, $"take {index}");
+            }
+        }
+        Directory.CreateDirectory(path);
+        
+        // Pass this folder to the coroutine to let it save each frame.
+        recording = true;
+        StartCoroutine(startRecording(path));
+    }
+    IEnumerator startRecording(string path) {
+        //Save frame with frame numbe
+        int framesSeen = 0;
+        int framesSaved = 0;
+        while (recording) {
+            yield return new WaitForEndOfFrame();
+            if (Time.frameCount > 999999) { Debug.LogWarning("y tho"); }
+            if (framesSeen % everyNFrames == 0) {
+                string fileName = framesSaved.ToString("000000");
+                fileName += ".png";
+                fileName = Path.Combine(path, fileName);
+                camRig.RenderToPNG(fileName, resolutionWidth, resolutionHeight);
+                framesSaved++;
+            }
+            framesSeen++;
+        }
+    }
+    internal void StopRecording(float delay = 0) {
+        StartCoroutine(stopRecording(delay));
+    }
+    IEnumerator stopRecording(float delay) {
+        if (delay > 0) {
+            yield return new WaitForSeconds(delay);
+        }
+        recording = false;
+        yield return null;
     }
 }
 
@@ -228,10 +310,4 @@ public class WaitUntilSceneTime : CustomYieldInstruction {
             Debug.LogWarning($"Instruction to WaitUntilSceneTime({m}:{s}) comes too late by {lateAmount}s.");
         }
     }
-}
-
-public enum DirectorMode {
-    AnimationTesting, //Normal mode, keeps game time and real time close
-    SimTesting, //Skips some yield statements so we don't wait for animations
-    Recording //Sets captureFramerate ensure constant framerate output, real and game time diverge
 }

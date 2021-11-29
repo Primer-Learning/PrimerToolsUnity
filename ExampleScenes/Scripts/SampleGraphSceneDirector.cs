@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class SampleGraphSceneDirector : Director
 {
+    [Header("Scene parameters")]
     //These are instantiated from prefabs linked to Director class
     private Graph graph;
 
@@ -15,7 +16,6 @@ public class SampleGraphSceneDirector : Director
         base.Awake();
         //Do initialization stuff here
         //e.g., set object scale to zero if they're going to scale in
-        camRig.SetUp(solidColor: false);
         camRig.cam.transform.localPosition = new Vector3(0, 0, -11);
         camRig.transform.localPosition = 3 * Vector3.up;
         camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
