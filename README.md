@@ -20,15 +20,19 @@ Other use cases I can think of are:
 
 To be useful for any of that, though, it's going to take more than me working on it. I'm not a software engineer, gamedev, or artist by training. If happen to know what you're doing on any of those fronts, you'll discover pretty quickly that I've taken some silly approaches along the way. I'm very open to suggestions or contributions of any sort, big or small.
 
-## Getting started
+## Set up
+
+#### Requirements
 
 This code only works inside of a Unity project, so you'll need to [download Unity](https://unity.com/) create a project. It's free for personal use. This project uses Unity 2020.3.20f1, but you're probably fine if you have a different recent version.
+
+Some objects in the repo are in the form of .blend files, so you'll need to have Blender installed for Unity to be able to interpret those.
+
+#### Getting started
 
 If you're just planning to use it, your best bet is probably to download Primer.unitypackage from the root directory and import that into your Unity project. Another option is to download the whole repo, unzip it, and drop it into the Assets folder of your Unity project.
 
 If you think you might contribute to the tool, I recommend setting it up as a submodule inside your Unity project's repo. Or, you can just clone this repo into your Assets folder if you don't want to use git for your Unity project.
-
-This repo uses git-LFS (Large File Storage) to handle some .blend files, so cloning might not work if you don't have that configured. So either [get that set up](https://git-lfs.github.com/) or just download the repo as a zip file. 
 
 If you run into other issues when setting up, [this might be helpful](https://thoughtbot.com/blog/how-to-git-with-unity).
 
