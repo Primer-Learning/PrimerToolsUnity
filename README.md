@@ -26,7 +26,7 @@ To be useful for any of that, though, it's going to take more than me working on
 
 This code only works inside of a Unity project, so you'll need to [download Unity](https://unity.com/) create a project. It's free for personal use. This project uses Unity 2020.3.20f1, but you're probably fine if you have a different recent version.
 
-Some objects in the repo are in the form of .blend files, so you'll need to have Blender installed for Unity to be able to interpret those.
+Some objects in the repo are in the form of .blend files, so you'll need to have [Blender](https://www.blender.org/download/) installed for Unity to be able to interpret those.
 
 #### Getting started
 
@@ -34,7 +34,7 @@ If you're just planning to use it, your best bet is probably to download Primer.
 
 If you think you might contribute to the tool, I recommend setting it up as a submodule inside your Unity project's repo. Or, you can just clone this repo into your Assets folder if you don't want to use git for your Unity project.
 
-If you run into other issues when setting up, [this might be helpful](https://thoughtbot.com/blog/how-to-git-with-unity).
+If you are planning to use git for your Unity project, [this might be helpful](https://thoughtbot.com/blog/how-to-git-with-unity).
 
 Once you get it open, there are four sample scenes. I'd recommend going through them in the order below. They also have some comments to help explain what they are doing.
 
