@@ -18,7 +18,7 @@ Other use cases I can think of are:
 
 - Academic researchers and teachers using it to animate their models or create 3D visualizations
 
-To be useful for any of that, though, it's going to take more than me working on it. I'm not a software engineer, gamedev, or artist by training. If happen to know what you're doing on any of those fronts, you'll discover pretty quickly that I've taken some silly approaches along the way. I'm very open to suggestions or contributions of any sort, big or small.
+To be useful for any of that, though, it's going to take more than me working on it. I'm not a software engineer, gamedev, or artist by training. If you happen to know what you're doing on any of those fronts, you'll discover pretty quickly that I've taken some silly approaches along the way. I'm very open to suggestions or contributions of any sort, big or small.
 
 ## Set up
 
