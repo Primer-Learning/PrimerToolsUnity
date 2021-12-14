@@ -11,7 +11,8 @@ public enum PlayerType {
 } 
 public enum ResultsDisplayMode {
     Gallery,
-    Numeric
+    Numeric,
+    Individual
 }
 public class CoinFlipper : Simulator 
 {
@@ -73,6 +74,8 @@ public class CoinFlipper : Simulator
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
 
+    internal float displayDistance = 5f;
+
     internal void Appear(float stagger = 0.25f) {
         flipperCharacter = Instantiate(flipperCharacterPrefab);
         flipperCharacter.transform.parent = transform;
@@ -106,18 +109,18 @@ public class CoinFlipper : Simulator
             c.ScaleDownToZero(duration: duration);
         }
     }
-    internal void Flip() {
-        StartCoroutine(flip());
+    internal void Flip(int outcome = -1) {
+        StartCoroutine(flip(outcome));
     }
-    IEnumerator flip() {
+    IEnumerator flip(int outcome = -1) {
         flipperCharacter.animator.SetTrigger("Scoop"); 
 
         //Spawn coin
-        SpawnCoin();
+        SpawnCoin(outcome);
         yield return new WaitForSeconds(tossDelay);
         TossCoin();
     }
-    void SpawnCoin() {
+    void SpawnCoin(int outcome = -1) {
         coin = Instantiate(coinPrefab).MakePrimerObject();
         coin.GetComponent<Rigidbody>().velocity = Vector3.zero;
         coin.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
@@ -126,7 +129,7 @@ public class CoinFlipper : Simulator
         // coin.transform.localScale = Vector3.one;
         coin.transform.localPosition = sourceDisp;
         int extraRot = 0;
-        if (SceneManager.sceneRandom.NextDouble() < headsRate) { 
+        if (outcome == 1 || (outcome == -1 && SceneManager.sceneRandom.NextDouble() < headsRate)) { 
             extraRot = 180; 
             expectedHeads = true;
         } else { expectedHeads = false; }
@@ -146,7 +149,7 @@ public class CoinFlipper : Simulator
         // Character starts looking at coin here
         flipperCharacter.StartLookingAt(coin.transform, correctionVector: Vector3.down); 
     }
-    IEnumerator waitUntilCoinIsStopped() {
+    public IEnumerator waitUntilCoinIsStopped() {
         Rigidbody co = coin.GetComponent<Rigidbody>();
         // Check that it's still twice, a small delay apart
         // Or just quit if it has been too long. Idk how to reliably have it settle to zero motion.
@@ -223,11 +226,29 @@ public class CoinFlipper : Simulator
         int res = GetResult();
         results.Add(res);
         int numResults = results.Count;
-
-        if (resultsDisplayMode == ResultsDisplayMode.Gallery) {
+        if (resultsDisplayMode == ResultsDisplayMode.Individual) {
             displayCoins.Add(coin);
             // Put the coin where it goes
             coin.GetComponent<Rigidbody>().isKinematic = true;
+            Vector3 front = Camera.main.transform.forward * displayDistance;
+            coin.MoveTo(Camera.main.transform.position + front);
+            if (res == 1)
+            {
+                coin.RotateTo(Quaternion.Euler(0, 180, 0));
+            }
+            else { coin.RotateTo(Quaternion.Euler(0, 0, 180)); }
+            yield return new WaitForSeconds(1.5f);
+            coin.transform.parent = display.transform;
+            Vector3 dest = new Vector3((numResults - 1) % displayRowLength, -(numResults - 1) / displayRowLength, 0);
+            coin.MoveTo(dest * displayCoinSpacing);
+            coin.ScaleTo(coin.GetIntrinsicScale());
+            yield return new WaitForSeconds(0.5f);
+        }
+        else if (resultsDisplayMode == ResultsDisplayMode.Gallery) {
+            displayCoins.Add(coin);
+            // Put the coin where it goes
+            coin.GetComponent<Rigidbody>().isKinematic = true;
+            
             coin.transform.parent = display.transform;
             Vector3 dest = new Vector3((numResults - 1) % displayRowLength, -(numResults - 1) / displayRowLength, 0);
             coin.MoveTo(dest * displayCoinSpacing);
@@ -295,14 +316,14 @@ public class CoinFlipper : Simulator
         return (float) probabilityAtLeastExtreme;
     }
 
-    internal void FlipAndRecord(int repetitions = 1) {
-        StartCoroutine(flipAndRecord(repetitions: repetitions));
+    internal void FlipAndRecord(int outcome = -1, int repetitions = 1) {
+        StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions));
     }
-    internal IEnumerator flipAndRecord(int repetitions = 1) {
+    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1) {
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
             SetFlipParameters();
-            Flip();
+            Flip(outcome);
             yield return waitUntilCoinIsStopped();
             yield return recordAndDisplay();
             currentlyFlipping = false;
@@ -348,7 +369,7 @@ public class CoinFlipper : Simulator
         }
         else {
             // Section for choosing valid initial conditions
-            if (!manager.savingNewParameters) {
+            if (!manager.refiningOldParameters) {
                 currentICs = manager.validInitialConditions[manager.icParameterIndex];
                 manager.icParameterIndex = (manager.icParameterIndex + 1) % manager.validInitialConditions.Count;
                 // Debug.Log(manager.icParameterIndex);
