@@ -74,7 +74,7 @@ public class CoinFlipper : Simulator
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
 
-    internal float displayDistance = 5f;
+    internal Vector3 individualOffset = new Vector3(0f, 1f, 5f);
 
     internal void Appear(float stagger = 0.25f) {
         flipperCharacter = Instantiate(flipperCharacterPrefab);
@@ -230,7 +230,7 @@ public class CoinFlipper : Simulator
             displayCoins.Add(coin);
             // Put the coin where it goes
             coin.GetComponent<Rigidbody>().isKinematic = true;
-            Vector3 front = Camera.main.transform.forward * displayDistance;
+            Vector3 front = individualOffset;
             coin.MoveTo(Camera.main.transform.position + front);
             if (res == 1)
             {

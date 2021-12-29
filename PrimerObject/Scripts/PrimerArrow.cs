@@ -10,6 +10,11 @@ public class PrimerArrow : PrimerObject
 
     float currentLength;
 
+    public void SetWidth(float width)
+    {
+        transform.localScale = Vector3.one * width;
+    }
+
     public void SetLength(float length) {
         shaftRoot.transform.localPosition = new Vector3 (
             length / transform.localScale.x,
@@ -29,18 +34,20 @@ public class PrimerArrow : PrimerObject
         currentLength = length;
     }
 
-    public void SetFromTo(Vector3 from, Vector3 to, float buffer = 0f) {
+    public void SetFromTo(Vector3 from, Vector3 to, float endBuffer = 0f, float startBuffer = 0f) {
         //HandleBuffer
         float length = (from - to).magnitude;
-        float bufferFac = buffer / length;
-        to = Vector3.Lerp(to, from, bufferFac);
-        length -= buffer;
+        float startBufferFac = startBuffer / length;
+        float endBufferFac = endBuffer / length;
+        Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
+        Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
+        length -= endBuffer + startBuffer;
 
         //Move object
-        transform.localPosition = to;
+        transform.localPosition = bTo;
         SetLength(length);
         //Assume we're looking at the local xy plane. This thing is flat.
-        float rads = Mathf.Atan2((from - to).y, (from - to).x);
+        float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
         transform.localRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
     }
 
