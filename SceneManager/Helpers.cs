@@ -117,7 +117,7 @@ public static class Helpers
     }
     public static List<Vector3> CalculateGridPositions(int numRows, int numColumns, float spacing, string plane = "xz") {
         List<Vector3> positions = new List<Vector3>();
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
                 float z = spacing * (i - (float)(numColumns - 1) / 2);
                 float x = spacing * (j - (float)(numRows - 1) / 2);

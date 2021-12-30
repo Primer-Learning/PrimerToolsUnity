@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CoinFlipSimManager : SimulationManager
 {
-    [SerializeField] CoinFlipper flipperPrefab = null;
+    internal CoinFlipper flipperPrefab = null;
     internal List<CoinFlipper> flippers = new List<CoinFlipper>();
     // Faking the physics
     public bool savingNewParameters;
@@ -28,12 +28,16 @@ public class CoinFlipSimManager : SimulationManager
     internal List<CoinFlipper> falseNegatives;
     internal List<CoinFlipper> falsePositives;
 
-    internal void Initialize() {
+    internal void Initialize(CoinFlipper flipperPrefabArg = null) {
         SetUpPhysicsPath();
         if (!savingNewParameters) {
             try { UnpackInitialConditions(); }
             catch { savingNewParameters = true; }
         }
+        if (flipperPrefabArg == null) {
+            flipperPrefabArg = Resources.Load<CoinFlipper>("FlipperPrefab");
+        }
+        flipperPrefab = flipperPrefabArg;
     }
     internal void WrapUp() {
         if (savingNewParameters || refiningOldParameters) {
@@ -176,7 +180,7 @@ public class CoinFlipSimManager : SimulationManager
     internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, float duration = 0) {
         List<Vector3> positions = Helpers.CalculateGridPositions(numRows, numColumns, spacing);
         if (flippers.Count > positions.Count) {
-            Debug.LogError("Not enough positions for all flippers");
+            Debug.LogError($"Only {positions.Count} positions for {flippers.Count} flippers");
         }
         if (duration == 0) {
             for (int i = 0; i < flippers.Count; i++) {
