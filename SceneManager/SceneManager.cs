@@ -56,13 +56,12 @@ public class SceneManager : PrimerObject
             }
         
             //Make camera rig if it doesn't exist
-            if (camRig == null) {
-                camRig = new GameObject("Cam Swivel").AddComponent<CameraRig>();
-            }
             if (cam == null) {
                 cam = Camera.main;
             }
-            camRig.SetUp();
+            if (camRig == null) {
+                camRig = cam.gameObject.AddComponent<CameraRig>();
+            }
             if (!useEditorVals) {
                 cam.clearFlags = CameraClearFlags.SolidColor;
                 cam.backgroundColor = PrimerColor.Gray;

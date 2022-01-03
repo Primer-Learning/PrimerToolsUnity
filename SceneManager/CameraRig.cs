@@ -9,37 +9,37 @@ public class CameraRig : PrimerObject
     // Makes it easy to rotate the camera around a center
 
     internal Camera cam;
-    internal PrimerObject camObject;
     RenderTexture rt = null;
     Texture2D image = null;
 
-    internal void SetUp(bool solidColor = true) {
-        cam = SceneManager.instance.cam; 
-        cam.transform.parent = transform;
-        camObject = cam.gameObject.AddComponent<PrimerObject>();
+    Vector3 swivelOrigin = Vector3.zero;
+    Vector3 swivelAxis = Vector3.up;
+    private float swivelAngle = 0;
+    public float SwivelAngle {
+        get { return swivelAngle; }
+        set {
+            float angleDiff = value - swivelAngle;
+            transform.RotateAround(swivelOrigin, swivelAxis, angleDiff);
+            // transform.Rotate(swivelAxis, angleDiff);
+            swivelAngle = value;
+        }
     }
-    public void GoToStandardPositions() {
-        cam.transform.localPosition = new Vector3 (0, 0, -10);
-        cam.transform.localRotation = Quaternion.identity;
 
-        transform.localPosition = new Vector3(0, 1, 0);
-        transform.localRotation = Quaternion.Euler(16, 0, 0);
+    void Awake() {
+        cam = SceneManager.instance.cam; 
     }
     public void GrabLight() {
         GameObject light = GameObject.Find("Directional Light");
-        light.transform.parent = cam.transform;
+        light.transform.parent = transform;
     }
-    internal void MoveRigCenter(Vector3 c) {
-        // Move rig after storing global position
-        Vector3 prevGlobal = transform.position;
-        transform.localPosition = c;
-
-        // Now move the child camera to put it back where it was
-        cam.transform.position -= transform.position - prevGlobal;
-    }
-
     public void ZoomTo(float distance, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-        camObject.MoveTo(new Vector3 (camObject.transform.localPosition.x, camObject.transform.localPosition.y, -distance), duration, ease);
+        MoveTo(-transform.forward * distance + swivelOrigin, duration, ease);
+    }
+
+    public void SwivelTo(float angle, Vector3? point = null, Vector3? axis = null, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+        if (point != null) { swivelOrigin = point.Value; }
+        if (axis != null) { swivelAxis = axis.Value; }
+        AnimateValue<float>("SwivelAngle", angle, duration: duration, ease: ease);
     }
 
     internal void RenderToPNG(string path, int resWidth, int resHeight) {
