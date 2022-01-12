@@ -142,7 +142,6 @@ public class CoinFlipSimManager : SimulationManager
             return AddFlipper(cheaterHeadsRate);
         }
         return AddFlipper(0.5f);
-        
     }
     internal void AddFlippers(int num, float headsRate = 0.5f) {
         for (int i = 0; i < num; i++) { AddFlipper(headsRate: headsRate); }
@@ -176,9 +175,29 @@ public class CoinFlipSimManager : SimulationManager
         }
         yield return null;
     }
+    internal delegate bool CascadeDelegateType(Vector3 pos, float startTime);
+    internal void ShowFlippersCascade(CascadeDelegateType cascadeDelegate, CoinFlipper skip = null) {
+        List<CoinFlipper> skipList = new List<CoinFlipper>() {skip};
+        StartCoroutine(showFlippersCascade(cascadeDelegate, skipList));
+    }
+    IEnumerator showFlippersCascade(CascadeDelegateType cascadeDelegate, List<CoinFlipper> skip = null) {
+        if (skip == null) {
+            skip = new List<CoinFlipper>();
+        }
+        float startTime = Time.time;
+        while (skip.Count < flippers.Count) {
+            foreach (CoinFlipper c in flippers) {
+                if ( !skip.Contains(c) && cascadeDelegate(c.transform.localPosition, startTime) ) {
+                    c.Appear();
+                    skip.Add(c);
+                }
+            }
+            yield return null;
+        }
+    }
 
-    internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, float duration = 0) {
-        List<Vector3> positions = Helpers.CalculateGridPositions(numRows, numColumns, spacing);
+    internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, int gridOriginIndexX = -1, int gridOriginIndexY = -1, float duration = 0) {
+        List<Vector3> positions = Helpers.CalculateGridPositions(numRows, numColumns, spacing, gridOriginIndexX: gridOriginIndexX, gridOriginIndexY: gridOriginIndexY);
         if (flippers.Count > positions.Count) {
             Debug.LogError($"Only {positions.Count} positions for {flippers.Count} flippers");
         }

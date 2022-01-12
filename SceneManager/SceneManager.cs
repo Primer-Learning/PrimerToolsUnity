@@ -23,6 +23,7 @@ public class SceneManager : PrimerObject
     internal PrimerArrow primerArrowPrefab;
     internal PrimerBracket primerBracketPrefab;
     internal PrimerText textPrefab;
+    internal PrimerText checkPrefab;
     internal Graph graphPrefab;
     internal PrimerObject sunLight;
 
@@ -48,6 +49,7 @@ public class SceneManager : PrimerObject
             primerBracketPrefab = Resources.Load("bracket", typeof(PrimerBracket)) as PrimerBracket;
             textPrefab = Resources.Load("text", typeof(PrimerText)) as PrimerText;
             graphPrefab = Resources.Load("Graph", typeof(Graph)) as Graph;
+            checkPrefab = Resources.Load<PrimerText>("checkmark");
             if (sunLight == null) {
                 sunLight = GameObject.Find("Directional Light").AddComponent<PrimerObject>();
                 if (sunLight == null) {
