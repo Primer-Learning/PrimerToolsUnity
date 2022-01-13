@@ -57,7 +57,7 @@ public class SimulationManager : MonoBehaviour
                 return pooledObjects[i];
             }
         }
-        Debug.LogWarning("Ran out of pooled objects, adding another to pool.");
+        // Debug.LogWarning("Ran out of pooled objects, adding another to pool.");
         GameObject go = (GameObject)Instantiate(objectToPool);
         go.transform.parent = transform;
         go.SetActive(true);

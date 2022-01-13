@@ -38,6 +38,7 @@ public class PrimerBlob : PrimerCharacter
     // Meshes
     [SerializeField] Mesh highPolyMesh = null;
     [SerializeField] Mesh lowPolyMesh = null;
+    [SerializeField] Mesh staticMesh = null;
     public enum MeshType {
         HighPolySkinned,
         LowPolySkinned,
@@ -117,19 +118,21 @@ public class PrimerBlob : PrimerCharacter
     internal void SwapMesh(MeshType mType = MeshType.Static) {
         GameObject meshGO = transform.Find("blob_mesh").gameObject;
         // This only implements the switch to static, since that's the one I intend to use rn.
+        SkinnedMeshRenderer smr = meshGO.GetComponent<SkinnedMeshRenderer>();
         switch (mType) {
             case MeshType.Static:
                 animator.SetTrigger("Still");
-                SkinnedMeshRenderer smr = meshGO.GetComponent<SkinnedMeshRenderer>();
-                meshGO.AddComponent<MeshFilter>().mesh = lowPolyMesh;
+                meshGO.AddComponent<MeshFilter>().mesh = staticMesh;
                 meshGO.AddComponent<MeshRenderer>().material = smr.material;
                 smr.enabled = false;
                 break;
             case MeshType.LowPolySkinned:
-                // smr.sharedMesh = lowPolyMesh;
+                smr.sharedMesh = lowPolyMesh;
+                smr.enabled = true;
                 break;
             case MeshType.HighPolySkinned:
-                // smr.sharedMesh = highPolyMesh;
+                smr.sharedMesh = highPolyMesh;
+                smr.enabled = true;
                 break;
             default:
                 break;
