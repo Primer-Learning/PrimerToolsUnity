@@ -833,12 +833,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66165ed5a2781ba49b8a6526b0dafb36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 7222739926456098793}
   lEye: {fileID: 544653982}
   rEye: {fileID: 2057487421}
   mouth: {fileID: 7492501191417907266}
   highPolyMesh: {fileID: 4300000, guid: 4ea75393267e8d2428a7128c3a18df4f, type: 2}
   lowPolyMesh: {fileID: 4300000, guid: fcc9b046f49dcf54dba28ef45b1137a8, type: 2}
+  staticMesh: {fileID: 4300000, guid: 92708d1acde90e24b8280715576efcd8, type: 2}
 --- !u!1 &7538004976239834687
 GameObject:
   m_ObjectHideFlags: 0
