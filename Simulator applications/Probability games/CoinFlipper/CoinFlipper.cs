@@ -74,7 +74,7 @@ public class CoinFlipper : Simulator
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
 
-    internal Vector3 individualOffset = new Vector3(0f, 1f, 5f);
+    internal Vector3 individualOffset = new Vector3(0f, 1f, 4f);
 
     internal void Appear(float stagger = 0.25f) {
         flipperCharacter = Instantiate(flipperCharacterPrefab);
