@@ -9,39 +9,61 @@ public class CameraRig : PrimerObject
     // Makes it easy to rotate the camera around a center
 
     internal Camera cam;
-    internal PrimerObject camObject;
     RenderTexture rt = null;
     Texture2D image = null;
 
-    internal void SetUp(bool solidColor = true) {
-        cam = SceneManager.instance.cam; 
-        cam.transform.parent = transform;
-        camObject = cam.gameObject.AddComponent<PrimerObject>();
+    private Vector3 swivelOrigin;
+    public Vector3 SwivelOrigin {
+        get { return swivelOrigin; }
+        set {
+            Vector3 posDiff = value - swivelOrigin;
+            transform.position += posDiff;
+            // transform.Rotate(swivelAxis, angleDiff);
+            swivelOrigin = value;
+        }
     }
-    public void GoToStandardPositions() {
-        cam.transform.localPosition = new Vector3 (0, 0, -10);
-        cam.transform.localRotation = Quaternion.identity;
+    private Quaternion swivel;
+    public Quaternion Swivel {
+        get { return swivel; }
+        set {
 
-        transform.localPosition = new Vector3(0, 1, 0);
-        transform.localRotation = Quaternion.Euler(16, 0, 0);
+            Quaternion diffRotation = Quaternion.Inverse(swivel) * value;
+            float angle;
+            Vector3 axis;
+            diffRotation.ToAngleAxis(out angle, out axis);
+            transform.RotateAround(swivelOrigin, axis, angle);
+            // transform.Rotate(swivelAxis, angleDiff);
+            swivel = transform.localRotation;
+        }
+    }
+    public float Distance {
+        get { 
+            return (transform.position - swivelOrigin).magnitude;
+        }
+        set {
+            Vector3 directionVector = (transform.position - swivelOrigin).normalized;
+            transform.position = directionVector * value + swivelOrigin;
+        }
+    }
+    protected override void Awake() {
+        base.Awake();
+        cam = SceneManager.instance.cam; 
+        swivel = transform.localRotation;
     }
     public void GrabLight() {
         GameObject light = GameObject.Find("Directional Light");
-        light.transform.parent = cam.transform;
+        light.transform.parent = transform;
     }
-    internal void MoveRigCenter(Vector3 c) {
-        // Move rig after storing global position
-        Vector3 prevGlobal = transform.position;
-        transform.localPosition = c;
-
-        // Now move the child camera to put it back where it was
-        cam.transform.position -= transform.position - prevGlobal;
+    public void MoveCenterTo(Vector3 newCenter, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+        AnimateValue<Vector3>("SwivelOrigin", newCenter, duration: duration, ease: ease);
     }
-
+    public void SwivelTo(Quaternion rotation, Vector3? point = null, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+        if (point != null) { swivelOrigin = point.Value; }
+        AnimateValue<Quaternion>("Swivel", rotation, duration: duration, ease: ease);
+    }
     public void ZoomTo(float distance, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-        camObject.MoveTo(new Vector3 (camObject.transform.localPosition.x, camObject.transform.localPosition.y, -distance), duration, ease);
+        AnimateValue<float>("Distance", distance, duration: duration, ease: ease);
     }
-
     internal void RenderToPNG(string path, int resWidth, int resHeight) {
         // I will admit that I'm not sure why I need to do the setup and cleanup
         // each frame, but if I don't, I just get black frames.

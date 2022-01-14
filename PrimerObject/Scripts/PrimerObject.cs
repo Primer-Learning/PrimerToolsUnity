@@ -58,6 +58,12 @@ public class PrimerObject : MonoBehaviour
         else if (type == typeof(Vector2)) {
             return Vector2.Lerp((Vector2)oldVal, (Vector2)newVal, t);
         }
+        else if (type == typeof(Quaternion)) {
+            return Quaternion.Slerp((Quaternion)oldVal, (Quaternion)newVal, t);
+        }
+        else if (type == typeof(Color)) {
+            return Color.Lerp((Color)oldVal, (Color)newVal, t);
+        }
         else {
             Debug.LogError("Can't lerp that type unless you fix me.");
             return null;

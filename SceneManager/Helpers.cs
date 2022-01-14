@@ -33,7 +33,6 @@ public static class Helpers
     // https://youtu.be/n_RHttAaRCke
     public static float ApplyNormalizedEasing(float t, EaseMode ease) {
 
-        if (t < 0 || t > 1) {Debug.LogWarning("Trying to apply easing outside domain, using clamped value.");}
         switch (ease) 
         {
             case EaseMode.Cubic:
@@ -115,12 +114,14 @@ public static class Helpers
         int sideLength = (int) Math.Ceiling(Math.Sqrt(numElements));
         return CalculateGridPositions(sideLength, sideLength, spacing, plane: plane);
     }
-    public static List<Vector3> CalculateGridPositions(int numRows, int numColumns, float spacing, string plane = "xz") {
+    public static List<Vector3> CalculateGridPositions(int numRows, int numColumns, float spacing, int gridOriginIndexX = -1, int gridOriginIndexY = -1, string plane = "xz") {
+        if (gridOriginIndexX == -1) { gridOriginIndexX = (numColumns - 1) / 2; }
+        if (gridOriginIndexY == -1) { gridOriginIndexY = (numRows - 1) / 2; }
         List<Vector3> positions = new List<Vector3>();
-        for (int i = 0; i < numColumns; i++) {
+        for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
-                float z = spacing * (i - (float)(numColumns - 1) / 2);
-                float x = spacing * (j - (float)(numRows - 1) / 2);
+                float z = spacing * (i - (float)gridOriginIndexY);
+                float x = spacing * (j - (float)gridOriginIndexX);
                 if (plane == "xz") {
                     positions.Add(new Vector3(x, 0, -z));
                 }
@@ -131,6 +132,29 @@ public static class Helpers
         }
         return positions;
     }
+    public static Vector3 GenerateNonCollidingPositionOnPlane(List<Transform> otherTransforms, float range = 1, float maxDistance = 1, int maxTries = 30) {
+        return GenerateNonCollidingPositionOnPlane(otherTransforms, rangeX: range, rangeZ: range, maxDistance: maxDistance, maxTries: maxTries);
+    }
+    public static Vector3 GenerateNonCollidingPositionOnPlane(List<Transform> otherTransforms, float rangeX = 1, float rangeZ = 1, float maxDistance = 1, int maxTries = 30) {
+        bool found = false;
+        Vector3 newPos = Vector3.zero;
+        int loops = 0;
+        while (found == false && loops < maxTries) {
+            loops++;
+            found = true;
+            newPos = new Vector3(UnityEngine.Random.Range(-rangeX, rangeX), 0, UnityEngine.Random.Range(-rangeZ, rangeZ));
+            foreach (Transform other in otherTransforms) {
+                float distance = (other.localPosition - newPos).sqrMagnitude;
+                if (distance < maxDistance * maxDistance) {
+                    found = false;
+                    // Debug.Log("Too close");
+                }
+            }
+        }
+        // if (loops == 30) { Debug.Log("Couldn't find a point"); }
+        return newPos;
+    }
+
     //I ended up not using this, but seems useful!
     public static Component CopyComponentTo(Component original, GameObject destination)
     {
