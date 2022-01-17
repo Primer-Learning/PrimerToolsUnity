@@ -77,7 +77,9 @@ public class CoinFlipper : Simulator
     internal Vector3 individualOffset = new Vector3(0f, 1f, 5f);
 
     internal void Appear(float stagger = 0.25f) {
-        flipperCharacter = Instantiate(flipperCharacterPrefab);
+        if (flipperCharacter == null) {
+            flipperCharacter = Instantiate(flipperCharacterPrefab);
+        }
         flipperCharacter.transform.parent = transform;
         flipperCharacter.transform.localPosition = flipperCharacterPosition;
         flipperCharacter.transform.localRotation = flipperCharacterRotation;

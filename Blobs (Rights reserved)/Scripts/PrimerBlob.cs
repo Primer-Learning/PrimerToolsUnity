@@ -374,6 +374,33 @@ public class PrimerBlob : PrimerCharacter
         accessories.Add(accessory);
         return accessory;
     }
+    internal void RandomizeColorAndAccessory(double accessoryChance = 0.7, double complementaryChance = 0.5f, List<AccessoryType> options = null) {
+        if (options == null) { options = AccessoryOptions; }
+        SetColor(PrimerColor.BlobColors[SceneManager.sceneRandom2.Next(PrimerColor.BlobColors.Count)]);
+
+        if (SceneManager.sceneRandom2.NextDouble() < accessoryChance) {
+            bool colorMatch = true;
+            AccessoryType aType = AccessoryOptions[SceneManager.sceneRandom2.Next(AccessoryOptions.Count)];
+            if (aType == AccessoryType.beard || aType == AccessoryType.eyePatch) {
+                if (SceneManager.sceneRandom2.NextDouble() >= complementaryChance) {
+                    colorMatch = false;
+                }
+            }
+            AddAccessory(aType, colorMatch: colorMatch);
+        }
+    }
+    List<AccessoryType> AccessoryOptions = new List<AccessoryType>() {
+        AccessoryType.beard,
+        AccessoryType.glasses,
+        AccessoryType.sunglasses,
+        AccessoryType.froggyHat,
+        AccessoryType.beanie,
+        AccessoryType.eyePatch,
+        AccessoryType.propellerHat,
+        AccessoryType.starShades,
+        AccessoryType.wizardHat,
+        AccessoryType.monocle
+    };
     // internal void HideBeard() {
     //     if (beard != null) {
     //         beard.ScaleDownToZero();

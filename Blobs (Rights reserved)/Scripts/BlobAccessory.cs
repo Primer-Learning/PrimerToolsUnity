@@ -90,10 +90,11 @@ public class BlobAccessory : PrimerObject
                 baseTextureName = "TEXTURE_woodensign_base_fair";
                 colorMatch = false;
                 break;
-            default:
-                // Debug.LogError("Accessory type not recognized");
+            case AccessoryType.none:
                 return null;
-                // break;
+            default:
+                Debug.LogError("Accessory type not recognized");
+                return null;
         }
 
         BlobAccessory ba = go.AddComponent<BlobAccessory>();
@@ -203,6 +204,7 @@ public class BlobAccessory : PrimerObject
 }
 
 public enum AccessoryType {
+    none,
     beard,
     glasses,
     sunglasses,
