@@ -154,7 +154,101 @@ public static class Helpers
         // if (loops == 30) { Debug.Log("Couldn't find a point"); }
         return newPos;
     }
+    // Copyright (c) 2020 Sebastian Lague
+    // Adapted from Sebastian Lague's code at https://github.com/SebLague/Poisson-Disc-Sampling
 
+    public static List<Vector2> GeneratePointsPoisson(float radius, float sampleRegionRadius, int numSamplesBeforeRejection = 30, bool centered = true) {
+        return GeneratePointsPoisson(radius, new Vector2(sampleRegionRadius * 2, sampleRegionRadius * 2), numSamplesBeforeRejection: numSamplesBeforeRejection, centered: centered, circle: true);
+    }
+    public static List<Vector2> GeneratePointsPoisson(float radius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30, bool centered = false, bool circle = false) {
+		float cellSize = radius/Mathf.Sqrt(2);
+
+		int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x/cellSize), Mathf.CeilToInt(sampleRegionSize.y/cellSize)];
+		List<Vector2> points = new List<Vector2>();
+		List<Vector2> spawnPoints = new List<Vector2>();
+
+        spawnPoints.Add(sampleRegionSize/2);
+		while (spawnPoints.Count > 0) {
+			int spawnIndex = UnityEngine.Random.Range(0,spawnPoints.Count);
+			Vector2 spawnCentre = spawnPoints[spawnIndex];
+			bool candidateAccepted = false;
+			for (int i = 0; i < numSamplesBeforeRejection; i++)
+			{
+				float angle = UnityEngine.Random.value * Mathf.PI * 2;
+				Vector2 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
+				Vector2 candidate = spawnCentre + dir * UnityEngine.Random.Range(radius, 2*radius);
+                bool isValid = false;
+                if (!circle) { isValid = IsValidRect(candidate, sampleRegionSize, cellSize, radius, points, grid); }
+                else { isValid = IsValidCirc(candidate, sampleRegionSize.x / 2, cellSize, radius, points, grid); }
+                if (isValid) {
+                    points.Add(candidate);
+                    spawnPoints.Add(candidate);
+                    grid[(int)(candidate.x/cellSize),(int)(candidate.y/cellSize)] = points.Count;
+                    candidateAccepted = true;
+                    break;
+                }
+			}
+			if (!candidateAccepted) {
+				spawnPoints.RemoveAt(spawnIndex);
+			}
+		}
+        if (centered) {
+            List<Vector2> tempPoints = points;
+            points = new List<Vector2>();
+            foreach (Vector2 p in tempPoints) {
+                points.Add(new Vector2(p.x - sampleRegionSize.x / 2, p.y - sampleRegionSize.y / 2));
+            }
+        }
+		return points;
+	}
+	static bool IsValidRect(Vector2 candidate, Vector2 sampleRegionSize, float cellSize, float radius, List<Vector2> points, int[,] grid) {
+		if (candidate.x >=0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y) {
+			int cellX = (int)(candidate.x/cellSize);
+			int cellY = (int)(candidate.y/cellSize);
+			int searchStartX = Mathf.Max(0,cellX -2);
+			int searchEndX = Mathf.Min(cellX+2,grid.GetLength(0)-1);
+			int searchStartY = Mathf.Max(0,cellY -2);
+			int searchEndY = Mathf.Min(cellY+2,grid.GetLength(1)-1);
+
+			for (int x = searchStartX; x <= searchEndX; x++) {
+				for (int y = searchStartY; y <= searchEndY; y++) {
+					int pointIndex = grid[x,y]-1;
+					if (pointIndex != -1) {
+						float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
+						if (sqrDst < radius*radius) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	static bool IsValidCirc(Vector2 candidate, float regionRadius, float cellSize, float radius, List<Vector2> points, int[,] grid) {
+		if ((candidate - new Vector2(regionRadius, regionRadius)).magnitude < regionRadius) {
+			int cellX = (int)(candidate.x/cellSize);
+			int cellY = (int)(candidate.y/cellSize);
+			int searchStartX = Mathf.Max(0,cellX -2);
+			int searchEndX = Mathf.Min(cellX+2,grid.GetLength(0)-1);
+			int searchStartY = Mathf.Max(0,cellY -2);
+			int searchEndY = Mathf.Min(cellY+2,grid.GetLength(1)-1);
+
+			for (int x = searchStartX; x <= searchEndX; x++) {
+				for (int y = searchStartY; y <= searchEndY; y++) {
+					int pointIndex = grid[x,y]-1;
+					if (pointIndex != -1) {
+						float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
+						if (sqrDst < radius*radius) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
     //I ended up not using this, but seems useful!
     public static Component CopyComponentTo(Component original, GameObject destination)
     {
