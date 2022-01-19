@@ -12,43 +12,63 @@ public class CameraRig : PrimerObject
     RenderTexture rt = null;
     Texture2D image = null;
 
-    private Vector3 swivelOrigin;
+    // This lets us control the camera in the inspector as if it had a parent transform.
+    // Currently, these override changes made directly to the transform.
+    // Ideally, changing either would update the other.
+    void OnValidate() {
+        SwivelOrigin = swivelOrigin;
+        Swivel = Quaternion.Euler(swivelEuler);
+        Distance = distance;
+    }
+    void OnDrawGizmos() {
+        Gizmos.DrawSphere(swivelOrigin, 0.1f);
+    }
+
+    [SerializeField] Vector3 swivelOrigin;
+    private Vector3 oldSwivelOrigin; // This allows the SwivelOrigin setter to notice the change when called from OnValidate
     public Vector3 SwivelOrigin {
         get { return swivelOrigin; }
         set {
-            Vector3 posDiff = value - swivelOrigin;
+            Vector3 posDiff = value - oldSwivelOrigin;
             transform.position += posDiff;
-            // transform.Rotate(swivelAxis, angleDiff);
             swivelOrigin = value;
+            oldSwivelOrigin = swivelOrigin;
         }
     }
+    public Vector3 swivelEuler; // For editing from the inspector through OnValidate
     private Quaternion swivel;
     public Quaternion Swivel {
         get { return swivel; }
         set {
-
             Quaternion diffRotation = Quaternion.Inverse(swivel) * value;
             float angle;
             Vector3 axis;
             diffRotation.ToAngleAxis(out angle, out axis);
             transform.RotateAround(swivelOrigin, axis, angle);
-            // transform.Rotate(swivelAxis, angleDiff);
             swivel = transform.localRotation;
+            swivelEuler = swivel.eulerAngles;
         }
     }
+    internal bool faceSwivel = true;
+    [SerializeField] float distance = 10;
     public float Distance {
         get { 
             return (transform.position - swivelOrigin).magnitude;
         }
         set {
-            Vector3 directionVector = (transform.position - swivelOrigin).normalized;
-            transform.position = directionVector * value + swivelOrigin;
+            if (faceSwivel) {
+                transform.position = swivelOrigin + swivel * Vector3.back * value;
+            }
+            else {
+                Vector3 directionVector = (transform.position - swivelOrigin).normalized;
+                transform.position = directionVector * value + swivelOrigin;
+            }
+            distance = value;
         }
     }
-    protected override void Awake() {
-        base.Awake();
-        cam = SceneManager.instance.cam; 
-        swivel = transform.localRotation;
+    
+    void Start() {
+        cam = SceneManager.instance.cam;
     }
     public void GrabLight() {
         GameObject light = GameObject.Find("Directional Light");

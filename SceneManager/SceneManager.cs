@@ -60,9 +60,13 @@ public class SceneManager : PrimerObject
             //Make camera rig if it doesn't exist
             if (cam == null) {
                 cam = Camera.main;
+                Debug.Log(cam);
             }
             if (camRig == null) {
-                camRig = cam.gameObject.AddComponent<CameraRig>();
+                camRig = cam.GetComponent<CameraRig>();
+                if (camRig == null) {
+                    camRig = cam.gameObject.AddComponent<CameraRig>();
+                }
             }
             if (!useEditorVals) {
                 cam.clearFlags = CameraClearFlags.SolidColor;
