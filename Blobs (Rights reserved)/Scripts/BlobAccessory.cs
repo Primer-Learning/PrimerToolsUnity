@@ -175,6 +175,12 @@ public class BlobAccessory : PrimerObject
         {PrimerColor.Green, "_purple"},
         {PrimerColor.Purple, "_dark_green"},
     };
+    internal static Dictionary<AccessoryType, float> SignHeights = new Dictionary<AccessoryType, float>() {
+        {AccessoryType.froggyHat, 0.2f},
+        {AccessoryType.beanie, 0.34f},
+        {AccessoryType.propellerHat, 0.3f},
+        {AccessoryType.wizardHat, 0.43f}
+    };
     // static Dictionary<Color, string> beanieDict = new Dictionary<Color, string>() {
     //     {PrimerColor.Blue, "texture_beanie_orange"},
     //     {PrimerColor.Orange, "texture_beanie_blue"},
