@@ -130,7 +130,8 @@ public class Graph : PrimerObject
         float ticLabelDistanceHorizontal = 0.65f, //For the vertically aligned axis
         float ticLabelSize = 1f,
         //Similar for y and z
-        float scale = 1, //Scale is float because it will be uniform in all directions to avoid warping. Axis length and tic units are determined elswhere.
+        float scale = -1, //Scale is float because it will be uniform in all directions to avoid warping. Axis length and tic units are determined elswhere.
+        float thickness = 1,
         
         bool manualTicMode = false,
         Dictionary<float, string> manualTicsX = null,
@@ -140,11 +141,18 @@ public class Graph : PrimerObject
 
         bool rightHanded = true
     )
-    {
+    {   
+        if (scale != -1) {
+            Debug.LogWarning("Setting scale from Graph.Initialize is deprecated. Use thickness instead. We gotchu this time, tho.");
+            thickness = scale;
+            xAxisLength *= thickness;
+            yAxisLength *= thickness;
+            zAxisLength *= thickness;
+        }
         this.paddingFraction = paddingFraction;
         this.xMin = xMin;
         this.xMax = xMax;
-        this.xAxisLength = xAxisLength;
+        this.xAxisLength = xAxisLength / thickness; 
         this.xTicStep = xTicStep;
         this.xAxisLabelString = xAxisLabelString;
         this.xAxisLabelPos = xAxisLabelPos;
@@ -156,7 +164,7 @@ public class Graph : PrimerObject
 
         this.yMin = yMin;
         this.yMax = yMax;
-        this.yAxisLength = yAxisLength;
+        this.yAxisLength = yAxisLength / thickness;
         this.yTicStep = yTicStep;
         this.yAxisLabelString = yAxisLabelString;
         this.yAxisLabelPos = yAxisLabelPos;
@@ -167,7 +175,7 @@ public class Graph : PrimerObject
 
         this.zMin = zMin;
         this.zMax = zMax;
-        this.zAxisLength = zAxisLength;
+        this.zAxisLength = zAxisLength / thickness;
         this.zTicStep = zTicStep;
         this.zAxisLabelString = zAxisLabelString;
         this.zAxisLabelPos = zAxisLabelPos;
@@ -192,7 +200,7 @@ public class Graph : PrimerObject
         
         //Set scale
         //Intrinsic scale determines base size and doesn't vary during animations
-        this.intrinsicScale = new Vector3(scale, scale, scale);
+        SetIntrinsicScale(thickness);
         transform.localScale = this.intrinsicScale;
     }
 
