@@ -18,13 +18,13 @@ public class SampleGraphSceneDirector : Director
         camRig.transform.localPosition = 3 * Vector3.up;
         camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
 
-        text1 = Instantiate(textPrefab, camRig.transform);
+        text1 = Instantiate(primerTextPrefab, camRig.transform);
         text1.transform.localScale = Vector3.zero;
     }
 
     //Define event actions
     IEnumerator Appear() { 
-        graph = Instantiate(graphPrefab);
+        graph = Instantiate(primerGraphPrefab);
         graph.transform.localPosition = new Vector3(-6, 0, 0);
         graph.transform.localRotation = Quaternion.Euler(0, 0, 0); 
         graph.Initialize(

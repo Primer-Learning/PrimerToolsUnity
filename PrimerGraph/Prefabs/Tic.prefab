@@ -48,7 +48,7 @@ MonoBehaviour:
   axis: 
   graph: {fileID: 0}
   cylinder: {fileID: 8544099395219791324}
-  textPrefab: {fileID: 6781811844555133956, guid: b888f32d80097df47b221d6a76ebb13a,
+  primerTextPrefab: {fileID: 6781811844555133956, guid: b888f32d80097df47b221d6a76ebb13a,
     type: 3}
   label: {fileID: 0}
 --- !u!1 &4352974918032652946

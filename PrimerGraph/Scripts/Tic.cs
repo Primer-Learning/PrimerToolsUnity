@@ -11,7 +11,7 @@ public class Tic : PrimerObject
     public Graph graph;
     [SerializeField] Transform cylinder = null;
 
-    public TextMeshPro textPrefab;
+    public TextMeshPro primerTextPrefab;
 
     public TextMeshPro label;
 
@@ -41,13 +41,13 @@ public class Tic : PrimerObject
 
     public void MakeLabel()
     {
-        label = Instantiate(textPrefab, this.transform);
+        label = Instantiate(primerTextPrefab, this.transform);
         label.text = this.value.ToString();
         AlignLabel();
     }
     public void MakeLabel(string labelText)
     {
-        label = Instantiate(textPrefab, this.transform);
+        label = Instantiate(primerTextPrefab, this.transform);
         label.text = labelText;
         AlignLabel();
     }

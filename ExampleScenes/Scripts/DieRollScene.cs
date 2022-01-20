@@ -35,7 +35,7 @@ public class DieRollScene : Director
     protected override void Start() {
         int numTextObjs = 3;
         for (int i = 0; i < numTextObjs; i++) {
-            PrimerText nt = Instantiate(textPrefab, camRig.cam.transform);
+            PrimerText nt = Instantiate(primerTextPrefab, camRig.cam.transform);
             nt.tmpro.alignment = TextAlignmentOptions.Left;
             texts.Add(nt);
         }
@@ -129,7 +129,7 @@ public class DieRollScene : Director
     }
 
     void SetUpGraph() {
-        graph = Instantiate(graphPrefab);
+        graph = Instantiate(primerGraphPrefab);
         graph.transform.localPosition = new Vector3(-3, -1, -1);
         graph.transform.localRotation = Quaternion.Euler(17, 0, 0); 
         Dictionary<float, string> xTics = new Dictionary<float, string> () {

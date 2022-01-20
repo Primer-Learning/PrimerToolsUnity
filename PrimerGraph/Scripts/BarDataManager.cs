@@ -14,7 +14,9 @@ public class BarDataManager: MonoBehaviour
 
     internal List<float> values = new List<float>();
     private List<PrimerObject> bars = new List<PrimerObject>();
+    // Bar appearance
     List<Color> barColors = new List<Color>();
+    internal float barWidth = 1;
     
     // private bool animationDone = true;
 
@@ -34,7 +36,7 @@ public class BarDataManager: MonoBehaviour
                 newBar.transform.parent = transform;
                 newBar.transform.localPosition = new Vector3(i + 1, 0, 0);
                 newBar.transform.localRotation = Quaternion.Euler(0, 0, 0);
-                newBar.transform.localScale = new Vector3(1, 0, 1);
+                newBar.transform.localScale = new Vector3(barWidth, 0, 1);
                 bars.Add(newBar);
             }
             else if (i > bars.Count) {
@@ -78,7 +80,7 @@ public class BarDataManager: MonoBehaviour
         values = newVals;
         for (int i = 0; i < values.Count; i++)
         {
-            bars[i].transform.localScale = new Vector3(1, values[i], 1);
+            bars[i].transform.localScale = new Vector3(barWidth, values[i], 1);
         }
     }
     internal void UpdateBars(List<int> newVals) {
