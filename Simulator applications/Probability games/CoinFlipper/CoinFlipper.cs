@@ -115,7 +115,9 @@ public class CoinFlipper : Simulator
         StartCoroutine(flip(outcome));
     }
     IEnumerator flip(int outcome = -1) {
-        flipperCharacter.animator.SetTrigger("Scoop"); 
+        if (flipperCharacter.animator != null) {
+            flipperCharacter.animator.SetTrigger("Scoop"); 
+        }
 
         //Spawn coin
         SpawnCoin(outcome);

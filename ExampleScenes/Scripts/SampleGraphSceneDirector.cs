@@ -14,9 +14,9 @@ public class SampleGraphSceneDirector : Director
 
     protected override void Awake() {
         base.Awake();
-        camRig.cam.transform.localPosition = new Vector3(0, 0, -11);
-        camRig.transform.localPosition = 3 * Vector3.up;
-        camRig.transform.localRotation = Quaternion.Euler(16, 0, 0);
+        camRig.Swivel = Quaternion.Euler(16, 0, 0);
+        camRig.SwivelOrigin = new Vector3(0, 3, 0);
+        camRig.Distance = 11;
 
         text1 = Instantiate(primerTextPrefab, camRig.transform);
         text1.transform.localScale = Vector3.zero;

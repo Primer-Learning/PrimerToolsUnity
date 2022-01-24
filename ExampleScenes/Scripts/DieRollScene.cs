@@ -26,7 +26,6 @@ public class DieRollScene : Director
 
     DieRoller mainRoller = null;
 
-    float camAngle = 17;
     DiceGame game = null;
 
     protected override void Awake() {
@@ -35,7 +34,7 @@ public class DieRollScene : Director
     protected override void Start() {
         int numTextObjs = 3;
         for (int i = 0; i < numTextObjs; i++) {
-            PrimerText nt = Instantiate(primerTextPrefab, camRig.cam.transform);
+            PrimerText nt = Instantiate(primerTextPrefab, camRig.transform);
             nt.tmpro.alignment = TextAlignmentOptions.Left;
             texts.Add(nt);
         }
@@ -49,9 +48,8 @@ public class DieRollScene : Director
         game.rollerGroup = rollerGroup;
         game.coinBucket = bucket;
 
-        camRig.cam.transform.localPosition = new Vector3(0, 0, -4);
-        camRig.transform.localPosition = new Vector3(0, 0, 0);
-        camRig.transform.localRotation = Quaternion.Euler(camAngle, 0, 0);
+        camRig.Swivel = Quaternion.Euler(17, 0, 0);
+        camRig.Distance = 4;
 
         base.Start();
     }
@@ -73,14 +71,15 @@ public class DieRollScene : Director
         yield return new WaitForSeconds(1);
         bucket.AddCoins(100);
         yield return new WaitForSeconds(2);
-        camRig.RotateTo(Quaternion.Euler(75, 0, 0), duration: 2);
+        camRig.SwivelTo(Quaternion.Euler(75, 0, 0), duration: 2);
         yield return new WaitForSeconds(2);
         game.Play(numEntries: 5000);
         
         yield return new WaitForSeconds(8f);
 
-        camRig.RotateTo(Quaternion.Euler(17, 0, 0));
-        camRig.MoveTo(0.5f * Vector3.up);
+        camRig.SwivelTo(Quaternion.Euler(17, 0, 0));
+        camRig.MoveCenterTo(0.5f * Vector3.up);
+
         graph.transform.localPosition = new Vector3(-2.25f, 0.7f, 2);
         graph.ScaleTo(0.65f);
         yield return new WaitForSeconds(1);
@@ -167,9 +166,7 @@ public class DieRollScene : Director
         rollerGroup.colorList = colors;
         BarDataManager bd = graph.AddBarData();
         graph.barData.SetColors(colors);
-        // graph.transform.parent = camRig.cam.transform;
         graph.transform.localScale = Vector3.zero;
-        // graph.ScaleUpFromZero();
         rollerGroup.SetUpGraph(graph);
         graph.SetIntrinsicScale();
         graph.transform.localScale = Vector3.zero;

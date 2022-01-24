@@ -51,7 +51,10 @@ public class Director : SceneManager
     protected virtual void DefineSchedule() {}
 
     protected virtual void Start() {
-        if (lightBackground) { camRig.cam.backgroundColor = Color.gray; }
+        if (lightBackground) {
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.backgroundColor = Color.gray;
+        }
         if (recordOnPlay) {
             StartRecording();
         }
