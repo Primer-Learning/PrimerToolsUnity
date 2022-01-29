@@ -350,7 +350,7 @@ MonoBehaviour:
   yAxisRod: {fileID: 988854110434800702}
   zAxisRod: {fileID: 740030072223022926}
   ticPrefab: {fileID: 1421780368190723177, guid: 7dc920566f9f26e49bebf5e8f70c5c40, type: 3}
-  textPrefab: {fileID: 1119334554916629558, guid: b888f32d80097df47b221d6a76ebb13a, type: 3}
+  primerTextPrefab: {fileID: 1119334554916629558, guid: b888f32d80097df47b221d6a76ebb13a, type: 3}
   xTics: []
   xAxisLabel: {fileID: 0}
   yTics: []

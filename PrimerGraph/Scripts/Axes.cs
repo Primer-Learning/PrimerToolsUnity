@@ -19,7 +19,7 @@ public class Axes : PrimerObject
     
     //Tics, labels, arrows
     public Tic ticPrefab;
-    public PrimerText textPrefab;
+    public PrimerText primerTextPrefab;
     
     public List<Tic> xTics = new List<Tic>();
     internal List<Transform> xArrows = new List<Transform>();
@@ -54,7 +54,7 @@ public class Axes : PrimerObject
         xAxisRod.transform.localScale = new Vector3 (graph.xAxisLength, xAxisRod.transform.localScale.y, xAxisRod.transform.localScale.z);
         
         //Axis label
-        xAxisLabel = Instantiate(textPrefab, xAxisMasterContainer.transform);
+        xAxisLabel = Instantiate(primerTextPrefab, xAxisMasterContainer.transform);
         Vector3 xLabelPos = Vector3.zero;
         if (graph.xAxisLabelPos == "along") {
             xLabelPos = new Vector3 (graph.xAxisLength / 2 + graph.xAxisOffset, -2 * graph.ticLabelDistanceVertical, 0f);
@@ -101,7 +101,7 @@ public class Axes : PrimerObject
         yAxisRod.transform.localScale = new Vector3(yAxisRod.transform.localScale.x, graph.yAxisLength, yAxisRod.transform.localScale.z);
 
         //Axis label
-        yAxisLabel = Instantiate(textPrefab, yAxisMasterContainer.transform);
+        yAxisLabel = Instantiate(primerTextPrefab, yAxisMasterContainer.transform);
         Vector3 yLabelPos = Vector3.zero;
         if (graph.yAxisLabelPos == "along")
         {
@@ -150,7 +150,7 @@ public class Axes : PrimerObject
         zAxisRod.transform.localScale = new Vector3(zAxisRod.transform.localScale.x, zAxisRod.transform.localScale.y, graph.zAxisLength);
 
         //Axis label
-        zAxisLabel = Instantiate(textPrefab, zAxisMasterContainer.transform);
+        zAxisLabel = Instantiate(primerTextPrefab, zAxisMasterContainer.transform);
         Vector3 zLabelPos = Vector3.zero;
         if (graph.zAxisLabelPos == "along")
         {

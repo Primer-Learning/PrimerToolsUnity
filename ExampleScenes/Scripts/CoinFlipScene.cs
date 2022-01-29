@@ -20,9 +20,12 @@ public class CoinFlipScene : Director
         // When designing the coins, I set gravity to 2x for some reason (the reason is laziness!)
         Physics.gravity = new Vector3(0, -9.81f * 2, 0);
 
-        camRig.cam.transform.localPosition = new Vector3(0, 0, -7.5f);
-        camRig.transform.localPosition = new Vector3(0, 1, 0);
-        camRig.transform.localRotation = Quaternion.Euler(17, 0, 0);
+        // camRig.transform.localPosition = new Vector3(0, 1, -7.5f);
+        // camRig.transform.localRotation = Quaternion.Euler(17, 0, 0);
+        camRig.Swivel = Quaternion.Euler(17, 0, 0);
+        camRig.SwivelOrigin = new Vector3(0, 1, 0);
+        camRig.Distance = 7.5f;
+
 
         flipperManager.Initialize();
         base.Start();
@@ -45,8 +48,8 @@ public class CoinFlipScene : Director
         flipperManager.flippers.Insert(0, toSkip);
         flipperManager.ArrangeAsGrid(5, 5, duration: 1f);
         camRig.ZoomTo(40);
-        camRig.MoveTo(Vector3.zero);
-        camRig.RotateTo(Quaternion.Euler(40, 0, 0));
+        // camRig.MoveTo(Vector3.zero);
+        // camRig.RotateTo(Quaternion.Euler(40, 0, 0));
         yield return new WaitForSeconds(1);
         flipperManager.flippers[12].flipperCharacterPrefab = blobPrefab;
         flipperManager.flippers[12].coinPrefab = blobCoin;

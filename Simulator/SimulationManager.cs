@@ -21,8 +21,6 @@ public class SimulationManager : MonoBehaviour
         else {
             Destroy(this.gameObject);
         }
-    }
-    void Start() {
         if (objectToPool != null) {
             pooledObjects = new List<GameObject>();
             for (int i = 0; i < numToPool; i++) {
@@ -35,6 +33,9 @@ public class SimulationManager : MonoBehaviour
         else {
             Debug.LogWarning("No pooled object defined.");
         }
+    }
+    void Start() {
+        
         if (sunLight == null) {
             sunLight = GameObject.Find("Directional Light").AddComponent<PrimerObject>();
             if (sunLight == null) {
@@ -56,7 +57,7 @@ public class SimulationManager : MonoBehaviour
                 return pooledObjects[i];
             }
         }
-        Debug.LogWarning("Ran out of pooled objects, addong another to pool.");
+        // Debug.LogWarning("Ran out of pooled objects, adding another to pool.");
         GameObject go = (GameObject)Instantiate(objectToPool);
         go.transform.parent = transform;
         go.SetActive(true);

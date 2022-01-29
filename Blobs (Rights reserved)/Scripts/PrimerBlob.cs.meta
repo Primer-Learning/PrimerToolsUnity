@@ -3,7 +3,12 @@ guid: 66165ed5a2781ba49b8a6526b0dafb36
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - lEye: {instanceID: 0}
+  - rEye: {instanceID: 0}
+  - mouth: {instanceID: 0}
+  - highPolyMesh: {fileID: 4300000, guid: 4ea75393267e8d2428a7128c3a18df4f, type: 2}
+  - lowPolyMesh: {fileID: 4300000, guid: fcc9b046f49dcf54dba28ef45b1137a8, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

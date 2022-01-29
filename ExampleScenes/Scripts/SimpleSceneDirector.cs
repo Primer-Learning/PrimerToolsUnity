@@ -52,7 +52,7 @@ public class SimpleSceneDirector : Director
         // but you can still set things up this way to conceptually organize a scene
 
         camRig.ZoomTo(20f, duration: 4); 
-        camRig.RotateTo(Quaternion.Euler(17, 0, 0), duration: 4);
+        camRig.SwivelTo(Quaternion.Euler(17, 0, 0), duration: 4);
         yield return null;
         // An IEnumerator still needs a yield statement in it, though
     }

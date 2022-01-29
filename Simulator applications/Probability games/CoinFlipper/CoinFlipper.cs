@@ -77,7 +77,9 @@ public class CoinFlipper : Simulator
     internal Vector3 individualOffset = new Vector3(0f, 1f, 4f);
 
     internal void Appear(float stagger = 0.25f) {
-        flipperCharacter = Instantiate(flipperCharacterPrefab);
+        if (flipperCharacter == null) {
+            flipperCharacter = Instantiate(flipperCharacterPrefab);
+        }
         flipperCharacter.transform.parent = transform;
         flipperCharacter.transform.localPosition = flipperCharacterPosition;
         flipperCharacter.transform.localRotation = flipperCharacterRotation;
@@ -113,7 +115,9 @@ public class CoinFlipper : Simulator
         StartCoroutine(flip(outcome));
     }
     IEnumerator flip(int outcome = -1) {
-        flipperCharacter.animator.SetTrigger("Scoop"); 
+        if (flipperCharacter.animator != null) {
+            flipperCharacter.animator.SetTrigger("Scoop"); 
+        }
 
         //Spawn coin
         SpawnCoin(outcome);
@@ -272,14 +276,14 @@ public class CoinFlipper : Simulator
             yield return new WaitForSeconds(1f);
             coin.Disappear();
             if (headsCountDisplay == null) {
-                headsCountDisplay = Instantiate(SceneManager.instance.textPrefab);
+                headsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 headsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
                 headsCountDisplay.transform.parent = display.transform;
                 headsCountDisplay.transform.localPosition = new Vector3(0.75f, 2, 2.5f);
                 headsCountDisplay.SetIntrinsicScale(0.5f);
                 headsCountDisplay.ScaleUpFromZero();
 
-                tailsCountDisplay = Instantiate(SceneManager.instance.textPrefab);
+                tailsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 tailsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
                 tailsCountDisplay.transform.parent = display.transform;
                 tailsCountDisplay.transform.localPosition = new Vector3(0.75f, 1.3f, 2.5f);
@@ -339,14 +343,14 @@ public class CoinFlipper : Simulator
             display.transform.localScale = Vector3.one;
             display.transform.localPosition = Vector3.zero;
             if (headsCountDisplay == null) {
-                headsCountDisplay = Instantiate(SceneManager.instance.textPrefab);
+                headsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 headsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
                 headsCountDisplay.transform.parent = display.transform;
                 headsCountDisplay.transform.localPosition = new Vector3(0.75f, 2, 2.5f);
                 headsCountDisplay.SetIntrinsicScale(0.5f);
                 headsCountDisplay.ScaleUpFromZero();
 
-                tailsCountDisplay = Instantiate(SceneManager.instance.textPrefab);
+                tailsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 tailsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
                 tailsCountDisplay.transform.parent = display.transform;
                 tailsCountDisplay.transform.localPosition = new Vector3(0.75f, 1.3f, 2.5f);
