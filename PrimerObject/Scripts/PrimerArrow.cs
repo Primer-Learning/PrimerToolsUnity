@@ -4,11 +4,23 @@ using UnityEngine;
 
 public class PrimerArrow : PrimerObject
 {
+    [Header ("Controls")]
+    [SerializeField] Vector3 headPosition;
+    [SerializeField] float headBuffer;
+    [SerializeField] Vector3 tailPosition = new Vector3(1, 1, 0);
+    [SerializeField] float tailBuffer;
+
+    [Header ("Object and transform references")]
     [SerializeField] PrimerObject shaftRoot = null;
     [SerializeField] Transform shaft = null;
     [SerializeField] Transform head = null;
-
     float currentLength;
+
+    void OnValidate() {
+        if ( (tailPosition - headPosition).magnitude > 0 ) {
+            SetFromTo(tailPosition, headPosition, endBuffer: headBuffer, startBuffer: tailBuffer);
+        }
+    }
 
     public void SetWidth(float width)
     {

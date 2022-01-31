@@ -45,7 +45,7 @@ public class SceneManager : PrimerObject
             Debug.Log("Seed: " + seed);
 
             // Load/assign common resources
-            primerArrowPrefab = Resources.Load("arrow", typeof(PrimerArrow)) as PrimerArrow;
+            primerArrowPrefab = Resources.Load("arrowPrefab", typeof(PrimerArrow)) as PrimerArrow;
             primerBracketPrefab = Resources.Load("bracket", typeof(PrimerBracket)) as PrimerBracket;
             primerTextPrefab = Resources.Load("text", typeof(PrimerText)) as PrimerText;
             primerGraphPrefab = Resources.Load("Graph", typeof(Graph)) as Graph;
