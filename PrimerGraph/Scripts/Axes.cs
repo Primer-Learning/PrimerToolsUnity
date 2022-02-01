@@ -51,7 +51,11 @@ public class Axes : PrimerObject
         
         //Axis rod
         xAxisRod.transform.localPosition = new Vector3 (graph.xAxisOffset, 0f, 0f);
-        xAxisRod.transform.localScale = new Vector3 (graph.xAxisLength, xAxisRod.transform.localScale.y, xAxisRod.transform.localScale.z);
+        xAxisRod.transform.localScale = new Vector3 (
+            graph.xAxisLength,
+            xAxisRod.transform.localScale.y * graph.xAxisThickness,
+            xAxisRod.transform.localScale.z * graph.xAxisThickness
+        );
         
         //Axis label
         xAxisLabel = Instantiate(primerTextPrefab, xAxisMasterContainer.transform);
@@ -98,7 +102,11 @@ public class Axes : PrimerObject
 
         //Axis rod
         yAxisRod.transform.localPosition = new Vector3(0f, graph.yAxisOffset, 0f);
-        yAxisRod.transform.localScale = new Vector3(yAxisRod.transform.localScale.x, graph.yAxisLength, yAxisRod.transform.localScale.z);
+        yAxisRod.transform.localScale = new Vector3(
+            yAxisRod.transform.localScale.x * graph.yAxisThickness,
+            graph.yAxisLength,
+            yAxisRod.transform.localScale.z * graph.yAxisThickness
+        );
 
         //Axis label
         yAxisLabel = Instantiate(primerTextPrefab, yAxisMasterContainer.transform);
@@ -147,7 +155,10 @@ public class Axes : PrimerObject
 
         //Axis rod
         zAxisRod.transform.localPosition = new Vector3(0f, 0f, graph.zAxisOffset);
-        zAxisRod.transform.localScale = new Vector3(zAxisRod.transform.localScale.x, zAxisRod.transform.localScale.y, graph.zAxisLength);
+        zAxisRod.transform.localScale = new Vector3(
+            zAxisRod.transform.localScale.x * graph.zAxisThickness,
+            zAxisRod.transform.localScale.y * graph.zAxisThickness,
+            graph.zAxisLength);
 
         //Axis label
         zAxisLabel = Instantiate(primerTextPrefab, zAxisMasterContainer.transform);
