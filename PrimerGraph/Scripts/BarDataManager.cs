@@ -98,11 +98,19 @@ public class BarDataManager: MonoBehaviour
         barColors = colors;
         SetColors();
     }
+    internal void SetColors(Color color) {
+        SetColors(new List<Color>() {color});
+    }
     void SetColors() {
         for (int i = 0; i < bars.Count; i++) {
             Color c = barColors[i % barColors.Count];
-            bars[i].SetEmissionColor(c);
+            bars[i].EmissionColor = c;
         }
+    }
+    internal void AnimateColors(List<Color> colors, float duration = 0.5f, EaseMode ease = EaseMode.None) {
+            for (int i = 0; i < bars.Count; i++) {
+                bars[i].AnimateEmissionColor(colors[i], duration: duration, ease: ease);
+            }
     }
 
     internal void RefreshData() {

@@ -15,6 +15,23 @@ public class PrimerObject : MonoBehaviour
         get { return GetComponent<RectTransform>().anchoredPosition;} 
         set { GetComponent<RectTransform>().anchoredPosition = value;} 
     }
+    public Color EmissionColor {
+        get {
+            Debug.LogWarning("Property EmissionColor only returns the color of the first material of the first renderer found.");
+            return GetComponentsInChildren<Renderer>()[0].materials[0].GetColor("_EmissionColor");
+        } 
+        set {
+            Renderer[] mrs = GetComponentsInChildren<Renderer>();
+            foreach (Renderer mr in mrs) {
+                foreach (Material mat in mr.materials) {
+                    mat.SetColor("_EmissionColor", value);
+                    mat.EnableKeyword("_EMISSION");
+                    mat.color = Color.black;
+                    mat.SetFloat("_Glossiness", 0);
+                }
+            }
+        } 
+    }
 
     // This is a new way of doing easing. not actually implemented anywhere yet
     // internal delegate ref TProperty KeyFunc<TProperty, TSelf>(TSelf self) where TSelf: PrimerObject;
@@ -590,16 +607,8 @@ public class PrimerObject : MonoBehaviour
         r.material.color = Color.black;
         r.material.SetFloat("_Glossiness", 0);
     }
-    public virtual void SetEmissionColor(Color newColor) {
-        Renderer[] mrs = GetComponentsInChildren<Renderer>();
-        foreach (Renderer mr in mrs) {
-            foreach (Material mat in mr.materials) {
-                mat.SetColor("_EmissionColor", newColor);
-                mat.EnableKeyword("_EMISSION");
-                mat.color = Color.black;
-                mat.SetFloat("_Glossiness", 0);
-            }
-        }
+    public virtual void AnimateEmissionColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
+        AnimateValue<Color>("EmissionColor", newColor, duration: duration, ease: ease);
     }
     public virtual void FadeOut(float newAlpha = 0, float duration = 0.5f, float delay = 0, EaseMode ease = EaseMode.None, List<PrimerObject> exemptions = null) {
         if (exemptions == null) { exemptions = new List<PrimerObject>(); }
