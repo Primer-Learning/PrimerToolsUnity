@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Animations;
 
 /// <summary>
 /// A 3D surface of a <see cref="Graph"/>
@@ -17,8 +19,10 @@ public class BarDataManager: MonoBehaviour
     // Bar appearance
     List<Color> barColors = new List<Color>();
     internal float barWidth = 1;
-    
-    // private bool animationDone = true;
+    internal bool showBarNumbers = false;
+    internal int barNumberPrecision = 3; // The number of places to hold after the decimal point
+    internal float barNumberScaleFactor = 0.3f;
+    private List<PrimerText> barNumbers = new List<PrimerText>();
 
     #endregion
 
@@ -38,6 +42,28 @@ public class BarDataManager: MonoBehaviour
                 newBar.transform.localRotation = Quaternion.Euler(0, 0, 0);
                 newBar.transform.localScale = new Vector3(barWidth, 0, 1);
                 bars.Add(newBar);
+
+                // Also generate the number labels
+                if (showBarNumbers) {
+                    PrimerText newBarNumber = Instantiate(SceneManager.instance.primerTextPrefab);
+                    newBarNumber.tmpro.alignment = TextAlignmentOptions.Bottom;
+                    newBarNumber.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 0);
+                    newBarNumber.transform.parent = transform.parent;
+                    newBarNumber.transform.localRotation = Quaternion.Euler(0, 0, 0);
+
+                    ParentConstraint pc = newBarNumber.gameObject.AddComponent<ParentConstraint>();
+                    ConstraintSource constraintSource = new ConstraintSource();
+                    constraintSource.sourceTransform = bars[i].transform;
+                    constraintSource.weight = 1;
+                    pc.AddSource(constraintSource);
+                    pc.SetTranslationOffset(0, Vector3.zero); 
+                    pc.translationAxis = Axis.X | Axis.Z;
+                    pc.locked = true;
+                    pc.constraintActive = true;
+
+                    newBarNumber.transform.localScale = new Vector3(0, 0, 1);
+                    barNumbers.Add(newBarNumber);
+                }
             }
             else if (i > bars.Count) {
                 Debug.LogError("Bar generation is effed.");
@@ -55,6 +81,19 @@ public class BarDataManager: MonoBehaviour
     IEnumerator animateBars(List<float> newVals, float duration, EaseMode ease) {
         GenerateBars(newVals.Count);
         List<float> oldVals = values;
+        if (showBarNumbers) {
+            for (int i = 0; i < newVals.Count; i++)
+            {
+                if (i == oldVals.Count) {
+                    oldVals.Add(0);
+                }
+                if (newVals[i] != oldVals[i]) {
+                    PrimerText newBarNum = barNumbers[i];
+                    newBarNum.MoveTo(new Vector3(0, newVals[i] * transform.localScale.y, 0), duration: duration, ease: ease);
+                    newBarNum.ScaleDownToZero(duration: duration, ease: ease);
+                }
+            }
+        }
         float startTime = Time.time;
         while (Time.time < startTime + duration) {
             float t = (Time.time - startTime) / duration;
@@ -74,6 +113,22 @@ public class BarDataManager: MonoBehaviour
             values[i] = newVals[i];
         }
         UpdateBars(values);
+        if (showBarNumbers) {
+            for (int i = 0; i < newVals.Count; i++)
+            {
+                PrimerText newBarNum = barNumbers[i];
+                if (newVals[i] > 0 && newBarNum.transform.localScale.y == 0) {
+                    float displayVal = (float) Math.Round(newVals[i], barNumberPrecision);
+                    string displayString = displayVal.ToString();
+                    if (newVals[i] != displayVal) {
+                        displayString = "~" + displayString;
+                    }
+                    newBarNum.tmpro.text = displayString;
+                    newBarNum.SetIntrinsicScale(Vector3.one * transform.localScale.x * barNumberScaleFactor);
+                    newBarNum.ScaleUpFromZero(duration: duration, ease: ease);
+                }
+            }
+        }
     }
 
     internal void UpdateBars(List<float> newVals) {
@@ -93,7 +148,6 @@ public class BarDataManager: MonoBehaviour
         }
         return fvals;
     }
-
     internal void SetColors(List<Color> colors) {
         barColors = colors;
         SetColors();
@@ -122,7 +176,7 @@ public class BarDataManager: MonoBehaviour
     }
     internal void AdjustBarSpaceScale() {
         float xScale = plot.xLengthMinusPadding / (plot.xMax - plot.xMin);        
-        float yScale = plot.yLengthMinusPadding / (plot.yMax - plot.yMin);        
+        float yScale = plot.yLengthMinusPadding / (plot.yMax - plot.yMin);      
         transform.localScale = new Vector3 (xScale, yScale, 1);
     }
     private void OnApplicationQuit() {
