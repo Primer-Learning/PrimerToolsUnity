@@ -18,7 +18,8 @@ public class BarDataManager: MonoBehaviour
     private List<PrimerObject> bars = new List<PrimerObject>();
     float barZOffset = 0.0001f;
     // Bar appearance
-    List<Color> barColors = new List<Color>();
+    // List<Color> barColors = new List<Color>();
+    internal Color defaultColor = Color.blue;
     internal float barWidth = 1;
     internal bool showBarNumbers = false;
     internal int barNumberPrecision = 3; // The number of places to hold after the decimal point
@@ -42,7 +43,11 @@ public class BarDataManager: MonoBehaviour
                 newBar.transform.localPosition = new Vector3(i + 1, 0, barZOffset);
                 newBar.transform.localRotation = Quaternion.Euler(0, 0, 0);
                 newBar.transform.localScale = new Vector3(barWidth, 0, 1);
+                newBar.EmissionColor = defaultColor;
                 bars.Add(newBar);
+                // if (barColors.Count > 0 && barColors.Count < bars.Count) {
+                //     barColors.Add(barColors[barColors.Count - 1]);
+                // }
 
                 // Also generate the number labels
                 if (showBarNumbers) {
@@ -70,7 +75,7 @@ public class BarDataManager: MonoBehaviour
                 Debug.LogError("Bar generation is effed.");
             }
         }
-        SetColors();
+        // SetColors();
     }
 
     internal void AnimateBars(List<float> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
@@ -150,22 +155,26 @@ public class BarDataManager: MonoBehaviour
         return fvals;
     }
     internal void SetColors(List<Color> colors) {
-        barColors = colors;
-        SetColors();
+        for (int i = 0; i < bars.Count; i++) {
+            Color c = colors[i % colors.Count];
+            bars[i].EmissionColor = c;
+        }
     }
     internal void SetColors(Color color) {
         SetColors(new List<Color>() {color});
     }
-    void SetColors() {
-        for (int i = 0; i < bars.Count; i++) {
-            Color c = barColors[i % barColors.Count];
-            bars[i].EmissionColor = c;
-        }
+    internal void SetColor(int barIndex, Color color) {
+        bars[barIndex].EmissionColor = color;
     }
     internal void AnimateColors(List<Color> colors, float duration = 0.5f, EaseMode ease = EaseMode.None) {
             for (int i = 0; i < bars.Count; i++) {
+                // barColors[i] = colors[i];
                 bars[i].AnimateEmissionColor(colors[i], duration: duration, ease: ease);
             }
+    }
+    internal void AnimateColor(int barIndex, Color color, float duration = 0.5f, EaseMode ease = EaseMode.None) {
+        // barColors[barIndex] = color;
+        bars[barIndex].AnimateEmissionColor(color, duration: duration, ease: ease);
     }
 
     internal void RefreshData() {
