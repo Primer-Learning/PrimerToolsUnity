@@ -298,11 +298,15 @@ public class Axes : PrimerObject
             }
         }
         else { //Manual tic mode
+            List<Tic> toKeep = new List<Tic>();
             foreach (KeyValuePair<float, string> entry in graph.manualTicsX) {
                 bool exists = false;
                 foreach (Tic tic in xTics)
                 {
-                    if (tic.value == entry.Key) { exists = true; }
+                    if (tic.value == entry.Key) {
+                        exists = true;
+                        toKeep.Add(tic);
+                    }
                 }
                 if (exists == false)
                 {
@@ -315,6 +319,14 @@ public class Axes : PrimerObject
                     xTics.Add(newTic);
                     newTic.MakeLabel(entry.Value);
                     newTic.ScaleUpFromZero();
+                    toKeep.Add(newTic);
+                }
+            }
+            for (int i = xTics.Count - 1; i >= 0; i--) {
+                Tic tic = xTics[i];
+                if (!toKeep.Contains(tic)) {
+                    xTics.Remove(tic);
+                    tic.Disappear();
                 }
             }
         }

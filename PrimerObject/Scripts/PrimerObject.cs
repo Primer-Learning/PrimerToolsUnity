@@ -17,7 +17,6 @@ public class PrimerObject : MonoBehaviour
     }
     public Color EmissionColor {
         get {
-            Debug.LogWarning("Property EmissionColor only returns the color of the first material of the first renderer found.");
             return GetComponentsInChildren<Renderer>()[0].materials[0].GetColor("_EmissionColor");
         } 
         set {

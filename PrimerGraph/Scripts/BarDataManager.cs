@@ -16,6 +16,7 @@ public class BarDataManager: MonoBehaviour
 
     internal List<float> values = new List<float>();
     private List<PrimerObject> bars = new List<PrimerObject>();
+    float barZOffset = 0.0001f;
     // Bar appearance
     List<Color> barColors = new List<Color>();
     internal float barWidth = 1;
@@ -38,7 +39,7 @@ public class BarDataManager: MonoBehaviour
             if (i == bars.Count) {
                 PrimerObject newBar = Instantiate(barPrefab);
                 newBar.transform.parent = transform;
-                newBar.transform.localPosition = new Vector3(i + 1, 0, 0);
+                newBar.transform.localPosition = new Vector3(i + 1, 0, barZOffset);
                 newBar.transform.localRotation = Quaternion.Euler(0, 0, 0);
                 newBar.transform.localScale = new Vector3(barWidth, 0, 1);
                 bars.Add(newBar);
