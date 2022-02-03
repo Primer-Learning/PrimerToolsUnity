@@ -29,6 +29,7 @@ public class Graph : PrimerObject
     public float xLengthMinusPadding;
     public float xAxisOffset;
     public float xDrawnMin;
+    public float xAxisThickness;
 
     [Header("Y")] 
     public float yMin;
@@ -41,6 +42,7 @@ public class Graph : PrimerObject
     //Calculated alignment shortcuts
     public float yLengthMinusPadding;
     public float yAxisOffset;
+    public float yAxisThickness;
 
     [Header("Z")] 
     public float zMin;
@@ -54,6 +56,7 @@ public class Graph : PrimerObject
     public float zLengthMinusPadding;
     public float zAxisOffset;
     public float zDrawnMin;
+    public float zAxisThickness;
 
     internal bool manualTicMode;
 
@@ -108,7 +111,8 @@ public class Graph : PrimerObject
         float xAxisLength = 1f, //Axis lengths and are the main tool for controlling size, since changing the graph's scale can warp component objects
         float xTicStep = 2f,
         bool xHidden = false,
-        
+        float xAxisThickness = 1,
+
         float yMin = 0f,
         float yMax = 10f,
         string yAxisLabelString = "y",
@@ -116,6 +120,7 @@ public class Graph : PrimerObject
         float yAxisLength = 1f, //Axis lengths and are the main tool for controlling size, since changing the graph's scale can warp component objects
         float yTicStep = 2f,
         bool yHidden = false,
+        float yAxisThickness = 1,
         
         float zMin = 0f,
         float zMax = 10f,
@@ -124,6 +129,7 @@ public class Graph : PrimerObject
         float zAxisLength = 1f, //Axis lengths and are the main tool for controlling size, since changing the graph's scale can warp component objects
         float zTicStep = 2f,
         bool zHidden = false,
+        float zAxisThickness = 1,
         
         int ticPrecision = 0, //Not implemented
         float ticLabelDistanceVertical = 0.25f, //For horizontally aligned axes
@@ -161,6 +167,7 @@ public class Graph : PrimerObject
         //Offset is padding plus the padded/scaled min
         this.xAxisOffset = - this.xAxisLength * this.paddingFraction + this.xMin * this.xLengthMinusPadding / (this.xMax - this.xMin);
         this.xDrawnMin = this.xAxisOffset + this.xAxisLength * paddingFraction;
+        this.xAxisThickness = xAxisThickness;
 
         this.yMin = yMin;
         this.yMax = yMax;
@@ -172,6 +179,7 @@ public class Graph : PrimerObject
         this.yLengthMinusPadding = this.yAxisLength * (1 - 2 * this.paddingFraction);
         //Offset is padding plus the padded/scaled min
         this.yAxisOffset = -this.yAxisLength * this.paddingFraction + this.yMin * this.yLengthMinusPadding / (this.yMax - this.yMin);
+        this.yAxisThickness = yAxisThickness;
 
         this.zMin = zMin;
         this.zMax = zMax;
@@ -184,6 +192,7 @@ public class Graph : PrimerObject
         //Offset is padding plus the padded/scaled min
         this.zAxisOffset = -this.zAxisLength * this.paddingFraction + this.zMin * this.zLengthMinusPadding / (this.zMax - this.zMin);
         this.zDrawnMin = this.zAxisOffset + this.zAxisLength * paddingFraction;
+        this.yAxisThickness = yAxisThickness;
 
         this.ticLabelDistanceVertical = ticLabelDistanceVertical;
         this.ticLabelDistanceHorizontal = ticLabelDistanceHorizontal;

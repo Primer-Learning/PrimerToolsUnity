@@ -65,11 +65,11 @@ public class PrimerArrow : PrimerObject
         transform.localRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
     }
 
-    public void AnimateFromTo(Vector3 from, Vector3 to, float buffer = 0, float duration = 0.5f, EaseMode ease = EaseMode.Cubic)
+    public void AnimateFromTo(Vector3 from, Vector3 to, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float endBuffer = 0f, float startBuffer = 0f)
     {
-        StartCoroutine(animateFromTo(from, to, buffer, duration, ease));
+        StartCoroutine(animateFromTo(from, to, duration, ease, endBuffer, startBuffer));
     }
-    private IEnumerator animateFromTo(Vector3 from, Vector3 to, float buffer, float duration, EaseMode ease)
+    private IEnumerator animateFromTo(Vector3 from, Vector3 to, float duration, EaseMode ease, float endBuffer = 0f, float startBuffer = 0f)
     {
         Vector3 oldPosition = transform.localPosition;
         Quaternion oldRotation = transform.localRotation;
@@ -77,12 +77,14 @@ public class PrimerArrow : PrimerObject
 
         //HandleBuffer
         float newLength = (from - to).magnitude;
-        float bufferFac = buffer / newLength;
-        to = Vector3.Lerp(to, from, bufferFac);
-        newLength -= buffer;
+        float startBufferFac = startBuffer / newLength;
+        float endBufferFac = endBuffer / newLength;
+        Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
+        Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
+        newLength -= startBuffer + endBuffer;
 
         //get new rotation
-        float rads = Mathf.Atan2((from - to).y, (from - to).x);
+        float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
         Quaternion newRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
 
         float startTime = Time.time;
@@ -90,12 +92,12 @@ public class PrimerArrow : PrimerObject
         {
             float t = (Time.time - startTime) / duration;
             t = Helpers.ApplyNormalizedEasing(t, ease);
-            transform.localPosition = Vector3.Lerp(oldPosition, to, t);
+            transform.localPosition = Vector3.Lerp(oldPosition, bTo, t);
             transform.localRotation = Quaternion.Slerp(oldRotation, newRotation, t);
             SetLength(Mathf.Lerp(oldLength, newLength, t));
             yield return null;
         }
-        SetFromTo(from, to); //Don't include buffer, since 'to' has already been altered
+        SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
     }
 
     internal override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0)

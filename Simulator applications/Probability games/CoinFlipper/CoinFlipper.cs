@@ -32,7 +32,7 @@ public class CoinFlipper : Simulator
     
     internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
     internal PrimerCharacter flipperCharacter = null;
-    PrimerObject coin = null;
+    internal PrimerObject coin = null;
     public GameObject coinPrefab = null;
     internal float headsRate = 0.5f;
     bool expectedHeads; // For testing whether the bias works properly.
@@ -63,8 +63,8 @@ public class CoinFlipper : Simulator
     
     // Recording and displaying results
     internal PrimerObject display = null;
-    int displayRowLength = 8;
-    float displayCoinSpacing = 1;
+    internal int displayRowLength = 8;
+    internal float displayCoinSpacing = 1;
     Vector3 displayPos = new Vector3(0, 2.5f, 1.5f);
     float displayScale = 0.5f;
     internal List<PrimerObject> displayCoins = new List<PrimerObject>();
@@ -74,7 +74,7 @@ public class CoinFlipper : Simulator
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
 
-    internal Vector3 individualOffset = new Vector3(0f, 1f, 5f);
+    internal Vector3 individualOffset = new Vector3(0f, 1f, 4f);
 
     internal void Appear(float stagger = 0.25f) {
         if (flipperCharacter == null) {
@@ -226,8 +226,8 @@ public class CoinFlipper : Simulator
         if (Vector3.Dot(coin.transform.forward, Vector3.up) > 0.99f) { return 1; }
         else { return 0; }
     }
-    IEnumerator recordAndDisplay(float duration = 0.5f) {
-        int res = GetResult();
+    internal IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1) {
+        int res = outcome == -1 ? GetResult() : outcome;
         results.Add(res);
         int numResults = results.Count;
         if (resultsDisplayMode == ResultsDisplayMode.Individual) {
@@ -329,7 +329,7 @@ public class CoinFlipper : Simulator
             SetFlipParameters();
             Flip(outcome);
             yield return waitUntilCoinIsStopped();
-            yield return recordAndDisplay();
+            yield return recordAndDisplay(outcome);
             currentlyFlipping = false;
         }
     }
