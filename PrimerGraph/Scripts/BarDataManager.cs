@@ -32,7 +32,7 @@ public class BarDataManager: MonoBehaviour
         // plot = transform.parent.gameObject.GetComponent<Graph>();
         bars = new List<PrimerObject>();
     }
-    private void GenerateBars(int totalBars = 0) {
+    internal void GenerateBars(int totalBars = 0) {
         if (totalBars == 0) { totalBars = values.Count; }
         // Just makes sure there are enough
         for (int i = 0; i < totalBars; i++)
@@ -75,7 +75,6 @@ public class BarDataManager: MonoBehaviour
                 Debug.LogError("Bar generation is effed.");
             }
         }
-        // SetColors();
     }
 
     internal void AnimateBars(List<float> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
@@ -154,16 +153,16 @@ public class BarDataManager: MonoBehaviour
         }
         return fvals;
     }
-    internal void SetColors(List<Color> colors) {
+    internal void SetBarColors(List<Color> colors) {
         for (int i = 0; i < bars.Count; i++) {
             Color c = colors[i % colors.Count];
             bars[i].EmissionColor = c;
         }
     }
-    internal void SetColors(Color color) {
-        SetColors(new List<Color>() {color});
+    internal void SetBarColors(Color color) {
+        SetBarColors(new List<Color>() {color});
     }
-    internal void SetColor(int barIndex, Color color) {
+    internal void SetBarColor(int barIndex, Color color) {
         bars[barIndex].EmissionColor = color;
     }
     internal void AnimateColors(List<Color> colors, float duration = 0.5f, EaseMode ease = EaseMode.None) {

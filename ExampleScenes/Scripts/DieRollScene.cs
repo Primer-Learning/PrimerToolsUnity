@@ -165,7 +165,7 @@ public class DieRollScene : Director
         };
         rollerGroup.colorList = colors;
         BarDataManager bd = graph.AddBarData();
-        graph.barData.SetColors(colors);
+        graph.barData.SetBarColors(colors);
         graph.transform.localScale = Vector3.zero;
         rollerGroup.SetUpGraph(graph);
         graph.SetIntrinsicScale();
