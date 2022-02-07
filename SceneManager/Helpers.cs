@@ -314,7 +314,10 @@ public static class Helpers
         return -1;
     }
 
-    public static int Choose(int m, int n) {
+    public static double Choose(int m, int n) { // Double for the extra size. Conceptually, an int.
+        if (m < 0 || n < 0) {
+            Debug.LogError("Choose method received negative argument");
+        }
         // ulong numerator = Factorial((ulong)m, (ulong)n);
         // ulong denominator = Factorial((ulong)(m-n));
         // return (int)(numerator / denominator);
@@ -326,7 +329,15 @@ public static class Helpers
             numeratorFactors.Remove(commonFactor);
         }
 
-        return numeratorFactors.Aggregate(1, (acc, val) => acc * val);
+        // int toReturn = numeratorFactors.Aggregate(1, (acc, val) => acc * val);
+        double toReturn = 1;
+        foreach (int primeFactor in numeratorFactors) {
+            toReturn = checked(toReturn * primeFactor);
+        }
+        if (toReturn < 0) {
+            Debug.LogError("Negative Ways");
+        }
+        return toReturn;
     }
     public static List<int> GetPrimeFactors(int n) {
         List<int> output = new List<int>();
@@ -338,7 +349,9 @@ public static class Helpers
             }
             else { i++; }
         }
-        output.Add(n);
+        if (n > 1) {
+            output.Add(n);
+        }
         return output;
     }
     public static List<int> GetPrimeFactorsOfFactorial(int x) {
@@ -349,36 +362,12 @@ public static class Helpers
         return output;
     }
     public static double Binomial(int numEvents, int numOfInterest, double probOfInterest) {
-        int ways = Helpers.Choose(numEvents, numOfInterest);
+        double ways = Helpers.Choose(numEvents, numOfInterest);
         // Could use log probabilities here to prevent underflow if necessary
         // 64 bits is plenty for now, though
         double probOfEach = System.Math.Pow(probOfInterest, numOfInterest) * System.Math.Pow(1 - probOfInterest, numEvents - numOfInterest);
 
         return ways * probOfEach;
-    }
-    public static double MaxBinomialAccuracy(int numEvents, double prob1, double prob2) {
-        // Wait, maybe this is garbage. Maybe it's frequentist?
-        if (prob1 > prob2) {
-            double placeHolder = prob1;
-            prob1 = prob2;
-            prob2 = placeHolder;
-        }
-        
-        double probMass1 = 0;
-        double probMass2 = 0;
-        int crossoverPoint = -1;
-        for (int i = 0; i <= numEvents; i++) {
-            double b1 = Binomial(numEvents, i, prob1);
-            double b2 = Binomial(numEvents, i, prob2);
-            if (b1 > b2) { probMass1 += b1; }
-            else { // Includes the case where they are equal, but since they are equal, who cares! (But it will matter if I add weights corresponding to base rates)
-                if (crossoverPoint == -1) { 
-                    crossoverPoint = i;
-                }
-                probMass2 += b2;
-            }
-        }
-        return (probMass1 + probMass2) / 2; // Change this when adjusting for different base rates.
     }
     public static double BayesProbabilityOfCheater(int numEvents, int numHeads, double cheaterProb, double fairProb = 0.5f, double cheaterBaseRate = 0.5f) {
         double probThisOutcomeIfCheater = Binomial(numEvents, numHeads, cheaterProb);

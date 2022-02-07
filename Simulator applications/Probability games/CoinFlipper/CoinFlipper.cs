@@ -302,7 +302,7 @@ public class CoinFlipper : Simulator
 
         double probabilityAtLeastExtreme = 0;
         for (int i = num; i >= numHeads; i--) {
-            int ways = Helpers.Choose(num, i);
+            double ways = Helpers.Choose(num, i);
             double probOfEach = System.Math.Pow(0.5, num);
             // Debug.Log($"{ways} ways, each with probability {probOfEach}.");
             probabilityAtLeastExtreme += ways * probOfEach;
