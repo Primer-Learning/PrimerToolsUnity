@@ -327,7 +327,7 @@ public class CoinFlipper : Simulator
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
             SetFlipParameters();
-            Flip(outcome);
+            Flip(outcome == -1 ? outcome : (outcome >> i) & 1);
             yield return waitUntilCoinIsStopped();
             yield return recordAndDisplay(outcome);
             currentlyFlipping = false;
