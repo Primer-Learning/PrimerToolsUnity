@@ -218,7 +218,7 @@ public class Director : SceneManager
             Time.timeScale /= 2;
         }
         if (Input.GetKeyDown(KeyCode.RightArrow)) {
-            Time.timeScale *= 2;
+            Time.timeScale = Mathf.Min(Time.timeScale * 2, 100);
         }
     }
 
