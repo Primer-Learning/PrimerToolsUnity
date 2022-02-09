@@ -568,6 +568,10 @@ public class PoissonDiscPointSet
     }
     public void AddPoint(int numSamplesBeforeRejection = 30) {
         bool pointFound = false;
+        // If we land here from a part of AddPoints handling overflow, we want to refresh the set of spawn points
+        if (spawnPoints.Count == 0) {
+            spawnPoints.AddRange(points);
+        }
         if (spawnPoints.Count == 0) {
             spawnPoints.Add(sampleRegionSize/2);
         }
@@ -596,20 +600,21 @@ public class PoissonDiscPointSet
         }
     }
     public void AddPoints(int numPoints, int numSamplesBeforeRejection = 30) {
+        int newTotal = points.Count + numPoints;
         for (int i = 0; i < numPoints; i++) {
             AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
         }
         float storedMinDistance = minDistance;
         // Squeeze mode doesn't seem to properly respect the new min distance
-        if (points.Count < numPoints && overflowMode != PoissonDiscOverflowMode.None) {
+        if (points.Count < newTotal && overflowMode != PoissonDiscOverflowMode.None) {
             Initialize(minDistance / 2, sampleRegionSize);
-            for (int i = points.Count; i < numPoints; i++) {
+            for (int i = points.Count; i < newTotal; i++) {
                 AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
             }
         }
-        while (points.Count < numPoints && overflowMode == PoissonDiscOverflowMode.Force) {
+        while (points.Count < newTotal && overflowMode == PoissonDiscOverflowMode.Force) {
             Initialize(minDistance / 2, sampleRegionSize);
-            for (int i = points.Count; i < numPoints; i++) {
+            for (int i = points.Count; i < newTotal; i++) {
                 AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
             }
         }
