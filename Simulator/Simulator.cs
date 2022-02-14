@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Simulator : PrimerObject
 {
+    // SimulationManager simManager = null;
     // CycleType cycleType = CycleType.Continuous;
     public enum CycleType {
         Continuous,

@@ -29,6 +29,7 @@ public class CoinFlipper : Simulator
     internal PlayerType labeledType = PlayerType.Unknown;
     public PrimerCharacter flipperCharacterPrefab = null;
     [SerializeField] PrimerObject floorPrefab = null;
+    internal System.Random rng;
     
     internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
     internal PrimerCharacter flipperCharacter = null;
@@ -73,8 +74,16 @@ public class CoinFlipper : Simulator
     internal List<int> results = new List<int>();
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
+    internal bool currentlyInASeriesOfFlips = false;
 
     internal Vector3 individualOffset = new Vector3(0f, 1f, 4f);
+
+    void Start() {
+        if (rng == null) {
+            int seed = System.Environment.TickCount;
+            rng = new System.Random(seed);
+        }
+    }
 
     internal void Appear(float stagger = 0.25f) {
         if (flipperCharacter == null) {
@@ -133,11 +142,11 @@ public class CoinFlipper : Simulator
         // coin.transform.localScale = Vector3.one;
         coin.transform.localPosition = sourceDisp;
         int extraRot = 0;
-        if (outcome == 1 || (outcome == -1 && SceneManager.sceneRandom.NextDouble() < headsRate)) { 
+        if (outcome == 1 || (outcome == -1 && rng.NextDouble() < headsRate)) { 
             extraRot = 180; 
             expectedHeads = true;
         } else { expectedHeads = false; }
-        coin.transform.localRotation = Quaternion.Euler(-45 + extraRot, 0, SceneManager.sceneRandom.Next(360));
+        coin.transform.localRotation = Quaternion.Euler(-45 + extraRot, 0, rng.Next(360));
         coin.transform.parent = flipperCharacter.transform.FindDeepChild("bone_neck");
         coin.SetIntrinsicScale(0.3f);
         coin.ScaleUpFromZero();
@@ -324,6 +333,7 @@ public class CoinFlipper : Simulator
         StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions));
     }
     internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1) {
+        currentlyInASeriesOfFlips = true;
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
             SetFlipParameters();
@@ -332,9 +342,10 @@ public class CoinFlipper : Simulator
             yield return recordAndDisplay(outcome);
             currentlyFlipping = false;
         }
+        currentlyInASeriesOfFlips = false;
     }
     internal void NonAnimatedFlip() {
-        if (SceneManager.sceneRandom.NextDouble() < headsRate) {
+        if (rng.NextDouble() < headsRate) {
             results.Add(1);
         }
         else { results.Add(0); }
@@ -379,7 +390,7 @@ public class CoinFlipper : Simulator
                 // Debug.Log(manager.icParameterIndex);
             }
             else {
-                currentICs = manager.validInitialConditions[SceneManager.sceneRandom.Next(manager.validInitialConditions.Count)];
+                currentICs = manager.validInitialConditions[rng.Next(manager.validInitialConditions.Count)];
             }
             initialVerticalSpeed = currentICs[0];
             initialHorizontalSpeed = currentICs[1];
