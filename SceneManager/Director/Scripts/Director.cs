@@ -44,13 +44,40 @@ public class Director : SceneManager
 
     // Media references to test how animations sync with voice or other video
     ReferenceScreen referenceScreenPrefab = null;
+    public AudioClip voiceOverReferenceClip = null;
     internal AudioSource voiceOverReference;
     internal static List<SceneBlock> schedule = new List<SceneBlock>();
     internal AudioSource doneAlarm;
 
     protected virtual void DefineSchedule() {}
 
+    protected override void Awake() {
+        base.Awake();
+        if (this.enabled) {
+            if (voiceOverReference == null) {
+                voiceOverReference = this.gameObject.AddComponent<AudioSource>();
+                voiceOverReference.clip = voiceOverReferenceClip;
+                voiceOverReference.playOnAwake = false;
+            }
+            if (doneAlarm == null) {
+                doneAlarm = this.gameObject.AddComponent<AudioSource>();
+                doneAlarm.clip = Resources.Load("zelda_secret", typeof(AudioClip)) as AudioClip;
+                doneAlarm.playOnAwake = false;
+            }
+
+            SetDirectorMode(mode);
+            DefineSchedule();
+            schedule.Sort((x,y) => x.scheduledStartTime.CompareTo(y.scheduledStartTime));
+
+            //Make scenes start right away without having to manually subtract the timing for each
+            if (schedule.Count > 0) {
+                float firstStart = schedule[0].scheduledStartTime;
+                timeBehind = -firstStart;
+            }
+        }
+    }
     protected virtual void Start() {
+        // override in subclass
         if (lightBackground) {
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Color.gray;
@@ -59,7 +86,6 @@ public class Director : SceneManager
             StartRecording();
         }
 
-        // override in subclass
         StartCoroutine(playScene());
     }
     internal IEnumerator playScene() {
@@ -78,6 +104,9 @@ public class Director : SceneManager
                 sb.expectedDuration = schedule[i + 1].scheduledStartTime - sb.scheduledStartTime;
             }
             yield return sb.delegateIEnumerator();
+            if (sb.flexible && schedule.Count > i + 1) {
+                timeBehind = Time.time - schedule[i + 1].scheduledStartTime;
+            }
         }
         List<PrimerObject> allPOs = Object.FindObjectsOfType<PrimerObject>().ToList();
         foreach (PrimerObject po in allPOs) {
@@ -160,31 +189,6 @@ public class Director : SceneManager
                 break;
         }
     }
-    protected override void Awake() {   
-        base.Awake();
-        if (this.enabled) {
-            if (voiceOverReference == null) {
-                voiceOverReference = this.gameObject.AddComponent<AudioSource>();
-                voiceOverReference.clip = Resources.Load("voiceover", typeof(AudioClip)) as AudioClip;
-                voiceOverReference.playOnAwake = false;
-            }
-            if (doneAlarm == null) {
-                doneAlarm = this.gameObject.AddComponent<AudioSource>();
-                doneAlarm.clip = Resources.Load("zelda_secret", typeof(AudioClip)) as AudioClip;
-                doneAlarm.playOnAwake = false;
-            }
-
-            SetDirectorMode(mode);
-            DefineSchedule();
-            schedule.Sort((x,y) => x.scheduledStartTime.CompareTo(y.scheduledStartTime));
-
-            //Make scenes start right away without having to manually subtract the timing for each
-            if (schedule.Count > 0) {
-                float firstStart = schedule[0].scheduledStartTime;
-                timeBehind = -firstStart;
-            }
-        }
-    }
 
     protected virtual void Update() {
         if (timeDisplay != null) {
@@ -255,7 +259,7 @@ public class Director : SceneManager
         StartCoroutine(startRecording(path));
     }
     IEnumerator startRecording(string path) {
-        //Save frame with frame numbe
+        //Save frame with frame number
         int framesSeen = 0;
         int framesSaved = 0;
         while (recording) {
@@ -280,6 +284,10 @@ public class Director : SceneManager
         }
         recording = false;
         yield return null;
+    }    
+    protected void InsertSceneTime(float extraTime) {
+        timeBehind += extraTime;
+        ((Director)SceneManager.instance).voiceOverReference.Pause();
     }
 }
 
@@ -292,6 +300,7 @@ public class WaitUntilSceneTime : CustomYieldInstruction {
             bool toKeepWaiting = Time.time - ((Director)SceneManager.instance).timeBehind < timeToWaitUntil;
             if (toKeepWaiting == false && ((Director)SceneManager.instance).voiceOverReference != null) {
                 ((Director)SceneManager.instance).voiceOverReference.time = timeToWaitUntil;
+                ((Director)SceneManager.instance).voiceOverReference.Play();
             }
             return toKeepWaiting;
         }
