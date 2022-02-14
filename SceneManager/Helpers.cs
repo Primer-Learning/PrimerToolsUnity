@@ -566,7 +566,7 @@ public class PoissonDiscPointSet
             grid[(int)(point.x/cellSize),(int)(point.y/cellSize)] = points.IndexOf(point);
         }
     }
-    public void AddPoint(int numSamplesBeforeRejection = 30) {
+    public bool AddPoint(int numSamplesBeforeRejection = 30) {
         bool pointFound = false;
         if (spawnPoints.Count == 0) {
             spawnPoints.Add(sampleRegionSize/2);
@@ -587,27 +587,33 @@ public class PoissonDiscPointSet
                     spawnPoints.Add(candidate);
                     grid[(int)(candidate.x/cellSize),(int)(candidate.y/cellSize)] = points.Count;
                     pointFound = true;
-                    break;
+                    return true;
                 }
             }
             if (!pointFound) {
                 spawnPoints.RemoveAt(spawnIndex);
             }
         }
+        return false;
     }
     public void AddPoints(int numPoints, int numSamplesBeforeRejection = 30) {
+        Debug.Log("Spawn points count: " + spawnPoints.Count.ToString());
+        int added = 0;
         for (int i = 0; i < numPoints; i++) {
-            AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
+            if (AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection))
+                added++;
+            else
+                break;
         }
         float storedMinDistance = minDistance;
         // Squeeze mode doesn't seem to properly respect the new min distance
-        if (points.Count < numPoints && overflowMode != PoissonDiscOverflowMode.None) {
+        if (added < numPoints && overflowMode != PoissonDiscOverflowMode.None) {
             Initialize(minDistance / 2, sampleRegionSize);
             for (int i = points.Count; i < numPoints; i++) {
                 AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
             }
         }
-        while (points.Count < numPoints && overflowMode == PoissonDiscOverflowMode.Force) {
+        while (added < numPoints && overflowMode == PoissonDiscOverflowMode.Force) {
             Initialize(minDistance / 2, sampleRegionSize);
             for (int i = points.Count; i < numPoints; i++) {
                 AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
