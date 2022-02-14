@@ -78,9 +78,19 @@ public class CoinFlipSimManager : SimulationManager
         foreach (CoinFlipper f in these) {
             crs.Add(StartCoroutine(testFlipper(numFlips, minNumHeads, f)));
         }
-        foreach (Coroutine cr in crs) {
-            yield return cr;
+        // This part used to yield on all the coroutines above, but that made Unity crash a lot, so now we track bools.
+        bool finished = false;
+        while (!finished) {
+            finished = true;
+            foreach (CoinFlipper f in these) {
+                if (f.currentlyInASeriesOfFlips) {
+                    finished = false;
+                    break;
+                }
+            }
+            yield return null;
         }
+        
         CategorizeTestedFlippers();
         Debug.Log($"True Positive Rate = {(float)truePositives.Count / alternatives.Count}");
         Debug.Log($"True Negative Rate = {(float)trueNegatives.Count / nulls.Count}");
@@ -131,6 +141,7 @@ public class CoinFlipSimManager : SimulationManager
     internal CoinFlipper AddFlipper(float headsRate = 0.5f) {
         CoinFlipper f = Instantiate(flipperPrefab);
         f.headsRate = headsRate;
+        f.rng = simRNG;
         f.manager = this;
         flippers.Add(f);
         if (headsRate == 0.5f) { f.trueType = PlayerType.Fair; }
@@ -138,7 +149,7 @@ public class CoinFlipSimManager : SimulationManager
         return f;
     }
     internal CoinFlipper AddFlipper(float cheaterProbability, float cheaterHeadsRate) {
-        if (SceneManager.sceneRandom.NextDouble() < cheaterProbability) {
+        if (simRNG.NextDouble() < cheaterProbability) {
             return AddFlipper(cheaterHeadsRate);
         }
         return AddFlipper(0.5f);

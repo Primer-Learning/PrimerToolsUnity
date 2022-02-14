@@ -15,6 +15,17 @@ public class PrimerArrow : PrimerObject
     [SerializeField] Transform shaft = null;
     [SerializeField] Transform head = null;
     float currentLength;
+    internal Color Color {
+        get {
+            return head.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color;
+            // Assume head and shaft are the same color
+        }
+        set {
+            head.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color = value;
+            shaft.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color = value;
+        }
+    }
+
 
     void OnValidate() {
         if ( (tailPosition - headPosition).magnitude > 0 ) {
@@ -118,7 +129,7 @@ public class PrimerArrow : PrimerObject
 
     public override void SetColor(Color c)
     {
-        head.GetComponent<MeshRenderer>().material.color = c;
-        shaft.GetComponent<MeshRenderer>().material.color = c;
+        Debug.LogWarning("Arrow color has been moved to a property. Just set PrimerArrow.Color normally.");
+        Color = c;
     }
 }
