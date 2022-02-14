@@ -526,7 +526,7 @@ public class PrimerObject : MonoBehaviour
         yield return new WaitForSeconds(duration - decay);
         this.ScaleTo(initialScale, duration: decay);
     }
-
+    // Todo: Make this "AnimateColor" instead of "ChangeColor" for more consistent and clear naming
     public virtual void ChangeColor(Color newColor, Renderer r, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         StartCoroutine(changeColor(r.material, newColor, duration, ease));
     }
