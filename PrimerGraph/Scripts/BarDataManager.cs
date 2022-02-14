@@ -16,6 +16,14 @@ public class BarDataManager: MonoBehaviour
 
     internal List<float> values = new List<float>();
     private List<PrimerObject> bars = new List<PrimerObject>();
+    public int BarCount {
+        get {
+            return bars.Count;
+        }
+        set {
+            Debug.LogError("Cannot set bar count directly");
+        }
+    }
     float barZOffset = 0.0001f;
     // Bar appearance
     // List<Color> barColors = new List<Color>();
@@ -32,7 +40,7 @@ public class BarDataManager: MonoBehaviour
         // plot = transform.parent.gameObject.GetComponent<Graph>();
         bars = new List<PrimerObject>();
     }
-    internal void GenerateBars(int totalBars = 0) {
+    void GenerateBars(int totalBars = 0) {
         if (totalBars == 0) { totalBars = values.Count; }
         // Just makes sure there are enough
         for (int i = 0; i < totalBars; i++)
@@ -85,6 +93,10 @@ public class BarDataManager: MonoBehaviour
     }
     IEnumerator animateBars(List<float> newVals, float duration, EaseMode ease) {
         GenerateBars(newVals.Count);
+        // Make sure to have unused bars disappear
+        while (newVals.Count < bars.Count) {
+            newVals.Add(0);
+        }
         List<float> oldVals = values;
         if (showBarNumbers) {
             for (int i = 0; i < newVals.Count; i++)
@@ -103,7 +115,7 @@ public class BarDataManager: MonoBehaviour
         while (Time.time < startTime + duration) {
             float t = (Time.time - startTime) / duration;
             t = Helpers.ApplyNormalizedEasing(t, ease);
-            for (int i = 0; i < newVals.Count; i++)
+            for (int i = 0; i < bars.Count; i++)
             {
                 if (i == oldVals.Count) {
                     oldVals.Add(0);
