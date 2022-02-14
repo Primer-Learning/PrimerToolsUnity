@@ -5,7 +5,16 @@ using UnityEngine;
 public class SimulationManager : MonoBehaviour
 {
     internal static SimulationManager instance;
-    internal int? simSeed;
+    internal System.Random simRNG;
+    int simSeed = -1;
+    public int SimSeed {
+        get { return simSeed; }
+        set {
+            simRNG = new System.Random(value);
+            simSeed = value;
+            Debug.Log($"New sim seed is {value}.");
+        }
+    }
     internal List<Simulator> sims = new List<Simulator>();
 
     internal Graph graph = null;
@@ -35,12 +44,14 @@ public class SimulationManager : MonoBehaviour
         }
     }
     void Start() {
-        
         if (sunLight == null) {
             sunLight = GameObject.Find("Directional Light").AddComponent<PrimerObject>();
             if (sunLight == null) {
                 Debug.LogWarning("Cannot find light");
             }
+        }
+        if (simSeed == -1) {
+            SimSeed = System.Environment.TickCount;
         }
     }
     void StartSimulations() {
@@ -97,8 +108,8 @@ public class SimulationManager : MonoBehaviour
         Director.sceneRandom = new System.Random(newSeed);
         // This is for purely visual stuff so messing with that doesn't affect rng state
         Director.sceneRandom2 = new System.Random(newSeed);
-        simSeed = newSeed;
-        Debug.Log($"Seed: {simSeed}");
+        // simSeed = newSeed;
+        // Debug.Log($"Seed: {simSeed}");
     }
 
     // Other methods needed in many sims

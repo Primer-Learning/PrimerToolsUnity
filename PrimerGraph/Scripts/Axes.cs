@@ -69,6 +69,7 @@ public class Axes : PrimerObject
         xAxisLabel.transform.localPosition = xLabelPos;
         xAxisLabel.tmpro.text = graph.xAxisLabelString;
         xAxisLabel.tmpro.alignment = TextAlignmentOptions.Midline;
+        xAxisLabel.SetIntrinsicScale();
 
         //Axis arrowheads
         switch (graph.arrows)
@@ -122,6 +123,7 @@ public class Axes : PrimerObject
         }
         yAxisLabel.transform.localPosition = yLabelPos;//yAxisLabel.transform.position;
         yAxisLabel.tmpro.text = graph.yAxisLabelString;
+        yAxisLabel.SetIntrinsicScale();
 
         //Axis arrowheads
         switch (graph.arrows)
