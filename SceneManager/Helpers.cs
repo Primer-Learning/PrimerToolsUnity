@@ -479,171 +479,133 @@ public enum PoissonDiscOverflowMode {
     Force
 }
 public class PoissonDiscPointSet
-{   
-    public PoissonDiscOverflowMode overflowMode = PoissonDiscOverflowMode.None;
-    float minDistance;
+{
+    public List<Vector2> points;
+    List<Vector2> spawnPoints;
     Vector2 sampleRegionSize;
     bool circular;
-    bool centered;
-    float cellSize;
-    int [,] grid;
-    public List<Vector2> points = new List<Vector2>();
-    public List<Vector2> Points {
-        get{
-            Vector2 centerOfMassShift;
-            if (centered) {
-                if (!circular) {
-                    float maxLeft = Mathf.Infinity;
-                    float maxRight = Mathf.Infinity;
-                    float maxUp = Mathf.Infinity;
-                    float maxDown = Mathf.Infinity;
-                    Vector2 total = Vector2.zero;
+    public PoissonDiscOverflowMode overflowMode;
+    float minDistance, cellSize;
+    int[,] grid;
 
-                    foreach (Vector2 point in points) {
-                        total += point;
-                        if (sampleRegionSize.x - point.x < maxRight) { maxRight = sampleRegionSize.x - point.x; }
-                        if (sampleRegionSize.y - point.y < maxUp) { maxUp = sampleRegionSize.y - point.y; }
-                        if (point.x < maxLeft) { maxLeft = point.x; }
-                        if (point.y < maxDown) { maxDown = point.y; }
-                    }
-                    total /= points.Count;
-                    centerOfMassShift = sampleRegionSize / 2 - total;
-                    if (centerOfMassShift.x > maxRight) { centerOfMassShift.x = maxRight; }
-                    if (centerOfMassShift.y > maxUp) { centerOfMassShift.x = maxUp; }
-                    if (centerOfMassShift.x < -maxLeft) { centerOfMassShift.x = -maxLeft; }
-                    if (centerOfMassShift.y < -maxDown) { centerOfMassShift.y = -maxDown; }
-
-                    List<Vector2> centeredPoints = new List<Vector2>();
-                    Vector2 shiftToCenter = centerOfMassShift - sampleRegionSize / 2;
-                    foreach (Vector2 point in points) {
-                        centeredPoints.Add(point + shiftToCenter);
-                    }
-                    return centeredPoints;
-                }
-                else {
-                    // This shifts the points to the center of the region right away for easier math
-                    Vector2 total = Vector2.zero;
-                    foreach (Vector2 point in points) {
-                        total += point;
-                    }
-                    total /= points.Count;
-                    List<Vector2> centeredPoints = new List<Vector2>();
-                    foreach (Vector2 point in points) {
-                        centeredPoints.Add(point - total); 
-                    }
-                    Vector2 correction = Vector2.zero;
-                    for (int i = 0; i < centeredPoints.Count; i++) {
-                        float overhang = centeredPoints[i].magnitude - sampleRegionSize.x / 2;
-                        if (overhang > correction.magnitude) {
-                            correction = -centeredPoints[i].normalized * overhang;
-                        }
-                    }
-                    for (int i = 0; i < centeredPoints.Count; i++) {
-                        centeredPoints[i] += correction;
-                    }
-                    return centeredPoints;
-                }
-
-            }
-            else { return points; }
-        }
-    }
-    List<Vector2> spawnPoints = new List<Vector2>();
-    public PoissonDiscPointSet(float minDistance, Vector2 sampleRegionSize, bool circular = false, bool centered = false, PoissonDiscOverflowMode overflowMode = PoissonDiscOverflowMode.None) {
-        Initialize(minDistance, sampleRegionSize);
-        this.circular = circular;
-        this.centered = centered;
-        this.overflowMode = overflowMode;
-    }
-    void Initialize(float minDistance, Vector2 sampleRegionSize) {
-        this.minDistance = minDistance;
+    public PoissonDiscPointSet(
+        float minDistance, Vector2 sampleRegionSize, bool circular = false,
+        PoissonDiscOverflowMode overflowMode = PoissonDiscOverflowMode.None
+    )
+    { // If circular, sampleRegionSize's components must be equal
         this.sampleRegionSize = sampleRegionSize;
-        cellSize = minDistance/Mathf.Sqrt(2);
-        grid = new int[Mathf.CeilToInt(sampleRegionSize.x/cellSize), Mathf.CeilToInt(sampleRegionSize.y/cellSize)];
-        spawnPoints = new List<Vector2>();
-        foreach (Vector2 point in points) {
-            spawnPoints.Add(point);
-            grid[(int)(point.x/cellSize),(int)(point.y/cellSize)] = points.IndexOf(point);
-        }
+        this.circular = circular;
+        this.overflowMode = overflowMode;
+        this.minDistance = minDistance;
+        this.cellSize = minDistance / Mathf.Sqrt(2);
+        this.Reset();
     }
-    public bool AddPoint(int numSamplesBeforeRejection = 30) {
-        bool pointFound = false;
-        if (spawnPoints.Count == 0) {
-            spawnPoints.Add(sampleRegionSize/2);
+
+    public bool AddPoint(int maxSamples = 30)
+    {
+        if (spawnPoints.Count == 0)
+        {
+            spawnPoints.Add(sampleRegionSize / 2);
         }
-        while (spawnPoints.Count > 0 && !pointFound) {
-            int spawnIndex = UnityEngine.Random.Range(0,spawnPoints.Count);
-            Vector2 spawnCentre = spawnPoints[spawnIndex];
-            for (int i = 0; i < numSamplesBeforeRejection; i++)
+        while (spawnPoints.Count > 0)
+        {
+            int spawnIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
+            Vector2 spawnCenter = spawnPoints[spawnIndex];
+            bool valid = false;
+
+            for (int i = 0; i < maxSamples; i++)
             {
-                float angle = UnityEngine.Random.value * Mathf.PI * 2;
-                Vector2 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                Vector2 candidate = spawnCentre + dir * UnityEngine.Random.Range(minDistance, 2 * minDistance);
-                bool isValid = false;
-                if (circular) { isValid = IsValidCirc(candidate); }
-                else { isValid = IsValidRect(candidate); }
-                if (isValid) {
+                float theta = UnityEngine.Random.value * Mathf.PI * 2;
+                Vector2 dir = new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
+                float r = minDistance * Mathf.Sqrt(UnityEngine.Random.value * 0.75f + 0.25f) * 2;
+                Vector2 candidate = spawnCenter + dir * r;
+                if (IsValid(candidate))
+                {
                     points.Add(candidate);
                     spawnPoints.Add(candidate);
-                    grid[(int)(candidate.x/cellSize),(int)(candidate.y/cellSize)] = points.Count;
-                    pointFound = true;
+                    grid[(int)(candidate.x / cellSize), (int)(candidate.y / cellSize)] = points.Count;
                     return true;
                 }
             }
-            if (!pointFound) {
-                spawnPoints.RemoveAt(spawnIndex);
-            }
+            spawnPoints.RemoveAt(spawnIndex);
         }
         return false;
     }
-    public void AddPoints(int numPoints, int numSamplesBeforeRejection = 30) {
-        Debug.Log("Spawn points count: " + spawnPoints.Count.ToString());
+
+    public int AddPoints(int numPoints, int maxSamples = 30, bool handleOverflow = true)
+    {
         int added = 0;
-        for (int i = 0; i < numPoints; i++) {
-            if (AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection))
+        for (int i = 0; i < numPoints; i++)
+        {
+            if (AddPoint(maxSamples))
                 added++;
-            else
-                break;
+            else break;
         }
-        float storedMinDistance = minDistance;
-        // Squeeze mode doesn't seem to properly respect the new min distance
-        if (added < numPoints && overflowMode != PoissonDiscOverflowMode.None) {
-            Initialize(minDistance / 2, sampleRegionSize);
-            for (int i = points.Count; i < numPoints; i++) {
-                AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
-            }
-        }
-        while (added < numPoints && overflowMode == PoissonDiscOverflowMode.Force) {
-            Initialize(minDistance / 2, sampleRegionSize);
-            for (int i = points.Count; i < numPoints; i++) {
-                AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
-            }
-        }
-        Initialize(storedMinDistance, sampleRegionSize);
-    }
-    public void AddPointsUntilFull(int numSamplesBeforeRejection = 30) {
-        if (spawnPoints.Count == 0) {
-            spawnPoints.Add(sampleRegionSize/2);
-        }
-        while(spawnPoints.Count > 0) {
-            AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
-        }
-    }
-    bool IsValidRect(Vector2 candidate) {
-        if (candidate.x >=0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y) {
-            int cellX = (int)(candidate.x/cellSize);
-            int cellY = (int)(candidate.y/cellSize);
-            int searchStartX = Mathf.Max(0,cellX -2);
-            int searchEndX = Mathf.Min(cellX+2,grid.GetLength(0)-1);
-            int searchStartY = Mathf.Max(0,cellY -2);
-            int searchEndY = Mathf.Min(cellY+2,grid.GetLength(1)-1);
 
-            for (int x = searchStartX; x <= searchEndX; x++) {
-                for (int y = searchStartY; y <= searchEndY; y++) {
-                    int pointIndex = grid[x,y]-1;
-                    if (pointIndex != -1) {
+        if (handleOverflow && added < numPoints)
+        {
+            if (overflowMode == PoissonDiscOverflowMode.Squeeze)
+            {
+                float prevMinDistance = minDistance;
+                SetMinDistance(minDistance / 2);
+                added += AddPoints(numPoints - added, maxSamples);
+                SetMinDistance(prevMinDistance);
+            }
+            else if (overflowMode == PoissonDiscOverflowMode.Force)
+            {
+                float prevMinDistance = minDistance;
+                SetMinDistance(minDistance / 2);
+                added += AddPoints(numPoints - added, maxSamples);
+                SetMinDistance(prevMinDistance);
+                if (added < numPoints)
+                {
+                    for (int i = 0; i < numPoints - added; i++)
+                    {
+                        if (circular)
+                        {
+                            float theta = UnityEngine.Random.value * Mathf.PI * 2;
+                            Vector2 dir = new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
+                            float r = sampleRegionSize.x / 2 * Mathf.Sqrt(UnityEngine.Random.value);
+                            points.Add(r * dir);
+                        }
+                        else
+                        {
+                            points.Add(new Vector2(UnityEngine.Random.value * sampleRegionSize.x, UnityEngine.Random.value * sampleRegionSize.y));
+                        }
+                    }
+                }
+            }
+        }
+        return added;
+    }
+
+    public void AddPointsUntilFull(int maxSamples = 30)
+    {
+        AddPoints(int.MaxValue, maxSamples, handleOverflow: false);
+    }
+
+    public bool IsValid(Vector2 candidate)
+    {
+        if ((circular && (candidate - sampleRegionSize / 2).magnitude < sampleRegionSize.x / 2) ||
+            (!circular && candidate.x >= 0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y))
+        {
+            int cellX = (int)(candidate.x / cellSize);
+            int cellY = (int)(candidate.y / cellSize);
+            int searchStartX = Mathf.Max(0, cellX - 2);
+            int searchEndX = Mathf.Min(cellX + 2, grid.GetLength(0) - 1);
+            int searchStartY = Mathf.Max(0, cellY - 2);
+            int searchEndY = Mathf.Min(cellY + 2, grid.GetLength(1) - 1);
+
+            for (int x = searchStartX; x <= searchEndX; x++)
+            {
+                for (int y = searchStartY; y <= searchEndY; y++)
+                {
+                    int pointIndex = grid[x, y] - 1;
+                    if (pointIndex != -1)
+                    {
                         float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
-                        if (sqrDst < minDistance*minDistance) {
+                        if (sqrDst < minDistance * minDistance)
+                        {
                             return false;
                         }
                     }
@@ -653,29 +615,60 @@ public class PoissonDiscPointSet
         }
         return false;
     }
-    bool IsValidCirc(Vector2 candidate) {
-        if ((candidate - sampleRegionSize / 2).magnitude < sampleRegionSize.x / 2) {
-            int cellX = (int)(candidate.x/cellSize);
-            int cellY = (int)(candidate.y/cellSize);
-            int searchStartX = Mathf.Max(0,cellX -2);
-            int searchEndX = Mathf.Min(cellX+2,grid.GetLength(0)-1);
-            int searchStartY = Mathf.Max(0,cellY -2);
-            int searchEndY = Mathf.Min(cellY+2,grid.GetLength(1)-1);
 
-            for (int x = searchStartX; x <= searchEndX; x++) {
-                for (int y = searchStartY; y <= searchEndY; y++) {
-                    int pointIndex = grid[x,y]-1;
-                    if (pointIndex != -1) {
-                        float sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
-                        if (sqrDst < minDistance*minDistance) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
+    public List<Vector2> GetCenteredRegionPoints()
+    {
+        List<Vector2> centered = new List<Vector2>(points.Count);
+        Vector2 offset = sampleRegionSize / 2;
+        foreach (Vector2 point in points)
+        {
+            centered.Add(point - offset);
         }
-        return false;
+        return centered;
+    }
+
+    public List<Vector2> GetCenteredPoints()
+    {
+        float minX = float.MaxValue, minY = float.MaxValue, maxX = 0, maxY = 0;
+        foreach (Vector2 point in points)
+        {
+            if (point.x < minX)
+                minX = point.x;
+            if (point.x > maxX)
+                maxX = point.x;
+            if (point.y < minY)
+                minY = point.y;
+            if (point.y > maxY)
+                maxY = point.y;
+        }
+        List<Vector2> centered = new List<Vector2>(points.Count);
+        Vector2 offset = new Vector2((minX + maxX) / 2, (minY + maxY) / 2);
+        foreach (Vector2 point in points)
+        {
+            centered.Add(point - offset);
+        }
+        return centered;
+    }
+
+    public void SetMinDistance(float minDistance)
+    {
+        this.minDistance = minDistance;
+        this.cellSize = minDistance / Mathf.Sqrt(2);
+        this.grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
+        this.spawnPoints.Clear();
+        for (int i = 0; i < points.Count; i++)
+        {
+            Vector2 point = points[i];
+            spawnPoints.Add(point);
+            grid[(int)(point.x / cellSize), (int)(point.y / cellSize)] = i + 1;
+        }
+    }
+
+    public void Reset()
+    {
+        this.grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
+        this.spawnPoints = new List<Vector2>();
+        this.points = new List<Vector2>();
     }
 }
 public static class GameObjectExtension
