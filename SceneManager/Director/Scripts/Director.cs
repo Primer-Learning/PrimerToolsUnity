@@ -43,7 +43,6 @@ public class Director : SceneManager
     TextMeshProUGUI timeScaleDisplay = null;    
 
     // Media references to test how animations sync with voice or other video
-    ReferenceScreen referenceScreenPrefab = null;
     public AudioClip voiceOverReferenceClip = null;
     internal AudioSource voiceOverReference;
     internal static List<SceneBlock> schedule = new List<SceneBlock>();
@@ -127,11 +126,12 @@ public class Director : SceneManager
         #endif
     }
     internal ReferenceScreen MakeReferenceScreen(VideoClip clip = null) {
-        ReferenceScreen rs = Instantiate(referenceScreenPrefab);
+        ReferenceScreen rs = Instantiate(Resources.Load<ReferenceScreen>("Reference screen prefab"));
         if (clip != null) {
             rs.screen.clip = clip;
             rs.screen.gameObject.GetComponent<MeshRenderer>().material.SetFloat("_Glossiness", 0);
         }
+        rs.transform.parent = camRig.transform;
         return rs;
     }
     public class SceneBlock {
@@ -189,7 +189,6 @@ public class Director : SceneManager
                 break;
         }
     }
-
     protected virtual void Update() {
         if (timeDisplay != null) {
             timeDisplay.text = (Time.time - timeBehind).ToString("0.0");
@@ -225,7 +224,6 @@ public class Director : SceneManager
             Time.timeScale = Mathf.Min(Time.timeScale * 2, 100);
         }
     }
-
     void StartRecording(int everyNFrames = 1) {
         cam.enabled = false;
 
