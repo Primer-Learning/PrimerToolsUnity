@@ -616,17 +616,23 @@ public class PoissonDiscPointSet
         return false;
     }
 
+    // Get points centered around the center of the region
     public List<Vector2> GetCenteredRegionPoints()
     {
         List<Vector2> centered = new List<Vector2>(points.Count);
-        Vector2 offset = sampleRegionSize / 2;
         foreach (Vector2 point in points)
         {
-            centered.Add(point - offset);
+            centered.Add(GetCenteredRegionPoint(point));
         }
         return centered;
     }
 
+    public Vector2 GetCenteredRegionPoint(Vector2 point)
+    {
+        return point - sampleRegionSize / 2;
+    }
+
+    // Get points centered based on their location
     public List<Vector2> GetCenteredPoints()
     {
         float minX = float.MaxValue, minY = float.MaxValue, maxX = 0, maxY = 0;
