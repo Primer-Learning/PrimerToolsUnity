@@ -501,8 +501,12 @@ public class PoissonDiscPointSet
         this.Reset();
     }
 
-    public bool AddPoint(int maxSamples = 30)
+    public bool AddPoint(int maxSamples = 30, bool handleOverflow = true)
     {
+        if (handleOverflow)
+        {
+            return AddPoints(1) > 0;
+        }
         if (spawnPoints.Count == 0)
         {
             spawnPoints.Add(sampleRegionSize / 2);
@@ -537,7 +541,7 @@ public class PoissonDiscPointSet
         int added = 0;
         for (int i = 0; i < numPoints; i++)
         {
-            if (AddPoint(maxSamples))
+            if (AddPoint(maxSamples, handleOverflow: false))
                 added++;
             else break;
         }
