@@ -131,7 +131,9 @@ public class BlobAccessory : PrimerObject
                 if (texture != null) {
                     SetTexture(textureName);
                 }
-                else { Debug.Log("Couldn't find texture"); }
+                else {
+                    SetColor(PrimerColor.ComplementaryColorMap[blob.color]);
+                }
             }
         }
         else {
@@ -174,6 +176,8 @@ public class BlobAccessory : PrimerObject
         {PrimerColor.Red, "_teal"},
         {PrimerColor.Green, "_purple"},
         {PrimerColor.Purple, "_dark_green"},
+        {PrimerColor.White, ""},
+        {PrimerColor.Gray, ""},
     };
     internal static Dictionary<AccessoryType, float> SignHeights = new Dictionary<AccessoryType, float>() {
         {AccessoryType.froggyHat, 0.2f},

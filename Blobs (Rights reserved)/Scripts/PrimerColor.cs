@@ -65,7 +65,9 @@ public static class PrimerColor
         {Yellow, YellowComplement},
         {Red, RedComplement},
         {Green, GreenComplement},
-        {Purple, PurpleComplement}
+        {Purple, PurpleComplement},
+        {Gray, White},
+        {White, Gray}
     };
     public static List<Color> BlobColors = new List<Color>() {
         PrimerColor.Blue,
