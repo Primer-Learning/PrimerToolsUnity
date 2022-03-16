@@ -339,7 +339,7 @@ public class CoinFlipper : Simulator
             SetFlipParameters();
             Flip(outcome == -1 ? outcome : (outcome >> i) & 1);
             yield return waitUntilCoinIsStopped();
-            yield return recordAndDisplay(outcome);
+            yield return recordAndDisplay(outcome: outcome);
             currentlyFlipping = false;
         }
         currentlyInASeriesOfFlips = false;
