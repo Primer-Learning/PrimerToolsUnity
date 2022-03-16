@@ -69,10 +69,10 @@ public static class PrimerColor
     };
     public static List<Color> BlobColors = new List<Color>() {
         PrimerColor.Blue,
-        PrimerColor.Orange,
-        PrimerColor.Yellow,
-        PrimerColor.Red,
         PrimerColor.Green,
+        PrimerColor.Yellow,
+        PrimerColor.Orange,
+        PrimerColor.Red,
         PrimerColor.Purple
     };
 

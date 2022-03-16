@@ -397,7 +397,7 @@ public class PrimerBlob : PrimerCharacter
             AddAccessory(aType, colorMatch: colorMatch);
         }
     }
-    List<AccessoryType> AccessoryOptions = new List<AccessoryType>() {
+    internal static List<AccessoryType> AccessoryOptions = new List<AccessoryType>() {
         AccessoryType.beard,
         AccessoryType.glasses,
         AccessoryType.sunglasses,
