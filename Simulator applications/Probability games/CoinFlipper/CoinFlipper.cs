@@ -154,10 +154,10 @@ public class CoinFlipper : Simulator
     void TossCoin() {
         coin.transform.parent = null;
         Rigidbody rb = coin.GetComponent<Rigidbody>();
+        rb.isKinematic = false;
         rb.velocity = Quaternion.Euler(0, angleDeviation, 0) * flipperCharacter.transform.forward * initialHorizontalSpeed + Vector3.up * initialVerticalSpeed;    
         rb.maxAngularVelocity = initialAngularSpeed;
         rb.angularVelocity = flipperCharacter.transform.right * initialAngularSpeed;
-        rb.isKinematic = false;
 
         // Character starts looking at coin here
         flipperCharacter.StartLookingAt(coin.transform, correctionVector: Vector3.down); 
@@ -328,7 +328,6 @@ public class CoinFlipper : Simulator
         }
         return (float) probabilityAtLeastExtreme;
     }
-
     internal void FlipAndRecord(int outcome = -1, int repetitions = 1) {
         StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions));
     }
