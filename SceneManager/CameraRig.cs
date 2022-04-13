@@ -24,7 +24,8 @@ public class CameraRig : PrimerObject
     // Ideally, changing either would update the other.
     void OnValidate() {
         SwivelOrigin = swivelOrigin;
-        Swivel = Quaternion.Euler(swivelEuler);
+        // Swivel = Quaternion.Euler(swivelEuler);
+        SetSwivelFromEditor(swivelEuler);
         Distance = distance;
     }
     void OnDrawGizmos() {
@@ -48,14 +49,34 @@ public class CameraRig : PrimerObject
     public Quaternion Swivel {
         get { return swivel; }
         set {
-            Quaternion diffRotation = Quaternion.Inverse(swivel) * value;
             float angle;
             Vector3 axis;
-            diffRotation.ToAngleAxis(out angle, out axis);
-            transform.RotateAround(swivelOrigin, axis, angle);
+
+            Quaternion diffRotation = Quaternion.Inverse(swivel) * value;
+            // This specific quaternion sometimes comes up at the end of animations
+            // And causes the RotateAround method to try to set the posotion to a NAN vector
+            if (diffRotation != new Quaternion(0, 0, 0, -1)) {
+                diffRotation.ToAngleAxis(out angle, out axis);
+                transform.RotateAround(swivelOrigin, axis, angle);
+            }
+
+
             swivel = transform.localRotation;
-            swivelEuler = swivel.eulerAngles;
+            swivelEuler = value.eulerAngles;
         }
+    }
+    void SetSwivelFromEditor(Vector3 eulerAngles) {
+        // New method that resets the rotation each time before applying
+        // Still has some rounding errors, but it's very minor
+        float angle;
+        Vector3 axis;
+        transform.rotation = Quaternion.identity;
+        Quaternion newRotation = Quaternion.Euler(eulerAngles);
+        newRotation.ToAngleAxis(out angle, out axis);
+        transform.RotateAround(swivelOrigin, axis, angle);
+
+        swivel = transform.localRotation;
+        // swivelEuler = eulerAngles;
     }
     internal bool faceSwivel = true;
     [SerializeField] float distance = 10;
