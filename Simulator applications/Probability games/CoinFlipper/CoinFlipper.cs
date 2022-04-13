@@ -235,7 +235,7 @@ public class CoinFlipper : Simulator
         if (Vector3.Dot(coin.transform.forward, Vector3.up) > 0.99f) { return 1; }
         else { return 0; }
     }
-    internal IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1) {
+    internal IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1, float delay = 1.5f) {
         int res = outcome == -1 ? GetResult() : outcome;
         results.Add(res);
         int numResults = results.Count;
@@ -243,14 +243,15 @@ public class CoinFlipper : Simulator
             displayCoins.Add(coin);
             // Put the coin where it goes
             coin.GetComponent<Rigidbody>().isKinematic = true;
-            Vector3 front = individualOffset;
-            coin.MoveTo(Camera.main.transform.position + front);
+            // Vector3 front = individualOffset;
+            // coin.MoveTo(Camera.main.transform.position + front);
+            coin.MoveTo(individualOffset);
             if (res == 1)
             {
                 coin.RotateTo(Quaternion.Euler(0, 180, 0));
             }
             else { coin.RotateTo(Quaternion.Euler(0, 0, 180)); }
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(delay);
             coin.transform.parent = display.transform;
             Vector3 dest = new Vector3((numResults - 1) % displayRowLength, -(numResults - 1) / displayRowLength, 0);
             coin.MoveTo(dest * displayCoinSpacing);
@@ -328,17 +329,17 @@ public class CoinFlipper : Simulator
         }
         return (float) probabilityAtLeastExtreme;
     }
-    internal void FlipAndRecord(int outcome = -1, int repetitions = 1) {
-        StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions));
+    internal void FlipAndRecord(int outcome = -1, int repetitions = 1, float delay = 1.5f) {
+        StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions, delay: delay));
     }
-    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1) {
+    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1, float delay = 1.5f) {
         currentlyInASeriesOfFlips = true;
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
             SetFlipParameters();
             Flip(outcome == -1 ? outcome : (outcome >> i) & 1);
             yield return waitUntilCoinIsStopped();
-            yield return recordAndDisplay(outcome: outcome);
+            yield return recordAndDisplay(outcome: outcome, delay: delay);
             currentlyFlipping = false;
         }
         currentlyInASeriesOfFlips = false;
