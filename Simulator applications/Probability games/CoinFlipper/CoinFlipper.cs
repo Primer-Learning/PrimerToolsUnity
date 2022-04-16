@@ -288,14 +288,14 @@ public class CoinFlipper : Simulator
             if (headsCountDisplay == null) {
                 headsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 headsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
-                headsCountDisplay.transform.parent = display.transform;
+                headsCountDisplay.transform.SetParent(display.transform);
                 headsCountDisplay.transform.localPosition = new Vector3(0.75f, 2, 2.5f);
                 headsCountDisplay.SetIntrinsicScale(0.5f);
                 headsCountDisplay.ScaleUpFromZero();
 
                 tailsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 tailsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
-                tailsCountDisplay.transform.parent = display.transform;
+                tailsCountDisplay.transform.SetParent(display.transform);
                 tailsCountDisplay.transform.localPosition = new Vector3(0.75f, 1.3f, 2.5f);
                 tailsCountDisplay.SetIntrinsicScale(0.5f);
                 tailsCountDisplay.ScaleUpFromZero();
@@ -356,14 +356,14 @@ public class CoinFlipper : Simulator
             if (headsCountDisplay == null) {
                 headsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 headsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
-                headsCountDisplay.transform.parent = display.transform;
+                headsCountDisplay.transform.SetParent(display.transform);
                 headsCountDisplay.transform.localPosition = new Vector3(0.75f, 2, 2.5f);
                 headsCountDisplay.SetIntrinsicScale(0.5f);
                 headsCountDisplay.ScaleUpFromZero();
 
                 tailsCountDisplay = Instantiate(SceneManager.instance.primerTextPrefab);
                 tailsCountDisplay.tmpro.alignment = TextAlignmentOptions.Left;
-                tailsCountDisplay.transform.parent = display.transform;
+                tailsCountDisplay.transform.SetParent(display.transform);
                 tailsCountDisplay.transform.localPosition = new Vector3(0.75f, 1.3f, 2.5f);
                 tailsCountDisplay.SetIntrinsicScale(0.5f);
                 tailsCountDisplay.ScaleUpFromZero();
