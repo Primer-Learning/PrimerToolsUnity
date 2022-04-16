@@ -12,7 +12,7 @@ public class SimulationManager : MonoBehaviour
         set {
             simRNG = new System.Random(value);
             simSeed = value;
-            Debug.Log($"New sim seed is {value}.");
+            // Debug.Log($"New sim seed is {value}.");
         }
     }
     internal List<Simulator> sims = new List<Simulator>();
@@ -39,9 +39,9 @@ public class SimulationManager : MonoBehaviour
                 pooledObjects.Add(go);
             }
         }
-        else {
-            Debug.LogWarning("No pooled object defined.");
-        }
+        // else {
+        //     Debug.LogWarning("No pooled object defined.");
+        // }
     }
     void Start() {
         if (sunLight == null) {

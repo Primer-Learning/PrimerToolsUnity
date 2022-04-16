@@ -29,10 +29,11 @@ public class CoinFlipSimManager : SimulationManager
     internal List<CoinFlipper> falsePositives;
 
     internal void Initialize(CoinFlipper flipperPrefabArg = null) {
-        SetUpPhysicsPath();
+        // SetUpPhysicsPath();
         if (!savingNewParameters) {
-            try { UnpackInitialConditions(); }
-            catch { savingNewParameters = true; }
+            UnpackInitialConditions();
+            // try { UnpackInitialConditions(); }
+            // catch { savingNewParameters = true; }
         }
         if (flipperPrefabArg == null) {
             flipperPrefabArg = Resources.Load<CoinFlipper>("FlipperPrefab");
