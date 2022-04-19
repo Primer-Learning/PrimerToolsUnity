@@ -242,6 +242,7 @@ public class CoinFlipper : Simulator
         if (resultsDisplayMode == ResultsDisplayMode.Individual) {
             displayCoins.Add(coin);
             // Put the coin where it goes
+            coin.transform.parent = transform;
             coin.GetComponent<Rigidbody>().isKinematic = true;
             // Vector3 front = individualOffset;
             // coin.MoveTo(Camera.main.transform.position + front);

@@ -121,6 +121,7 @@ public class Director : SceneManager
                 yield return null;
             }
         }
+        yield return new WaitForSeconds(1);
         #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
         #endif
@@ -132,6 +133,7 @@ public class Director : SceneManager
             rs.screen.gameObject.GetComponent<MeshRenderer>().material.SetFloat("_Glossiness", 0);
         }
         rs.transform.parent = camRig.transform;
+        rs.transform.localRotation = Quaternion.identity;
         return rs;
     }
     public class SceneBlock {
