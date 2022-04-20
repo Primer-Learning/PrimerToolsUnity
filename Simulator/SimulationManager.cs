@@ -12,7 +12,7 @@ public class SimulationManager : MonoBehaviour
         set {
             simRNG = new System.Random(value);
             simSeed = value;
-            // Debug.Log($"New sim seed is {value}.");
+            Debug.Log($"New sim seed is {value}.");
         }
     }
     internal List<Simulator> sims = new List<Simulator>();
@@ -105,10 +105,11 @@ public class SimulationManager : MonoBehaviour
     }
     internal void SetAndSaveSeed(int newSeed) {
         // This is the main one
-        Director.sceneRandom = new System.Random(newSeed);
+        // Director.sceneRandom = new System.Random(newSeed);
         // This is for purely visual stuff so messing with that doesn't affect rng state
-        Director.sceneRandom2 = new System.Random(newSeed);
+        // Director.sceneRandom2 = new System.Random(newSeed);
         // simSeed = newSeed;
+        // SimSeed = newSeed;
         // Debug.Log($"Seed: {simSeed}");
     }
 

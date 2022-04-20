@@ -64,7 +64,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _GlossMapScale: 0.625
+    - _GlossMapScale: 0.37
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0

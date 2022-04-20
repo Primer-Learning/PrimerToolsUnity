@@ -43,7 +43,7 @@ public class SceneManager : PrimerObject
             // This is for purely visual stuff so messing with that doesn't affect rng state
             // Doesn't matter unless you set it in the Simulator class, but it's created here.
             sceneRandom2 = new System.Random(seed);
-            // Debug.Log("Seed: " + seed);
+            Debug.Log("Seed: " + seed);
 
             // Load/assign common resources
             primerArrowPrefab = Resources.Load("arrowPrefab", typeof(PrimerArrow)) as PrimerArrow;

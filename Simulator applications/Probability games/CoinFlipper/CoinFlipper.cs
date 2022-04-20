@@ -82,9 +82,9 @@ public class CoinFlipper : Simulator
         if (rng == null) {
             int seed = System.Environment.TickCount;
             rng = new System.Random(seed);
+            Debug.LogWarning("Creating new seed for an individual flipper");
         }
     }
-
     internal void Appear(float stagger = 0.25f) {
         if (flipperCharacter == null) {
             flipperCharacter = Instantiate(flipperCharacterPrefab);
