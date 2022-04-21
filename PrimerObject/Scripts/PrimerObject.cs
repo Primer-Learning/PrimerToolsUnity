@@ -580,6 +580,15 @@ public class PrimerObject : MonoBehaviour
                 i++;
         }
     }
+    public virtual void TempColorChange(Color newColor, float duration = 1, float attack = 0.5f, float decay = 0.5f, EaseMode ease = EaseMode.None) {
+        StartCoroutine(tempColorChange(newColor, duration, attack, decay, ease));
+    }
+    internal virtual IEnumerator tempColorChange(Color newColor, float duration, float attack, float decay, EaseMode ease) {
+        Color oldColor = GetComponentsInChildren<MeshRenderer>()[0].material.color;
+        ChangeColor(newColor, duration: attack, ease: ease);
+        yield return new WaitForSeconds(duration - attack - decay);
+        ChangeColor(oldColor, duration: decay, ease: ease);
+    }
     public virtual void SetColor(Color newColor, Renderer r) {
         r.material.color = newColor;
     }

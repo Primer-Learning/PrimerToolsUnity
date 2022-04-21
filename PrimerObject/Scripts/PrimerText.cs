@@ -31,4 +31,11 @@ public class PrimerText : PrimerObject
     public override void ChangeColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         AnimateValue<Color>("Color", newColor, duration: duration, ease: ease);
     }
+    internal override IEnumerator tempColorChange(Color newColor, float duration, float attack, float decay, EaseMode ease)
+    {
+        Color oldColor = this.Color;
+        ChangeColor(newColor, duration: attack, ease: ease);
+        yield return new WaitForSeconds(duration - attack - decay);
+        ChangeColor(oldColor, duration: decay, ease: ease);
+    }
 }

@@ -341,6 +341,15 @@ public class PrimerBlob : PrimerCharacter
         animator.SetTrigger("EffortLeft");
         animator.SetTrigger("EffortRight");
     }
+    public void AngryEyes() {
+        animator.SetTrigger("LeftEyeStern");
+        animator.SetTrigger("RightEyeStern");
+    }
+    public void EvilPose() {
+        AngryEyes();
+        animator.SetBool("Victory", true);
+        animator.SetTrigger("MouthSmile");
+    }
 
     public void CloseEyes(float duration = 1) {
         StartCoroutine(closeEyes(duration));
