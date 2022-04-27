@@ -207,7 +207,7 @@ public class CoinFlipSimManager : SimulationManager
             yield return null;
         }
     }
-    internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, int gridOriginIndexX = -1, int gridOriginIndexY = -1, float duration = 0) {
+    internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, float gridOriginIndexX = -1, float gridOriginIndexY = -1, float duration = 0) {
         List<Vector3> positions = Helpers.CalculateGridPositions(numRows, numColumns, spacing, gridOriginIndexX: gridOriginIndexX, gridOriginIndexY: gridOriginIndexY);
         if (flippers.Count > positions.Count) {
             Debug.LogError($"Only {positions.Count} positions for {flippers.Count} flippers");

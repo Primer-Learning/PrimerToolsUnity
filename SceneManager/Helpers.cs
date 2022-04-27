@@ -114,9 +114,9 @@ public static class Helpers
         int sideLength = (int) Math.Ceiling(Math.Sqrt(numElements));
         return CalculateGridPositions(sideLength, sideLength, spacing, plane: plane);
     }
-    public static List<Vector3> CalculateGridPositions(int numRows, int numColumns, float spacing, int gridOriginIndexX = -1, int gridOriginIndexY = -1, string plane = "xz") {
-        if (gridOriginIndexX == -1) { gridOriginIndexX = (numColumns - 1) / 2; }
-        if (gridOriginIndexY == -1) { gridOriginIndexY = (numRows - 1) / 2; }
+    public static List<Vector3> CalculateGridPositions(int numRows, int numColumns, float spacing, float gridOriginIndexX = -1, float gridOriginIndexY = -1, string plane = "xz") {
+        if (gridOriginIndexX == -1) { gridOriginIndexX = (float)(numColumns - 1) / 2; }
+        if (gridOriginIndexY == -1) { gridOriginIndexY = (float)(numRows - 1) / 2; }
         List<Vector3> positions = new List<Vector3>();
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numColumns; j++) {
