@@ -54,19 +54,13 @@ public class LatexRendererComponent : MonoBehaviour
         await Task.Factory.StartNew(() => directory.Delete(true));
     }
 
-    private async Task GenerateDvi()
+    private async Task<string> GenerateSvg()
     {
         DirectoryInfo temporaryDirectory = CreateTempDirectory();
         Debug.Log($"LaTeX build directory: {temporaryDirectory.FullName}");
 
         var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
-        await using (var sourceFile = new FileStream(sourcePath, FileMode.CreateNew))
-        {
-            await using (var writer = new StreamWriter(sourceFile))
-            {
-                await writer.WriteAsync(latex);
-            }
-        };
+        await File.WriteAllTextAsync(sourcePath, latex);
 
         try
         {
@@ -85,6 +79,8 @@ public class LatexRendererComponent : MonoBehaviour
                 "--no-fonts",
                 $"--output={outputPath}",
             });
+
+            return await File.ReadAllTextAsync(outputPath);
         }
         finally
         {
@@ -129,11 +125,20 @@ public class LatexRendererComponent : MonoBehaviour
     public string latex;
     private string _lastRenderedLatex;
 
+    private string _svg;
+    private string _lastRenderedSvg;
+
     public async void Update()
     {
+        if (_svg != _lastRenderedSvg)
+        {
+            GenerateSprite(_svg);
+            _lastRenderedSvg = _svg;
+        }
+        
         if (latex != _lastRenderedLatex)
         {
-            await GenerateDvi();
+            _svg = await GenerateSvg();
             _lastRenderedLatex = latex;
         }
     }
