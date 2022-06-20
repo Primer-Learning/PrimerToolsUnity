@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 [ExecuteInEditMode]
 public class LatexRendererComponent : MonoBehaviour
 {
-    private static async void ExecuteProcess(string name, IEnumerable<string> arguments)
+    private static async Task ExecuteProcess(string name, IEnumerable<string> arguments)
     {
         var startInfo = new ProcessStartInfo(name)
         {
@@ -49,12 +49,12 @@ public class LatexRendererComponent : MonoBehaviour
             Path.Combine(Path.GetTempPath(), $"unity-latex-{Guid.NewGuid().ToString()}"));
     }
 
-    private static async void RecursivelyDeleteDirectory(DirectoryInfo directory)
+    private static async Task RecursivelyDeleteDirectory(DirectoryInfo directory)
     {
         await Task.Factory.StartNew(() => directory.Delete(true));
     }
 
-    private async void GenerateDvi()
+    private async Task GenerateDvi()
     {
         DirectoryInfo temporaryDirectory = CreateTempDirectory();
         Debug.Log($"LaTeX build directory: {temporaryDirectory.FullName}");
@@ -70,7 +70,7 @@ public class LatexRendererComponent : MonoBehaviour
 
         try
         {
-            ExecuteProcess("/Library/TeX/texbin/latex", new string[] {
+            await ExecuteProcess("/Library/TeX/texbin/latex", new string[] {
                 "-interaction=batchmode",
                 "-halt-on-error",
                 $"-output-directory={temporaryDirectory.FullName}",
@@ -79,7 +79,7 @@ public class LatexRendererComponent : MonoBehaviour
             var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
 
             var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
-            ExecuteProcess("/Library/TeX/texbin/dvisvgm", new string[]
+            await ExecuteProcess("/Library/TeX/texbin/dvisvgm", new string[]
             {
                 dviPath,
                 "--no-fonts",
@@ -133,7 +133,7 @@ public class LatexRendererComponent : MonoBehaviour
     {
         if (latex != _lastRenderedLatex)
         {
-            GenerateDvi();
+            await GenerateDvi();
             _lastRenderedLatex = latex;
         }
     }
