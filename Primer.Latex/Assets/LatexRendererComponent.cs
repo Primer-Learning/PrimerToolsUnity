@@ -15,7 +15,7 @@ public class LatexRendererComponent : MonoBehaviour
 {
     private static async void ExecuteProcess(string name, IEnumerable<string> arguments)
     {
-        var startInfo = new ProcessStartInfo("/Library/TeX/texbin/latex")
+        var startInfo = new ProcessStartInfo(name)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -75,6 +75,15 @@ public class LatexRendererComponent : MonoBehaviour
                 "-halt-on-error",
                 $"-output-directory={temporaryDirectory.FullName}",
                 sourcePath,
+            });
+            var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
+
+            var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
+            ExecuteProcess("/Library/TeX/texbin/dvisvgm", new string[]
+            {
+                dviPath,
+                "--no-fonts",
+                $"--output={outputPath}",
             });
         }
         finally
