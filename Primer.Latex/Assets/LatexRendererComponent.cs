@@ -1,16 +1,48 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 [ExecuteInEditMode]
 public class LatexRendererComponent : MonoBehaviour
 {
+    private static async void ExecuteProcess(string name, IEnumerable<string> arguments)
+    {
+        var startInfo = new ProcessStartInfo("/Library/TeX/texbin/latex")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        startInfo.ArgumentList.AddRange(arguments);
+
+        var process = new Process()
+        {
+            StartInfo = startInfo
+        };
+
+        using (process)
+        {
+            process.Start();
+                
+            process.OutputDataReceived += (sender, args) => UnityEngine.Debug.Log($"stdout: {args.Data}");
+            process.ErrorDataReceived += (sender, args) => UnityEngine.Debug.Log($"stderr: {args.Data}");
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+                
+            // TODO: asyncify
+            process.WaitForExit();
+        }
+    }
+    
     private static DirectoryInfo CreateTempDirectory()
     {
         return Directory.CreateDirectory(
@@ -38,36 +70,12 @@ public class LatexRendererComponent : MonoBehaviour
 
         try
         {
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo("/Library/TeX/texbin/latex")
-                {
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    ArgumentList =
-                    {
-                        "-interaction=batchmode",
-                        "-halt-on-error",
-                        $"-output-directory={temporaryDirectory.FullName}",
-                        sourcePath,
-                    }
-                }
-            };
-
-            using (process)
-            {
-                process.Start();
-                
-                process.OutputDataReceived += (sender, args) => UnityEngine.Debug.Log($"stdout: {args.Data}");
-                process.ErrorDataReceived += (sender, args) => UnityEngine.Debug.Log($"stderr: {args.Data}");
-
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                
-                // TODO: asyncify
-                process.WaitForExit();
-            }
+            ExecuteProcess("/Library/TeX/texbin/latex", new string[] {
+                "-interaction=batchmode",
+                "-halt-on-error",
+                $"-output-directory={temporaryDirectory.FullName}",
+                sourcePath,
+            });
         }
         finally
         {
