@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -116,7 +117,7 @@ public class LatexRendererComponent : MonoBehaviour
         }
 
         var geoms = VectorUtils.TessellateScene(sceneInfo.Scene, tessOptions);
-            
+        
         // Build a sprite with the tessellated geometry.
         var sprite = VectorUtils.BuildSprite(geoms, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128, true);
         GetComponent<SpriteRenderer>().sprite = sprite;
@@ -140,6 +141,8 @@ public class LatexRendererComponent : MonoBehaviour
         {
             _svg = await GenerateSvg();
             _lastRenderedLatex = latex;
+            
+            EditorApplication.QueuePlayerLoopUpdate();
         }
     }
 }
