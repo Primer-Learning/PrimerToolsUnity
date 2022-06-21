@@ -14,81 +14,8 @@ using Debug = UnityEngine.Debug;
 [ExecuteInEditMode]
 public class LatexRendererComponent : MonoBehaviour
 {
-    private static async Task ExecuteProcess(string name, IEnumerable<string> arguments)
-    {
-        var startInfo = new ProcessStartInfo(name)
-        {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-        };
-        startInfo.ArgumentList.AddRange(arguments);
+    private LatexToSvgConverter _converter = LatexToSvgConverter.Create();
 
-        var process = new Process()
-        {
-            StartInfo = startInfo
-        };
-
-        using (process)
-        {
-            process.Start();
-                
-            process.OutputDataReceived += (sender, args) => UnityEngine.Debug.Log($"stdout: {args.Data}");
-            process.ErrorDataReceived += (sender, args) => UnityEngine.Debug.Log($"stderr: {args.Data}");
-
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-                
-            // TODO: asyncify
-            process.WaitForExit();
-        }
-    }
-    
-    private static DirectoryInfo CreateTempDirectory()
-    {
-        return Directory.CreateDirectory(
-            Path.Combine(Path.GetTempPath(), $"unity-latex-{Guid.NewGuid().ToString()}"));
-    }
-
-    private static async Task RecursivelyDeleteDirectory(DirectoryInfo directory)
-    {
-        await Task.Factory.StartNew(() => directory.Delete(true));
-    }
-
-    private async Task<string> GenerateSvg()
-    {
-        DirectoryInfo temporaryDirectory = CreateTempDirectory();
-        Debug.Log($"LaTeX build directory: {temporaryDirectory.FullName}");
-
-        var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
-        await File.WriteAllTextAsync(sourcePath, latex);
-
-        try
-        {
-            await ExecuteProcess("/Library/TeX/texbin/latex", new string[] {
-                "-interaction=batchmode",
-                "-halt-on-error",
-                $"-output-directory={temporaryDirectory.FullName}",
-                sourcePath,
-            });
-            var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
-
-            var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
-            await ExecuteProcess("/Library/TeX/texbin/dvisvgm", new string[]
-            {
-                dviPath,
-                "--no-fonts",
-                $"--output={outputPath}",
-            });
-
-            return await File.ReadAllTextAsync(outputPath);
-        }
-        finally
-        {
-            //RecursivelyDeleteDirectory(temporaryDirectory);
-        }
-    }
-    
     private void GenerateSprite(string svgText)
     {
         var tessOptions = new VectorUtils.TessellationOptions()
@@ -139,10 +66,17 @@ public class LatexRendererComponent : MonoBehaviour
         
         if (latex != _lastRenderedLatex)
         {
-            _svg = await GenerateSvg();
-            _lastRenderedLatex = latex;
+            try
+            {
+                _svg = await _converter.RenderLatexToSvg(latex);
+                _lastRenderedLatex = latex;
             
-            EditorApplication.QueuePlayerLoopUpdate();
+                EditorApplication.QueuePlayerLoopUpdate();
+            }
+            catch (OperationCanceledException)
+            {
+                //
+            }
         }
     }
 }
