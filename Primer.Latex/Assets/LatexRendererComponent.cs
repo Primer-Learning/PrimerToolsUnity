@@ -58,13 +58,14 @@ public class LatexRendererComponent : MonoBehaviour
 
     public async void Update()
     {
-        if (_converter is null)
-        {
-            _converter = LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
-        }
+        // TODO: This can be moved to awake() once the implementation is a bit more stable. It's here because
+        //       awake() doesn't get called when code is reloaded. 
+        _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
         
         if (_svg != _lastRenderedSvg)
         {
+            // This must be done within the player update loops, so it's important that this is before any await calls
+            // in this function. If it's done outside of it, there will be an error when creating the sprite.
             GenerateSprite(_svg);
             _lastRenderedSvg = _svg;
         }
@@ -80,7 +81,7 @@ public class LatexRendererComponent : MonoBehaviour
             }
             catch (OperationCanceledException)
             {
-                //
+                // This will happen when we've already started rendering a different LaTeX string
             }
         }
     }
