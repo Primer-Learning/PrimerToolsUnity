@@ -14,7 +14,7 @@ using Debug = UnityEngine.Debug;
 [ExecuteInEditMode]
 public class LatexRendererComponent : MonoBehaviour
 {
-    private LatexToSvgConverter _converter = LatexToSvgConverter.Create();
+    private LatexToSvgConverter _converter;
 
     private void GenerateSprite(string svgText)
     {
@@ -58,6 +58,11 @@ public class LatexRendererComponent : MonoBehaviour
 
     public async void Update()
     {
+        if (_converter is null)
+        {
+            _converter = LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
+        }
+        
         if (_svg != _lastRenderedSvg)
         {
             GenerateSprite(_svg);

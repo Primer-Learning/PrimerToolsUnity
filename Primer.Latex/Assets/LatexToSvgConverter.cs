@@ -5,23 +5,27 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 
 public class LatexToSvgConverter : IDisposable
 {
     private readonly DirectoryInfo _temporaryDirectory;
+    private readonly string _templateText;
     
     // Allows the last call to RenderLatexToSvg to be cancelled
     private CancellationTokenSource _latestCancellationTokenSource;
 
-    public static LatexToSvgConverter Create()
+    public static LatexToSvgConverter Create(string templateText)
     {
-        return new LatexToSvgConverter(Directory.CreateDirectory(
+        return new LatexToSvgConverter(templateText, Directory.CreateDirectory(
             Path.Combine(Path.GetTempPath(), $"unity-latex-{Guid.NewGuid().ToString()}")));
     }
 
-    private LatexToSvgConverter(DirectoryInfo temporaryDirectory)
+    private LatexToSvgConverter(string templateText, DirectoryInfo temporaryDirectory)
     {
+        _templateText = templateText;
         _temporaryDirectory = temporaryDirectory;
         Debug.Log($"Initialized LaTeX build directory: {_temporaryDirectory.FullName}");
     }
@@ -70,7 +74,7 @@ public class LatexToSvgConverter : IDisposable
     public string RenderLatexToSvgSync(string latex)
     {
         var sourcePath = Path.Combine(_temporaryDirectory.FullName, "source.tex");
-        File.WriteAllText(sourcePath, latex);
+        File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
         
         ExecuteProcess(1000, "/Library/TeX/texbin/latex", new string[] {
             "-interaction=batchmode",
