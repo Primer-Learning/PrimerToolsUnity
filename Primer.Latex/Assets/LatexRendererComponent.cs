@@ -18,15 +18,6 @@ public class LatexRendererComponent : MonoBehaviour
 
     private void GenerateSprite(string svgText)
     {
-        var tessOptions = new VectorUtils.TessellationOptions()
-        {
-            StepDistance = 100.0f,
-            MaxCordDeviation = 0.5f,
-            MaxTanAngleDeviation = 0.1f,
-            SamplingStepSize = 0.01f
-        };
-    
-        // Dynamically import the SVG data, and tessellate the resulting vector scene.
         SVGParser.SceneInfo sceneInfo;
         try
         {
@@ -34,22 +25,25 @@ public class LatexRendererComponent : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            if (svgText != "")
-            {
-                Debug.LogError($"Invalid SVG, got error: {e.ToString()}");
-            }
-
+            Debug.LogError($"Invalid SVG, got error: {e.ToString()}");
             GetComponent<SpriteRenderer>().sprite = null;
             return;
         }
 
-        var geoms = VectorUtils.TessellateScene(sceneInfo.Scene, tessOptions);
-        
-        // Build a sprite with the tessellated geometry.
-        var sprite = VectorUtils.BuildSprite(geoms, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128, true);
+        var geometry = VectorUtils.TessellateScene(sceneInfo.Scene, new VectorUtils.TessellationOptions()
+        {
+            StepDistance = 100.0f,
+            MaxCordDeviation = 0.5f,
+            MaxTanAngleDeviation = 0.1f,
+            SamplingStepSize = 0.01f
+        });
+
+        var sprite = VectorUtils.BuildSprite(
+            geometry, 10.0f, VectorUtils.Alignment.Center, Vector2.zero, 128,
+            true);
         GetComponent<SpriteRenderer>().sprite = sprite;
     }
-    
+
     public string latex;
     private string _lastRenderedLatex;
 
@@ -61,7 +55,7 @@ public class LatexRendererComponent : MonoBehaviour
         // TODO: This can be moved to awake() once the implementation is a bit more stable. It's here because
         //       awake() doesn't get called when code is reloaded. 
         _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
-        
+
         if (_svg != _lastRenderedSvg)
         {
             // This must be done within the player update loops, so it's important that this is before any await calls
@@ -69,14 +63,14 @@ public class LatexRendererComponent : MonoBehaviour
             GenerateSprite(_svg);
             _lastRenderedSvg = _svg;
         }
-        
+
         if (latex != _lastRenderedLatex)
         {
             try
             {
                 _svg = await _converter.RenderLatexToSvg(latex);
                 _lastRenderedLatex = latex;
-            
+
                 EditorApplication.QueuePlayerLoopUpdate();
             }
             catch (OperationCanceledException)
