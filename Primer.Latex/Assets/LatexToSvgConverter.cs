@@ -36,12 +36,7 @@ public class LatexToSvgConverter : IDisposable
         var currentCancellationTokenSource = new CancellationTokenSource();
         _latestCancellationTokenSource = currentCancellationTokenSource;
 
-        return Task.Run(() =>
-        {
-            string svg = RenderLatexToSvgSync(latex);
-            currentCancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return svg;
-        });
+        return Task.Run(() => RenderLatexToSvgSync(latex), currentCancellationTokenSource.Token);
     }
 
     private static void ExecuteProcess(int millisecondsTimeout, string name, IEnumerable<string> arguments)
