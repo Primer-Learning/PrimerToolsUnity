@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
@@ -43,7 +44,7 @@ public class LatexToSvgConverter : IDisposable
         return Task.Run(() => RenderLatexToSvgSync(latex), currentCancellationTokenSource.Token);
     }
 
-    private static void ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory, string name,
+    private static int ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory, string name,
         IEnumerable<string> arguments)
     {
         var startInfo = new ProcessStartInfo(name)
@@ -81,6 +82,8 @@ public class LatexToSvgConverter : IDisposable
         {
             throw new TimeoutException($"Process {name} did not exit after {millisecondsTimeout}ms");
         }
+
+        return process.ExitCode;
     }
 
     public string RenderLatexToSvgSync(string latex)
@@ -89,13 +92,21 @@ public class LatexToSvgConverter : IDisposable
         
         var sourcePath = Path.Combine(_temporaryDirectory.FullName, "source.tex");
         File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
-        
-        ExecuteProcess(1000, _temporaryDirectory, "/Library/TeX/texbin/latex", new string[] {
-            "-interaction=batchmode",
-            "-halt-on-error",
-            $"-output-directory={_temporaryDirectory.FullName}",
-            sourcePath,
-        });
+
+        if (ExecuteProcess(1000, _temporaryDirectory, "/Library/TeX/texbin/latex", new string[]
+            {
+                "-interaction=batchmode",
+                "-halt-on-error",
+                $"-output-directory={_temporaryDirectory.FullName}",
+                sourcePath,
+            }) != 0)
+        {
+            var errors =
+                from line in File.ReadAllLines(Path.Combine(_temporaryDirectory.FullName, "source.log"))
+                    where line.StartsWith("! ") && line.Length > 2
+                    select line.Substring(2);
+            throw new Exception($"Got LaTeX error(s): {string.Join(", ", errors)}");
+        }
         var dviPath = Path.Combine(_temporaryDirectory.FullName, "source.dvi");
 
         var outputPath = Path.Combine(_temporaryDirectory.FullName, "output.svg");
