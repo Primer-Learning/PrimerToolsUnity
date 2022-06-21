@@ -111,20 +111,17 @@ public class LatexToSvgConverter : IDisposable
 
     private void ReleaseUnmanagedResources()
     {
-        // void DeleteRecursively(DirectoryInfo directory)
-        // {
-        //     foreach (var subDirectory in directory.EnumerateDirectories())
-        //     {
-        //         DeleteRecursively(subDirectory);
-        //     }
-        //     
-        //     directory.Delete(true);
-        // }
-        
-        Task.Run(() =>
+        void DeleteRecursively(DirectoryInfo directory)
         {
-            _temporaryDirectory.Delete(true);
-        });
+            foreach (var subDirectory in directory.EnumerateDirectories())
+            {
+                DeleteRecursively(subDirectory);
+            }
+            
+            directory.Delete(true);
+        }
+        
+        DeleteRecursively(_temporaryDirectoryRoot);
     }
 
     public void Dispose()
