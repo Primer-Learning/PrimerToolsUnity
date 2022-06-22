@@ -17,12 +17,12 @@ using Debug = UnityEngine.Debug;
 public class LatexRendererComponent : MonoBehaviour
 {
     public string latex;
+    private string _lastRenderedLatex;
 
     private LatexToSvgConverter _converter;
-    private string _lastRenderedLatex;
-    private string _lastRenderedSvg;
 
     private string _svg;
+    private string _lastRenderedSvg;
 
     private List<GameObject> _svgParts = new List<GameObject>();
 
@@ -84,22 +84,6 @@ public class LatexRendererComponent : MonoBehaviour
         }
 
         _svgParts = new List<GameObject>();
-    }
-
-    private static Bounds GetBounds(Vector2[] vectors)
-    {
-        if (vectors is null || vectors.Length == 0)
-        {
-            return new Bounds();
-        }
-
-        Bounds result = new Bounds(vectors[0], Vector3.zero);
-        for (var i = 1; i < vectors.Length; ++i)
-        {
-            result.Encapsulate(vectors[i]);
-        }
-
-        return result;
     }
 
     private List<(Vector2, Sprite)> BuildSprites(string svgText)
