@@ -69,7 +69,7 @@ public class LatexRendererComponent : MonoBehaviour
         _svg = null;
     }
 
-    void DestroySvgParts()
+    private void DestroySvgParts()
     {
         foreach (var part in _svgParts)
         {
@@ -86,7 +86,7 @@ public class LatexRendererComponent : MonoBehaviour
         _svgParts = new List<GameObject>();
     }
 
-    private List<(Vector2, Sprite)> BuildSprites(string svgText)
+    private static List<(Vector2, Sprite)> BuildSprites(string svgText)
     {
         SVGParser.SceneInfo sceneInfo;
         try
@@ -99,13 +99,15 @@ public class LatexRendererComponent : MonoBehaviour
             return null;
         }
 
-        var allGeometry = VectorUtils.TessellateScene(sceneInfo.Scene, new VectorUtils.TessellationOptions()
-        {
-            StepDistance = 100.0f,
-            MaxCordDeviation = 0.5f,
-            MaxTanAngleDeviation = 0.1f,
-            SamplingStepSize = 0.01f
-        });
+        List<VectorUtils.Geometry> allGeometry = VectorUtils.TessellateScene(
+            sceneInfo.Scene,
+            new VectorUtils.TessellationOptions()
+            {
+                StepDistance = 100.0f,
+                MaxCordDeviation = 0.5f,
+                MaxTanAngleDeviation = 0.1f,
+                SamplingStepSize = 0.01f
+            });
         
         Rect scaledBounds = VectorUtils.Bounds(
             from geometry in allGeometry

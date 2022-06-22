@@ -86,31 +86,31 @@ public class LatexToSvgConverter : IDisposable
         return process.ExitCode;
     }
 
-    public string RenderLatexToSvgSync(string latex)
+    private string RenderLatexToSvgSync(string latex)
     {
-        var _temporaryDirectory = _temporaryDirectoryRoot.CreateSubdirectory(Guid.NewGuid().ToString());
+        var temporaryDirectory = _temporaryDirectoryRoot.CreateSubdirectory(Guid.NewGuid().ToString());
         
-        var sourcePath = Path.Combine(_temporaryDirectory.FullName, "source.tex");
+        var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
         File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
 
-        if (ExecuteProcess(1000, _temporaryDirectory, "/Library/TeX/texbin/latex", new string[]
+        if (ExecuteProcess(1000, temporaryDirectory, "/Library/TeX/texbin/latex", new string[]
             {
                 "-interaction=batchmode",
                 "-halt-on-error",
-                $"-output-directory={_temporaryDirectory.FullName}",
+                $"-output-directory={temporaryDirectory.FullName}",
                 sourcePath,
             }) != 0)
         {
             var errors =
-                from line in File.ReadAllLines(Path.Combine(_temporaryDirectory.FullName, "source.log"))
+                from line in File.ReadAllLines(Path.Combine(temporaryDirectory.FullName, "source.log"))
                     where line.StartsWith("! ") && line.Length > 2
-                    select line.Substring(2);
+                    select line[2..];
             throw new Exception($"Got LaTeX error(s): {string.Join(", ", errors)}");
         }
-        var dviPath = Path.Combine(_temporaryDirectory.FullName, "source.dvi");
+        var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
 
-        var outputPath = Path.Combine(_temporaryDirectory.FullName, "output.svg");
-        ExecuteProcess(1000, _temporaryDirectory, "/Library/TeX/texbin/dvisvgm", new string[]
+        var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
+        ExecuteProcess(1000, temporaryDirectory, "/Library/TeX/texbin/dvisvgm", new string[]
         {
             dviPath,
             "--no-fonts",
