@@ -28,10 +28,6 @@ public class LatexRendererComponent : MonoBehaviour
 
     public async void Update()
     {
-        // TODO: This can be moved to awake() once the implementation is a bit more stable. It's here because
-        //       awake() doesn't get called when code is reloaded. 
-        _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
-
         if (_svg != _lastRenderedSvg)
         {
             // This must be done within the player update loop, so it's important that this is before any await calls
@@ -58,9 +54,19 @@ public class LatexRendererComponent : MonoBehaviour
         }
     }
 
+    public void OnEnable()
+    {
+        _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
+    }
+
     public void OnDisable()
     {
+        _converter = null;
+        
         DestroySvgParts();
+        _lastRenderedLatex = null;
+        _lastRenderedSvg = null;
+        _svg = null;
     }
 
     void DestroySvgParts()
