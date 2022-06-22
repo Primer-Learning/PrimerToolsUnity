@@ -16,6 +16,48 @@ using Debug = UnityEngine.Debug;
 [SelectionBase]
 public class LatexRendererComponent : MonoBehaviour
 {
+    public string latex;
+
+    private LatexToSvgConverter _converter;
+    private string _lastRenderedLatex;
+    private string _lastRenderedSvg;
+
+    private string _svg;
+
+    private List<GameObject> _svgParts = new List<GameObject>();
+
+    public async void Update()
+    {
+        // TODO: This can be moved to awake() once the implementation is a bit more stable. It's here because
+        //       awake() doesn't get called when code is reloaded. 
+        _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
+
+        if (_svg != _lastRenderedSvg)
+        {
+            // This must be done within the player update loop, so it's important that this is before any await calls
+            // in this function. If it's done outside of it, there will be an error when creating the sprite.
+            CreateSvgParts(BuildSprites(_svg));
+            _lastRenderedSvg = _svg;
+        }
+
+        if (latex != _lastRenderedLatex)
+        {
+            try
+            {
+                // TODO: This only needs to be in update when running in the editor. I'd like a better pattern for
+                //       dealing with changed properties in the editor, but I haven't found one yet.
+                _svg = await _converter.RenderLatexToSvg(latex);
+                _lastRenderedLatex = latex;
+
+                EditorApplication.QueuePlayerLoopUpdate();
+            }
+            catch (OperationCanceledException)
+            {
+                // This will happen when we've already started rendering a different LaTeX string
+            }
+        }
+    }
+
     public void OnDisable()
     {
         DestroySvgParts();
@@ -37,8 +79,6 @@ public class LatexRendererComponent : MonoBehaviour
 
         _svgParts = new List<GameObject>();
     }
-    
-    private LatexToSvgConverter _converter;
 
     private static Bounds GetBounds(Vector2[] vectors)
     {
@@ -128,46 +168,6 @@ public class LatexRendererComponent : MonoBehaviour
                 HideFlags.NotEditable;
             
             _svgParts.Add(obj);
-        }
-    }
-
-    private List<GameObject> _svgParts = new List<GameObject>();
-
-    public string latex;
-    private string _lastRenderedLatex;
-
-    private string _svg;
-    private string _lastRenderedSvg;
-
-    public async void Update()
-    {
-        // TODO: This can be moved to awake() once the implementation is a bit more stable. It's here because
-        //       awake() doesn't get called when code is reloaded. 
-        _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
-
-        if (_svg != _lastRenderedSvg)
-        {
-            // This must be done within the player update loop, so it's important that this is before any await calls
-            // in this function. If it's done outside of it, there will be an error when creating the sprite.
-            CreateSvgParts(BuildSprites(_svg));
-            _lastRenderedSvg = _svg;
-        }
-
-        if (latex != _lastRenderedLatex)
-        {
-            try
-            {
-                // TODO: This only needs to be in update when running in the editor. I'd like a better pattern for
-                //       dealing with changed properties in the editor, but I haven't found one yet.
-                _svg = await _converter.RenderLatexToSvg(latex);
-                _lastRenderedLatex = latex;
-
-                EditorApplication.QueuePlayerLoopUpdate();
-            }
-            catch (OperationCanceledException)
-            {
-                // This will happen when we've already started rendering a different LaTeX string
-            }
         }
     }
 }
