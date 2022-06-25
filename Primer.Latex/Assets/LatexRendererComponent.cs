@@ -13,6 +13,8 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
+[assembly: InternalsVisibleTo("LatexRendererEditor")]
+
 [ExecuteInEditMode]
 [SelectionBase]
 public class LatexRendererComponent : MonoBehaviour
@@ -25,7 +27,9 @@ public class LatexRendererComponent : MonoBehaviour
     private string _svg;
     private string _lastRenderedSvg;
 
-    public List<GameObject> _svgParts = new List<GameObject>();
+    [SerializeField]
+    [HideInInspector]
+    internal List<GameObject> _svgParts = new List<GameObject>();
 
     public async void Update()
     {
