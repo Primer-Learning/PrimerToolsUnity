@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
 using Unity.VisualScripting;
@@ -24,7 +25,7 @@ public class LatexRendererComponent : MonoBehaviour
     private string _svg;
     private string _lastRenderedSvg;
 
-    private List<GameObject> _svgParts = new List<GameObject>();
+    public List<GameObject> _svgParts = new List<GameObject>();
 
     public async void Update()
     {
