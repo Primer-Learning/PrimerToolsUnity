@@ -2,27 +2,30 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(LatexRendererComponent))]
-public class LatexRendererComponentEditor : Editor
+namespace UnityEditor.LatexRenderer
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(LatexRendererComponent))]
+    public class LatexRendererComponentEditor : Editor
     {
-        base.OnInspectorGUI();
-
-        if (GUILayout.Button("Release SVG Parts"))
+        public override void OnInspectorGUI()
         {
-            var component = (LatexRendererComponent)target;
+            base.OnInspectorGUI();
 
-            foreach (var svgPart in component._svgParts)
+            if (GUILayout.Button("Release SVG Parts"))
             {
-                Undo.RecordObject(svgPart, "Enable");
-                svgPart.hideFlags = HideFlags.None;
-            }
+                var component = (LatexRendererComponent)target;
 
-            // If we didn't clear _svgParts, the component would destroy them when it was destroyed
-            Undo.RecordObject(component, "");
-            component._svgParts = new List<GameObject>();
-            Undo.DestroyObjectImmediate(component);
+                foreach (var svgPart in component._svgParts)
+                {
+                    Undo.RecordObject(svgPart, "Enable");
+                    svgPart.hideFlags = HideFlags.None;
+                }
+
+                // If we didn't clear _svgParts, the component would destroy them when it was destroyed
+                Undo.RecordObject(component, "");
+                component._svgParts = new List<GameObject>();
+                Undo.DestroyObjectImmediate(component);
+            }
         }
     }
 }

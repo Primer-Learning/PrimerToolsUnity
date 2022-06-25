@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Codice.CM.SemanticMerge.Gui;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,11 +14,80 @@ using Debug = UnityEngine.Debug;
 
 public class LatexToSvgConverter : IDisposable
 {
+    public static string LatexExecutablePath;
+    public static string DvisvgmExecutablePath;
+    
     private readonly DirectoryInfo _temporaryDirectoryRoot;
     private readonly string _templateText;
     
     // Allows the last call to RenderLatexToSvg to be cancelled
     private CancellationTokenSource _latestCancellationTokenSource;
+    
+    private static string FindInPath(string name)
+    {
+        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        
+        var pathParts = Environment.GetEnvironmentVariable("PATH")?.Split(isWindows ? ";" : ":");
+        if (pathParts is null)
+        {
+            return null;
+        }
+
+        foreach (var directory in pathParts)
+        {
+            var plain = Path.Combine(directory, name);
+            if (File.Exists(plain))
+            {
+                return plain;
+            }
+
+            var exe = $"{plain}.exe";
+            if (File.Exists(exe))
+            {
+                return exe;
+            }
+        }
+
+        return null;
+    }
+
+    private static string FindLatexExecutablePath()
+    {
+        if (LatexExecutablePath is not null && LatexExecutablePath.Length > 0)
+        {
+            return LatexExecutablePath;
+        }
+        else
+        {
+            var found = FindInPath("latex");
+            if (found is null)
+            {
+                throw new FileNotFoundException(
+                    "Could not find latex in your PATH. Add it or add the location in your Unity editor preferences.");
+            }
+
+            return found;
+        }
+    }
+    
+    private static string FindDvisvgmExecutablePath()
+    {
+        if (DvisvgmExecutablePath is not null && DvisvgmExecutablePath.Length > 0)
+        {
+            return DvisvgmExecutablePath;
+        }
+        else
+        {
+            var found = FindInPath("dvisvgm");
+            if (found is null)
+            {
+                throw new FileNotFoundException(
+                    "Could not find dvisvgm in your PATH. Add it or add the location in your Unity editor preferences.");
+            }
+
+            return found;
+        }
+    }
 
     public static LatexToSvgConverter Create(string templateText)
     {
@@ -54,7 +125,11 @@ public class LatexToSvgConverter : IDisposable
             UseShellExecute = false,
             WorkingDirectory = workingDirectory.FullName,
         };
-        startInfo.ArgumentList.AddRange(arguments);
+        
+        foreach (var arg in arguments)
+        {
+            startInfo.ArgumentList.Add(arg);
+        }
 
         using var process = new Process() { StartInfo = startInfo };
 
@@ -93,7 +168,7 @@ public class LatexToSvgConverter : IDisposable
         var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
         File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
 
-        if (ExecuteProcess(1000, temporaryDirectory, "/Library/TeX/texbin/latex", new string[]
+        if (ExecuteProcess(1000, temporaryDirectory, FindLatexExecutablePath(), new string[]
             {
                 "-interaction=batchmode",
                 "-halt-on-error",
@@ -110,7 +185,7 @@ public class LatexToSvgConverter : IDisposable
         var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
 
         var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
-        ExecuteProcess(1000, temporaryDirectory, "/Library/TeX/texbin/dvisvgm", new string[]
+        ExecuteProcess(1000, temporaryDirectory, FindDvisvgmExecutablePath(), new string[]
         {
             dviPath,
             "--no-fonts",

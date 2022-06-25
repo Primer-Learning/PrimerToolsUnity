@@ -1,0 +1,19 @@
+{
+    "name": "LatexRendererEditor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:babec0437122f45ecaddd206c8c4a634",
+        "GUID:49818357e697641afb75d2f8acaf1861"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,16 @@
+{
+    "name": "LatexRenderer",
+    "rootNamespace": "",
+    "references": [
+        "GUID:68550284b645f4b9894995579f34290a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
