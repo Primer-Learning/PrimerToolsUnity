@@ -13,7 +13,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-[assembly: InternalsVisibleTo("LatexRendererEditor")]
+[assembly: InternalsVisibleTo("Primer.LatexRenderer.Editor")]
 
 [ExecuteInEditMode]
 [SelectionBase]

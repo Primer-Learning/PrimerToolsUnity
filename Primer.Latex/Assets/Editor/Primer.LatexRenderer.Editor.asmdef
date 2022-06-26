@@ -1,10 +1,13 @@
 {
-    "name": "LatexRenderer",
+    "name": "Primer.LatexRenderer.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:68550284b645f4b9894995579f34290a"
+        "GUID:babec0437122f45ecaddd206c8c4a634",
+        "GUID:49818357e697641afb75d2f8acaf1861"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
