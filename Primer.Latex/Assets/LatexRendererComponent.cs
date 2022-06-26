@@ -21,6 +21,8 @@ public class LatexRendererComponent : MonoBehaviour
 {
     public string latex;
     
+    const float SvgPixelsPerUnit = 10f;
+
     [SerializeField]
     [HideInInspector]
     private string _lastRenderedLatex;
@@ -145,7 +147,7 @@ public class LatexRendererComponent : MonoBehaviour
             Debug.LogError($"Invalid SVG, got error: {e.ToString()}");
             return null;
         }
-
+        
         List<VectorUtils.Geometry> allGeometry = VectorUtils.TessellateScene(
             sceneInfo.Scene,
             new VectorUtils.TessellationOptions()
@@ -159,7 +161,7 @@ public class LatexRendererComponent : MonoBehaviour
         Rect scaledBounds = VectorUtils.Bounds(
             from geometry in allGeometry
             from vertex in geometry.Vertices
-            select geometry.WorldTransform * vertex);
+            select (geometry.WorldTransform * vertex) / SvgPixelsPerUnit);
         
         // Holds an (offset, sprite) for each shape in the SVG 
         var sprites = new List<(Vector2, Sprite)>(allGeometry.Count);
@@ -167,7 +169,7 @@ public class LatexRendererComponent : MonoBehaviour
         foreach (var geometry in allGeometry)
         {
             Vector2 offset = VectorUtils.Bounds(
-                from vertex in geometry.Vertices select geometry.WorldTransform * vertex).min;
+                from vertex in geometry.Vertices select (geometry.WorldTransform * vertex) / SvgPixelsPerUnit).min;
 
             // This matches the way flipYAxis would work in BuildSprite if we gave it all of the geometry in the SVG
             // rather than just one at a time.
@@ -177,7 +179,7 @@ public class LatexRendererComponent : MonoBehaviour
                 offset,
                 VectorUtils.BuildSprite(
                     new List<VectorUtils.Geometry>() { geometry },
-                    1f,
+                    SvgPixelsPerUnit,
                     VectorUtils.Alignment.TopLeft,
                     Vector2.zero,
                     128,
