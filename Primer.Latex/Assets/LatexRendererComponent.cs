@@ -103,22 +103,31 @@ public class LatexRendererComponent : MonoBehaviour
     {
         bool wasDeletedInEditor = Application.isEditor && gameObject.scene.isLoaded;
         if (wasDeletedInEditor) {
-            DestroySvgParts();
+            DestroySvgParts(true);
         }
     }
 
-    private void DestroySvgParts()
+    private void DestroySvgParts(bool undoable = false)
     {
         foreach (var part in _svgParts)
         {
+            #if UNITY_EDITOR
             if (Application.isEditor)
             {
-                DestroyImmediate(part);
+                if (undoable)
+                {
+                    Undo.DestroyObjectImmediate(part);
+                }
+                else
+                {
+                    DestroyImmediate(part);
+                }
+
+                continue;
             }
-            else
-            {
-                Destroy(part);
-            }
+            #endif
+            
+            Destroy(part);
         }
 
         _svgParts = new List<GameObject>();
