@@ -13,11 +13,14 @@ namespace UnityEditor.LatexRenderer
 
             if (GUILayout.Button("Release SVG Parts"))
             {
+                Undo.SetCurrentGroupName("Release SVG Parts");
+                
                 var component = (LatexRendererComponent)target;
 
                 foreach (var svgPart in component._svgParts)
                 {
-                    Undo.RecordObject(svgPart, "Enable");
+                    // TODO: This isn't working as expected... See the HACK in LatexRendererComponent.Start.
+                    Undo.RecordObject(svgPart, "");
                     svgPart.hideFlags = HideFlags.None;
                 }
 

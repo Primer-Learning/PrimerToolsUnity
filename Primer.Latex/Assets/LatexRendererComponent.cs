@@ -20,16 +20,26 @@ using Debug = UnityEngine.Debug;
 public class LatexRendererComponent : MonoBehaviour
 {
     public string latex;
+    
+    [SerializeField]
+    [HideInInspector]
     private string _lastRenderedLatex;
 
     private LatexToSvgConverter _converter;
 
+    [SerializeField]
+    [HideInInspector]
     private string _svg;
+    
+    [SerializeField]
+    [HideInInspector]
     private string _lastRenderedSvg;
 
     [SerializeField]
     [HideInInspector]
     internal List<GameObject> _svgParts = new List<GameObject>();
+    
+    private const HideFlags SvgPartsHideFlags = HideFlags.NotEditable;
 
     public async void Update()
     {
@@ -59,19 +69,42 @@ public class LatexRendererComponent : MonoBehaviour
         }
     }
 
+    public void Start()
+    {
+        // HACK: When undoing a "Release SVG Parts" operation, the hideFlags are not restored. Unfortunately I can't
+        // figure out why, so we make sure they're properly set here.
+        foreach (var part in _svgParts)
+        {
+            part.hideFlags = SvgPartsHideFlags;
+        }
+    }
+
     public void OnEnable()
     {
         _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
+        
+        foreach (var part in _svgParts)
+        {
+            part.SetActive(true);
+        }
     }
 
     public void OnDisable()
     {
         _converter = null;
         
-        DestroySvgParts();
-        _lastRenderedLatex = null;
-        _lastRenderedSvg = null;
-        _svg = null;
+        foreach (var part in _svgParts)
+        {
+            part.SetActive(false);
+        }
+    }
+
+    public void OnDestroy()
+    {
+        bool wasDeletedInEditor = Application.isEditor && gameObject.scene.isLoaded;
+        if (wasDeletedInEditor) {
+            DestroySvgParts();
+        }
     }
 
     private void DestroySvgParts()
@@ -159,10 +192,7 @@ public class LatexRendererComponent : MonoBehaviour
             obj.transform.parent = gameObject.transform;
             obj.transform.localPosition = (Vector3)offset;
 
-            obj.hideFlags =
-                HideFlags.DontSaveInBuild |
-                HideFlags.DontSaveInEditor |
-                HideFlags.NotEditable;
+            obj.hideFlags = SvgPartsHideFlags;
             
             _svgParts.Add(obj);
         }
