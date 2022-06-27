@@ -60,7 +60,10 @@ namespace LatexRenderer
             {
                 _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex);
                 _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
+                
+                #if UNITY_EDITOR
                 EditorApplication.QueuePlayerLoopUpdate();
+                #endif
             } else if (_currentBuild.Svg is not null && !_currentBuild.DidCreateSvgParts)
             {
                 // This must be done within the player update loop, so it's important that this isn't run after any
@@ -114,7 +117,7 @@ namespace LatexRenderer
         {
             foreach (var part in _svgParts)
             {
-#if UNITY_EDITOR
+                #if UNITY_EDITOR
                 if (Application.isEditor)
                 {
                     if (undoable)
@@ -128,7 +131,7 @@ namespace LatexRenderer
 
                     continue;
                 }
-#endif
+                #endif
 
                 Destroy(part);
             }
