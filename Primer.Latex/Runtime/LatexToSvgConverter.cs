@@ -22,9 +22,6 @@ namespace LatexRenderer
         private readonly DirectoryInfo _temporaryDirectoryRoot;
         private readonly string _templateText;
 
-        // Allows the last call to RenderLatexToSvg to be cancelled
-        private CancellationTokenSource _latestCancellationTokenSource;
-        
         private const int Timeout = 10 * 1000;
 
         private static string FindInPath(string name)
@@ -108,15 +105,7 @@ namespace LatexRenderer
 
         public Task<string> RenderLatexToSvg(string latex)
         {
-            if (_latestCancellationTokenSource is not null && !_latestCancellationTokenSource.IsCancellationRequested)
-            {
-                _latestCancellationTokenSource.Cancel();
-            }
-
-            var currentCancellationTokenSource = new CancellationTokenSource();
-            _latestCancellationTokenSource = currentCancellationTokenSource;
-
-            return Task.Run(() => RenderLatexToSvgSync(latex), currentCancellationTokenSource.Token);
+            return Task.Run(() => RenderLatexToSvgSync(latex));
         }
 
         private static int ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory, string name,

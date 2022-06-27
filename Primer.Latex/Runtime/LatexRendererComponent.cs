@@ -23,45 +23,51 @@ namespace LatexRenderer
     {
         public string latex;
 
-        const float SvgPixelsPerUnit = 10f;
+        private const float SvgPixelsPerUnit = 10f;
 
-        [SerializeField] [HideInInspector] private string _lastRenderedLatex;
+        [Serializable]
+        private class Build
+        {
+            public string Latex;
+            public string Svg = null;
+            public bool DidCreateSvgParts = false;
+            
+            [NonSerialized]
+            public Task<string> LatexToSvgTask = null;
+            
+            public Build(string latex)
+            {
+                Latex = latex;
+            }
+        }
+
+        [SerializeField] [HideInInspector] private Build _currentBuild = new Build("");
+
+            [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new List<GameObject>();
 
         private LatexToSvgConverter _converter;
-
-        [SerializeField] [HideInInspector] private string _svg;
-
-        [SerializeField] [HideInInspector] private string _lastRenderedSvg;
-
-        [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new List<GameObject>();
 
         private const HideFlags SvgPartsHideFlags = HideFlags.NotEditable;
 
         public async void Update()
         {
-            if (_svg != _lastRenderedSvg)
+            if (_currentBuild.Latex != latex)
             {
-                // This must be done within the player update loop, so it's important that this is before any await calls
-                // in this function. If it's done outside of it, there will be an error when creating the sprite.
-                CreateSvgParts(BuildSprites(_svg));
-                _lastRenderedSvg = _svg;
+                _currentBuild = new Build(latex);
             }
-
-            if (latex != _lastRenderedLatex)
+            
+            if (_currentBuild.LatexToSvgTask is null)
             {
-                try
-                {
-                    // TODO: This only needs to be in update when running in the editor. I'd like a better pattern for
-                    //       dealing with changed properties in the editor, but I haven't found one yet.
-                    _svg = await _converter.RenderLatexToSvg(latex);
-                    _lastRenderedLatex = latex;
-
-                    EditorApplication.QueuePlayerLoopUpdate();
-                }
-                catch (OperationCanceledException)
-                {
-                    // This will happen when we've already started rendering a different LaTeX string
-                }
+                _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex);
+                _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
+                EditorApplication.QueuePlayerLoopUpdate();
+            } else if (_currentBuild.LatexToSvgTask.IsCompletedSuccessfully && !_currentBuild.DidCreateSvgParts)
+            {
+                // This must be done within the player update loop, so it's important that this isn't run after any
+                // await calls in this function. If it's done outside of it, there will be an error when creating the
+                // sprite.
+                CreateSvgParts(BuildSprites(_currentBuild.Svg));
+                _currentBuild.DidCreateSvgParts = true;
             }
         }
 
