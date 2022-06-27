@@ -128,6 +128,7 @@ namespace LatexRenderer
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 WorkingDirectory = workingDirectory.FullName,
+                CreateNoWindow = true,
             };
 
             foreach (var arg in arguments)
