@@ -24,6 +24,8 @@ namespace LatexRenderer
 
         // Allows the last call to RenderLatexToSvg to be cancelled
         private CancellationTokenSource _latestCancellationTokenSource;
+        
+        private const int Timeout = 10 * 1000;
 
         private static string FindInPath(string name)
         {
@@ -172,7 +174,7 @@ namespace LatexRenderer
             var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
             File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
 
-            if (ExecuteProcess(1000, temporaryDirectory, FindLatexExecutablePath(), new string[]
+            if (ExecuteProcess(Timeout, temporaryDirectory, FindLatexExecutablePath(), new string[]
                 {
                     "-interaction=batchmode",
                     "-halt-on-error",
@@ -190,7 +192,7 @@ namespace LatexRenderer
             var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
 
             var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
-            ExecuteProcess(1000, temporaryDirectory, FindDvisvgmExecutablePath(), new string[]
+            ExecuteProcess(Timeout, temporaryDirectory, FindDvisvgmExecutablePath(), new string[]
             {
                 dviPath,
                 "--no-fonts",
