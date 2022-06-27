@@ -42,8 +42,8 @@ namespace LatexRenderer
         }
 
         [SerializeField] [HideInInspector] private Build _currentBuild = new Build("");
-
-            [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new List<GameObject>();
+        
+        [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new List<GameObject>();
 
         private LatexToSvgConverter _converter;
 
