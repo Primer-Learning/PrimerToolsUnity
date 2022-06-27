@@ -1,5 +1,6 @@
 using UnityEditor.SettingsManagement;
 using UnityEngine;
+using LatexRenderer;
 
 namespace UnityEditor.LatexRenderer.UserSettings
 {
