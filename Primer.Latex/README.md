@@ -1,1 +1,1 @@
-* To install `vectorgraphics` package, you must add it by name in the Unity Package Manager. Its full name is `com.unity.vectorgraphics`.
+* On Windows, you'll need to install miktex. After you've done that, open up the miktex console, run updates, and then install the cm-super package. This has font information in it that's necessary to turn text into SVGs.
