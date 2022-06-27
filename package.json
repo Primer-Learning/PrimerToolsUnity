@@ -1,0 +1,7 @@
+{
+    "name": "org.primerlearning.primertools",
+    "version": "0.1.0",
+    "description": "Tools used for Primer YouTube videos",
+    "displayName": "PrimerTools",
+    "unity": "2021.3"
+}
