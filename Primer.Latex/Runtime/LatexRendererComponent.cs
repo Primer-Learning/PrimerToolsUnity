@@ -61,7 +61,7 @@ namespace LatexRenderer
                 _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex);
                 _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
                 EditorApplication.QueuePlayerLoopUpdate();
-            } else if (_currentBuild.LatexToSvgTask.IsCompletedSuccessfully && !_currentBuild.DidCreateSvgParts)
+            } else if (_currentBuild.Svg is not null && !_currentBuild.DidCreateSvgParts)
             {
                 // This must be done within the player update loop, so it's important that this isn't run after any
                 // await calls in this function. If it's done outside of it, there will be an error when creating the
