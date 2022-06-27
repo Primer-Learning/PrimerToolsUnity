@@ -21,6 +21,7 @@ namespace LatexRenderer
     [SelectionBase]
     public class LatexRendererComponent : MonoBehaviour
     {
+        [TextArea]
         public string latex;
 
         private const float SvgPixelsPerUnit = 10f;
