@@ -22,7 +22,7 @@ namespace LatexRenderer
         private readonly DirectoryInfo _temporaryDirectoryRoot;
         private readonly string _templateText;
 
-        private const int Timeout = 10 * 1000;
+        private const int Timeout = 30 * 1000;
 
         private static string FindInPath(string name)
         {
