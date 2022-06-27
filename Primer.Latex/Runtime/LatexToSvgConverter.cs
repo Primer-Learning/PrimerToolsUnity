@@ -20,7 +20,6 @@ namespace LatexRenderer
         public static string DvisvgmExecutablePath;
 
         private readonly DirectoryInfo _temporaryDirectoryRoot;
-        private readonly string _templateText;
 
         private const int Timeout = 30 * 1000;
 
@@ -90,22 +89,21 @@ namespace LatexRenderer
             }
         }
 
-        public static LatexToSvgConverter Create(string templateText)
+        public static LatexToSvgConverter Create()
         {
-            return new LatexToSvgConverter(templateText, Directory.CreateDirectory(
+            return new LatexToSvgConverter(Directory.CreateDirectory(
                 Path.Combine(Path.GetTempPath(), $"unity-latex-{Guid.NewGuid().ToString()}")));
         }
 
-        private LatexToSvgConverter(string templateText, DirectoryInfo temporaryDirectoryRoot)
+        private LatexToSvgConverter(DirectoryInfo temporaryDirectoryRoot)
         {
-            _templateText = templateText;
             _temporaryDirectoryRoot = temporaryDirectoryRoot;
             Debug.Log($"Initialized LaTeX build directory: {_temporaryDirectoryRoot.FullName}");
         }
 
-        public Task<string> RenderLatexToSvg(string latex)
+        public Task<string> RenderLatexToSvg(string latex, List<string> headers)
         {
-            return Task.Run(() => RenderLatexToSvgSync(latex));
+            return Task.Run(() => RenderLatexToSvgSync(latex, headers));
         }
 
         private static int ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory, string name,
@@ -157,12 +155,18 @@ namespace LatexRenderer
             return process.ExitCode;
         }
 
-        private string RenderLatexToSvgSync(string latex)
+        private string RenderLatexToSvgSync(string latex, List<string> headers)
         {
             var temporaryDirectory = _temporaryDirectoryRoot.CreateSubdirectory(Guid.NewGuid().ToString());
 
             var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
-            File.WriteAllText(sourcePath, _templateText.Replace("[tex_expression]", latex));
+            File.WriteAllText(sourcePath, @$"
+            {String.Join(Environment.NewLine, headers)}
+            \begin{{document}}
+            \color{{white}}
+            {latex}
+            \end{{document}}
+            ");
 
             if (ExecuteProcess(Timeout, temporaryDirectory, FindLatexExecutablePath(), new string[]
                 {

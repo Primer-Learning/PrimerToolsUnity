@@ -24,25 +24,88 @@ namespace LatexRenderer
         [TextArea]
         public string latex;
 
+        [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
+        public List<string> headers = new List<string>()
+        {
+            @"\documentclass[preview]{standalone}",
+            @"\usepackage[english]{babel}",
+            @"\usepackage[utf8]{inputenc}",
+            @"\usepackage[T1]{fontenc}",
+            @"\usepackage{amsmath}",
+            @"\usepackage{amssymb}",
+            @"\usepackage{dsfont}",
+            @"\usepackage{setspace}",
+            @"\usepackage{tipa}",
+            @"\usepackage{relsize}",
+            @"\usepackage{textcomp}",
+            @"\usepackage{mathrsfs}",
+            @"\usepackage{calligra}",
+            @"\usepackage{wasysym}",
+            @"\usepackage{ragged2e}",
+            @"\usepackage{physics}",
+            @"\usepackage{xcolor}",
+            @"\usepackage{microtype}",
+            @"\usepackage{pifont}",
+            @"\DisableLigatures{encoding = *, family = * }",
+            @"\linespread{1}",
+        };
+
         private const float SvgPixelsPerUnit = 10f;
 
         [Serializable]
         private class Build
         {
-            public string Latex;
+            public class Key
+            {
+                public readonly string Latex;
+                public readonly List<string> Headers;
+
+                public Key(LatexRendererComponent source)
+                {
+                    Latex = source.latex;
+                    Headers = new List<string>(source.headers);
+                }
+
+                public static bool operator ==(Key a, Key b)
+                {
+                    if (a is null)
+                    {
+                        return b is null;
+                    }
+
+                    return a.Equals(b);
+                }
+                
+                public static bool operator !=(Key a, Key b)
+                {
+                    return !(a == b);
+                }
+                
+                public override bool Equals(object obj)
+                {
+                    return Equals(obj as Key);
+                }
+
+                public bool Equals(Key other)
+                {
+                    return Latex == other.Latex && Headers.SequenceEqual(other.Headers);
+                }
+            }
+
+            public Key Source;
             public string Svg = null;
             public bool DidCreateSvgParts = false;
             
             [NonSerialized]
             public Task<string> LatexToSvgTask = null;
             
-            public Build(string latex)
+            public Build(Key source)
             {
-                Latex = latex;
+                Source = source;
             }
         }
 
-        [SerializeField] [HideInInspector] private Build _currentBuild = new Build("");
+        [SerializeField] [HideInInspector] private Build _currentBuild = null;
         
         [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new List<GameObject>();
 
@@ -52,14 +115,15 @@ namespace LatexRenderer
 
         public async void Update()
         {
-            if (_currentBuild.Latex != latex)
+            Build.Key currentKey = new Build.Key(this);
+            if (_currentBuild?.Source != currentKey)
             {
-                _currentBuild = new Build(latex);
+                _currentBuild = new Build(currentKey);
             }
             
             if (_currentBuild.LatexToSvgTask is null)
             {
-                _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex);
+                _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex, headers);
                 _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
                 
                 #if UNITY_EDITOR
@@ -87,7 +151,7 @@ namespace LatexRenderer
 
         public void OnEnable()
         {
-            _converter ??= LatexToSvgConverter.Create(Resources.Load<TextAsset>("tex_template").text);
+            _converter ??= LatexToSvgConverter.Create();
 
             foreach (var part in _svgParts)
             {
