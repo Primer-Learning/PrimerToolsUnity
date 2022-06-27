@@ -17,25 +17,23 @@ public class Director : SceneManager
     private bool paused;
     internal bool animating = true;
     internal float timeBehind; //For adjusting effective timing after events with flexible timing
+    // internal bool playing = false;
 
     [Header("Mode select")]
     [SerializeField] protected DirectorMode mode;
 
     [Header("Recording options")]
-    [SerializeField] bool recordOnPlay;
+    public bool recordOnPlay;
     public int videoFrameRate = 60;
     public int resolutionWidth = 1920;
     public int resolutionHeight = 1080;
     public int everyNFrames = 1;
     string frameOutDir = null;
-    bool recording = false;
+    internal bool recording = false;
 
     [Header("Testing options")]
     [SerializeField] bool lightBackground = false;
 
-    [Header("Scene parameters")]
-    // So subclasses will have this header automatically
-    // But it doesn't work!
 
     // Some reference displays that might be useful, but I rarely use anymore
     TextMeshProUGUI timeDisplay = null;
@@ -43,6 +41,9 @@ public class Director : SceneManager
     TextMeshProUGUI timeScaleDisplay = null;    
 
     // Media references to test how animations sync with voice or other video
+    [Header("Scene parameters")]
+    // So subclasses will have this header automatically
+    // But it doesn't work!
     public AudioClip voiceOverReferenceClip = null;
     internal AudioSource voiceOverReference;
     internal static List<SceneBlock> schedule = new List<SceneBlock>();
@@ -60,7 +61,7 @@ public class Director : SceneManager
             }
             if (doneAlarm == null) {
                 doneAlarm = this.gameObject.AddComponent<AudioSource>();
-                doneAlarm.clip = Resources.Load("zelda_secret", typeof(AudioClip)) as AudioClip;
+                doneAlarm.clip = Resources.Load("WW_Beedle_ThankYou", typeof(AudioClip)) as AudioClip;
                 doneAlarm.playOnAwake = false;
             }
 
@@ -84,10 +85,10 @@ public class Director : SceneManager
         if (recordOnPlay) {
             StartRecording();
         }
-
         StartCoroutine(playScene());
     }
     internal IEnumerator playScene() {
+        // playing = true;
         for (int i = 0; i < schedule.Count; i++) {
             SceneBlock sb = schedule[i];
 
@@ -109,12 +110,15 @@ public class Director : SceneManager
         }
         List<PrimerObject> allPOs = Object.FindObjectsOfType<PrimerObject>().ToList();
         foreach (PrimerObject po in allPOs) {
-            po.Disappear();
+            if (po.GetComponent<Director>() == null) {
+                po.ScaleDownToZero();
+            }
         }
         if (mode == DirectorMode.ConstantFrameRate) {
             StopRecording(delay: 1); //Delay by one second to give a buffer
         }
         if (doneAlarm != null) {
+            Debug.Log("Done alarm is not null, at least");
             doneAlarm.loop = false;
             doneAlarm.Play();
             while (doneAlarm.isPlaying) {
@@ -122,6 +126,9 @@ public class Director : SceneManager
             }
         }
         yield return new WaitForSeconds(1);
+        if (recording) {
+            StopRecording();
+        }
         #if UNITY_EDITOR
         EditorApplication.isPlaying = false;
         #endif
@@ -226,7 +233,7 @@ public class Director : SceneManager
             Time.timeScale = Mathf.Min(Time.timeScale * 2, 100);
         }
     }
-    void StartRecording(int everyNFrames = 1) {
+    internal void StartRecording(int everyNFrames = 1) {
         cam.enabled = false;
 
         // In frameOutDir, make a folder with the director's name, if it doesn't exist
@@ -283,11 +290,25 @@ public class Director : SceneManager
             yield return new WaitForSeconds(delay);
         }
         recording = false;
+        cam.enabled = true;
         yield return null;
     }    
     protected void InsertSceneTime(float extraTime) {
         timeBehind += extraTime;
         ((Director)SceneManager.instance).voiceOverReference.Pause();
+    }
+    protected void PauseVoiceOverAtTime(float minutes, float seconds)
+    {   
+        float sceneTime = minutes * 60 + seconds;
+        PauseVoiceOverAtTime(sceneTime);
+    }
+    protected void PauseVoiceOverAtTime(float sceneTime)
+    {
+        StartCoroutine(pauseVoiceOverAtTime(sceneTime));
+    }
+    IEnumerator pauseVoiceOverAtTime(float sceneTime) {
+        yield return new WaitUntilSceneTime(sceneTime);
+        voiceOverReference.Pause();
     }
 }
 
@@ -299,8 +320,10 @@ public class WaitUntilSceneTime : CustomYieldInstruction {
         {   
             bool toKeepWaiting = Time.time - ((Director)SceneManager.instance).timeBehind < timeToWaitUntil;
             if (toKeepWaiting == false && ((Director)SceneManager.instance).voiceOverReference != null) {
-                ((Director)SceneManager.instance).voiceOverReference.time = timeToWaitUntil;
-                ((Director)SceneManager.instance).voiceOverReference.Play();
+                if (!((Director)SceneManager.instance).recording) {
+                    ((Director)SceneManager.instance).voiceOverReference.time = timeToWaitUntil;
+                    ((Director)SceneManager.instance).voiceOverReference.Play();
+                }
             }
             return toKeepWaiting;
         }

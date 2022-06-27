@@ -65,10 +65,10 @@ public class SceneManager : PrimerObject
                 // Debug.Log(cam);
             }
             if (camRig == null) {
-                camRig = cam.GetComponent<CameraRig>();
-                if (camRig == null) {
+                // if (camRig == null) {
                     camRig = cam.gameObject.AddComponent<CameraRig>();
-                }
+                // }
+                // camRig = cam.GetComponent<CameraRig>();
             }
             if (!useEditorVals) {
                 cam.clearFlags = CameraClearFlags.SolidColor;

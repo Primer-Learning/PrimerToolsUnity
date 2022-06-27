@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine;
+using UnityEditor;
 
 public class CoinFlipSimManager : SimulationManager
 {
@@ -29,7 +30,7 @@ public class CoinFlipSimManager : SimulationManager
     internal List<CoinFlipper> falsePositives;
 
     internal void Initialize(CoinFlipper flipperPrefabArg = null) {
-        // SetUpPhysicsPath();
+        SetUpPhysicsPath();
         if (!savingNewParameters) {
             UnpackInitialConditions();
             // try { UnpackInitialConditions(); }
@@ -51,7 +52,6 @@ public class CoinFlipSimManager : SimulationManager
     }
     void SetUpPhysicsPath() {
         string path = Application.dataPath;
-
         // Todo: Figure out how to make this work if someone changed the directory name away from
         // "PrimerTools". Application.dataPath goes to the Assets folder.
         path = Path.Combine(path, "PrimerTools", "Simulator applications", "Probability games", "CoinFlipper", "coinFlipInitialConditions");
@@ -93,8 +93,35 @@ public class CoinFlipSimManager : SimulationManager
         }
         
         CategorizeTestedFlippers();
-        Debug.Log($"True Positive Rate = {(float)truePositives.Count / alternatives.Count}");
-        Debug.Log($"True Negative Rate = {(float)trueNegatives.Count / nulls.Count}");
+        float tpr = (float)truePositives.Count / alternatives.Count;
+        float tnr = (float)trueNegatives.Count / nulls.Count;
+        Debug.Log($"True Positive Rate = {tpr}");
+        Debug.Log($"True Negative Rate = {tnr}");
+        // if (tpr <= 0.8 || tnr <= 0.95) {
+        //     EditorApplication.isPlaying = false;
+        //     EditorApplication.isPlaying = true;
+        // }
+
+        // Check aggregate fair player heads frequency
+        int totalFlips = 0;
+        int totalHeads = 0;
+        foreach (CoinFlipper f in flippers) {
+            if (f.trueType == PlayerType.Fair) {
+                totalFlips += f.results.Count();
+                totalHeads += f.results.Sum();
+            }
+        }
+        Debug.Log($"Fair players aggregate heads rate: {(float)totalHeads/totalFlips}");
+        // Check aggregate cheater heads frequency
+        totalFlips = 0;
+        totalHeads = 0;
+        foreach (CoinFlipper f in flippers) {
+            if (f.trueType == PlayerType.Cheater) {
+                totalFlips += f.results.Count();
+                totalHeads += f.results.Sum();
+            }
+        }
+        Debug.Log($"Cheater aggregate heads rate: {(float)totalHeads/totalFlips}");
     }
     internal void CategorizeTestedFlippers() {
         // Start over each time. Keeps things clean, and it's not that slow.

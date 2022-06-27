@@ -29,7 +29,7 @@ public class CoinFlipper : Simulator
     internal PlayerType labeledType = PlayerType.Unknown;
     public PrimerCharacter flipperCharacterPrefab = null;
     [SerializeField] PrimerObject floorPrefab = null;
-    internal System.Random rng;
+    internal System.Random rng = null;
     
     internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
     internal PrimerCharacter flipperCharacter = null;
@@ -53,7 +53,7 @@ public class CoinFlipper : Simulator
     float maxInitialAngularSpeed = 40;
     float maxAngleDeviation = 30;
     float minInitialHorizontalSpeed = 1;
-    float minInitialVerticalSpeed = 3;
+    float minInitialVerticalSpeed = 7;
     float minInitialAngularSpeed = 4;
     float minAngleDeviation = -30;
 
@@ -71,6 +71,7 @@ public class CoinFlipper : Simulator
     internal List<PrimerObject> displayCoins = new List<PrimerObject>();
     internal PrimerText headsCountDisplay = null;
     internal PrimerText tailsCountDisplay = null;
+    internal Vector3 numericDisplayPosition = Vector3.zero;
     internal List<int> results = new List<int>();
     internal CoinFlipSimManager manager = null;
     internal bool currentlyFlipping = false;
@@ -120,14 +121,14 @@ public class CoinFlipper : Simulator
             c.ScaleDownToZero(duration: duration);
         }
     }
-    internal void Flip(int outcome = -1) {
-        StartCoroutine(flip(outcome));
+    internal void Flip(int outcome = -1, int initialConditionsIndex = -1) {
+        StartCoroutine(flip(outcome: outcome, initialConditionsIndex: initialConditionsIndex));
     }
-    IEnumerator flip(int outcome = -1) {
+    IEnumerator flip(int outcome = -1, int initialConditionsIndex = -1) {
+        SetFlipParameters(initialConditionsIndex: initialConditionsIndex);
         if (flipperCharacter.animator != null) {
             flipperCharacter.animator.SetTrigger("Scoop"); 
         }
-
         //Spawn coin
         SpawnCoin(outcome);
         yield return new WaitForSeconds(tossDelay);
@@ -145,7 +146,8 @@ public class CoinFlipper : Simulator
         if (outcome == 1 || (outcome == -1 && rng.NextDouble() < headsRate)) { 
             extraRot = 180; 
             expectedHeads = true;
-        } else { expectedHeads = false; }
+        }
+        else{ expectedHeads = false; }
         coin.transform.localRotation = Quaternion.Euler(-45 + extraRot, 0, rng.Next(360));
         coin.transform.parent = flipperCharacter.transform.FindDeepChild("bone_neck");
         coin.SetIntrinsicScale(0.3f);
@@ -190,6 +192,12 @@ public class CoinFlipper : Simulator
             }
             else { stateIndex = 0; }
             yield return null;
+        }
+        if (expectedHeads == true) {
+            if (GetResult() != 1) { Debug.Log("Unexpected Tails"); }
+        }
+        else {
+            if (GetResult() != 0) { Debug.Log("Unexpected Heads"); }
         }
         // For testing
         if (manager.savingNewParameters) {
@@ -236,6 +244,7 @@ public class CoinFlipper : Simulator
         else { return 0; }
     }
     internal IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1, float delay = 1.5f) {
+        if (outcome == -1) { Debug.Log("Outcome = -1, which is a bad thing"); }
         int res = outcome == -1 ? GetResult() : outcome;
         results.Add(res);
         int numResults = results.Count;
@@ -283,7 +292,7 @@ public class CoinFlipper : Simulator
             }
             else { coin.RotateTo(Quaternion.Euler(0, 0, 180)); }
             display.transform.localScale = Vector3.one;
-            display.transform.localPosition = Vector3.zero;
+            display.transform.localPosition = numericDisplayPosition;
             yield return new WaitForSeconds(1f);
             coin.Disappear();
             if (headsCountDisplay == null) {
@@ -330,15 +339,20 @@ public class CoinFlipper : Simulator
         }
         return (float) probabilityAtLeastExtreme;
     }
-    internal void FlipAndRecord(int outcome = -1, int repetitions = 1, float delay = 1.5f) {
+    internal void FlipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
         StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions, delay: delay));
     }
-    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1, float delay = 1.5f) {
+    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
         currentlyInASeriesOfFlips = true;
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
-            SetFlipParameters();
-            Flip(outcome == -1 ? outcome : (outcome >> i) & 1);
+            if (outcome == -1) {
+                outcome = 0;
+                if (rng.NextDouble() < headsRate) {
+                    outcome = 1;
+                }
+            }
+            Flip(outcome);
             yield return waitUntilCoinIsStopped();
             yield return recordAndDisplay(outcome: outcome, delay: delay);
             currentlyFlipping = false;
@@ -375,7 +389,7 @@ public class CoinFlipper : Simulator
             tailsCountDisplay.tmpro.text = $"Tails: {numTails}";
         }
     }
-    void SetFlipParameters() {
+    void SetFlipParameters(int initialConditionsIndex = -1) {
         if (manager.savingNewParameters) {
             // Section for generating valid initial conditions
             initialHorizontalSpeed = UnityEngine.Random.Range((float) minInitialHorizontalSpeed, (float) maxInitialHorizontalSpeed);
@@ -386,6 +400,7 @@ public class CoinFlipper : Simulator
         else {
             // Section for choosing valid initial conditions
             if (!manager.refiningOldParameters) {
+                if (initialConditionsIndex != -1) {manager.icParameterIndex = initialConditionsIndex;}
                 currentICs = manager.validInitialConditions[manager.icParameterIndex];
                 manager.icParameterIndex = (manager.icParameterIndex + 1) % manager.validInitialConditions.Count;
                 // Debug.Log(manager.icParameterIndex);

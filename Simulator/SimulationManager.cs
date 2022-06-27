@@ -51,6 +51,7 @@ public class SimulationManager : MonoBehaviour
             }
         }
         if (simSeed == -1) {
+            Debug.Log("Generating new SimSeed for sim manager");
             SimSeed = System.Environment.TickCount;
         }
     }

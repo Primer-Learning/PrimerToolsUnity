@@ -342,13 +342,13 @@ public class PrimerBlob : PrimerCharacter
         animator.SetTrigger("EffortRight");
     }
     public void AngryEyes() {
-        animator.SetTrigger("LeftEyeStern");
-        animator.SetTrigger("RightEyeStern");
+        GetAnimator().SetTrigger("LeftEyeStern");
+        GetAnimator().SetTrigger("RightEyeStern");
     }
     public void EvilPose() {
         AngryEyes();
-        animator.SetBool("Victory", true);
-        animator.SetTrigger("MouthSmile");
+        GetAnimator().SetBool("Victory", true);
+        GetAnimator().SetTrigger("MouthSmile");
     }
 
     public void CloseEyes(float duration = 1) {

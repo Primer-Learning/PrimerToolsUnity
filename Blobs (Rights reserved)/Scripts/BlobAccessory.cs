@@ -117,6 +117,7 @@ public class BlobAccessory : PrimerObject
                     SetTexture(textureName);
                 }
                 else {
+                    Debug.LogWarning("Texture not found, matching color instead");
                     colorMatch = true;
                 }
             }
