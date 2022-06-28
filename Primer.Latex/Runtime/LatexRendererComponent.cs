@@ -46,7 +46,6 @@ namespace LatexRenderer
             @"\usepackage{xcolor}",
             @"\usepackage{microtype}",
             @"\usepackage{pifont}",
-            @"\DisableLigatures{encoding = *, family = * }",
             @"\linespread{1}",
         };
 

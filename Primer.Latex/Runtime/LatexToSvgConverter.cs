@@ -51,7 +51,7 @@ namespace LatexRenderer
             return null;
         }
 
-        private static string FindLatexExecutablePath()
+        private static string FindXelatexExecutablePath()
         {
             if (LatexExecutablePath is not null && LatexExecutablePath.Length > 0)
             {
@@ -59,7 +59,7 @@ namespace LatexRenderer
             }
             else
             {
-                var found = FindInPath("latex");
+                var found = FindInPath("xelatex");
                 if (found is null)
                 {
                     throw new FileNotFoundException(
@@ -168,8 +168,9 @@ namespace LatexRenderer
             \end{{document}}
             ");
 
-            if (ExecuteProcess(Timeout, temporaryDirectory, FindLatexExecutablePath(), new string[]
+            if (ExecuteProcess(Timeout, temporaryDirectory, FindXelatexExecutablePath(), new string[]
                 {
+                    "-no-pdf",
                     "-interaction=batchmode",
                     "-halt-on-error",
                     $"-output-directory={temporaryDirectory.FullName}",
@@ -180,10 +181,10 @@ namespace LatexRenderer
                     from line in File.ReadAllLines(Path.Combine(temporaryDirectory.FullName, "source.log"))
                     where line.StartsWith("! ") && line.Length > 2
                     select line[2..];
-                throw new Exception($"Got LaTeX error(s): {string.Join(", ", errors)}");
+                throw new Exception($"Got xelatex error(s): {string.Join(", ", errors)}");
             }
 
-            var dviPath = Path.Combine(temporaryDirectory.FullName, "source.dvi");
+            var dviPath = Path.Combine(temporaryDirectory.FullName, "source.xdv");
 
             var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
             ExecuteProcess(Timeout, temporaryDirectory, FindDvisvgmExecutablePath(), new string[]

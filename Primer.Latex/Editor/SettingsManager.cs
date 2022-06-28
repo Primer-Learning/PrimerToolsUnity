@@ -32,7 +32,7 @@ namespace UnityEditor.LatexRenderer.UserSettings
         private static void SyncPaths()
         {
             LatexToSvgConverter.LatexExecutablePath = Instance.Get<string>(
-                "general.latexExecutablePath", SettingsScope.User);
+                "general.xelatexExecutablePath", SettingsScope.User);
             LatexToSvgConverter.DvisvgmExecutablePath = Instance.Get<string>(
                 "general.dvisvgmExecutablePath", SettingsScope.User);
         }
