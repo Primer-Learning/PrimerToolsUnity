@@ -23,6 +23,14 @@ namespace LatexRenderer
 
         private const int Timeout = 30 * 1000;
 
+        private static string PrependPath(IEnumerable<string> toAdd)
+        {
+            var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var delimiter = isWindows ? ";" : ":";
+            var pathParts = Environment.GetEnvironmentVariable("PATH")?.Split(delimiter) ?? new string[] {};
+            return String.Join(delimiter, toAdd.Concat(pathParts));
+        }
+
         private static string FindInPath(string name)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -117,6 +125,8 @@ namespace LatexRenderer
                 WorkingDirectory = workingDirectory.FullName,
                 CreateNoWindow = true,
             };
+            
+            startInfo.Environment.Add("PATH", PrependPath(new string[] {Path.GetDirectoryName(name)}));
 
             foreach (var arg in arguments)
             {
