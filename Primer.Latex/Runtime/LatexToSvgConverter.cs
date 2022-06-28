@@ -189,7 +189,7 @@ namespace LatexRenderer
             ExecuteProcess(Timeout, temporaryDirectory, FindDvisvgmExecutablePath(), new string[]
             {
                 dviPath,
-                "--no-fonts",
+                "--no-fonts=1",
                 $"--output={outputPath}",
             });
 
