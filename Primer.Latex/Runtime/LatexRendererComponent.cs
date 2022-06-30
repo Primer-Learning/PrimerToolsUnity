@@ -49,16 +49,20 @@ namespace LatexRenderer
 
         [SerializeField] [HideInInspector] private Build _currentBuild;
 
-        [SerializeField] [HideInInspector] internal List<GameObject> _svgParts = new();
+        public Material material;
 
-        private LatexToSvgConverter _converter;
+        private readonly LatexToSvgConverter _converter = LatexToSvgConverter.Create();
 
-        public void Start()
+        private readonly SpriteDirectRenderer _renderer = new();
+
+#if UNITY_EDITOR
+
+
+        private void Reset()
         {
-            // HACK: When undoing a "Release SVG Parts" operation, the hideFlags are not restored. Unfortunately I can't
-            // figure out why, so we make sure they're properly set here.
-            foreach (var part in _svgParts) part.hideFlags = SvgPartsHideFlags;
+            material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
         }
+#endif
 
         public async void Update()
         {
@@ -71,59 +75,22 @@ namespace LatexRenderer
                 _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
 
 #if UNITY_EDITOR
-                EditorApplication.QueuePlayerLoopUpdate();
+                if (!Application.isPlaying)
+                    EditorApplication.QueuePlayerLoopUpdate();
 #endif
             }
             else if (_currentBuild.Svg is not null && !_currentBuild.DidCreateSvgParts)
             {
                 // This must be done within the player update loop, so it's important that this isn't run after any
-                // await calls in this function. If it's done outside of it, there will be an error when creating the
+                // await calls in this   function. If it's done outside of it, there will be an error when creating the
                 // sprite.
-                CreateSvgParts(BuildSprites(_currentBuild.Svg));
+                var sprites = BuildSprites(_currentBuild.Svg);
+                _renderer.SetSprites(sprites.Select(i => (i.Item2, (Vector3)i.Item1)), material,
+                    false);
                 _currentBuild.DidCreateSvgParts = true;
             }
-        }
 
-        public void OnEnable()
-        {
-            _converter ??= LatexToSvgConverter.Create();
-
-            foreach (var part in _svgParts) part.SetActive(true);
-        }
-
-        public void OnDisable()
-        {
-            _converter = null;
-
-            foreach (var part in _svgParts) part.SetActive(false);
-        }
-
-        public void OnDestroy()
-        {
-            var wasDeletedInEditor = Application.isEditor && gameObject.scene.isLoaded;
-            if (wasDeletedInEditor) DestroySvgParts(true);
-        }
-
-        private void DestroySvgParts(bool undoable = false)
-        {
-            foreach (var part in _svgParts)
-            {
-#if UNITY_EDITOR
-                if (Application.isEditor)
-                {
-                    if (undoable)
-                        Undo.DestroyObjectImmediate(part);
-                    else
-                        DestroyImmediate(part);
-
-                    continue;
-                }
-#endif
-
-                Destroy(part);
-            }
-
-            _svgParts = new List<GameObject>();
+            _renderer.Draw(transform);
         }
 
         private static List<(Vector2, Sprite)> BuildSprites(string svgText)
@@ -172,25 +139,26 @@ namespace LatexRenderer
             return sprites;
         }
 
-        private void CreateSvgParts(List<(Vector2, Sprite)> sprites)
-        {
-            DestroySvgParts();
-
-            var partNumber = 0;
-            foreach (var (offset, sprite) in sprites)
-            {
-                var obj = new GameObject($"SvgPart {partNumber++}");
-
-                obj.AddComponent<SpriteRenderer>().sprite = sprite;
-
-                obj.transform.parent = gameObject.transform;
-                obj.transform.localPosition = offset;
-
-                obj.hideFlags = SvgPartsHideFlags;
-
-                _svgParts.Add(obj);
-            }
-        }
+        // private void CreateSvgParts(List<(Vector2, Sprite)> sprites)
+        // {
+        //     var partNumber = 0;
+        //     foreach (var (offset, sprite) in sprites)
+        //     {
+        //         var obj = new GameObject($"SvgPart {partNumber++}");
+        //
+        //         var renderer = obj.AddComponent<SpriteRenderer>();
+        //         renderer.sprite = sprite;
+        //         if (Material)
+        //             renderer.material = Material;
+        //
+        //         obj.transform.parent = gameObject.transform;
+        //         obj.transform.localPosition = offset;
+        //
+        //         obj.hideFlags = SvgPartsHideFlags;
+        //
+        //         _svgParts.Add(obj);
+        //     }
+        // }
 
         [Serializable]
         private class Build
@@ -241,5 +209,17 @@ namespace LatexRenderer
                 }
             }
         }
+
+#if UNITY_EDITOR
+        [Tooltip(
+            "Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
+        [SerializeField]
+        internal SpriteDirectRenderer.GizmoMode gizmos = SpriteDirectRenderer.GizmoMode.Nothing;
+
+        private void OnDrawGizmos()
+        {
+            _renderer.DrawWireGizmos(transform, gizmos);
+        }
+#endif
     }
 }

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using LatexRenderer;
-using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
 {
@@ -11,24 +9,24 @@ namespace UnityEditor.LatexRenderer
         {
             base.OnInspectorGUI();
 
-            if (GUILayout.Button("Release SVG Parts"))
-            {
-                Undo.SetCurrentGroupName("Release SVG Parts");
-
-                var component = (LatexRendererComponent)target;
-
-                foreach (var svgPart in component._svgParts)
-                {
-                    // TODO: This isn't working as expected... See the HACK in LatexRendererComponent.Start.
-                    Undo.RecordObject(svgPart, "");
-                    svgPart.hideFlags = HideFlags.None;
-                }
-
-                // If we didn't clear _svgParts, the component would destroy them when it was destroyed
-                Undo.RecordObject(component, "");
-                component._svgParts = new List<GameObject>();
-                Undo.DestroyObjectImmediate(component);
-            }
+            // if (GUILayout.Button("Release SVG Parts"))
+            // {
+            //     Undo.SetCurrentGroupName("Release SVG Parts");
+            //
+            //     var component = (LatexRendererComponent)target;
+            //
+            //     foreach (var svgPart in component._svgParts)
+            //     {
+            //         // TODO: This isn't working as expected... See the HACK in LatexRendererComponent.Start.
+            //         Undo.RecordObject(svgPart, "");
+            //         svgPart.hideFlags = HideFlags.None;
+            //     }
+            //
+            //     // If we didn't clear _svgParts, the component would destroy them when it was destroyed
+            //     Undo.RecordObject(component, "");
+            //     component._svgParts = new List<GameObject>();
+            //     Undo.DestroyObjectImmediate(component);
+            // }
         }
     }
 }
