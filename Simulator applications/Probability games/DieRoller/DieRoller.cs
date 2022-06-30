@@ -5,12 +5,12 @@ using UnityEngine;
 using UnityEditor;
 public class DieRoller : PrimerObject
 {
-    internal RollerGroup group = null;
-    internal GameObject diePrefab = null;
-    internal Vector3 trayPosition = Vector3.zero;
-    internal Quaternion trayRotation = Quaternion.identity;
-    internal Vector3 sourcePosition = new Vector3(-6.6f, 7.3f, 6.6f);
-    internal Quaternion sourceRotation = Quaternion.identity;
+    public RollerGroup group = null;
+    public GameObject diePrefab = null;
+    public Vector3 trayPosition = Vector3.zero;
+    public Quaternion trayRotation = Quaternion.identity;
+    public Vector3 sourcePosition = new Vector3(-6.6f, 7.3f, 6.6f);
+    public Quaternion sourceRotation = Quaternion.identity;
     private Vector3 _rollDir = new Vector3(1, -0.4f, -1.4f).normalized;
     public Vector3 RollDir {
         get {
@@ -21,29 +21,29 @@ public class DieRoller : PrimerObject
             _rollDir = value;
         }
     }
-    internal Vector3 sourceDisp = Vector3.zero;
-    internal PrimerObject tray = null;
-    internal PrimerObject source = null;  
+    public Vector3 sourceDisp = Vector3.zero;
+    public PrimerObject tray = null;
+    public PrimerObject source = null;  
     public delegate void NoneToVoidDelType();
     public NoneToVoidDelType onRoll;
     // public NoneToVoidDelType onRoll;
 
 
-    internal float rollDelay = 0;
+    public float rollDelay = 0;
     
     PrimerObject currentDie;
     // Vector3 initialVelRange = new Vector3(10, -10, 10);
     // Vector3 dropCenter = new Vector3(0, 50, 0);
-    internal int numFaces = 6;
-    internal float stoppedThreshold = 0.01f;
-    internal float landCheckPause = 0.7f;
-    internal float maxTime = 3;
+    public int numFaces = 6;
+    public float stoppedThreshold = 0.01f;
+    public float landCheckPause = 0.7f;
+    public float maxTime = 3;
 
-    internal float initialVel = 50;
+    public float initialVel = 50;
 
-    // internal List<int> results = new List<int>();
+    // public List<int> results = new List<int>();
 
-    internal bool currentlyRolling = false;
+    public bool currentlyRolling = false;
     bool ready = false;
 
     void NoneToVoidDefaultDelegate(){}
@@ -57,7 +57,7 @@ public class DieRoller : PrimerObject
         }
     }
     
-    internal void AnimateIn(float duration = 1) {
+    public void AnimateIn(float duration = 1) {
         StartCoroutine(animateIn(duration));
     }
     IEnumerator animateIn(float duration) {
@@ -72,7 +72,7 @@ public class DieRoller : PrimerObject
         ready = true;
     }
 
-    internal void Roll() {
+    public void Roll() {
         StartCoroutine(repeatedRolls());
     }
     IEnumerator repeatedRolls() {
@@ -96,7 +96,7 @@ public class DieRoller : PrimerObject
         }
         currentlyRolling = false;
     }
-    internal IEnumerator singleRoll() {
+    public IEnumerator singleRoll() {
         while (currentlyRolling || !ready) { yield return null; }
         currentlyRolling = true;
         if (currentDie != null) { currentDie.Disappear(duration: rollDelay, toPool: true); }

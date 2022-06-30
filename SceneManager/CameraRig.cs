@@ -15,7 +15,7 @@ public class CameraRig : PrimerObject
     [SerializeField] int yDivisions = 3;
     [SerializeField] int lineWidth = 5;
     [SerializeField] Slider sliderPrefab = null;
-    internal Camera cam;
+    public Camera cam;
     RenderTexture rt = null;
     Texture2D image = null;
 
@@ -78,7 +78,7 @@ public class CameraRig : PrimerObject
         swivel = transform.localRotation;
         // swivelEuler = eulerAngles;
     }
-    internal bool faceSwivel = true;
+    public bool faceSwivel = true;
     [SerializeField] float distance = 10;
     public float Distance {
         get { 
@@ -113,7 +113,7 @@ public class CameraRig : PrimerObject
     public void ZoomTo(float distance, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
         AnimateValue<float>("Distance", distance, duration: duration, ease: ease);
     }
-    internal void RenderToPNG(string path, int resWidth, int resHeight) {
+    public void RenderToPNG(string path, int resWidth, int resHeight) {
         // I will admit that I'm not sure why I need to do the setup and cleanup
         // each frame, but if I don't, I just get black frames.
 

@@ -58,7 +58,7 @@ public class Graph : PrimerObject
     public float zDrawnMin;
     public float zAxisThickness;
 
-    internal bool manualTicMode;
+    public bool manualTicMode;
 
     public Dictionary<float, string> manualTicsX;
     public Dictionary<float, string> manualTicsY;
@@ -495,7 +495,7 @@ public class Graph : PrimerObject
         allLabels.Add(axesHandler.yAxisLabel);
         allLabels.Add(axesHandler.zAxisLabel);
     }
-    internal void AutoTicStep(bool x = false, bool y = false, bool z = false) {
+    public void AutoTicStep(bool x = false, bool y = false, bool z = false) {
         if (x) {
             while (xMax / xTicStep > 6) {
                 if (xTicStep.ToString()[0] == '1') {
@@ -536,7 +536,7 @@ public class Graph : PrimerObject
             }
         }
     }
-    internal void AddLine() {
+    public void AddLine() {
         
     }
     protected override IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease) {

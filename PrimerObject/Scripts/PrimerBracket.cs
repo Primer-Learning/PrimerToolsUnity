@@ -58,7 +58,7 @@ public class PrimerBracket : PrimerObject
         rBar.localScale = new Vector3(rBarLength, rBar.localScale.y, rBar.localScale.z);
     }
 
-    internal override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
+    public override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
         SetIntrinsicScale();
         base.ScaleUpFromZero(duration: duration, ease: ease, delay: delay);
     }

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Coin : PrimerObject 
 {
-    internal int value;
+    public int value;
 }

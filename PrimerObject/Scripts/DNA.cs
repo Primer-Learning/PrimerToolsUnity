@@ -7,14 +7,14 @@ public class DNA : PrimerObject
 {
     [SerializeField] GameObject strandOnePrefab = null;
     [SerializeField] GameObject strandTwoPrefab = null;
-    internal PrimerObject strand1;
-    internal PrimerObject strand2;
-    internal Color? color = null;
+    public PrimerObject strand1;
+    public PrimerObject strand2;
+    public Color? color = null;
     protected override void Awake() {
         base.Awake();
     }
     
-    internal void GenerateStrands(float duration = 1) {
+    public void GenerateStrands(float duration = 1) {
         if (strand1 == null) {
             strand1 = Instantiate(strandOnePrefab).MakePrimerObject();
             if (color != null) {
@@ -37,12 +37,12 @@ public class DNA : PrimerObject
         }
     }
 
-    internal PrimerObject ReleaseStrand() {
+    public PrimerObject ReleaseStrand() {
         PrimerObject strand = strand1;
         strand1 = null;
         return strand;
     }
-    internal void AcceptStrand(PrimerObject strand, float duration = 1) {
+    public void AcceptStrand(PrimerObject strand, float duration = 1) {
         strand1 = strand;
         strand1.transform.parent = transform;
         strand1.MoveTo(Vector3.zero, duration: duration);

@@ -15,9 +15,9 @@ public enum DirectorMode {
 public class Director : SceneManager
 {
     private bool paused;
-    internal bool animating = true;
-    internal float timeBehind; //For adjusting effective timing after events with flexible timing
-    // internal bool playing = false;
+    public bool animating = true;
+    public float timeBehind; //For adjusting effective timing after events with flexible timing
+    // public bool playing = false;
 
     [Header("Mode select")]
     [SerializeField] protected DirectorMode mode;
@@ -29,7 +29,7 @@ public class Director : SceneManager
     public int resolutionHeight = 1080;
     public int everyNFrames = 1;
     string frameOutDir = null;
-    internal bool recording = false;
+    public bool recording = false;
 
     [Header("Testing options")]
     [SerializeField] bool lightBackground = false;
@@ -45,9 +45,9 @@ public class Director : SceneManager
     // So subclasses will have this header automatically
     // But it doesn't work!
     public AudioClip voiceOverReferenceClip = null;
-    internal AudioSource voiceOverReference;
-    internal static List<SceneBlock> schedule = new List<SceneBlock>();
-    internal AudioSource doneAlarm;
+    public AudioSource voiceOverReference;
+    public static List<SceneBlock> schedule = new List<SceneBlock>();
+    public AudioSource doneAlarm;
 
     protected virtual void DefineSchedule() {}
 
@@ -87,7 +87,7 @@ public class Director : SceneManager
         }
         StartCoroutine(playScene());
     }
-    internal IEnumerator playScene() {
+    public IEnumerator playScene() {
         // playing = true;
         for (int i = 0; i < schedule.Count; i++) {
             SceneBlock sb = schedule[i];
@@ -133,7 +133,7 @@ public class Director : SceneManager
         EditorApplication.isPlaying = false;
         #endif
     }
-    internal ReferenceScreen MakeReferenceScreen(VideoClip clip = null) {
+    public ReferenceScreen MakeReferenceScreen(VideoClip clip = null) {
         ReferenceScreen rs = Instantiate(Resources.Load<ReferenceScreen>("Reference screen prefab"));
         if (clip != null) {
             rs.screen.clip = clip;
@@ -176,10 +176,10 @@ public class Director : SceneManager
             schedule.Add(this);
         }
     }
-    internal DirectorMode GetDirectorMode() {
+    public DirectorMode GetDirectorMode() {
         return mode;
     }
-    internal void SetDirectorMode(DirectorMode newMode) {
+    public void SetDirectorMode(DirectorMode newMode) {
         mode = newMode;
         switch (mode) 
         {
@@ -233,7 +233,7 @@ public class Director : SceneManager
             Time.timeScale = Mathf.Min(Time.timeScale * 2, 100);
         }
     }
-    internal void StartRecording(int everyNFrames = 1) {
+    public void StartRecording(int everyNFrames = 1) {
         cam.enabled = false;
 
         // In frameOutDir, make a folder with the director's name, if it doesn't exist
@@ -282,7 +282,7 @@ public class Director : SceneManager
             framesSeen++;
         }
     }
-    internal void StopRecording(float delay = 0) {
+    public void StopRecording(float delay = 0) {
         StartCoroutine(stopRecording(delay));
     }
     IEnumerator stopRecording(float delay) {

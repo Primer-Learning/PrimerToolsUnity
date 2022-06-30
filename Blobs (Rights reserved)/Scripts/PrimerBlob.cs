@@ -5,8 +5,8 @@ using System.Reflection;
 
 public class PrimerBlob : PrimerCharacter
 {
-    internal Color color = PrimerColor.Blue;
-    internal List<BlobAccessory> accessories = new List<BlobAccessory>();
+    public Color color = PrimerColor.Blue;
+    public List<BlobAccessory> accessories = new List<BlobAccessory>();
 
     // So many of these are global variables for two reasons.
     // (1) Releasing the override gradually toward the state of the animator is done in LateUpdate.
@@ -115,7 +115,7 @@ public class PrimerBlob : PrimerCharacter
         }
     }
 
-    internal void SwapMesh(MeshType mType = MeshType.Static) {
+    public void SwapMesh(MeshType mType = MeshType.Static) {
         GameObject meshGO = transform.Find("blob_mesh").gameObject;
         // This only implements the switch to static, since that's the one I intend to use rn.
         SkinnedMeshRenderer smr = meshGO.GetComponent<SkinnedMeshRenderer>();
@@ -381,7 +381,7 @@ public class PrimerBlob : PrimerCharacter
         }
     }
 
-    internal BlobAccessory AddAccessory(AccessoryType accessoryType, bool animate = false, bool highQuality = true, bool colorMatch = false) {
+    public BlobAccessory AddAccessory(AccessoryType accessoryType, bool animate = false, bool highQuality = true, bool colorMatch = false) {
         BlobAccessory accessory = BlobAccessory.NewAccessory(this, accessoryType, highQuality: highQuality, colorMatch: colorMatch);
         if (animate) {
             if (accessory != null) {
@@ -391,7 +391,7 @@ public class PrimerBlob : PrimerCharacter
         accessories.Add(accessory);
         return accessory;
     }
-    internal void RandomizeColorAndAccessory(double accessoryChance = 0.7, double complementaryChance = 0.5f, List<AccessoryType> options = null) {
+    public void RandomizeColorAndAccessory(double accessoryChance = 0.7, double complementaryChance = 0.5f, List<AccessoryType> options = null) {
         if (options == null) { options = AccessoryOptions; }
         SetColor(PrimerColor.BlobColors[SceneManager.sceneRandom2.Next(PrimerColor.BlobColors.Count)]);
 
@@ -406,7 +406,7 @@ public class PrimerBlob : PrimerCharacter
             AddAccessory(aType, colorMatch: colorMatch);
         }
     }
-    internal static List<AccessoryType> AccessoryOptions = new List<AccessoryType>() {
+    public static List<AccessoryType> AccessoryOptions = new List<AccessoryType>() {
         AccessoryType.beard,
         AccessoryType.glasses,
         AccessoryType.sunglasses,
@@ -418,7 +418,7 @@ public class PrimerBlob : PrimerCharacter
         AccessoryType.wizardHat,
         AccessoryType.monocle
     };
-    // internal void HideBeard() {
+    // public void HideBeard() {
     //     if (beard != null) {
     //         beard.ScaleDownToZero();
     //     }

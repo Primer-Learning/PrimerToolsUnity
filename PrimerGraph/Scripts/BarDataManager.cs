@@ -14,7 +14,7 @@ public class BarDataManager: MonoBehaviour
     public Graph plot;
     [SerializeField] PrimerObject barPrefab = null;
 
-    internal List<float> values = new List<float>();
+    public List<float> values = new List<float>();
     private List<PrimerObject> bars = new List<PrimerObject>();
     public int BarCount {
         get {
@@ -27,11 +27,11 @@ public class BarDataManager: MonoBehaviour
     float barZOffset = 0.0001f;
     // Bar appearance
     // List<Color> barColors = new List<Color>();
-    internal Color defaultColor = Color.blue;
-    internal float barWidth = 1;
-    internal bool showBarNumbers = false;
-    internal int barNumberPrecision = 3; // The number of places to hold after the decimal point
-    internal float barNumberScaleFactor = 0.3f;
+    public Color defaultColor = Color.blue;
+    public float barWidth = 1;
+    public bool showBarNumbers = false;
+    public int barNumberPrecision = 3; // The number of places to hold after the decimal point
+    public float barNumberScaleFactor = 0.3f;
     private List<PrimerText> barNumbers = new List<PrimerText>();
 
     #endregion
@@ -85,10 +85,10 @@ public class BarDataManager: MonoBehaviour
         }
     }
 
-    internal void AnimateBars(List<float> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+    public void AnimateBars(List<float> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
         StartCoroutine(animateBars(newVals, duration, ease));
     }
-    internal void AnimateBars(List<int> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+    public void AnimateBars(List<int> newVals, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
         AnimateBars(IntListToFloat(newVals), duration, ease);
     }
     IEnumerator animateBars(List<float> newVals, float duration, EaseMode ease) {
@@ -148,14 +148,14 @@ public class BarDataManager: MonoBehaviour
         }
     }
 
-    internal void UpdateBars(List<float> newVals) {
+    public void UpdateBars(List<float> newVals) {
         values = newVals;
         for (int i = 0; i < values.Count; i++)
         {
             bars[i].transform.localScale = new Vector3(barWidth, values[i], 1);
         }
     }
-    internal void UpdateBars(List<int> newVals) {
+    public void UpdateBars(List<int> newVals) {
         UpdateBars(IntListToFloat(newVals));
     }
     private List<float> IntListToFloat(List<int> ints) {
@@ -165,37 +165,37 @@ public class BarDataManager: MonoBehaviour
         }
         return fvals;
     }
-    internal void SetBarColors(List<Color> colors) {
+    public void SetBarColors(List<Color> colors) {
         for (int i = 0; i < bars.Count; i++) {
             Color c = colors[i % colors.Count];
             bars[i].EmissionColor = c;
         }
     }
-    internal void SetBarColors(Color color) {
+    public void SetBarColors(Color color) {
         SetBarColors(new List<Color>() {color});
     }
-    internal void SetBarColor(int barIndex, Color color) {
+    public void SetBarColor(int barIndex, Color color) {
         bars[barIndex].EmissionColor = color;
     }
-    internal void AnimateColors(List<Color> colors, float duration = 0.5f, EaseMode ease = EaseMode.None) {
+    public void AnimateColors(List<Color> colors, float duration = 0.5f, EaseMode ease = EaseMode.None) {
             for (int i = 0; i < bars.Count; i++) {
                 // barColors[i] = colors[i];
                 bars[i].AnimateEmissionColor(colors[i], duration: duration, ease: ease);
             }
     }
-    internal void AnimateColor(int barIndex, Color color, float duration = 0.5f, EaseMode ease = EaseMode.None) {
+    public void AnimateColor(int barIndex, Color color, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         // barColors[barIndex] = color;
         bars[barIndex].AnimateEmissionColor(color, duration: duration, ease: ease);
     }
 
-    internal void RefreshData() {
+    public void RefreshData() {
         transform.localRotation = Quaternion.identity; //Really shouldn't be rotated relative to parent
         transform.localPosition = Vector3.zero; //Shouldn't be displaced relative to parent
         AdjustBarSpaceScale();
         GenerateBars();
         UpdateBars(values);
     }
-    internal void AdjustBarSpaceScale() {
+    public void AdjustBarSpaceScale() {
         float xScale = plot.xLengthMinusPadding / (plot.xMax - plot.xMin);        
         float yScale = plot.yLengthMinusPadding / (plot.yMax - plot.yMin);      
         transform.localScale = new Vector3 (xScale, yScale, 1);
@@ -207,7 +207,7 @@ public class BarDataManager: MonoBehaviour
     private void ForceStopAnimation() {
         StopAllCoroutines();
     }
-    internal static Dictionary<float, string> GenerateIntegerCategories(int num, int min = 0, int step = 1) {
+    public static Dictionary<float, string> GenerateIntegerCategories(int num, int min = 0, int step = 1) {
         Dictionary<float, string> categoryDict = new Dictionary<float, string>();
         for (int i = 0; i < num; i++) {
             categoryDict.Add(1 + i, (min + i * step).ToString());

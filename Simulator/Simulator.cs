@@ -10,7 +10,7 @@ public class Simulator : PrimerObject
         Continuous,
         Phased
     }
-    internal virtual void Go() {
+    public virtual void Go() {
         //Override in subclass
     }
 }

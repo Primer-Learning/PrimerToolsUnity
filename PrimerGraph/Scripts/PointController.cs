@@ -30,8 +30,8 @@ public class PointController : PrimerObject
     }
     #endregion
 
-    #region internal methods
-    internal void Refresh() {
+    #region public methods
+    public void Refresh() {
         transform.localPosition = value; 
 
         //Scale points to smallest axis, keeping them round
@@ -43,7 +43,7 @@ public class PointController : PrimerObject
         this.intrinsicScale = transform.localScale;
     }
 
-    internal void DeactivatePoint(float duration = 0.5f) {
+    public void DeactivatePoint(float duration = 0.5f) {
         StartCoroutine(deactivatePoint(duration));
     }
     private IEnumerator deactivatePoint(float duration) {
@@ -52,7 +52,7 @@ public class PointController : PrimerObject
         Destroy(this);
     }
 
-    internal void ActivatePoint(float duration) {
+    public void ActivatePoint(float duration) {
         this.ScaleUpFromZero(duration: duration);
     }
     #endregion

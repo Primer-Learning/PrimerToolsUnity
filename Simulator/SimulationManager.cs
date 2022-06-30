@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SimulationManager : MonoBehaviour
 {
-    internal static SimulationManager instance;
-    internal System.Random simRNG;
+    public static SimulationManager instance;
+    public System.Random simRNG;
     int simSeed = -1;
     public int SimSeed {
         get { return simSeed; }
@@ -15,14 +15,14 @@ public class SimulationManager : MonoBehaviour
             Debug.Log($"New sim seed is {value}.");
         }
     }
-    internal List<Simulator> sims = new List<Simulator>();
+    public List<Simulator> sims = new List<Simulator>();
 
-    internal Graph graph = null;
+    public Graph graph = null;
     public GameObject objectToPool;
-    internal int numToPool = 100; //Override in subclass
+    public int numToPool = 100; //Override in subclass
     public List<GameObject> pooledObjects;
     public PrimerObject sunLight = null;
-    internal bool sunCycling = false;
+    public bool sunCycling = false;
     protected virtual void Awake() {
         if (instance == null) {
             instance = this;
@@ -62,7 +62,7 @@ public class SimulationManager : MonoBehaviour
     }
 
     // Pooling
-    internal GameObject GetPooledObject() {
+    public GameObject GetPooledObject() {
         for (int i = 0; i < pooledObjects.Count; i++) {
             if (!pooledObjects[i].activeInHierarchy) {
                 pooledObjects[i].SetActive(true);
@@ -100,11 +100,11 @@ public class SimulationManager : MonoBehaviour
     }
 
     // Basic setup
-    internal virtual void SetUpGraph(Graph g) {
+    public virtual void SetUpGraph(Graph g) {
         if (graph != null) {Debug.LogWarning("Sim graph already set");}
         graph = g;
     }
-    internal void SetAndSaveSeed(int newSeed) {
+    public void SetAndSaveSeed(int newSeed) {
         // This is the main one
         // Director.sceneRandom = new System.Random(newSeed);
         // This is for purely visual stuff so messing with that doesn't affect rng state
@@ -115,7 +115,7 @@ public class SimulationManager : MonoBehaviour
     }
 
     // Other methods needed in many sims
-    internal void CycleSun(float duration = 1) {
+    public void CycleSun(float duration = 1) {
         StartCoroutine(cycleSun(duration));
     }
     private IEnumerator cycleSun(float duration) {

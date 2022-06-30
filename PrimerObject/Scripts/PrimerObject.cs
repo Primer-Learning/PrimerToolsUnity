@@ -33,8 +33,8 @@ public class PrimerObject : MonoBehaviour
     }
 
     // This is a new way of doing easing. not actually implemented anywhere yet
-    // internal delegate ref TProperty KeyFunc<TProperty, TSelf>(TSelf self) where TSelf: PrimerObject;
-    internal delegate void OnFrameType();
+    // public delegate ref TProperty KeyFunc<TProperty, TSelf>(TSelf self) where TSelf: PrimerObject;
+    public delegate void OnFrameType();
     static void DoNothing(){}
     IEnumerator animateValue<TProperty>(string propertyName, TProperty newVal, float duration, EaseMode ease, OnFrameType onFrame) {
         var prop = this.GetType().GetProperty(propertyName);
@@ -55,7 +55,7 @@ public class PrimerObject : MonoBehaviour
         onFrame();
         // Debug.Log(key((TSelf)this));
     }
-    internal void AnimateValue<TProperty>(string propertyName, TProperty newVal, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, OnFrameType onFrameFunc = null) {
+    public void AnimateValue<TProperty>(string propertyName, TProperty newVal, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, OnFrameType onFrameFunc = null) {
         if (onFrameFunc == null) { onFrameFunc = DoNothing; }
         StartCoroutine(animateValue<TProperty>(propertyName, newVal, duration, ease, onFrameFunc));
     }
@@ -100,11 +100,11 @@ public class PrimerObject : MonoBehaviour
         return intrinsicScale;
     }
 
-    internal virtual void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
+    public virtual void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
         transform.localScale = Vector3.zero;
         StartCoroutine(scaleTo(intrinsicScale, duration, ease, delay: delay));
     }
-    internal void ScaleUpFromZeroStaggered(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float durationPerPiece = 0.1f) {
+    public void ScaleUpFromZeroStaggered(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float durationPerPiece = 0.1f) {
         StartCoroutine(scaleUpFromZeroStaggered(duration, ease, durationPerPiece));
     }
     IEnumerator scaleUpFromZeroStaggered (float duration, EaseMode ease, float durationPerPiece) {
@@ -135,11 +135,11 @@ public class PrimerObject : MonoBehaviour
         }
     }
 
-    internal virtual void ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+    public virtual void ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
         StartCoroutine(scaleTo(Vector3.zero, duration, ease));
     }
 
-    internal virtual void Disappear(float duration = 0.5f, bool toPool = false, EaseMode ease = EaseMode.Cubic, float delay = 0) {
+    public virtual void Disappear(float duration = 0.5f, bool toPool = false, EaseMode ease = EaseMode.Cubic, float delay = 0) {
         if ((SceneManager.instance is Director && !((Director)SceneManager.instance).animating)) {
             duration = 0;
         }
@@ -201,7 +201,7 @@ public class PrimerObject : MonoBehaviour
         yield return null;
     }
 
-    internal void MoveBy(Vector3 disp, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, CoordinateFrame frame = CoordinateFrame.Local) {
+    public void MoveBy(Vector3 disp, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, CoordinateFrame frame = CoordinateFrame.Local) {
         if (frame == CoordinateFrame.Local) {
             this.MoveTo(transform.localPosition + disp, duration, ease, frame);
         }
@@ -242,7 +242,7 @@ public class PrimerObject : MonoBehaviour
             transform.position = newPos; //Ensure we actually get exactly to newPos
         }
     }
-    internal void MoveRectTo(Vector2 newPos, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+    public void MoveRectTo(Vector2 newPos, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
         AnimateValue<Vector2>("AnchoredPosition", newPos, duration: duration, ease: ease);
     }
 
@@ -583,7 +583,7 @@ public class PrimerObject : MonoBehaviour
     public virtual void TempColorChange(Color newColor, float duration = 1, float attack = 0.5f, float decay = 0.5f, EaseMode ease = EaseMode.None) {
         StartCoroutine(tempColorChange(newColor, duration, attack, decay, ease));
     }
-    internal virtual IEnumerator tempColorChange(Color newColor, float duration, float attack, float decay, EaseMode ease) {
+    public virtual IEnumerator tempColorChange(Color newColor, float duration, float attack, float decay, EaseMode ease) {
         Color oldColor = GetComponentsInChildren<MeshRenderer>()[0].material.color;
         ChangeColor(newColor, duration: attack, ease: ease);
         yield return new WaitForSeconds(duration - attack - decay);

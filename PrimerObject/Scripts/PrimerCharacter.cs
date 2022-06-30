@@ -5,7 +5,7 @@ using UnityEngine;
 public class PrimerCharacter : PrimerObject
 {
     // Currently a replacement for the blobs, which I'm keeping private
-    internal Animator animator = null;
+    public Animator animator = null;
     public virtual Animator GetAnimator() {
         return this.GetComponent<Animator>();
     }

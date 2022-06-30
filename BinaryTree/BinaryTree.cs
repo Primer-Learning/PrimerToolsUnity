@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BinaryTree : PrimerObject
 {
-    internal BTNode root;
+    public BTNode root;
 
     public void SetLabelProps(float labelBuffer = -1, float labelLerp = -1, int labelAlign = -1)
     {
@@ -264,7 +264,7 @@ public class BinaryTree : PrimerObject
             return node.Parent.transform.position + node.yOffset + direction * node.xOffset * (1 + node.SpaceNeeded(-direction, height));
         return node.Parent.intendedPos + node.yOffset + direction * node.xOffset * (1 + node.SpaceNeeded(-direction, height));
     }
-    internal void SetRootNodeText(string newText) {
+    public void SetRootNodeText(string newText) {
         root.transform.GetComponentsInChildren<TextMeshPro>()[0].text = newText;
     }
 
@@ -333,7 +333,7 @@ public class BinaryTree : PrimerObject
         }
         return root;
     }
-    internal void ShowBranchLabels(string leftLabel, string rightLabel, float delay, int maxLevel = -1) {
+    public void ShowBranchLabels(string leftLabel, string rightLabel, float delay, int maxLevel = -1) {
         StartCoroutine(showBranchLabels(root, "", leftLabel, rightLabel, delay, maxLevel));
     }
     IEnumerator showBranchLabels(BTNode node, string labelVal, string leftLabel, string rightLabel, float delay, int maxLevel) {
@@ -354,7 +354,7 @@ public class BinaryTree : PrimerObject
             }
         }
     }
-    internal void HideAllLabels(float delay) {
+    public void HideAllLabels(float delay) {
         StartCoroutine(hideAllLabels(root, delay));
     }
     IEnumerator hideAllLabels(BTNode node, float delay) {
@@ -370,7 +370,7 @@ public class BinaryTree : PrimerObject
         }
     }
 
-    internal int GetLevelCount() {
+    public int GetLevelCount() {
         // Lazy but all I need right now, assumes tree is full
         BTNode node = root;
         int levelCount = 1;

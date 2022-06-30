@@ -8,7 +8,7 @@ public class CoinBucket : PrimerObject
     [SerializeField] GameObject bucketPrefab = null;
     PrimerObject bucket = null;
 
-    internal List<Coin> coins = new List<Coin>();
+    public List<Coin> coins = new List<Coin>();
 
     Vector3 coinOrigin = new Vector3(0, 10, 0);
 
@@ -30,7 +30,7 @@ public class CoinBucket : PrimerObject
             bucket.FadeOut(duration: 0);
         }
     }
-    internal void AddCoins(int numToAdd) {
+    public void AddCoins(int numToAdd) {
         StartCoroutine(addCoins(numToAdd));
     }
     IEnumerator addCoins(int numToAdd) {
@@ -66,7 +66,7 @@ public class CoinBucket : PrimerObject
         }
     }
 
-    internal List<Coin> PluckCoins(int num = 1, bool animate = true) {
+    public List<Coin> PluckCoins(int num = 1, bool animate = true) {
         List<Coin> removed = new List<Coin>();
         for (int i = 0; i < num; i++)
         {

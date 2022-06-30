@@ -22,7 +22,7 @@ public class Axes : PrimerObject
     public PrimerText primerTextPrefab;
     
     public List<Tic> xTics = new List<Tic>();
-    internal List<Transform> xArrows = new List<Transform>();
+    public List<Transform> xArrows = new List<Transform>();
     public PrimerText xAxisLabel;
     
     public List<Tic> yTics = new List<Tic>();

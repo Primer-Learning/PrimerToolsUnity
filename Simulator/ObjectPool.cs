@@ -6,7 +6,7 @@ public class ObjectPool : MonoBehaviour
 {
     // SimulationManager already handles pooling. This is old, but it might be useful if all you want is pooling.
     public GameObject objectToPool;
-    internal int numToPool = 100; 
+    public int numToPool = 100; 
     public List<GameObject> pooledObjects;
 
     void Start() {
@@ -23,7 +23,7 @@ public class ObjectPool : MonoBehaviour
             Debug.LogWarning("No pooled object defined.");
         }
     }
-    internal GameObject GetPooledObject() {
+    public GameObject GetPooledObject() {
         for (int i = 0; i < pooledObjects.Count; i++) {
             if (!pooledObjects[i].activeInHierarchy) {
                 pooledObjects[i].SetActive(true);

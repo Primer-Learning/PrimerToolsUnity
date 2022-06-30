@@ -12,7 +12,7 @@ public class CurveData : MonoBehaviour
     int curveResolution = 200;
     public List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private InterpolationMode interpolationMode = InterpolationMode.None;
-    internal Graph plot;
+    public Graph plot;
     Vector3[] dataPoints;
     public bool animationDone = true;
 
@@ -21,7 +21,7 @@ public class CurveData : MonoBehaviour
             lr.material.SetColor("_EmissionColor", c);
         }
     }
-    internal void SetLineWidth(float width) {
+    public void SetLineWidth(float width) {
         if (interpolationMode == InterpolationMode.None) {
             LineRenderer lineRenderer = lineRenderers[0];
             lineRenderer.widthMultiplier = width;
@@ -188,7 +188,7 @@ public class CurveData : MonoBehaviour
     private void SetCurveResolution(int resolution) {
         curveResolution = resolution;
     }
-    internal void RefreshData() {
+    public void RefreshData() {
         if (interpolationMode == InterpolationMode.None) {
             LineRenderer lineRenderer = lineRenderers[0];
             if (lineRenderer == null) {

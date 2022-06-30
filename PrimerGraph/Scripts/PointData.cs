@@ -13,7 +13,7 @@ public class PointData : MonoBehaviour
     public GameObject pointObjectPrefab; //Sphere by default, but shapes are fun
     public float pointObjectScale = 1f;
     
-    internal Dictionary<string, PointController> data = new Dictionary<string, PointController>();
+    public Dictionary<string, PointController> data = new Dictionary<string, PointController>();
     private Stack<PointController> pooledObjects = new Stack<PointController>();
     #endregion
     
@@ -79,8 +79,8 @@ public class PointData : MonoBehaviour
     }
     #endregion
 
-    #region internal methods
-    internal void RefreshData() {
+    #region public methods
+    public void RefreshData() {
         transform.localRotation = Quaternion.identity; //Really shouldn't be rotated relative to parent
         transform.localPosition = Vector3.zero; //Shouldn't be dispalced relative to parent
         AdjustPointSpaceScale();

@@ -15,7 +15,7 @@ public class PrimerArrow : PrimerObject
     [SerializeField] Transform shaft = null;
     [SerializeField] Transform head = null;
     float currentLength;
-    internal Color Color {
+    public Color Color {
         get {
             return head.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color;
             // Assume head and shaft are the same color
@@ -111,7 +111,7 @@ public class PrimerArrow : PrimerObject
         SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
     }
 
-    internal override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0)
+    public override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0)
     {
         //Appear from the shaft, even though the point is our center here
         shaftRoot.ScaleUpFromZero(duration: duration, ease: ease, delay: delay);

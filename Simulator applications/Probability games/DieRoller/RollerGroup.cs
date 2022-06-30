@@ -5,26 +5,26 @@ using UnityEngine;
 using UnityEditor;
 public class RollerGroup : SimulationManager
 {
-    internal UpdateMode updateMode = UpdateMode.EveryTime;
-    internal float updateInterval = 0.1f;
+    public UpdateMode updateMode = UpdateMode.EveryTime;
+    public float updateInterval = 0.1f;
     bool updating = false;
-    // internal bool rolling = false;
-    internal int rollsSoFar = 0;
-    internal int rollCap = 0;
-    internal List<DieRoller> rollers = new List<DieRoller>();
+    // public bool rolling = false;
+    public int rollsSoFar = 0;
+    public int rollCap = 0;
+    public List<DieRoller> rollers = new List<DieRoller>();
 
     // Roller defaults    
     public GameObject diePrefab = null;
     public GameObject sourcePrefab = null;
     public GameObject trayPrefab = null;
-    internal Vector3 trayPosition = Vector3.zero;
-    internal Quaternion trayRotation = Quaternion.identity;
-    internal Vector3 sourcePosition = new Vector3(-6.6f, 5.25f, 6.6f);
-    internal Vector3 sourceFacing = new Vector3(1, 0, -1);
-    internal Vector3 sourceDisp = new Vector3(1.6f, 2.5f, -1.6f);
-    internal Vector3 sourceScale = Vector3.one * 3;
+    public Vector3 trayPosition = Vector3.zero;
+    public Quaternion trayRotation = Quaternion.identity;
+    public Vector3 sourcePosition = new Vector3(-6.6f, 5.25f, 6.6f);
+    public Vector3 sourceFacing = new Vector3(1, 0, -1);
+    public Vector3 sourceDisp = new Vector3(1.6f, 2.5f, -1.6f);
+    public Vector3 sourceScale = Vector3.one * 3;
     int numFaces = 6;
-    internal float rollDelay = 0.5f;
+    public float rollDelay = 0.5f;
     float stoppedThreshold = 0.01f;
     float landCheckPause = 0.7f;
     float maxTime = 3;
@@ -34,8 +34,8 @@ public class RollerGroup : SimulationManager
     public NoneToVoidDelType onUpdate;
 
     // Graph graph = null;
-    internal List<int> results = new List<int>();
-    internal List<Color> colorList = null;
+    public List<int> results = new List<int>();
+    public List<Color> colorList = null;
     void NoneToVoidDefaultDelegate(){}
     protected override void Awake() {
         base.Awake();
@@ -43,7 +43,7 @@ public class RollerGroup : SimulationManager
         Reset();
     }
 
-    internal DieRoller AddRoller() {
+    public DieRoller AddRoller() {
         GameObject go = new GameObject("Roller");
         DieRoller nr = go.AddComponent<DieRoller>();
         nr.group = this;
@@ -84,11 +84,11 @@ public class RollerGroup : SimulationManager
         }
     }
 
-    internal void Roll(int numRolls = 1, bool reset = true) {
+    public void Roll(int numRolls = 1, bool reset = true) {
         StartCoroutine(roll(numRolls, reset));
     }
 
-    internal IEnumerator roll(int numRolls, bool reset = true) {
+    public IEnumerator roll(int numRolls, bool reset = true) {
         //This is a coroutine so a scene can easily wait for it.
         if (reset) { Reset(); }
         rollCap += numRolls;
@@ -103,17 +103,17 @@ public class RollerGroup : SimulationManager
         }
     }
 
-    internal bool StillRolling() {
+    public bool StillRolling() {
         return (rollsSoFar < rollCap);
     }
-    internal bool RollersStillWorking() {
+    public bool RollersStillWorking() {
         foreach (DieRoller r in rollers) {
             if (r.currentlyRolling) { return true; }
         }
         return false;
     }
     
-    internal void BeginUpdating() {
+    public void BeginUpdating() {
         StartCoroutine(checkForUpdates());
     }
     IEnumerator checkForUpdates() {
@@ -123,7 +123,7 @@ public class RollerGroup : SimulationManager
             UpdateGraph();
         }
     }
-    internal void RecordResult(int result) {
+    public void RecordResult(int result) {
         results[result]++;
         // if (result > 0) { rollsSoFar++; }
         if (updateMode == UpdateMode.EveryTime) {
@@ -160,7 +160,7 @@ public class RollerGroup : SimulationManager
         yield return new WaitForSeconds(duration);
         updating = false;
     }
-    internal override void SetUpGraph(Graph graph) {
+    public override void SetUpGraph(Graph graph) {
         base.SetUpGraph(graph);
         if (graph.barData == null) {
             graph.AddBarData();

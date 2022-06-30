@@ -25,29 +25,29 @@ public class CoinFlipper : Simulator
 
     Define expected effect size to calculate power-value and then also p-value
     */
-    internal PlayerType trueType = PlayerType.Fair;
-    internal PlayerType labeledType = PlayerType.Unknown;
+    public PlayerType trueType = PlayerType.Fair;
+    public PlayerType labeledType = PlayerType.Unknown;
     public PrimerCharacter flipperCharacterPrefab = null;
     [SerializeField] PrimerObject floorPrefab = null;
-    internal System.Random rng = null;
+    public System.Random rng = null;
     
-    internal ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
-    internal PrimerCharacter flipperCharacter = null;
-    internal PrimerObject coin = null;
+    public ResultsDisplayMode resultsDisplayMode = ResultsDisplayMode.Gallery;
+    public PrimerCharacter flipperCharacter = null;
+    public PrimerObject coin = null;
     public GameObject coinPrefab = null;
-    internal float headsRate = 0.5f;
+    public float headsRate = 0.5f;
     bool expectedHeads; // For testing whether the bias works properly.
-    internal PrimerObject floor = null;
+    public PrimerObject floor = null;
 
     Vector3 flipperCharacterPosition = new Vector3(-2, 0, 2);
     Quaternion flipperCharacterRotation = Quaternion.Euler(0, 135, 0);
     float floorSize = 3;
     Vector3 sourceDisp = new Vector3(0, 0.8f, 0.8f);
     List<float> currentICs = null;
-    internal float initialHorizontalSpeed = 3;
-    internal float initialVerticalSpeed = 12;
-    internal float initialAngularSpeed = 16;
-    internal float angleDeviation = 30;
+    public float initialHorizontalSpeed = 3;
+    public float initialVerticalSpeed = 12;
+    public float initialAngularSpeed = 16;
+    public float angleDeviation = 30;
     float maxInitialHorizontalSpeed = 4;
     float maxInitialVerticalSpeed = 13;
     float maxInitialAngularSpeed = 40;
@@ -63,21 +63,21 @@ public class CoinFlipper : Simulator
     float stoppedThreshold = 0.01f;
     
     // Recording and displaying results
-    internal PrimerObject display = null;
-    internal int displayRowLength = 8;
-    internal float displayCoinSpacing = 1;
+    public PrimerObject display = null;
+    public int displayRowLength = 8;
+    public float displayCoinSpacing = 1;
     Vector3 displayPos = new Vector3(0, 2.5f, 1.5f);
     float displayScale = 0.5f;
-    internal List<PrimerObject> displayCoins = new List<PrimerObject>();
-    internal PrimerText headsCountDisplay = null;
-    internal PrimerText tailsCountDisplay = null;
-    internal Vector3 numericDisplayPosition = Vector3.zero;
-    internal List<int> results = new List<int>();
-    internal CoinFlipSimManager manager = null;
-    internal bool currentlyFlipping = false;
-    internal bool currentlyInASeriesOfFlips = false;
+    public List<PrimerObject> displayCoins = new List<PrimerObject>();
+    public PrimerText headsCountDisplay = null;
+    public PrimerText tailsCountDisplay = null;
+    public Vector3 numericDisplayPosition = Vector3.zero;
+    public List<int> results = new List<int>();
+    public CoinFlipSimManager manager = null;
+    public bool currentlyFlipping = false;
+    public bool currentlyInASeriesOfFlips = false;
 
-    internal Vector3 individualOffset = new Vector3(0f, 1f, 4f);
+    public Vector3 individualOffset = new Vector3(0f, 1f, 4f);
 
     void Start() {
         if (rng == null) {
@@ -86,7 +86,7 @@ public class CoinFlipper : Simulator
             Debug.LogWarning("Creating new seed for an individual flipper");
         }
     }
-    internal void Appear(float stagger = 0.25f) {
+    public void Appear(float stagger = 0.25f) {
         if (flipperCharacter == null) {
             flipperCharacter = Instantiate(flipperCharacterPrefab);
         }
@@ -112,7 +112,7 @@ public class CoinFlipper : Simulator
         yield return new WaitForSeconds(stagger);
         flipperCharacter.ScaleUpFromZero();
     }
-    internal void FormOfBlob(float duration = 0.5f) {
+    public void FormOfBlob(float duration = 0.5f) {
         floor.ScaleDownToZero(duration: duration);
         flipperCharacter.ScaleTo(1, duration: duration);
         flipperCharacter.MoveTo(Vector3.zero, duration: duration);
@@ -121,7 +121,7 @@ public class CoinFlipper : Simulator
             c.ScaleDownToZero(duration: duration);
         }
     }
-    internal void Flip(int outcome = -1, int initialConditionsIndex = -1) {
+    public void Flip(int outcome = -1, int initialConditionsIndex = -1) {
         StartCoroutine(flip(outcome: outcome, initialConditionsIndex: initialConditionsIndex));
     }
     IEnumerator flip(int outcome = -1, int initialConditionsIndex = -1) {
@@ -243,7 +243,7 @@ public class CoinFlipper : Simulator
         if (Vector3.Dot(coin.transform.forward, Vector3.up) > 0.99f) { return 1; }
         else { return 0; }
     }
-    internal IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1, float delay = 1.5f) {
+    public IEnumerator recordAndDisplay(float duration = 0.5f, int outcome = -1, float delay = 1.5f) {
         if (outcome == -1) { Debug.Log("Outcome = -1, which is a bad thing"); }
         int res = outcome == -1 ? GetResult() : outcome;
         results.Add(res);
@@ -316,7 +316,7 @@ public class CoinFlipper : Simulator
             tailsCountDisplay.tmpro.text = $"Tails: {numTails}";
         }
     }
-    internal float CalcProbThisExtremeIfNull() {
+    public float CalcProbThisExtremeIfNull() {
         int num = results.Count;
         int numHeads = results.Sum();
 
@@ -329,7 +329,7 @@ public class CoinFlipper : Simulator
         }
         return (float) probabilityAtLeastExtreme;
     }
-    internal float CalcProbThisExtremeIfAlternative(float headsRateGuess = 0.75f) {
+    public float CalcProbThisExtremeIfAlternative(float headsRateGuess = 0.75f) {
         int num = results.Count;
         int numHeads = results.Sum();
 
@@ -339,10 +339,10 @@ public class CoinFlipper : Simulator
         }
         return (float) probabilityAtLeastExtreme;
     }
-    internal void FlipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
+    public void FlipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
         StartCoroutine(flipAndRecord(outcome: outcome, repetitions: repetitions, delay: delay));
     }
-    internal IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
+    public IEnumerator flipAndRecord(int outcome = -1, int repetitions = 1, float delay = 0.5f) {
         currentlyInASeriesOfFlips = true;
         for (int i = 0; i < repetitions; i++) {
             currentlyFlipping = true;
@@ -359,7 +359,7 @@ public class CoinFlipper : Simulator
         }
         currentlyInASeriesOfFlips = false;
     }
-    internal void NonAnimatedFlip() {
+    public void NonAnimatedFlip() {
         if (rng.NextDouble() < headsRate) {
             results.Add(1);
         }

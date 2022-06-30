@@ -14,9 +14,9 @@ public class SurfaceData : MonoBehaviour
     #endregion
 
     #region variables
-    internal Graph plot;
-    internal Vector3 mins; //Min values for each graph axis
-    internal Vector3 maxs; //Max values for each graph axis
+    public Graph plot;
+    public Vector3 mins; //Min values for each graph axis
+    public Vector3 maxs; //Max values for each graph axis
     
     private Vector3[] dataPoints;
     private Vector3[] verts;
@@ -155,8 +155,8 @@ public class SurfaceData : MonoBehaviour
     }
     #endregion
 
-    #region internal methods
-    internal void RefreshData() {
+    #region public methods
+    public void RefreshData() {
         if (planeMeshFilter == null) {
             Debug.LogError("Mesh Filter Not defined");
             return;

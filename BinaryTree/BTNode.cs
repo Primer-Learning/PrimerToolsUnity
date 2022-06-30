@@ -7,14 +7,14 @@ public class BTNode : PrimerObject
     public Vector3 yOffset = new Vector3(0f, -2f, 0f);
     public Vector3 xOffset = new Vector3(1f, 0f, 0f);
     public float buffer = 1.75f;
-    internal float labelBuffer = 2f;
+    public float labelBuffer = 2f;
     public float labelLerp = 0.5f;
     public TMPro.TextAlignmentOptions labelAlign = TMPro.TextAlignmentOptions.Center;
     private BTNode left = null, right = null;
-    internal PrimerArrow arrow = null;
-    internal BTNode Parent = null;
-    internal Vector3 intendedPos;
-    internal PrimerText label;
+    public PrimerArrow arrow = null;
+    public BTNode Parent = null;
+    public Vector3 intendedPos;
+    public PrimerText label;
     private void OnValidate()
     {
         PlaceArrow();
@@ -106,7 +106,7 @@ public class BTNode : PrimerObject
         }
     }
 
-    internal int SpaceNeeded(int direction, int height = -1)
+    public int SpaceNeeded(int direction, int height = -1)
     {
         BTNode next = null;
         if (direction == -1) next = Left;

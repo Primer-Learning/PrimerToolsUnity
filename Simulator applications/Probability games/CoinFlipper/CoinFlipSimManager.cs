@@ -7,29 +7,29 @@ using UnityEditor;
 
 public class CoinFlipSimManager : SimulationManager
 {
-    internal CoinFlipper flipperPrefab = null;
-    internal List<CoinFlipper> flippers = new List<CoinFlipper>();
+    public CoinFlipper flipperPrefab = null;
+    public List<CoinFlipper> flippers = new List<CoinFlipper>();
     // Faking the physics
     public bool savingNewParameters;
     public bool refiningOldParameters;
     public bool testing;
-    internal int icParameterIndex = 0;
+    public int icParameterIndex = 0;
     string physicsPath;
     string sillyPath;
-    internal List<List<float>> validInitialConditions = new List<List<float>>();
-    internal List<List<float>> sillyInitialConditions = new List<List<float>>();
+    public List<List<float>> validInitialConditions = new List<List<float>>();
+    public List<List<float>> sillyInitialConditions = new List<List<float>>();
     // Lists for categories
-    internal List<CoinFlipper> nulls;
-    internal List<CoinFlipper> alternatives;
-    internal List<CoinFlipper> negatives;
-    internal List<CoinFlipper> positives;
+    public List<CoinFlipper> nulls;
+    public List<CoinFlipper> alternatives;
+    public List<CoinFlipper> negatives;
+    public List<CoinFlipper> positives;
 
-    internal List<CoinFlipper> trueNegatives;
-    internal List<CoinFlipper> truePositives;
-    internal List<CoinFlipper> falseNegatives;
-    internal List<CoinFlipper> falsePositives;
+    public List<CoinFlipper> trueNegatives;
+    public List<CoinFlipper> truePositives;
+    public List<CoinFlipper> falseNegatives;
+    public List<CoinFlipper> falsePositives;
 
-    internal void Initialize(CoinFlipper flipperPrefabArg = null) {
+    public void Initialize(CoinFlipper flipperPrefabArg = null) {
         SetUpPhysicsPath();
         if (!savingNewParameters) {
             UnpackInitialConditions();
@@ -41,7 +41,7 @@ public class CoinFlipSimManager : SimulationManager
         }
         flipperPrefab = flipperPrefabArg;
     }
-    internal void WrapUp() {
+    public void WrapUp() {
         if (savingNewParameters || refiningOldParameters) {
             SavePhysicsFiles();
         }
@@ -66,14 +66,14 @@ public class CoinFlipSimManager : SimulationManager
         Helpers.WriteToBinaryFile(validInitialConditions, physicsPath);
         Helpers.WriteToBinaryFile(sillyInitialConditions, sillyPath);
     }
-    internal IEnumerator testFlipper(int numFlips, int minNumHeads, CoinFlipper f) {
+    public IEnumerator testFlipper(int numFlips, int minNumHeads, CoinFlipper f) {
         yield return f.flipAndRecord(repetitions: numFlips);
         f.labeledType = PlayerType.Fair;
         if (f.results.Sum() >= minNumHeads) {
             f.labeledType = PlayerType.Cheater;
         }
     }
-    internal IEnumerator testFlippers(int numFlips, int minNumHeads, List<CoinFlipper> these = null) {
+    public IEnumerator testFlippers(int numFlips, int minNumHeads, List<CoinFlipper> these = null) {
         if (these == null) { these = flippers; }
         List<Coroutine> crs = new List<Coroutine>();
         foreach (CoinFlipper f in these) {
@@ -123,7 +123,7 @@ public class CoinFlipSimManager : SimulationManager
         }
         Debug.Log($"Cheater aggregate heads rate: {(float)totalHeads/totalFlips}");
     }
-    internal void CategorizeTestedFlippers() {
+    public void CategorizeTestedFlippers() {
         // Start over each time. Keeps things clean, and it's not that slow.
         nulls = new List<CoinFlipper>();
         alternatives = new List<CoinFlipper>();
@@ -160,13 +160,13 @@ public class CoinFlipSimManager : SimulationManager
             }
         }
     }
-    internal void ParallelFlipRuns(int numFlips = 1, List<CoinFlipper> these = null) {
+    public void ParallelFlipRuns(int numFlips = 1, List<CoinFlipper> these = null) {
         if (these == null) { these = flippers; }
         foreach (CoinFlipper f in these) {
             f.FlipAndRecord(repetitions: numFlips);
         }
     }
-    internal CoinFlipper AddFlipper(float headsRate = 0.5f) {
+    public CoinFlipper AddFlipper(float headsRate = 0.5f) {
         CoinFlipper f = Instantiate(flipperPrefab);
         f.headsRate = headsRate;
         f.rng = simRNG;
@@ -176,25 +176,25 @@ public class CoinFlipSimManager : SimulationManager
         else { f.trueType = PlayerType.Cheater; }
         return f;
     }
-    internal CoinFlipper AddFlipper(float cheaterProbability, float cheaterHeadsRate) {
+    public CoinFlipper AddFlipper(float cheaterProbability, float cheaterHeadsRate) {
         if (simRNG.NextDouble() < cheaterProbability) {
             return AddFlipper(cheaterHeadsRate);
         }
         return AddFlipper(0.5f);
     }
-    internal void AddFlippers(int num, float headsRate = 0.5f) {
+    public void AddFlippers(int num, float headsRate = 0.5f) {
         for (int i = 0; i < num; i++) { AddFlipper(headsRate: headsRate); }
     }
-    internal void ShowFlippers() {
+    public void ShowFlippers() {
         ShowFlippers(skip: 0, stagger: 0);
     }
-    internal void ShowFlippers(int skip = 0, float stagger = 0) {
+    public void ShowFlippers(int skip = 0, float stagger = 0) {
         StartCoroutine(showFlippers(skip, stagger));
     }
-    internal void ShowFlippers(List<CoinFlipper> skip = null, float stagger = 0) {
+    public void ShowFlippers(List<CoinFlipper> skip = null, float stagger = 0) {
         StartCoroutine(showFlippers(skip, stagger));
     }
-    internal void ShowFlippers(CoinFlipper skip = null, float stagger = 0) {
+    public void ShowFlippers(CoinFlipper skip = null, float stagger = 0) {
         List<CoinFlipper> skipList = new List<CoinFlipper>(){skip};
         StartCoroutine(showFlippers(skipList, stagger));
     }
@@ -214,8 +214,8 @@ public class CoinFlipSimManager : SimulationManager
         }
         yield return null;
     }
-    internal delegate bool CascadeDelegateType(Vector3 pos, float startTime);
-    internal void ShowFlippersCascade(CascadeDelegateType cascadeDelegate, CoinFlipper skip = null) {
+    public delegate bool CascadeDelegateType(Vector3 pos, float startTime);
+    public void ShowFlippersCascade(CascadeDelegateType cascadeDelegate, CoinFlipper skip = null) {
         List<CoinFlipper> skipList = new List<CoinFlipper>() {skip};
         StartCoroutine(showFlippersCascade(cascadeDelegate, skipList));
     }
@@ -234,7 +234,7 @@ public class CoinFlipSimManager : SimulationManager
             yield return null;
         }
     }
-    internal void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, float gridOriginIndexX = -1, float gridOriginIndexY = -1, float duration = 0) {
+    public void ArrangeAsGrid(int numRows, int numColumns, float spacing = 7, float gridOriginIndexX = -1, float gridOriginIndexY = -1, float duration = 0) {
         List<Vector3> positions = Helpers.CalculateGridPositions(numRows, numColumns, spacing, gridOriginIndexX: gridOriginIndexX, gridOriginIndexY: gridOriginIndexY);
         if (flippers.Count > positions.Count) {
             Debug.LogError($"Only {positions.Count} positions for {flippers.Count} flippers");

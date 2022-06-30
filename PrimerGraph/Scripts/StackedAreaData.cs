@@ -14,15 +14,15 @@ public class StackedAreaData : MonoBehaviour
     #endregion
 
     #region variables
-    internal Graph plot;
-    internal Vector3 mins; //Min values for each graph axis
-    internal Vector3 maxs; //Max values for each graph axis
+    public Graph plot;
+    public Vector3 mins; //Min values for each graph axis
+    public Vector3 maxs; //Max values for each graph axis
     
     private Vector3[] verts;
     private bool animationDone = true;
 
     private int numValuesInShaderFloatArray = 900; //Number of entries in shader float arrays. Big because you can't change their size.
-    internal int pointsPerUnit = 1; //In case we want graph and function to have different units
+    public int pointsPerUnit = 1; //In case we want graph and function to have different units
     private float shaderXStep; //Use this to scale the mesh
     private int clippingNumber = 0;
     #endregion
@@ -138,8 +138,8 @@ public class StackedAreaData : MonoBehaviour
     }
     #endregion
 
-    #region internal methods
-    internal void RefreshData() {
+    #region public methods
+    public void RefreshData() {
         if (planeMeshFilter == null) {
             Debug.LogError("Mesh Filter Not defined");
             return;

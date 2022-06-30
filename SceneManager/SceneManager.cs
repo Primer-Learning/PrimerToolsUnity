@@ -16,17 +16,17 @@ public class SceneManager : PrimerObject
     public bool useEditorVals = false;
 
     // RNG init
-    internal static System.Random sceneRandom;
-    internal static System.Random sceneRandom2; //Sometimes it's useful to have separate rng for visual purposes
+    public static System.Random sceneRandom;
+    public static System.Random sceneRandom2; //Sometimes it's useful to have separate rng for visual purposes
 
     // Prefab vars, probably not necessary to do this here
-    internal PrimerArrow primerArrowPrefab;
-    internal PrimerBracket primerBracketPrefab;
-    internal PrimerText primerTextPrefab;
-    internal PrimerText primerCheckPrefab;
-    internal PrimerText primerXPrefab;
-    internal Graph primerGraphPrefab;
-    internal PrimerObject sunLight;
+    public PrimerArrow primerArrowPrefab;
+    public PrimerBracket primerBracketPrefab;
+    public PrimerText primerTextPrefab;
+    public PrimerText primerCheckPrefab;
+    public PrimerText primerXPrefab;
+    public Graph primerGraphPrefab;
+    public PrimerObject sunLight;
 
     protected override void Awake() {
         base.Awake();

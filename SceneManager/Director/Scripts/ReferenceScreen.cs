@@ -7,5 +7,5 @@ public class ReferenceScreen : PrimerObject
 {   
     public VideoPlayer screen = null;
 
-    internal void Play() { screen.Play(); }
+    public void Play() { screen.Play(); }
 }

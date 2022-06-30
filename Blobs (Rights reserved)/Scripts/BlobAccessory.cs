@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BlobAccessory : PrimerObject
 {
-    internal PrimerBlob blob;
-    internal AccessoryType accessoryType;
+    public PrimerBlob blob;
+    public AccessoryType accessoryType;
 
     // Constructor that loads and instantiates the proper prefab
     // also that sets the color or texture based on the blob color and type
@@ -108,7 +108,7 @@ public class BlobAccessory : PrimerObject
         return ba;
     }
 
-    internal void SetColor(bool colorMatch = false, string textureName = null) {
+    public void SetColor(bool colorMatch = false, string textureName = null) {
         if (texturedAccessoryTypes.Contains(accessoryType)) {
             // If !colormatch, look for a default texture. If it doesn't exist, colormatch anyway
             if (!colorMatch) {
@@ -148,10 +148,10 @@ public class BlobAccessory : PrimerObject
             }
         }
     }
-    internal void SetTexture(string textureName) {
+    public void SetTexture(string textureName) {
         SetTexture(Resources.Load<Texture>(textureName));
     }
-    internal void SetTexture(Texture texture) {
+    public void SetTexture(Texture texture) {
         MeshRenderer[] mr = GetComponentsInChildren<MeshRenderer>();
         // if (mr.Length != 1) { Debug.LogWarning($"Unexpected number of MeshRenderers in {this.gameObject.name}"); }
         Material mat = mr[0].material;
@@ -180,7 +180,7 @@ public class BlobAccessory : PrimerObject
         {PrimerColor.White, ""},
         {PrimerColor.Gray, ""},
     };
-    internal static Dictionary<AccessoryType, float> SignHeights = new Dictionary<AccessoryType, float>() {
+    public static Dictionary<AccessoryType, float> SignHeights = new Dictionary<AccessoryType, float>() {
         {AccessoryType.froggyHat, 0.2f},
         {AccessoryType.beanie, 0.34f},
         {AccessoryType.propellerHat, 0.3f},

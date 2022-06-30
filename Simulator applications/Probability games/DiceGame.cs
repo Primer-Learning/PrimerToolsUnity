@@ -5,19 +5,19 @@ using UnityEngine;
 
 public class DiceGame : MonoBehaviour
 {
-    internal RollerGroup rollerGroup = null;
-    internal CoinBucket coinBucket = null;
-    internal int entryFee = 1;
-    internal int payout = 7;
-    internal List<int> resultsSoFar = new List<int>();
+    public RollerGroup rollerGroup = null;
+    public CoinBucket coinBucket = null;
+    public int entryFee = 1;
+    public int payout = 7;
+    public List<int> resultsSoFar = new List<int>();
     static float defaultWaitTime = 0;
     float waitTime = defaultWaitTime;
     float payoutWaitTime = 1;
 
-    internal int numPlays = 0;
-    internal int numCompleted = 0;
+    public int numPlays = 0;
+    public int numCompleted = 0;
     int totalEntries = 0;
-    internal bool isPlaying = false;
+    public bool isPlaying = false;
     List<DieRoller> busyRollers = new List<DieRoller>();
 
     void Start() {
@@ -27,16 +27,16 @@ public class DiceGame : MonoBehaviour
         }
     }
 
-    internal bool IsPlaying() {
+    public bool IsPlaying() {
         if (numCompleted == totalEntries) { return false; }
         return true;
     }
 
-    internal void Play(int numEntries = 1) {
+    public void Play(int numEntries = 1) {
         StartCoroutine(play(numEntries));
     }
 
-    internal IEnumerator play(int numEntries = 1) {
+    public IEnumerator play(int numEntries = 1) {
         isPlaying = true;
         rollerGroup.BeginUpdating();
         totalEntries += numEntries;
