@@ -1,6 +1,6 @@
-using UnityEditor.SettingsManagement;
-using UnityEngine;
 using LatexRenderer;
+using UnityEditor.Callbacks;
+using UnityEditor.SettingsManagement;
 
 namespace UnityEditor.LatexRenderer.UserSettings
 {
@@ -12,10 +12,7 @@ namespace UnityEditor.LatexRenderer.UserSettings
         {
             get
             {
-                if (_instance is null)
-                {
-                    Initialize();
-                } 
+                if (_instance is null) Initialize();
 
                 return _instance;
             }
@@ -28,7 +25,7 @@ namespace UnityEditor.LatexRenderer.UserSettings
             SyncPaths();
         }
 
-        [UnityEditor.Callbacks.DidReloadScripts]
+        [DidReloadScripts]
         private static void SyncPaths()
         {
             LatexToSvgConverter.LatexExecutablePath = Instance.Get<string>(

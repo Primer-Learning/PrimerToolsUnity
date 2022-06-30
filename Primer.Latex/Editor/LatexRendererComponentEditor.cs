@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
 using LatexRenderer;
+using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
 {
@@ -15,7 +14,7 @@ namespace UnityEditor.LatexRenderer
             if (GUILayout.Button("Release SVG Parts"))
             {
                 Undo.SetCurrentGroupName("Release SVG Parts");
-                
+
                 var component = (LatexRendererComponent)target;
 
                 foreach (var svgPart in component._svgParts)
