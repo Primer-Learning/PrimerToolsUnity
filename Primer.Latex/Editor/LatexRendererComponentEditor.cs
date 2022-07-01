@@ -119,8 +119,14 @@ namespace UnityEditor.LatexRenderer
             if (!isTaskRunning)
             {
                 var stagedHeaders = GetStringArrayValue(headersProperty);
-                if (latexProperty.stringValue != LatexRenderer.Latex ||
-                    !stagedHeaders.SequenceEqual(LatexRenderer.Headers))
+
+                var isStagingDifferent = latexProperty.stringValue != LatexRenderer.Latex ||
+                                         !stagedHeaders.SequenceEqual(LatexRenderer.Headers);
+                var isDifferentThanLastTask =
+                    latexProperty.stringValue != _currentTaskValues.latex ||
+                    _currentTaskValues.headers is null ||
+                    !stagedHeaders.SequenceEqual(_currentTaskValues.headers);
+                if (isStagingDifferent && isDifferentThanLastTask)
                 {
                     _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue, stagedHeaders);
                     _currentTaskValues = (latexProperty.stringValue, stagedHeaders);
