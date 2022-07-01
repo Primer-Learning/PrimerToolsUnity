@@ -6,7 +6,7 @@ namespace LatexRenderer
 {
     internal class SpriteDirectRenderer
     {
-        private DrawSpec[] _drawSpecs = { };
+        internal DrawSpec[] _drawSpecs = { };
 
         /// <summary>The last values given to SetSprites.</summary>
         private (Sprite[] sprites, Vector3[] spritePositions, Material material) _lastSeenSprites;
@@ -47,7 +47,7 @@ namespace LatexRenderer
                     drawSpec.Material, 0);
         }
 
-        private struct DrawSpec
+        internal struct DrawSpec
         {
             public Mesh Mesh;
             public Material Material;

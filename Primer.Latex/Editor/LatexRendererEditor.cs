@@ -134,19 +134,16 @@ namespace UnityEditor.LatexRenderer
                 Undo.SetCurrentGroupName("Release SVG Parts");
 
                 var partNumber = 0;
-                for (var i = 0; i < LatexRenderer._sprites.Length; ++i)
+                foreach (var drawSpec in LatexRenderer._renderer._drawSpecs)
                 {
-                    var sprite = LatexRenderer._sprites[i];
-                    var position = LatexRenderer._spritesPositions[i];
-
                     var obj = new GameObject($"SvgPart {partNumber++}");
 
-                    var renderer = obj.AddComponent<SpriteRenderer>();
-                    renderer.sprite = sprite;
-                    renderer.material = LatexRenderer.material;
+                    obj.AddComponent<MeshFilter>().sharedMesh = drawSpec.Mesh;
+                    var renderer = obj.AddComponent<MeshRenderer>().material =
+                        LatexRenderer.material;
 
                     obj.transform.SetParent(LatexRenderer.transform, false);
-                    obj.transform.localPosition = position;
+                    obj.transform.localPosition = drawSpec.Position;
 
                     Undo.RegisterCreatedObjectUndo(obj, "");
                 }

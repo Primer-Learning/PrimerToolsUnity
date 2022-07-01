@@ -55,7 +55,7 @@ namespace LatexRenderer
 
         private readonly LatexToSvgConverter _converter = LatexToSvgConverter.Create();
 
-        private readonly SpriteDirectRenderer _renderer = new();
+        internal readonly SpriteDirectRenderer _renderer = new();
 
         /// <summary>Represents a single request to build an SVG.</summary>
         /// <remarks>
