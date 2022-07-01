@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
@@ -7,20 +9,31 @@ namespace UnityEditor.LatexRenderer
     [CustomEditor(typeof(global::LatexRenderer.LatexRenderer))]
     public class LatexRendererComponentEditor : Editor
     {
+        private (CancellationTokenSource cancellationSource, Task task)? _currentTask;
+
         private global::LatexRenderer.LatexRenderer LatexRenderer =>
             (global::LatexRenderer.LatexRenderer)target;
 
         private (string message, MessageType messageType) GetTaskStatusText()
         {
-            var (isRunning, exception) = LatexRenderer.GetTaskStatus();
-            if (isRunning)
-                return ("Rendering LaTeX...", MessageType.Info);
-            if (exception is not null)
-                return (exception.Message, MessageType.Error);
+            if (_currentTask.HasValue)
+            {
+                var (cancellationSource, task) = _currentTask.Value;
+                if (cancellationSource.IsCancellationRequested && !task.IsCompleted)
+                    return ("Cancelling...", MessageType.Warning);
+                if (!task.IsCompleted)
+                    return ("Rendering LaTeX...", MessageType.Info);
+                if (task.Exception is not null)
+                    return (task.Exception.Message, MessageType.Error);
+            }
 
             return ("OK", MessageType.Info);
         }
 
+        public override bool RequiresConstantRepaint()
+        {
+            return true;
+        }
 
         public override void OnInspectorGUI()
         {
@@ -38,8 +51,10 @@ namespace UnityEditor.LatexRenderer
 
             var latexProperty = serializedObject.FindProperty("_latex");
             EditorGUILayout.PropertyField(latexProperty);
-            if (latexProperty.stringValue != LatexRenderer.Latex)
-                LatexRenderer.SetLatex(latexProperty.stringValue);
+
+            var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
+            if (latexProperty.stringValue != LatexRenderer.Latex && !isTaskRunning)
+                _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue);
 
             DrawPropertiesExcluding(serializedObject, "_latex");
 
