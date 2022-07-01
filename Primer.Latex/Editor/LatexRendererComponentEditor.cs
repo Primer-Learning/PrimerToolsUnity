@@ -24,6 +24,8 @@ namespace UnityEditor.LatexRenderer
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             var (message, messageType) = GetTaskStatusText();
             EditorGUILayout.HelpBox(message, messageType);
 
@@ -34,7 +36,15 @@ namespace UnityEditor.LatexRenderer
             if (GUILayout.Button("Cancel Rendering Task"))
                 LatexRenderer.CancelTask();
 
-            base.OnInspectorGUI();
+            var latexProperty = serializedObject.FindProperty("_latex");
+            EditorGUILayout.PropertyField(latexProperty);
+            if (latexProperty.stringValue != LatexRenderer.Latex)
+                LatexRenderer.SetLatex(latexProperty.stringValue);
+
+            DrawPropertiesExcluding(serializedObject, "_latex");
+
+            serializedObject.ApplyModifiedProperties();
+
 
             // if (GUILayout.Button("Release SVG Parts"))
             // {

@@ -21,7 +21,7 @@ namespace LatexRenderer
 
         private const HideFlags SvgPartsHideFlags = HideFlags.NotEditable;
 
-        [TextArea] public string latex;
+        [SerializeField] [TextArea] private string _latex;
 
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
         public List<string> headers = new()
@@ -52,9 +52,25 @@ namespace LatexRenderer
 
         public Material material;
 
+        [SerializeField] [HideInInspector] private Vector3[] _spritesPositions;
+        [SerializeField] [HideInInspector] private Sprite[] _sprites;
+
         private readonly LatexToSvgConverter _converter = LatexToSvgConverter.Create();
 
         private readonly SpriteDirectRenderer _renderer = new();
+
+        /// <summary>Represents a single request to build an SVG.</summary>
+        /// <remarks>
+        ///     <para>Used to pass an SVG into the player loop for BuildSprites() to build.</para>
+        ///     <para>buildSpritesResult will always return null if successful.</para>
+        /// </remarks>
+        private (TaskCompletionSource<object> buildSpritesResult, string svg, string latex)?
+            _svgToBuildSpritesFor;
+
+        public string Latex => _latex;
+
+        private IEnumerable<(Sprite, Vector3)> Sprites =>
+            _sprites.Zip(_spritesPositions, (sprite, position) => (sprite, position));
 
 #if UNITY_EDITOR
         private void Reset()
@@ -63,34 +79,58 @@ namespace LatexRenderer
         }
 #endif
 
-        public async void Update()
+        public void Update()
         {
-            var currentKey = new Build.Key(this);
-            if (_currentBuild?.Source != currentKey) _currentBuild = new Build(currentKey);
+            if (_svgToBuildSpritesFor.HasValue)
+                try
+                {
+                    var sprites = BuildSprites(_svgToBuildSpritesFor.Value.svg);
 
-            if (_currentBuild.LatexToSvgTask is null)
-            {
-                (_currentBuild.CancellationSource, _currentBuild.LatexToSvgTask) =
-                    _converter.RenderLatexToSvg(latex, headers);
-                _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
+                    _sprites = sprites.Select(i => i.Item2).ToArray();
+                    _spritesPositions = sprites.Select(i => (Vector3)i.Item1).ToArray();
+                    // Sprites is _sprites and _spritesPositions zipped
+                    _renderer.SetSprites(Sprites, material, false);
+                    _latex = _svgToBuildSpritesFor.Value.latex;
 
-#if UNITY_EDITOR
-                if (!Application.isPlaying)
-                    EditorApplication.QueuePlayerLoopUpdate();
-#endif
-            }
-            else if (_currentBuild.Svg is not null && !_currentBuild.DidCreateSvgParts)
-            {
-                // This must be done within the player update loop, so it's important that this isn't run after any
-                // await calls in this   function. If it's done outside of it, there will be an error when creating the
-                // sprite.
-                var sprites = BuildSprites(_currentBuild.Svg);
-                _renderer.SetSprites(sprites.Select(i => (i.Item2, (Vector3)i.Item1)), material,
-                    false);
-                _currentBuild.DidCreateSvgParts = true;
-            }
+                    _svgToBuildSpritesFor.Value.buildSpritesResult.SetResult(null);
+                }
+                catch (Exception err)
+                {
+                    _svgToBuildSpritesFor.Value.buildSpritesResult.SetException(err);
+                }
+                finally
+                {
+                    _svgToBuildSpritesFor = null;
+                }
 
             _renderer.Draw(transform);
+        }
+
+        private void OnEnable()
+        {
+            _renderer.SetSprites(Sprites, material, false);
+        }
+
+        public (CancellationTokenSource, Task) SetLatex(string latex)
+        {
+            var (cancellationSource, task) = _converter.RenderLatexToSvg(_latex, headers);
+            return (cancellationSource, SetLatex(latex, task));
+        }
+
+        private async Task SetLatex(string latex, Task<string> renderTask)
+        {
+            var svg = await renderTask;
+
+#if UNITY_EDITOR
+            // Update normally gets called only sporadically in the editor
+            if (!Application.isPlaying)
+                EditorApplication.QueuePlayerLoopUpdate();
+#endif
+
+            var completionSource = new TaskCompletionSource<object>();
+            _svgToBuildSpritesFor = (completionSource, svg, latex);
+
+            await completionSource.Task;
         }
 
         public (bool isRunning, AggregateException exception) GetTaskStatus()
@@ -111,7 +151,8 @@ namespace LatexRenderer
             return _converter.TemporaryDirectoryRoot;
         }
 
-        private static List<(Vector2, Sprite)> BuildSprites(string svgText)
+        /// <remarks>Must be run inside the player loop.</remarks>
+        private static List<(Vector2 position, Sprite sprite)> BuildSprites(string svgText)
         {
             SVGParser.SceneInfo sceneInfo;
             try
@@ -201,7 +242,7 @@ namespace LatexRenderer
 
                 public Key(LatexRenderer source)
                 {
-                    Latex = source.latex;
+                    Latex = source._latex;
                     Headers = new List<string>(source.headers);
                 }
 
