@@ -19,8 +19,6 @@ namespace LatexRenderer
     {
         private const float SvgPixelsPerUnit = 10f;
 
-        private const HideFlags SvgPartsHideFlags = HideFlags.NotEditable;
-
         [SerializeField] [TextArea] private string _latex;
 
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
@@ -47,8 +45,6 @@ namespace LatexRenderer
             @"\usepackage{pifont}",
             @"\linespread{1}"
         };
-
-        [SerializeField] [HideInInspector] private Build _currentBuild;
 
         public Material material;
 
@@ -133,19 +129,6 @@ namespace LatexRenderer
             await completionSource.Task;
         }
 
-        public (bool isRunning, AggregateException exception) GetTaskStatus()
-        {
-            if (_currentBuild?.LatexToSvgTask is null) return (false, null);
-
-            return (!_currentBuild.LatexToSvgTask.IsCompleted,
-                _currentBuild.LatexToSvgTask.Exception);
-        }
-
-        public void CancelTask()
-        {
-            _currentBuild.CancellationSource.Cancel();
-        }
-
         public DirectoryInfo GetRootBuildDirectory()
         {
             return _converter.TemporaryDirectoryRoot;
@@ -218,57 +201,6 @@ namespace LatexRenderer
         //         _svgParts.Add(obj);
         //     }
         // }
-
-        [Serializable]
-        private class Build
-        {
-            public string Svg;
-            public bool DidCreateSvgParts;
-            [NonSerialized] public CancellationTokenSource CancellationSource;
-
-            [NonSerialized] public Task<string> LatexToSvgTask;
-
-            public Key Source;
-
-            public Build(Key source)
-            {
-                Source = source;
-            }
-
-            public class Key
-            {
-                public readonly List<string> Headers;
-                public readonly string Latex;
-
-                public Key(LatexRenderer source)
-                {
-                    Latex = source._latex;
-                    Headers = new List<string>(source.headers);
-                }
-
-                public static bool operator ==(Key a, Key b)
-                {
-                    if (a is null) return b is null;
-
-                    return a.Equals(b);
-                }
-
-                public static bool operator !=(Key a, Key b)
-                {
-                    return !(a == b);
-                }
-
-                public override bool Equals(object obj)
-                {
-                    return Equals(obj as Key);
-                }
-
-                public bool Equals(Key other)
-                {
-                    return Latex == other.Latex && Headers.SequenceEqual(other.Headers);
-                }
-            }
-        }
 
 #if UNITY_EDITOR
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
