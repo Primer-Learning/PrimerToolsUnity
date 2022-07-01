@@ -19,7 +19,10 @@ namespace LatexRenderer
         /// <summary>Will be used instead of searching the PATH env variable.</summary>
         public static string DvisvgmExecutablePath;
 
+        private readonly object _currentTaskLock = new();
+
         private readonly DirectoryInfo _temporaryDirectoryRoot;
+        private Task<string> _currentTask;
 
         private LatexToSvgConverter(DirectoryInfo temporaryDirectoryRoot)
         {
@@ -97,7 +100,14 @@ namespace LatexRenderer
 
         public Task<string> RenderLatexToSvg(string latex, List<string> headers)
         {
-            return Task.Run(() => RenderLatexToSvgSync(latex, headers));
+            lock (_currentTaskLock)
+            {
+                if (_currentTask is not null && !_currentTask.IsCompleted)
+                    throw new Exception("A rendering job is already running.");
+
+                _currentTask = Task.Run(() => RenderLatexToSvgSync(latex, headers));
+                return _currentTask;
+            }
         }
 
         private static int ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory,
