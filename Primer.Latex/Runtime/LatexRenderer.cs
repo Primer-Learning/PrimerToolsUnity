@@ -84,7 +84,7 @@ namespace LatexRenderer
                     var sprites = BuildSprites(_svgToBuildSpritesFor.Value.svg);
 
 #if UNITY_EDITOR
-                    if (Application.isEditor && !Application.isPlaying)
+                    if (!Application.isPlaying)
                         Undo.RecordObject(this, "Set LaTeX");
 #endif
 
