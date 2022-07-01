@@ -21,7 +21,7 @@ namespace LatexRenderer
                     Enumerable.Repeat(new Vector3(0f, 0f, -1f), sprite.vertices.Length)
                         .ToArray(),
                 tangents =
-                    Enumerable.Repeat(new Vector4(1f, 0f, 0f, 1f), sprite.vertices.Length)
+                    Enumerable.Repeat(new Vector4(1f, 0f, 0f, -1f), sprite.vertices.Length)
                         .ToArray(),
                 uv = sprite.vertices
             };
