@@ -143,8 +143,7 @@ namespace UnityEditor.LatexRenderer
 
                     var renderer = obj.AddComponent<SpriteRenderer>();
                     renderer.sprite = sprite;
-                    if (LatexRenderer.material)
-                        renderer.material = LatexRenderer.material;
+                    renderer.material = LatexRenderer.material;
 
                     obj.transform.parent = LatexRenderer.transform;
                     obj.transform.localPosition = position;
