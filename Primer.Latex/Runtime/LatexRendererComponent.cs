@@ -99,6 +99,11 @@ namespace LatexRenderer
                 _currentBuild.LatexToSvgTask.Exception);
         }
 
+        public DirectoryInfo GetRootBuildDirectory()
+        {
+            return _converter.TemporaryDirectoryRoot;
+        }
+
         private static List<(Vector2, Sprite)> BuildSprites(string svgText)
         {
             SVGParser.SceneInfo sceneInfo;

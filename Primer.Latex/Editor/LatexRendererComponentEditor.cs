@@ -1,4 +1,7 @@
+using System.Diagnostics;
+using System.IO;
 using LatexRenderer;
+using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
 {
@@ -23,6 +26,10 @@ namespace UnityEditor.LatexRenderer
         {
             var (message, messageType) = GetTaskStatusText();
             EditorGUILayout.HelpBox(message, messageType);
+
+            if (GUILayout.Button("Open Build Directory"))
+                Process.Start(
+                    $"{LatexRenderer.GetRootBuildDirectory()}{Path.DirectorySeparatorChar}");
 
             base.OnInspectorGUI();
 

@@ -22,15 +22,15 @@ namespace LatexRenderer
 
         private readonly object _currentTaskLock = new();
 
-        private readonly DirectoryInfo _temporaryDirectoryRoot;
+        public readonly DirectoryInfo TemporaryDirectoryRoot;
         private Task<string> _currentTask;
 
         private int _nextBuildNumber;
 
         private LatexToSvgConverter(DirectoryInfo temporaryDirectoryRoot)
         {
-            _temporaryDirectoryRoot = temporaryDirectoryRoot;
-            Debug.Log($"Initialized LaTeX build directory: {_temporaryDirectoryRoot.FullName}");
+            TemporaryDirectoryRoot = temporaryDirectoryRoot;
+            Debug.Log($"Initialized LaTeX build directory: {TemporaryDirectoryRoot.FullName}");
         }
 
         public void Dispose()
@@ -167,7 +167,7 @@ namespace LatexRenderer
             var buildNumber = Interlocked.Increment(ref _nextBuildNumber) - 1;
 
             var temporaryDirectory =
-                _temporaryDirectoryRoot.CreateSubdirectory($"build-{buildNumber}");
+                TemporaryDirectoryRoot.CreateSubdirectory($"build-{buildNumber}");
 
             var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
             File.WriteAllText(sourcePath, @$"
@@ -212,7 +212,7 @@ namespace LatexRenderer
                 directory.Delete(true);
             }
 
-            DeleteRecursively(_temporaryDirectoryRoot);
+            DeleteRecursively(TemporaryDirectoryRoot);
         }
 
         ~LatexToSvgConverter()
