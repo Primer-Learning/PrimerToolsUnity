@@ -9,7 +9,8 @@ namespace LatexRenderer
         private DrawSpec[] _drawSpecs = { };
 
         /// <summary>The last values given to SetSprites.</summary>
-        private (Sprite[] sprites, Vector3[] spritePositions) _lastSeenSprites;
+        private (Sprite[] sprites, Vector3[] spritePositions, Material baseMaterial, bool
+            overrideTexture) _lastSeenSprites;
 
         private static DrawSpec CreateDrawSpec(Sprite sprite, Vector3 position,
             Material baseMaterial, bool overrideTexture)
@@ -39,14 +40,13 @@ namespace LatexRenderer
         public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material baseMaterial,
             bool overrideTexture)
         {
-            if (sprites == _lastSeenSprites.sprites &&
-                spritePositions == _lastSeenSprites.spritePositions)
-                return;
+            var args = (sprites, spritePositions, baseMaterial, overrideTexture);
+            if (args == _lastSeenSprites) return;
 
             _drawSpecs = sprites.Zip(spritePositions,
                 (sprite, position) =>
                     CreateDrawSpec(sprite, position, baseMaterial, overrideTexture)).ToArray();
-            _lastSeenSprites = (sprites, spritePositions);
+            _lastSeenSprites = args;
         }
 
         public void Draw(Transform parent)
