@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -35,6 +36,15 @@ namespace UnityEditor.LatexRenderer
             return true;
         }
 
+        private static List<string> GetStringArrayValue(SerializedProperty array)
+        {
+            var result = new List<string>();
+            for (var i = 0; i < array.arraySize; ++i)
+                result.Add(array.GetArrayElementAtIndex(i).stringValue);
+
+            return result;
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -52,11 +62,15 @@ namespace UnityEditor.LatexRenderer
             var latexProperty = serializedObject.FindProperty("_latex");
             EditorGUILayout.PropertyField(latexProperty);
 
+            var headersProperty = serializedObject.FindProperty("_headers");
+            EditorGUILayout.PropertyField(headersProperty);
+
             var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
             if (latexProperty.stringValue != LatexRenderer.Latex && !isTaskRunning)
-                _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue);
+                _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue,
+                    GetStringArrayValue(headersProperty));
 
-            DrawPropertiesExcluding(serializedObject, "_latex");
+            DrawPropertiesExcluding(serializedObject, "_latex", "_headers");
 
             serializedObject.ApplyModifiedProperties();
 

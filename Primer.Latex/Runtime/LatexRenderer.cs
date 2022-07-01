@@ -22,7 +22,8 @@ namespace LatexRenderer
         [SerializeField] [TextArea] private string _latex;
 
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
-        public List<string> headers = new()
+        [SerializeField]
+        private List<string> _headers = new()
         {
             @"\documentclass[preview]{standalone}",
             @"\usepackage[english]{babel}",
@@ -60,8 +61,8 @@ namespace LatexRenderer
         ///     <para>Used to pass an SVG into the player loop for BuildSprites() to build.</para>
         ///     <para>buildSpritesResult will always return null if successful.</para>
         /// </remarks>
-        private (TaskCompletionSource<object> buildSpritesResult, string svg, string latex)?
-            _svgToBuildSpritesFor;
+        private (TaskCompletionSource<object> buildSpritesResult, string svg, string latex,
+            List<string> headers)? _svgToBuildSpritesFor;
 
         public string Latex => _latex;
 
@@ -87,6 +88,7 @@ namespace LatexRenderer
                     // Sprites is _sprites and _spritesPositions zipped
                     _renderer.SetSprites(Sprites, material, false);
                     _latex = _svgToBuildSpritesFor.Value.latex;
+                    _headers = _svgToBuildSpritesFor.Value.headers;
 
                     _svgToBuildSpritesFor.Value.buildSpritesResult.SetResult(null);
                 }
@@ -107,13 +109,13 @@ namespace LatexRenderer
             _renderer.SetSprites(Sprites, material, false);
         }
 
-        public (CancellationTokenSource, Task) SetLatex(string latex)
+        public (CancellationTokenSource, Task) SetLatex(string latex, List<string> headers)
         {
-            var (cancellationSource, task) = _converter.RenderLatexToSvg(_latex, headers);
-            return (cancellationSource, SetLatex(latex, task));
+            var (cancellationSource, task) = _converter.RenderLatexToSvg(latex, headers);
+            return (cancellationSource, SetLatex(latex, headers, task));
         }
 
-        private async Task SetLatex(string latex, Task<string> renderTask)
+        private async Task SetLatex(string latex, List<string> headers, Task<string> renderTask)
         {
             var svg = await renderTask;
 
@@ -124,7 +126,7 @@ namespace LatexRenderer
 #endif
 
             var completionSource = new TaskCompletionSource<object>();
-            _svgToBuildSpritesFor = (completionSource, svg, latex);
+            _svgToBuildSpritesFor = (completionSource, svg, latex, headers);
 
             await completionSource.Task;
         }
