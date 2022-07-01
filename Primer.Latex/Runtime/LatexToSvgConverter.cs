@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Debug = UnityEngine.Debug;
 
 namespace LatexRenderer
 {
@@ -30,7 +29,6 @@ namespace LatexRenderer
         private LatexToSvgConverter(DirectoryInfo temporaryDirectoryRoot)
         {
             TemporaryDirectoryRoot = temporaryDirectoryRoot;
-            Debug.Log($"Initialized LaTeX build directory: {TemporaryDirectoryRoot.FullName}");
         }
 
         public void Dispose()
