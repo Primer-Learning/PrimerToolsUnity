@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Debug = UnityEngine.Debug;
 
@@ -23,6 +24,8 @@ namespace LatexRenderer
 
         private readonly DirectoryInfo _temporaryDirectoryRoot;
         private Task<string> _currentTask;
+
+        private int _nextBuildNumber;
 
         private LatexToSvgConverter(DirectoryInfo temporaryDirectoryRoot)
         {
@@ -161,8 +164,10 @@ namespace LatexRenderer
 
         private string RenderLatexToSvgSync(string latex, List<string> headers)
         {
+            var buildNumber = Interlocked.Increment(ref _nextBuildNumber) - 1;
+
             var temporaryDirectory =
-                _temporaryDirectoryRoot.CreateSubdirectory(Guid.NewGuid().ToString());
+                _temporaryDirectoryRoot.CreateSubdirectory($"build-{buildNumber}");
 
             var sourcePath = Path.Combine(temporaryDirectory.FullName, "source.tex");
             File.WriteAllText(sourcePath, @$"
