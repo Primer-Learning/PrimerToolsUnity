@@ -23,7 +23,7 @@ namespace LatexRenderer
                 tangents =
                     Enumerable.Repeat(new Vector4(1f, 0f, 0f, 1f), sprite.vertices.Length)
                         .ToArray(),
-                uv = sprite.uv
+                uv = sprite.vertices
             };
 
             return new DrawSpec { Material = material, Mesh = mesh, Position = position };
