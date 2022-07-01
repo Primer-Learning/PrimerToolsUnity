@@ -44,7 +44,10 @@ namespace UnityEditor.LatexRenderer
                     return ("Cancelling...", MessageType.Warning);
                 if (!task.IsCompleted)
                     return ("Rendering LaTeX...", MessageType.Info);
-                if (task.Exception is not null)
+                if (task.Exception is not null &&
+                    (_stagingObject.FindProperty("_latex").stringValue != LatexRenderer.Latex ||
+                     !GetStringArrayValue(_stagingObject.FindProperty("_headers"))
+                         .SequenceEqual(LatexRenderer.Headers)))
                     return (task.Exception.Message, MessageType.Error);
             }
 
