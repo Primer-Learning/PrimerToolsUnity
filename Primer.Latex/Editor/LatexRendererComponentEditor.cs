@@ -119,30 +119,15 @@ namespace UnityEditor.LatexRenderer
             var headersProperty = _stagingObject.FindProperty("_headers");
             EditorGUILayout.PropertyField(headersProperty);
 
-            var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
-            if (!isTaskRunning)
-            {
-                var stagedHeaders = GetStringArrayValue(headersProperty);
+            EditorGUILayout.Space(10);
 
-                var isStagingDifferent = latexProperty.stringValue != LatexRenderer.Latex ||
-                                         !stagedHeaders.SequenceEqual(LatexRenderer.Headers);
-                var isDifferentThanLastTask =
-                    latexProperty.stringValue != _currentTaskValues.latex ||
-                    _currentTaskValues.headers is null ||
-                    !stagedHeaders.SequenceEqual(_currentTaskValues.headers);
-                if (isStagingDifferent && isDifferentThanLastTask)
-                {
-                    _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue, stagedHeaders);
-                    _currentTaskValues = (latexProperty.stringValue, stagedHeaders);
-                }
-            }
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("material"));
 
-            DrawPropertiesExcluding(serializedObject, "_latex", "_headers");
+            EditorGUILayout.Space(10);
 
-            serializedObject.ApplyModifiedProperties();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmos"));
 
-            _lastSeenValues = GetCurrentValues();
-
+            EditorGUILayout.Space(10);
 
             if (GUILayout.Button("Release SVG Parts"))
             {
@@ -169,6 +154,28 @@ namespace UnityEditor.LatexRenderer
 
                 Undo.DestroyObjectImmediate(LatexRenderer);
             }
+
+            var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
+            if (!isTaskRunning)
+            {
+                var stagedHeaders = GetStringArrayValue(headersProperty);
+
+                var isStagingDifferent = latexProperty.stringValue != LatexRenderer.Latex ||
+                                         !stagedHeaders.SequenceEqual(LatexRenderer.Headers);
+                var isDifferentThanLastTask =
+                    latexProperty.stringValue != _currentTaskValues.latex ||
+                    _currentTaskValues.headers is null ||
+                    !stagedHeaders.SequenceEqual(_currentTaskValues.headers);
+                if (isStagingDifferent && isDifferentThanLastTask)
+                {
+                    _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue, stagedHeaders);
+                    _currentTaskValues = (latexProperty.stringValue, stagedHeaders);
+                }
+            }
+
+            serializedObject.ApplyModifiedProperties();
+
+            _lastSeenValues = GetCurrentValues();
         }
     }
 }
