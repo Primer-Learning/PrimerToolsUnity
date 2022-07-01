@@ -47,7 +47,7 @@ namespace UnityEditor.LatexRenderer
                     $"{LatexRenderer.GetRootBuildDirectory()}{Path.DirectorySeparatorChar}");
 
             if (GUILayout.Button("Cancel Rendering Task"))
-                LatexRenderer.CancelTask();
+                _currentTask?.cancellationSource.Cancel();
 
             var latexProperty = serializedObject.FindProperty("_latex");
             EditorGUILayout.PropertyField(latexProperty);
