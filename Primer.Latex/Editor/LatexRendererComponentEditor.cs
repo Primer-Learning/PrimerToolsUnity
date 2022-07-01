@@ -113,7 +113,8 @@ namespace UnityEditor.LatexRenderer
                 _currentTask?.cancellationSource.Cancel();
 
             var latexProperty = _stagingObject.FindProperty("_latex");
-            EditorGUILayout.PropertyField(latexProperty);
+            EditorGUILayout.PropertyField(latexProperty,
+                GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 6));
 
             var headersProperty = _stagingObject.FindProperty("_headers");
             EditorGUILayout.PropertyField(headersProperty);
