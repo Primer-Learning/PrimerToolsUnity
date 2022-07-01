@@ -101,20 +101,24 @@ namespace LatexRenderer
                 Path.Combine(Path.GetTempPath(), $"unity-latex-{Guid.NewGuid().ToString()}")));
         }
 
-        public Task<string> RenderLatexToSvg(string latex, List<string> headers)
+        public (CancellationTokenSource, Task<string>) RenderLatexToSvg(string latex,
+            List<string> headers)
         {
             lock (_currentTaskLock)
             {
                 if (_currentTask is not null && !_currentTask.IsCompleted)
                     throw new Exception("A LaTeX rendering task is already running.");
 
-                _currentTask = Task.Run(() => RenderLatexToSvgSync(latex, headers));
-                return _currentTask;
+                var source = new CancellationTokenSource();
+
+                _currentTask = Task.Run(() => RenderLatexToSvgSync(latex, headers, source.Token),
+                    source.Token);
+                return (source, _currentTask);
             }
         }
 
         private static int ExecuteProcess(int millisecondsTimeout, DirectoryInfo workingDirectory,
-            string name, IEnumerable<string> arguments)
+            string name, IEnumerable<string> arguments, CancellationToken cancellationToken)
         {
             var startInfo = new ProcessStartInfo(name)
             {
@@ -132,7 +136,9 @@ namespace LatexRenderer
             using var process = new Process { StartInfo = startInfo };
 
             process.Start();
-            process.WaitForExit(millisecondsTimeout);
+
+            while (!process.HasExited && !cancellationToken.IsCancellationRequested)
+                process.WaitForExit(200);
 
             var wasKilled = false;
             if (!process.HasExited)
@@ -156,13 +162,13 @@ namespace LatexRenderer
             }
 
             if (wasKilled)
-                throw new TimeoutException(
-                    $"Process {name} did not exit after {millisecondsTimeout}ms");
+                throw new TimeoutException($"Process {name} was killed.");
 
             return process.ExitCode;
         }
 
-        private string RenderLatexToSvgSync(string latex, List<string> headers)
+        private string RenderLatexToSvgSync(string latex, List<string> headers,
+            CancellationToken cancellationToken)
         {
             var buildNumber = Interlocked.Increment(ref _nextBuildNumber) - 1;
 
@@ -183,7 +189,7 @@ namespace LatexRenderer
                     {
                         "-no-pdf", "-interaction=batchmode", "-halt-on-error",
                         $"-output-directory={temporaryDirectory.FullName}", sourcePath
-                    }) != 0)
+                    }, cancellationToken) != 0)
             {
                 var errors =
                     from line in File.ReadAllLines(Path.Combine(temporaryDirectory.FullName,
@@ -197,7 +203,7 @@ namespace LatexRenderer
 
             var outputPath = Path.Combine(temporaryDirectory.FullName, "output.svg");
             ExecuteProcess(Timeout, temporaryDirectory, FindDvisvgmExecutablePath(),
-                new[] { dviPath, "--no-fonts=1", $"--output={outputPath}" });
+                new[] { dviPath, "--no-fonts=1", $"--output={outputPath}" }, cancellationToken);
 
             return File.ReadAllText(outputPath);
         }

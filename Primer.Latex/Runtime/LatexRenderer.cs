@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
 using UnityEditor;
@@ -69,7 +70,8 @@ namespace LatexRenderer
 
             if (_currentBuild.LatexToSvgTask is null)
             {
-                _currentBuild.LatexToSvgTask = _converter.RenderLatexToSvg(latex, headers);
+                (_currentBuild.CancellationSource, _currentBuild.LatexToSvgTask) =
+                    _converter.RenderLatexToSvg(latex, headers);
                 _currentBuild.Svg = await _currentBuild.LatexToSvgTask;
 
 #if UNITY_EDITOR
@@ -97,6 +99,11 @@ namespace LatexRenderer
 
             return (!_currentBuild.LatexToSvgTask.IsCompleted,
                 _currentBuild.LatexToSvgTask.Exception);
+        }
+
+        public void CancelTask()
+        {
+            _currentBuild.CancellationSource.Cancel();
         }
 
         public DirectoryInfo GetRootBuildDirectory()
@@ -176,6 +183,7 @@ namespace LatexRenderer
         {
             public string Svg;
             public bool DidCreateSvgParts;
+            [NonSerialized] public CancellationTokenSource CancellationSource;
 
             [NonSerialized] public Task<string> LatexToSvgTask;
 

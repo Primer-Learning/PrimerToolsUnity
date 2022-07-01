@@ -31,6 +31,9 @@ namespace UnityEditor.LatexRenderer
                 Process.Start(
                     $"{LatexRenderer.GetRootBuildDirectory()}{Path.DirectorySeparatorChar}");
 
+            if (GUILayout.Button("Cancel Rendering Task"))
+                LatexRenderer.CancelTask();
+
             base.OnInspectorGUI();
 
             // if (GUILayout.Button("Release SVG Parts"))
