@@ -9,7 +9,7 @@ using UnityEngine;
 namespace UnityEditor.LatexRenderer
 {
     [CustomEditor(typeof(global::LatexRenderer.LatexRenderer))]
-    public class LatexRendererComponentEditor : Editor
+    public class LatexRendererEditor : Editor
     {
         private (CancellationTokenSource cancellationSource, Task task)? _currentTask;
         private (string latex, List<string> headers) _currentTaskValues;
