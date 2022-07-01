@@ -15,6 +15,7 @@ namespace LatexRenderer
 {
     [ExecuteInEditMode]
     [SelectionBase]
+    [AddComponentMenu("Primer Learning/Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
         private const float SvgPixelsPerUnit = 10f;
