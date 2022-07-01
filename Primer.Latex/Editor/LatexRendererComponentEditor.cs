@@ -153,6 +153,7 @@ namespace UnityEditor.LatexRenderer
                 }
 
                 Undo.DestroyObjectImmediate(LatexRenderer);
+                return;
             }
 
             var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
