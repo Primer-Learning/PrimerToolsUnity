@@ -19,7 +19,7 @@ namespace LatexRenderer
     {
         private const float SvgPixelsPerUnit = 10f;
 
-        [SerializeField] [TextArea] private string _latex;
+        [SerializeField] [TextArea] private string _latex = "";
 
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
         [SerializeField]
@@ -65,9 +65,8 @@ namespace LatexRenderer
             List<string> headers)? _svgToBuildSpritesFor;
 
         public string Latex => _latex;
+        public IReadOnlyList<string> Headers => _headers;
 
-        private IEnumerable<(Sprite, Vector3)> Sprites =>
-            _sprites.Zip(_spritesPositions, (sprite, position) => (sprite, position));
 
 #if UNITY_EDITOR
         private void Reset()
@@ -83,10 +82,14 @@ namespace LatexRenderer
                 {
                     var sprites = BuildSprites(_svgToBuildSpritesFor.Value.svg);
 
+#if UNITY_EDITOR
+                    if (Application.isEditor && !Application.isPlaying)
+                        Undo.RecordObject(this, "Set LaTeX");
+#endif
+
                     _sprites = sprites.Select(i => i.Item2).ToArray();
                     _spritesPositions = sprites.Select(i => (Vector3)i.Item1).ToArray();
-                    // Sprites is _sprites and _spritesPositions zipped
-                    _renderer.SetSprites(Sprites, material, false);
+
                     _latex = _svgToBuildSpritesFor.Value.latex;
                     _headers = _svgToBuildSpritesFor.Value.headers;
 
@@ -101,12 +104,8 @@ namespace LatexRenderer
                     _svgToBuildSpritesFor = null;
                 }
 
+            _renderer.SetSprites(_sprites, _spritesPositions, material, false);
             _renderer.Draw(transform);
-        }
-
-        private void OnEnable()
-        {
-            _renderer.SetSprites(Sprites, material, false);
         }
 
         public (CancellationTokenSource, Task) SetLatex(string latex, List<string> headers)
@@ -119,14 +118,14 @@ namespace LatexRenderer
         {
             var svg = await renderTask;
 
+            var completionSource = new TaskCompletionSource<object>();
+            _svgToBuildSpritesFor = (completionSource, svg, latex, new List<string>(headers));
+
 #if UNITY_EDITOR
             // Update normally gets called only sporadically in the editor
             if (!Application.isPlaying)
                 EditorApplication.QueuePlayerLoopUpdate();
 #endif
-
-            var completionSource = new TaskCompletionSource<object>();
-            _svgToBuildSpritesFor = (completionSource, svg, latex, headers);
 
             await completionSource.Task;
         }

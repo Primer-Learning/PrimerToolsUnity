@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -8,6 +7,9 @@ namespace LatexRenderer
     internal class SpriteDirectRenderer
     {
         private DrawSpec[] _drawSpecs = { };
+
+        /// <summary>The last values given to SetSprites.</summary>
+        private (Sprite[] sprites, Vector3[] spritePositions) _lastSeenSprites;
 
         private static DrawSpec CreateDrawSpec(Sprite sprite, Vector3 position,
             Material baseMaterial, bool overrideTexture)
@@ -34,11 +36,17 @@ namespace LatexRenderer
             return new DrawSpec { Material = material, Mesh = mesh, Position = position };
         }
 
-        public void SetSprites(IEnumerable<(Sprite sprite, Vector3 position)> sprites,
-            Material baseMaterial, bool overrideTexture)
+        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material baseMaterial,
+            bool overrideTexture)
         {
-            _drawSpecs = sprites.Select(i =>
-                CreateDrawSpec(i.sprite, i.position, baseMaterial, overrideTexture)).ToArray();
+            if (sprites == _lastSeenSprites.sprites &&
+                spritePositions == _lastSeenSprites.spritePositions)
+                return;
+
+            _drawSpecs = sprites.Zip(spritePositions,
+                (sprite, position) =>
+                    CreateDrawSpec(sprite, position, baseMaterial, overrideTexture)).ToArray();
+            _lastSeenSprites = (sprites, spritePositions);
         }
 
         public void Draw(Transform parent)

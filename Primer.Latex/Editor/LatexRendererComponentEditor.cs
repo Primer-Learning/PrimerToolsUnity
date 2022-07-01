@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -11,9 +12,28 @@ namespace UnityEditor.LatexRenderer
     public class LatexRendererComponentEditor : Editor
     {
         private (CancellationTokenSource cancellationSource, Task task)? _currentTask;
+        private (string latex, List<string> headers) _currentTaskValues;
+
+        /// <summary>
+        ///     The last values for latex and headers MaybeUpdateStagingObject has seen on the
+        ///     serializedObject.
+        /// </summary>
+        private (string latex, List<string> headers) _lastSeenValues;
+
+        /// <summary>
+        ///     Used instead of the actual serialized object for new latex and headers values. So we can
+        ///     make sure they're only actually changed when a build finishes.
+        /// </summary>
+        private SerializedObject _stagingObject;
 
         private global::LatexRenderer.LatexRenderer LatexRenderer =>
             (global::LatexRenderer.LatexRenderer)target;
+
+        private void OnEnable()
+        {
+            _stagingObject = new SerializedObject(target);
+            _lastSeenValues = GetCurrentValues();
+        }
 
         private (string message, MessageType messageType) GetTaskStatusText()
         {
@@ -45,9 +65,39 @@ namespace UnityEditor.LatexRenderer
             return result;
         }
 
+        /// <summary>Gets the latex and headers properties of serializedObject.</summary>
+        /// <remarks>See _lastSeenValues.</remarks>
+        private (string latex, List<string> headers) GetCurrentValues()
+        {
+            return (serializedObject.FindProperty("_latex").stringValue,
+                GetStringArrayValue(serializedObject.FindProperty("_headers")));
+        }
+
+        /// <summary>Updates _stagingObject if it was changed outside of this class (ex: by an undo operation).</summary>
+        private void MaybeUpdateStagingObject()
+        {
+            var currentValues = GetCurrentValues();
+
+            var latexChanged = _currentTaskValues.latex != currentValues.latex &&
+                               _lastSeenValues.latex != currentValues.latex;
+            var headersChanged =
+                (_currentTaskValues.headers is null ||
+                 !currentValues.headers.SequenceEqual(_currentTaskValues.headers)) &&
+                !_lastSeenValues.headers.SequenceEqual(currentValues.headers);
+
+            if (latexChanged || headersChanged)
+            {
+                _stagingObject.Update();
+                _stagingObject.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            _lastSeenValues = currentValues;
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
+            MaybeUpdateStagingObject();
 
             var (message, messageType) = GetTaskStatusText();
             EditorGUILayout.HelpBox(message, messageType);
@@ -59,20 +109,29 @@ namespace UnityEditor.LatexRenderer
             if (GUILayout.Button("Cancel Rendering Task"))
                 _currentTask?.cancellationSource.Cancel();
 
-            var latexProperty = serializedObject.FindProperty("_latex");
+            var latexProperty = _stagingObject.FindProperty("_latex");
             EditorGUILayout.PropertyField(latexProperty);
 
-            var headersProperty = serializedObject.FindProperty("_headers");
+            var headersProperty = _stagingObject.FindProperty("_headers");
             EditorGUILayout.PropertyField(headersProperty);
 
             var isTaskRunning = _currentTask.HasValue && !_currentTask.Value.task.IsCompleted;
-            if (latexProperty.stringValue != LatexRenderer.Latex && !isTaskRunning)
-                _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue,
-                    GetStringArrayValue(headersProperty));
+            if (!isTaskRunning)
+            {
+                var stagedHeaders = GetStringArrayValue(headersProperty);
+                if (latexProperty.stringValue != LatexRenderer.Latex ||
+                    !stagedHeaders.SequenceEqual(LatexRenderer.Headers))
+                {
+                    _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue, stagedHeaders);
+                    _currentTaskValues = (latexProperty.stringValue, stagedHeaders);
+                }
+            }
 
             DrawPropertiesExcluding(serializedObject, "_latex", "_headers");
 
             serializedObject.ApplyModifiedProperties();
+
+            _lastSeenValues = GetCurrentValues();
 
 
             // if (GUILayout.Button("Release SVG Parts"))
