@@ -49,8 +49,8 @@ namespace LatexRenderer
 
         public Material material;
 
-        [SerializeField] [HideInInspector] private Vector3[] _spritesPositions;
-        [SerializeField] [HideInInspector] private Sprite[] _sprites;
+        [SerializeField] [HideInInspector] internal Vector3[] _spritesPositions;
+        [SerializeField] [HideInInspector] internal Sprite[] _sprites;
 
         private readonly LatexToSvgConverter _converter = LatexToSvgConverter.Create();
 
@@ -183,27 +183,6 @@ namespace LatexRenderer
 
             return sprites;
         }
-
-        // private void CreateSvgParts(List<(Vector2, Sprite)> sprites)
-        // {
-        //     var partNumber = 0;
-        //     foreach (var (offset, sprite) in sprites)
-        //     {
-        //         var obj = new GameObject($"SvgPart {partNumber++}");
-        //
-        //         var renderer = obj.AddComponent<SpriteRenderer>();
-        //         renderer.sprite = sprite;
-        //         if (Material)
-        //             renderer.material = Material;
-        //
-        //         obj.transform.parent = gameObject.transform;
-        //         obj.transform.localPosition = offset;
-        //
-        //         obj.hideFlags = SvgPartsHideFlags;
-        //
-        //         _svgParts.Add(obj);
-        //     }
-        // }
 
 #if UNITY_EDITOR
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
