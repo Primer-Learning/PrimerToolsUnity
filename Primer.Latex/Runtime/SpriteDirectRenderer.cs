@@ -9,18 +9,10 @@ namespace LatexRenderer
         private DrawSpec[] _drawSpecs = { };
 
         /// <summary>The last values given to SetSprites.</summary>
-        private (Sprite[] sprites, Vector3[] spritePositions, Material baseMaterial, bool
-            overrideTexture) _lastSeenSprites;
+        private (Sprite[] sprites, Vector3[] spritePositions, Material material) _lastSeenSprites;
 
-        private static DrawSpec CreateDrawSpec(Sprite sprite, Vector3 position,
-            Material baseMaterial, bool overrideTexture)
+        private static DrawSpec CreateDrawSpec(Sprite sprite, Vector3 position, Material material)
         {
-            Material material;
-            if (overrideTexture)
-                material = new Material(baseMaterial) { mainTexture = sprite.texture };
-            else
-                material = baseMaterial;
-
             var mesh = new Mesh
             {
                 vertices = Array.ConvertAll(sprite.vertices, i => (Vector3)i),
@@ -37,15 +29,13 @@ namespace LatexRenderer
             return new DrawSpec { Material = material, Mesh = mesh, Position = position };
         }
 
-        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material baseMaterial,
-            bool overrideTexture)
+        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material material)
         {
-            var args = (sprites, spritePositions, baseMaterial, overrideTexture);
+            var args = (sprites, spritePositions, material);
             if (args == _lastSeenSprites) return;
 
             _drawSpecs = sprites.Zip(spritePositions,
-                (sprite, position) =>
-                    CreateDrawSpec(sprite, position, baseMaterial, overrideTexture)).ToArray();
+                (sprite, position) => CreateDrawSpec(sprite, position, material)).ToArray();
             _lastSeenSprites = args;
         }
 

@@ -104,7 +104,7 @@ namespace LatexRenderer
                     _svgToBuildSpritesFor = null;
                 }
 
-            _renderer.SetSprites(_sprites, _spritesPositions, material, false);
+            _renderer.SetSprites(_sprites, _spritesPositions, material);
             _renderer.Draw(transform);
         }
 
