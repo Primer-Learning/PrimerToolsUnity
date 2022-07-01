@@ -145,7 +145,7 @@ namespace UnityEditor.LatexRenderer
                     renderer.sprite = sprite;
                     renderer.material = LatexRenderer.material;
 
-                    obj.transform.parent = LatexRenderer.transform;
+                    obj.transform.SetParent(LatexRenderer.transform, false);
                     obj.transform.localPosition = position;
 
                     Undo.RegisterCreatedObjectUndo(obj, "");
