@@ -1,14 +1,14 @@
 using System.Diagnostics;
 using System.IO;
-using LatexRenderer;
 using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
 {
-    [CustomEditor(typeof(LatexRendererComponent))]
+    [CustomEditor(typeof(global::LatexRenderer.LatexRenderer))]
     public class LatexRendererComponentEditor : Editor
     {
-        private LatexRendererComponent LatexRenderer => (LatexRendererComponent)target;
+        private global::LatexRenderer.LatexRenderer LatexRenderer =>
+            (global::LatexRenderer.LatexRenderer)target;
 
         private (string message, MessageType messageType) GetTaskStatusText()
         {

@@ -14,7 +14,7 @@ namespace LatexRenderer
 {
     [ExecuteInEditMode]
     [SelectionBase]
-    public class LatexRendererComponent : MonoBehaviour
+    public class LatexRenderer : MonoBehaviour
     {
         private const float SvgPixelsPerUnit = 10f;
 
@@ -191,7 +191,7 @@ namespace LatexRenderer
                 public readonly List<string> Headers;
                 public readonly string Latex;
 
-                public Key(LatexRendererComponent source)
+                public Key(LatexRenderer source)
                 {
                     Latex = source.latex;
                     Headers = new List<string>(source.headers);
