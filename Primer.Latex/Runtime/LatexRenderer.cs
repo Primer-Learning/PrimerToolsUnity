@@ -170,13 +170,11 @@ namespace LatexRenderer
                 var offset = VectorUtils.Bounds(from vertex in geometry.Vertices
                     select geometry.WorldTransform * vertex / SvgPixelsPerUnit).min;
 
-                // TODO: I'm not entirely sure why this works... I would've expected this
-                // adjustment to get applied after I flip the Y axis.
                 offset -= scaledBounds.center;
 
                 // This matches the way flipYAxis would work in BuildSprite if we gave it all of the geometry in the SVG
                 // rather than just one at a time.
-                offset.y = scaledBounds.height - offset.y;
+                offset.y = -offset.y;
 
                 sprites.Add((offset,
                     VectorUtils.BuildSprite(new List<VectorUtils.Geometry> { geometry },
