@@ -43,7 +43,7 @@ namespace LatexRenderer
         {
             foreach (var drawSpec in _drawSpecs)
                 Graphics.DrawMesh(drawSpec.Mesh,
-                    Matrix4x4.Translate(drawSpec.Position) * parent.localToWorldMatrix,
+                    parent.localToWorldMatrix * Matrix4x4.Translate(drawSpec.Position),
                     drawSpec.Material, 0);
         }
 
