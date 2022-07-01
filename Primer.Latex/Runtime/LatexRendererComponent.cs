@@ -91,6 +91,14 @@ namespace LatexRenderer
             _renderer.Draw(transform);
         }
 
+        public (bool isRunning, AggregateException exception) GetTaskStatus()
+        {
+            if (_currentBuild?.LatexToSvgTask is null) return (false, null);
+
+            return (!_currentBuild.LatexToSvgTask.IsCompleted,
+                _currentBuild.LatexToSvgTask.Exception);
+        }
+
         private static List<(Vector2, Sprite)> BuildSprites(string svgText)
         {
             SVGParser.SceneInfo sceneInfo;

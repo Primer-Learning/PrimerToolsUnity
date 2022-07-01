@@ -103,7 +103,7 @@ namespace LatexRenderer
             lock (_currentTaskLock)
             {
                 if (_currentTask is not null && !_currentTask.IsCompleted)
-                    throw new Exception("A rendering job is already running.");
+                    throw new Exception("A LaTeX rendering task is already running.");
 
                 _currentTask = Task.Run(() => RenderLatexToSvgSync(latex, headers));
                 return _currentTask;

@@ -5,8 +5,25 @@ namespace UnityEditor.LatexRenderer
     [CustomEditor(typeof(LatexRendererComponent))]
     public class LatexRendererComponentEditor : Editor
     {
+        private LatexRendererComponent LatexRenderer => (LatexRendererComponent)target;
+
+        private (string message, MessageType messageType) GetTaskStatusText()
+        {
+            var (isRunning, exception) = LatexRenderer.GetTaskStatus();
+            if (isRunning)
+                return ("Rendering LaTeX...", MessageType.Info);
+            if (exception is not null)
+                return (exception.Message, MessageType.Error);
+
+            return ("OK", MessageType.Info);
+        }
+
+
         public override void OnInspectorGUI()
         {
+            var (message, messageType) = GetTaskStatusText();
+            EditorGUILayout.HelpBox(message, messageType);
+
             base.OnInspectorGUI();
 
             // if (GUILayout.Button("Release SVG Parts"))
