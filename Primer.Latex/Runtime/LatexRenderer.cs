@@ -104,8 +104,11 @@ namespace LatexRenderer
                     _svgToBuildSpritesFor = null;
                 }
 
-            _renderer.SetSprites(_sprites, _spritesPositions, material);
-            _renderer.Draw(transform);
+            if (_sprites is not null && _spritesPositions is not null)
+            {
+                _renderer.SetSprites(_sprites, _spritesPositions, material);
+                _renderer.Draw(transform);
+            }
         }
 
         public (CancellationTokenSource, Task) SetLatex(string latex, List<string> headers)
