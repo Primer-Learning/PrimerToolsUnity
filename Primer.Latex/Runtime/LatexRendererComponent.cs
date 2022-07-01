@@ -56,8 +56,6 @@ namespace LatexRenderer
         private readonly SpriteDirectRenderer _renderer = new();
 
 #if UNITY_EDITOR
-
-
         private void Reset()
         {
             material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
@@ -211,10 +209,11 @@ namespace LatexRenderer
         }
 
 #if UNITY_EDITOR
+        // This needs to be private (or internal) because SpriteDirectRenderer is internal
         [Tooltip(
             "Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         [SerializeField]
-        internal SpriteDirectRenderer.GizmoMode gizmos = SpriteDirectRenderer.GizmoMode.Nothing;
+        private SpriteDirectRenderer.GizmoMode gizmos = SpriteDirectRenderer.GizmoMode.Nothing;
 
         private void OnDrawGizmos()
         {

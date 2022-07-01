@@ -12,7 +12,11 @@ namespace LatexRenderer
     public class LatexToSvgConverter : IDisposable
     {
         private const int Timeout = 30 * 1000;
+
+        /// <summary>Will be used instead of searching the PATH env variable.</summary>
         public static string LatexExecutablePath;
+
+        /// <summary>Will be used instead of searching the PATH env variable.</summary>
         public static string DvisvgmExecutablePath;
 
         private readonly DirectoryInfo _temporaryDirectoryRoot;
@@ -84,6 +88,7 @@ namespace LatexRenderer
             return found;
         }
 
+        /// <summary>Creates a new converter with its own (also new) temporary directory.</summary>
         public static LatexToSvgConverter Create()
         {
             return new LatexToSvgConverter(Directory.CreateDirectory(
