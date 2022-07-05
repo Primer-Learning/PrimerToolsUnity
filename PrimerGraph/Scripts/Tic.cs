@@ -15,6 +15,18 @@ public class Tic : PrimerObject
 
     public TextMeshPro label;
 
+    void Start() {
+        if (!graph.showTicMarksX && axis == "x") {
+            cylinder.gameObject.SetActive(false);
+        }
+        if (!graph.showTicMarksY && axis == "y") {
+            cylinder.gameObject.SetActive(false);
+        }
+        if (!graph.showTicMarksZ && axis == "z") {
+            cylinder.gameObject.SetActive(false);
+        }
+    }
+
     public void SetPosition() 
     {
         if (this.graph == null) { Debug.LogError("Tic has no graph assigned"); }

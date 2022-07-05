@@ -324,7 +324,7 @@ public class Axes : PrimerObject
                 if (exists == false)
                 {
                     Tic newTic = Instantiate(ticPrefab, xAxisMasterContainer.transform);
-                    Destroy(newTic.transform.Find("cylinder").gameObject);
+                    // Destroy(newTic.transform.Find("cylinder").gameObject);
                     newTic.graph = this.graph;
                     newTic.axis = "x";
                     newTic.value = entry.Key;

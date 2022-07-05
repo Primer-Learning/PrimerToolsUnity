@@ -30,6 +30,7 @@ public class Graph : PrimerObject
     public float xAxisOffset;
     public float xDrawnMin;
     public float xAxisThickness;
+    public bool showTicMarksX = true;
 
     [Header("Y")] 
     public float yMin;
@@ -43,6 +44,7 @@ public class Graph : PrimerObject
     public float yLengthMinusPadding;
     public float yAxisOffset;
     public float yAxisThickness;
+    public bool showTicMarksY = true;
 
     [Header("Z")] 
     public float zMin;
@@ -57,6 +59,7 @@ public class Graph : PrimerObject
     public float zAxisOffset;
     public float zDrawnMin;
     public float zAxisThickness;
+    public bool showTicMarksZ = true;
 
     public bool manualTicMode;
 
@@ -112,6 +115,7 @@ public class Graph : PrimerObject
         float xTicStep = 2f,
         bool xHidden = false,
         float xAxisThickness = 1,
+        bool showTicMarksX = true,
 
         float yMin = 0f,
         float yMax = 10f,
@@ -121,6 +125,7 @@ public class Graph : PrimerObject
         float yTicStep = 2f,
         bool yHidden = false,
         float yAxisThickness = 1,
+        bool showTicMarksY = true,
         
         float zMin = 0f,
         float zMax = 10f,
@@ -130,6 +135,7 @@ public class Graph : PrimerObject
         float zTicStep = 2f,
         bool zHidden = false,
         float zAxisThickness = 1,
+        bool showTicMarksZ = true,
         
         int ticPrecision = 0, //Not implemented
         float ticLabelDistanceVertical = 0.25f, //For horizontally aligned axes
