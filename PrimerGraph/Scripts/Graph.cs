@@ -388,7 +388,9 @@ public class Graph : PrimerObject
             var s = stackedAreas[id];
             s.ScaleMesh();
         }
-        barData.AdjustBarSpaceScale();
+        if (barData != null) {
+            barData.AdjustBarSpaceScale();
+        }
     }
 
     public void ChangeRangeX(float newMin, float newMax, float? newXLength = null, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
