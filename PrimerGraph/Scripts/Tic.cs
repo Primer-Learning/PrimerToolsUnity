@@ -11,9 +11,9 @@ public class Tic : PrimerObject
     public Graph graph;
     [SerializeField] Transform cylinder = null;
 
-    public TextMeshPro primerTextPrefab;
+    public PrimerText primerTextPrefab;
 
-    public TextMeshPro label;
+    public PrimerText label;
 
     void Start() {
         if (!graph.showTicMarksX && axis == "x") {
@@ -54,13 +54,13 @@ public class Tic : PrimerObject
     public void MakeLabel()
     {
         label = Instantiate(primerTextPrefab, this.transform);
-        label.text = this.value.ToString();
+        label.tmpro.text = this.value.ToString();
         AlignLabel();
     }
     public void MakeLabel(string labelText)
     {
         label = Instantiate(primerTextPrefab, this.transform);
-        label.text = labelText;
+        label.tmpro.text = labelText;
         AlignLabel();
     }
     private void AlignLabel() {
@@ -72,7 +72,7 @@ public class Tic : PrimerObject
                 break;
             case "y":
                 pos = new Vector3 (-graph.ticLabelDistanceHorizontal, 0f, 0f);
-                label.alignment = TextAlignmentOptions.MidlineRight;
+                label.tmpro.alignment = TextAlignmentOptions.MidlineRight;
                 break;
             case "z":
                 pos = new Vector3 (0f, -graph.ticLabelDistanceVertical, 0f);
