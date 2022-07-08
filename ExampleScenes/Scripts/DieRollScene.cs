@@ -144,7 +144,7 @@ public class DieRollScene : Director
             yTicStep: 2f,
             zHidden: true,
             xMax: 7,
-            manualTicMode: true,
+            manualTicModeX: true,
             manualTicsX: xTics,
             yMax: 10,
             xAxisLength: 3f,

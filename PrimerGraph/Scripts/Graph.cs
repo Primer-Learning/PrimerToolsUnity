@@ -61,7 +61,8 @@ public class Graph : PrimerObject
     public float zAxisThickness;
     public bool showTicMarksZ = true;
 
-    public bool manualTicMode;
+    public bool manualTicModeX;
+    public bool manualTicModeY;
 
     public Dictionary<float, string> manualTicsX;
     public Dictionary<float, string> manualTicsY;
@@ -116,6 +117,9 @@ public class Graph : PrimerObject
         bool xHidden = false,
         float xAxisThickness = 1,
         bool showTicMarksX = true,
+        bool manualTicModeX = false,
+
+        Dictionary<float, string> manualTicsX = null,
 
         float yMin = 0f,
         float yMax = 10f,
@@ -126,6 +130,8 @@ public class Graph : PrimerObject
         bool yHidden = false,
         float yAxisThickness = 1,
         bool showTicMarksY = true,
+        bool manualTicModeY = false,
+        Dictionary<float, string> manualTicsY = null,
         
         float zMin = 0f,
         float zMax = 10f,
@@ -145,8 +151,6 @@ public class Graph : PrimerObject
         float scale = -1, //Scale is float because it will be uniform in all directions to avoid warping. Axis length and tic units are determined elswhere.
         float thickness = 1,
         
-        bool manualTicMode = false,
-        Dictionary<float, string> manualTicsX = null,
 
         float paddingFraction = 0.05f, //How much of the total length is allocated to extending axes/arrows beyond the data range
         string arrows = "both",
@@ -205,8 +209,10 @@ public class Graph : PrimerObject
         this.ticLabelSize = ticLabelSize;
         this.arrows = arrows;
 
-        this.manualTicMode = manualTicMode;
+        this.manualTicModeX = manualTicModeX;
+        this.manualTicModeY = manualTicModeY;
         this.manualTicsX = manualTicsX;
+        this.manualTicsY = manualTicsY;
 
         this.rightHanded = rightHanded;
 

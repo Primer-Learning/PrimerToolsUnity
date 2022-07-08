@@ -246,7 +246,7 @@ public class Axes : PrimerObject
     public void HandleTicsX()
     {
         if (graph.xTicStep <= 0) {return;}
-        if (!graph.manualTicMode) {
+        if (!graph.manualTicModeX) {
             List<Tic> toRemove = new List<Tic>(xTics);
             //Make missing tics
             //Above zero
@@ -348,7 +348,7 @@ public class Axes : PrimerObject
     public void HandleTicsY()
     {
         if (graph.yTicStep <= 0) {return;}
-        // if (!graph.manualTicMode) {
+        if (!graph.manualTicModeY) {
             List<Tic> toRemove = new List<Tic>(yTics);
             //Make missing tics
             //Above zero
@@ -411,27 +411,27 @@ public class Axes : PrimerObject
                     tic.ScaleDownToZero();
                 }
             }
-        // }
-        // else { //Manual tic mode
-        //     foreach (KeyValuePair<float, string> entry in graph.manualTicsY) {
-        //         bool exists = false;
-        //         foreach (Tic tic in xTics)
-        //         {
-        //             if (tic.value == entry.Key) { exists = true; }
-        //         }
-        //         if (exists == false)
-        //         {
-        //             Tic newTic = Instantiate(ticPrefab, xAxisMasterContainer.transform);
-        //             newTic.graph = this.graph;
-        //             newTic.axis = "y";
-        //             newTic.value = entry.Key;
-        //             newTic.SetPosition();
-        //             yTics.Add(newTic);
-        //             newTic.MakeLabel(entry.Value);
-        //             newTic.ScaleUpFromZero();
-        //         }
-        //     }
-        // }
+        }
+        else { //Manual tic mode
+            foreach (KeyValuePair<float, string> entry in graph.manualTicsY) {
+                bool exists = false;
+                foreach (Tic tic in yTics)
+                {
+                    if (tic.value == entry.Key) { exists = true; }
+                }
+                if (exists == false)
+                {
+                    Tic newTic = Instantiate(ticPrefab, yAxisMasterContainer.transform);
+                    newTic.graph = this.graph;
+                    newTic.axis = "y";
+                    newTic.value = entry.Key;
+                    newTic.SetPosition();
+                    yTics.Add(newTic);
+                    newTic.MakeLabel(entry.Value);
+                    newTic.ScaleUpFromZero();
+                }
+            }
+        }
     }
 
     private void HandleTicsZ()
