@@ -14,7 +14,6 @@ using UnityEngine;
 namespace LatexRenderer
 {
     [ExecuteInEditMode]
-    [SelectionBase]
     [AddComponentMenu("Primer Learning/Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
