@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LatexRenderer;
 using UnityEngine;
 
 namespace UnityEditor.LatexRenderer
@@ -11,6 +12,10 @@ namespace UnityEditor.LatexRenderer
     [CustomEditor(typeof(global::LatexRenderer.LatexRenderer))]
     public class LatexRendererEditor : Editor
     {
+        private static readonly
+            Dictionary<global::LatexRenderer.LatexRenderer, (string latex, List<string> headers )>
+            _pendingSetLatex = new();
+
         private (CancellationTokenSource cancellationSource, Task task)? _currentTask;
         private (string latex, List<string> headers) _currentTaskValues;
 
@@ -33,6 +38,17 @@ namespace UnityEditor.LatexRenderer
         {
             _stagingObject = new SerializedObject(target);
             _lastSeenValues = GetCurrentValues();
+        }
+
+        /// <summary>
+        ///     Pends an attempt to set the latex and headers for a given LatexRenderer. Whenever an
+        ///     editor for that LatexRenderer is rendered it will attempt to build the latex and headers given,
+        ///     as if the user had entered the values themselves.
+        /// </summary>
+        internal static void PendSetLatex(global::LatexRenderer.LatexRenderer latexRenderer,
+            string latex, List<string> headers)
+        {
+            _pendingSetLatex.Add(latexRenderer, (latex, headers));
         }
 
         private (string message, MessageType messageType) GetTaskStatusText()
@@ -66,6 +82,16 @@ namespace UnityEditor.LatexRenderer
                 result.Add(array.GetArrayElementAtIndex(i).stringValue);
 
             return result;
+        }
+
+        private static void SetStringArrayValue(SerializedProperty array, List<string> value)
+        {
+            array.ClearArray();
+            for (var i = 0; i < value.Count; ++i)
+            {
+                array.InsertArrayElementAtIndex(i);
+                array.GetArrayElementAtIndex(i).stringValue = value[i];
+            }
         }
 
         /// <summary>Gets the latex and headers properties of serializedObject.</summary>
@@ -113,10 +139,17 @@ namespace UnityEditor.LatexRenderer
                 _currentTask?.cancellationSource.Cancel();
 
             var latexProperty = _stagingObject.FindProperty("_latex");
+            var headersProperty = _stagingObject.FindProperty("_headers");
+            if (_pendingSetLatex.TryGetValue(LatexRenderer, out var pending))
+            {
+                latexProperty.stringValue = pending.latex;
+                SetStringArrayValue(headersProperty, pending.headers);
+                _pendingSetLatex.Remove(LatexRenderer);
+            }
+
             EditorGUILayout.PropertyField(latexProperty,
                 GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 6));
 
-            var headersProperty = _stagingObject.FindProperty("_headers");
             EditorGUILayout.PropertyField(headersProperty);
 
             EditorGUILayout.Space(10);
@@ -147,6 +180,11 @@ namespace UnityEditor.LatexRenderer
 
                     Undo.RegisterCreatedObjectUndo(obj, "");
                 }
+
+                var releasedRenderer = LatexRenderer.gameObject
+                    .AddComponent<ReleasedLatexRendererContainer.ReleasedLatexRenderer>();
+                releasedRenderer.SetLatex(LatexRenderer.Latex, LatexRenderer.Headers.ToList());
+                Undo.RegisterCreatedObjectUndo(releasedRenderer, "");
 
                 Undo.DestroyObjectImmediate(LatexRenderer);
                 return;
