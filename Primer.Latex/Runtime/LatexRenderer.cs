@@ -172,7 +172,7 @@ namespace LatexRenderer
             foreach (var geometry in allGeometry)
             {
                 var offset = VectorUtils.Bounds(from vertex in geometry.Vertices
-                    select geometry.WorldTransform * vertex / SvgPixelsPerUnit).min;
+                    select geometry.WorldTransform * vertex / SvgPixelsPerUnit).center;
 
                 offset -= scaledBounds.center;
 
@@ -182,7 +182,7 @@ namespace LatexRenderer
 
                 sprites.Add((offset,
                     VectorUtils.BuildSprite(new List<VectorUtils.Geometry> { geometry },
-                        SvgPixelsPerUnit, VectorUtils.Alignment.TopLeft, Vector2.zero, 128, true)));
+                        SvgPixelsPerUnit, VectorUtils.Alignment.Center, Vector2.zero, 128, true)));
             }
 
             return sprites;
