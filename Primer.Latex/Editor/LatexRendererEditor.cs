@@ -183,7 +183,8 @@ namespace UnityEditor.LatexRenderer
 
                 var releasedRenderer = LatexRenderer.gameObject
                     .AddComponent<ReleasedLatexRendererContainer.ReleasedLatexRenderer>();
-                releasedRenderer.SetLatex(LatexRenderer.Latex, LatexRenderer.Headers.ToList());
+                releasedRenderer.SetLatex(LatexRenderer.Latex, LatexRenderer.Headers.ToList(),
+                    LatexRenderer.material);
                 Undo.RegisterCreatedObjectUndo(releasedRenderer, "");
 
                 Undo.DestroyObjectImmediate(LatexRenderer);

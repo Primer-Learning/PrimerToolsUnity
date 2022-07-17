@@ -9,18 +9,23 @@ namespace LatexRenderer
     {
         public class ReleasedLatexRenderer : MonoBehaviour
         {
-            [SerializeField] [HideInInspector] private List<string> _headers = new();
+            [SerializeField] [HideInInspector] private List<string> _headers;
 
-            [SerializeField] [HideInInspector] private string _latex = "";
+            [SerializeField] [HideInInspector] private string _latex;
+
+            [SerializeField] [HideInInspector] private Material _material;
+
+            public Material Material => _material;
 
             public IReadOnlyList<string> Headers => _headers;
 
             public string Latex => _latex;
 
-            internal void SetLatex(string latex, List<string> headers)
+            internal void SetLatex(string latex, List<string> headers, Material material)
             {
                 _latex = latex;
                 _headers = headers;
+                _material = material;
             }
         }
     }
