@@ -67,14 +67,6 @@ namespace LatexRenderer
         public string Latex => _latex;
         public IReadOnlyList<string> Headers => _headers;
 
-
-#if UNITY_EDITOR
-        private void Reset()
-        {
-            material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
-        }
-#endif
-
         public void Update()
         {
             if (_svgToBuildSpritesFor.HasValue)
@@ -187,7 +179,13 @@ namespace LatexRenderer
             return sprites;
         }
 
+
 #if UNITY_EDITOR
+        private void Reset()
+        {
+            material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+        }
+
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
         [Tooltip(
             "Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
