@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
 using UnityEditor;
+using UnityEditor.Presets;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Primer.LatexRenderer.Editor")]
@@ -64,8 +65,27 @@ namespace LatexRenderer
         private (TaskCompletionSource<object> buildSpritesResult, string svg, string latex,
             List<string> headers)? _svgToBuildSpritesFor;
 
-        public string Latex => _latex;
-        public IReadOnlyList<string> Headers => _headers;
+        public string Latex
+        {
+            get
+            {
+                if (AreSpritesValid())
+                    return _latex;
+
+                return null;
+            }
+        }
+
+        public IReadOnlyList<string> Headers
+        {
+            get
+            {
+                if (AreSpritesValid())
+                    return _headers;
+
+                return null;
+            }
+        }
 
         public void Update()
         {
@@ -96,11 +116,45 @@ namespace LatexRenderer
                     _svgToBuildSpritesFor = null;
                 }
 
-            if (_sprites is not null && _spritesPositions is not null)
+            if (AreSpritesValid() && _spritesPositions is not null)
             {
                 _renderer.SetSprites(_sprites, _spritesPositions, material);
                 _renderer.Draw(transform);
             }
+        }
+
+        /// <summary>
+        ///     This is expected to happen when a LatexRenderer is (a) initialized from defaults, (b) set
+        ///     via a preset in the editor, (c) and occasionally when undoing/redoing.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         The sprite assets are added as subassets of the scene the LatexRenderer is in, and can be
+        ///         garbage collected any time if there's no LatexRenderer referencing them. This means when
+        ///         redoing/undoing you can arrive in a state where the LatexRenderer is pointing at sprites
+        ///         that have been cleaned up. Fortunately Unity notices when deserializing and the sprites
+        ///         appear as null values in our list.
+        ///     </para>
+        ///     <para>
+        ///         Presets that refer to a Sprite also don't prevent the sprite from being garbage collected
+        ///         (and the preset could be applied to a LatexRenderer in a different scene anyways). So
+        ///         presets often cause this same issue. Finally, when editing a preset directly, we actually
+        ///         set its stored _sprites value to null directly since we need to make sure we never have a
+        ///         mismatch between Latex & Headers text and the stored sprites.
+        ///     </para>
+        ///     <para>
+        ///         I suspect there's a way to handle these situations using hooks into various parts of the
+        ///         editor. But a decently thorough dive into the options had me arrive at the conclusion that
+        ///         the approach here (just recognizing the mismatch and having the inspector rebuild) is the
+        ///         simplest approach. Hopefully as my domain knowledge of the editor improves I'll think of an
+        ///         even cleaner way though.
+        ///     </para>
+        /// </remarks>
+        internal bool AreSpritesValid()
+        {
+            // If the Sprite has been garbage collected, it will not be exactly null but will instead
+            // be a special "null unity object". `value == null` or `!value` need to be used to check it.
+            return _sprites is not null && _sprites.All(i => (bool)i);
         }
 
         public (CancellationTokenSource, Task) SetLatex(string latex, List<string> headers)
@@ -183,7 +237,12 @@ namespace LatexRenderer
 #if UNITY_EDITOR
         private void Reset()
         {
-            material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+            // A default preset will automatically get applied when we're reset. If we unconditionally
+            // set material here, we'll blow away the value it set.
+            var presets = Preset.GetDefaultPresetsForObject(this);
+            if (presets.Length == 0 ||
+                presets.All(preset => preset.excludedProperties.Contains("material")))
+                material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
         }
 
         // This needs to be private (or internal) because SpriteDirectRenderer is internal

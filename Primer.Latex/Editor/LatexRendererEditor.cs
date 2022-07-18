@@ -123,8 +123,32 @@ namespace UnityEditor.LatexRenderer
             _lastSeenValues = currentValues;
         }
 
+        /// <summary>Will be true if we are editing a preset.</summary>
+        /// <remarks>
+        ///     This condition was found through exploration... There is no documented way to determine
+        ///     whether we're currently editing a preset. There's likely to be other cases where this is true
+        ///     that we'll want to figure out how to exclude. But we'll handle those as needed.
+        /// </remarks>
+        private bool IsTargetAPreset()
+        {
+            return LatexRenderer.gameObject.scene.handle == 0;
+        }
+
         public override void OnInspectorGUI()
         {
+            if (IsTargetAPreset())
+            {
+                LatexRenderer._sprites = new Sprite[] { null };
+                LatexRenderer._spritesPositions = null;
+                serializedObject.Update();
+
+                base.OnInspectorGUI();
+                EditorGUILayout.HelpBox(
+                    "You are editing a preset and the LaTeX will not be built until you apply the preset to an actual LatexRenderer component.",
+                    MessageType.Warning);
+                return;
+            }
+
             serializedObject.Update();
             MaybeUpdateStagingObject();
 
@@ -196,13 +220,16 @@ namespace UnityEditor.LatexRenderer
             {
                 var stagedHeaders = GetStringArrayValue(headersProperty);
 
+                var needsRebuild = !LatexRenderer.AreSpritesValid();
+                var didTaskFail = _currentTask.HasValue && _currentTask.Value.task.IsFaulted;
                 var isStagingDifferent = latexProperty.stringValue != LatexRenderer.Latex ||
                                          !stagedHeaders.SequenceEqual(LatexRenderer.Headers);
                 var isDifferentThanLastTask =
                     latexProperty.stringValue != _currentTaskValues.latex ||
                     _currentTaskValues.headers is null ||
                     !stagedHeaders.SequenceEqual(_currentTaskValues.headers);
-                if (isStagingDifferent && isDifferentThanLastTask)
+                if ((needsRebuild && (isDifferentThanLastTask || !didTaskFail)) ||
+                    (isStagingDifferent && isDifferentThanLastTask))
                 {
                     _currentTask = LatexRenderer.SetLatex(latexProperty.stringValue, stagedHeaders);
                     _currentTaskValues = (latexProperty.stringValue, stagedHeaders);
