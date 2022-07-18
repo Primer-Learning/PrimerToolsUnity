@@ -25,8 +25,8 @@ public class PrimerObject : MonoBehaviour
                 foreach (Material mat in mr.materials) {
                     mat.SetColor("_EmissionColor", value);
                     mat.EnableKeyword("_EMISSION");
-                    mat.color = Color.black;
-                    mat.SetFloat("_Glossiness", 0);
+                    // mat.color = Color.black;
+                    // mat.SetFloat("_Glossiness", 0);
                 }
             }
         } 
@@ -612,8 +612,8 @@ public class PrimerObject : MonoBehaviour
     public virtual void SetEmissionColor(Color newColor, Renderer r) {
         r.material.SetColor("_EmissionColor", newColor);
         r.material.EnableKeyword("_EMISSION");
-        r.material.color = Color.black;
-        r.material.SetFloat("_Glossiness", 0);
+        // r.material.color = Color.black;
+        // r.material.SetFloat("_Glossiness", 0);
     }
     public virtual void AnimateEmissionColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         AnimateValue<Color>("EmissionColor", newColor, duration: duration, ease: ease);

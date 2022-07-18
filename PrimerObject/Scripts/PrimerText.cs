@@ -9,11 +9,18 @@ public class PrimerText : PrimerObject
     public TextMeshPro tmpro;
     public bool flipped;
 
+    float animateableNumber = 0;
+    public float AnimateableNumber {
+        get{ return animateableNumber; }
+        set{
+            animateableNumber = value; 
+            tmpro.text = FormatFloat(value);
+        }
+    }
     public Color Color {
         get { return this.tmpro.color; }
         set { this.tmpro.color = value; }
     }
-    
     protected override void Awake() {
         base.Awake();
         //This script assumes it's on a prefab with a TextMeshPro component
@@ -27,6 +34,13 @@ public class PrimerText : PrimerObject
                 transform.parent.up
             ) * (flipped ? Quaternion.Euler(0, 180, 0) : Quaternion.identity);
         }
+    }
+    // Making this a method in case I want to add different modes
+    string FormatFloat(float numToFormat) {
+        return $"{(int)numToFormat}";
+    }
+    public void AddToNumber(float numAdded) {
+        AnimateableNumber += numAdded;
     }
     public override void ChangeColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         AnimateValue<Color>("Color", newColor, duration: duration, ease: ease);
