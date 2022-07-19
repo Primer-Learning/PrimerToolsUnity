@@ -9,10 +9,9 @@ namespace LatexRenderer.Timeline
     public class LatexTransitionBehaviour : PlayableBehaviour
     {
         private Target _afterTarget;
+        private float _morphDuration = 0.5f;
         private List<(MorphTarget beforeChild, MorphTarget afterChild)> _morphTargets = new();
-        private float _scaleDownDuration = 0.1f;
         private List<Target> _scaleDownTargets = new();
-        private float _scaleUpDuration = 0.1f;
         private List<Target> _scaleUpTargets = new();
 
         public Transform After;
@@ -21,35 +20,22 @@ namespace LatexRenderer.Timeline
         public Transform BeforeAnchor;
         public List<(Transform beforeChild, Transform afterChild)> MorphTransitions;
 
-        public float ScaleDownDuration
+        public float MorphDuration
         {
-            get => _scaleDownDuration;
+            get => _morphDuration;
             set
             {
                 if (value is < 0f or > 1f)
                     throw new ArgumentOutOfRangeException(nameof(value),
                         "Must be time ratio between 0 and 1 inclusive.");
 
-                _scaleDownDuration = value;
-            }
-        }
-
-        public float ScaleUpDuration
-        {
-            get => _scaleUpDuration;
-            set
-            {
-                if (value is < 0f or > 1f)
-                    throw new ArgumentOutOfRangeException(nameof(value),
-                        "Must be time ratio between 0 and 1 inclusive.");
-
-                _scaleUpDuration = value;
+                _morphDuration = value;
             }
         }
 
         private void UpdateScaleDowns(float timeRatio)
         {
-            var scaleDownTimeRatio = timeRatio / ScaleDownDuration;
+            var scaleDownTimeRatio = timeRatio / _morphDuration;
             foreach (var i in _scaleDownTargets)
             {
                 i.transform.localScale = Vector3.Lerp(i.originalScale, Vector3.zero,
@@ -60,7 +46,7 @@ namespace LatexRenderer.Timeline
 
         private void UpdateScaleUps(float timeRatio)
         {
-            var scaleUpTimeRatio = (timeRatio - (1 - ScaleUpDuration)) / ScaleUpDuration;
+            var scaleUpTimeRatio = (timeRatio - _morphDuration) / (1 - _morphDuration);
             foreach (var i in _scaleUpTargets)
             {
                 i.transform.localScale = Vector3.Lerp(Vector3.zero, i.originalScale,
@@ -71,8 +57,7 @@ namespace LatexRenderer.Timeline
 
         private void UpdateMorphs(float timeRatio)
         {
-            var morphTimeRatio = (timeRatio - ScaleDownDuration) /
-                                 (1 - ScaleDownDuration - ScaleUpDuration);
+            var morphTimeRatio = timeRatio / _morphDuration;
             foreach (var (beforeChild, afterChild) in _morphTargets)
             {
                 beforeChild.transform.position = Vector3.Lerp(beforeChild.originalWorldPosition,
