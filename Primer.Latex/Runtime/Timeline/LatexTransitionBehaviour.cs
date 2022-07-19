@@ -105,10 +105,8 @@ namespace LatexRenderer.Timeline
 
         private void AlignAnchors()
         {
-            var beforeBounds = SuperBounds.GetSuperBounds(BeforeAnchor
-                .GetComponentsInChildren<Renderer>().Select(i => i.bounds));
-            var afterBounds = SuperBounds.GetSuperBounds(AfterAnchor
-                .GetComponentsInChildren<Renderer>().Select(i => i.bounds));
+            var beforeBounds = SuperBounds.GetSuperBounds(BeforeAnchor);
+            var afterBounds = SuperBounds.GetSuperBounds(AfterAnchor);
 
             _afterTarget.transform.position += beforeBounds.center - afterBounds.center;
         }

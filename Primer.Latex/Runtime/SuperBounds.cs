@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LatexRenderer
@@ -19,6 +20,11 @@ namespace LatexRenderer
             var result = new Bounds();
             result.SetMinMax(min, max);
             return result;
+        }
+
+        public static Bounds GetSuperBounds(Component obj)
+        {
+            return GetSuperBounds(obj.GetComponentsInChildren<Renderer>().Select(i => i.bounds));
         }
     }
 }
