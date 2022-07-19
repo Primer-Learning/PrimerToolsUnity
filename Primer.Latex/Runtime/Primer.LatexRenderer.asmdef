@@ -2,7 +2,8 @@
     "name": "Primer.LatexRenderer",
     "rootNamespace": "",
     "references": [
-        "GUID:68550284b645f4b9894995579f34290a"
+        "Unity.VectorGraphics",
+        "Unity.Timeline"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
