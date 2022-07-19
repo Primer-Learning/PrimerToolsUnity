@@ -177,13 +177,11 @@ namespace LatexRenderer.Timeline
         {
             public readonly Vector3 originalWorldPosition;
             public Bounds originalSuperBounds;
-            public Vector3 originalWorldScale;
 
             public MorphTarget(Transform transform) : base(transform)
             {
                 originalSuperBounds = SuperBounds.GetSuperBounds(transform);
                 originalWorldPosition = transform.position;
-                originalWorldScale = transform.lossyScale;
             }
         }
     }
