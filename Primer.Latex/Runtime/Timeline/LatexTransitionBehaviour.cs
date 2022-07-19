@@ -51,16 +51,22 @@ namespace LatexRenderer.Timeline
         {
             var scaleDownTimeRatio = timeRatio / ScaleDownDuration;
             foreach (var i in _scaleDownTargets)
+            {
                 i.transform.localScale = Vector3.Lerp(i.originalScale, Vector3.zero,
                     scaleDownTimeRatio);
+                i.transform.gameObject.SetActive(scaleDownTimeRatio < 1);
+            }
         }
 
         private void UpdateScaleUps(float timeRatio)
         {
             var scaleUpTimeRatio = (timeRatio - (1 - ScaleUpDuration)) / ScaleUpDuration;
             foreach (var i in _scaleUpTargets)
+            {
                 i.transform.localScale = Vector3.Lerp(Vector3.zero, i.originalScale,
                     scaleUpTimeRatio);
+                i.transform.gameObject.SetActive(scaleUpTimeRatio > 0);
+            }
         }
 
         private void UpdateMorphs(float timeRatio)
@@ -78,6 +84,9 @@ namespace LatexRenderer.Timeline
                                       beforeChild.originalSuperBounds.size.x);
                 beforeChild.transform.localScale = Vector3.Lerp(beforeChild.originalScale,
                     goalLocalScale, morphTimeRatio);
+
+                beforeChild.transform.gameObject.SetActive(morphTimeRatio < 1);
+                afterChild.transform.gameObject.SetActive(morphTimeRatio >= 1);
             }
         }
 
@@ -107,7 +116,7 @@ namespace LatexRenderer.Timeline
             var allTargets =
                 Concatenate(_morphTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
                     _scaleDownTargets, _scaleUpTargets, new[] { _afterTarget });
-            foreach (var target in allTargets) target.ApplyOriginalTransform();
+            foreach (var target in allTargets) target.ApplyOriginalValues();
 
             ResetTargets();
         }
@@ -154,6 +163,7 @@ namespace LatexRenderer.Timeline
         /// <summary>Target Renderer with its original Transform values.</summary>
         private class Target
         {
+            public readonly bool originalActive;
             public readonly Vector3 originalPosition;
             public readonly Vector3 originalScale;
 
@@ -164,19 +174,21 @@ namespace LatexRenderer.Timeline
                 this.transform = transform;
                 originalScale = transform.localScale;
                 originalPosition = transform.localPosition;
+                originalActive = transform.gameObject.activeSelf;
             }
 
-            public void ApplyOriginalTransform()
+            public void ApplyOriginalValues()
             {
                 transform.localPosition = originalPosition;
                 transform.localScale = originalScale;
+                transform.gameObject.SetActive(originalActive);
             }
         }
 
         private class MorphTarget : Target
         {
+            public readonly Bounds originalSuperBounds;
             public readonly Vector3 originalWorldPosition;
-            public Bounds originalSuperBounds;
 
             public MorphTarget(Transform transform) : base(transform)
             {
