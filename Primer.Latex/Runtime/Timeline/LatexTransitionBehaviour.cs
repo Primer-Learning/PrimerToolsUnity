@@ -9,7 +9,7 @@ namespace LatexRenderer.Timeline
     public class LatexTransitionBehaviour : PlayableBehaviour
     {
         private Target _afterTarget;
-        private List<(Target beforeChild, Target afterChild)> _morphTargets = new();
+        private List<(MorphTarget beforeChild, MorphTarget afterChild)> _morphTargets = new();
         private float _scaleDownDuration = 0.1f;
         private List<Target> _scaleDownTargets = new();
         private float _scaleUpDuration = 0.1f;
@@ -65,11 +65,20 @@ namespace LatexRenderer.Timeline
 
         private void UpdateMorphs(float timeRatio)
         {
-            // var morphTimeRatio =
-            // foreach (var (beforeChild, afterChild) in _morphTargets)
-            // {
-            //     beforeChild.transform.localPosition = Vector3.Lerp()
-            // }
+            var morphTimeRatio = (timeRatio - ScaleDownDuration) /
+                                 (1 - ScaleDownDuration - ScaleUpDuration);
+            foreach (var (beforeChild, afterChild) in _morphTargets)
+            {
+                beforeChild.transform.position = Vector3.Lerp(beforeChild.originalWorldPosition,
+                    afterChild.transform.position, morphTimeRatio);
+
+                // NOTE: I'm unsure if this will hold up to a tree of scaling transforms...
+                var goalLocalScale = beforeChild.originalScale *
+                                     (afterChild.originalSuperBounds.size.x /
+                                      beforeChild.originalSuperBounds.size.x);
+                beforeChild.transform.localScale = Vector3.Lerp(beforeChild.originalScale,
+                    goalLocalScale, morphTimeRatio);
+            }
         }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
@@ -88,7 +97,7 @@ namespace LatexRenderer.Timeline
         private void ResetTargets()
         {
             _afterTarget = null;
-            _morphTargets = new List<(Target beforeChild, Target afterChild)>();
+            _morphTargets = new List<(MorphTarget beforeChild, MorphTarget afterChild)>();
             _scaleDownTargets = new List<Target>();
             _scaleUpTargets = new List<Target>();
         }
@@ -115,7 +124,7 @@ namespace LatexRenderer.Timeline
         {
             ResetTargets();
 
-            _afterTarget = Target.FromTransform(After);
+            _afterTarget = new Target(After);
             AlignAnchors();
 
             _morphTargets = MorphTransitions.Select(i =>
@@ -126,7 +135,7 @@ namespace LatexRenderer.Timeline
                 if (i.afterChild.parent != After)
                     throw new Exception("AfterChild of morph transition is not child of After.");
 
-                return (Target.FromTransform(i.beforeChild), Target.FromTransform(i.afterChild));
+                return (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild));
             }).ToList();
 
             var allMorphChildren =
@@ -135,35 +144,46 @@ namespace LatexRenderer.Timeline
 
             foreach (Transform i in Before.transform)
                 if (!allMorphChildren.Contains(i))
-                    _scaleDownTargets.Add(Target.FromTransform(i));
+                    _scaleDownTargets.Add(new Target(i));
 
             foreach (Transform i in After.transform)
                 if (!allMorphChildren.Contains(i))
-                    _scaleUpTargets.Add(Target.FromTransform(i));
+                    _scaleUpTargets.Add(new Target(i));
         }
 
         /// <summary>Target Renderer with its original Transform values.</summary>
         private class Target
         {
-            public Vector3 originalPosition;
-            public Vector3 originalScale;
+            public readonly Vector3 originalPosition;
+            public readonly Vector3 originalScale;
 
-            public Transform transform;
+            public readonly Transform transform;
+
+            public Target(Transform transform)
+            {
+                this.transform = transform;
+                originalScale = transform.localScale;
+                originalPosition = transform.localPosition;
+            }
 
             public void ApplyOriginalTransform()
             {
                 transform.localPosition = originalPosition;
                 transform.localScale = originalScale;
             }
+        }
 
-            public static Target FromTransform(Transform transform)
+        private class MorphTarget : Target
+        {
+            public readonly Vector3 originalWorldPosition;
+            public Bounds originalSuperBounds;
+            public Vector3 originalWorldScale;
+
+            public MorphTarget(Transform transform) : base(transform)
             {
-                return new Target
-                {
-                    transform = transform,
-                    originalScale = transform.localScale,
-                    originalPosition = transform.localPosition
-                };
+                originalSuperBounds = SuperBounds.GetSuperBounds(transform);
+                originalWorldPosition = transform.position;
+                originalWorldScale = transform.lossyScale;
             }
         }
     }
