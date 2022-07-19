@@ -8,6 +8,7 @@ namespace LatexRenderer.Timeline
 {
     public class LatexTransitionBehaviour : PlayableBehaviour
     {
+        private Target _afterTarget;
         private List<(Target beforeChild, Target afterChild)> _morphTargets = new();
         private float _scaleDownDuration = 0.1f;
         private List<Target> _scaleDownTargets = new();
@@ -86,6 +87,7 @@ namespace LatexRenderer.Timeline
 
         private void ResetTargets()
         {
+            _afterTarget = null;
             _morphTargets = new List<(Target beforeChild, Target afterChild)>();
             _scaleDownTargets = new List<Target>();
             _scaleUpTargets = new List<Target>();
@@ -95,15 +97,28 @@ namespace LatexRenderer.Timeline
         {
             var allTargets =
                 Concatenate(_morphTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
-                    _scaleDownTargets, _scaleUpTargets);
+                    _scaleDownTargets, _scaleUpTargets, new[] { _afterTarget });
             foreach (var target in allTargets) target.ApplyOriginalTransform();
 
             ResetTargets();
         }
 
+        private void AlignAnchors()
+        {
+            var beforeBounds = SuperBounds.GetSuperBounds(BeforeAnchor
+                .GetComponentsInChildren<Renderer>().Select(i => i.bounds));
+            var afterBounds = SuperBounds.GetSuperBounds(AfterAnchor
+                .GetComponentsInChildren<Renderer>().Select(i => i.bounds));
+
+            _afterTarget.transform.position += beforeBounds.center - afterBounds.center;
+        }
+
         public override void OnBehaviourPlay(Playable playable, FrameData info)
         {
             ResetTargets();
+
+            _afterTarget = Target.FromTransform(After);
+            AlignAnchors();
 
             _morphTargets = MorphTransitions.Select(i =>
             {
