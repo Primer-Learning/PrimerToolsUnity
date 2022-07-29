@@ -6,9 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.VectorGraphics;
+using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Presets;
-using UnityEngine;
+#endif
 
 [assembly: InternalsVisibleTo("Primer.LatexRenderer.Editor")]
 
