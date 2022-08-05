@@ -4,7 +4,6 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Primer.RandomColoredNoise;
 
 public class CameraRig : PrimerObject
 {
@@ -19,7 +18,6 @@ public class CameraRig : PrimerObject
     public Camera cam;
     RenderTexture rt = null;
     Texture2D image = null;
-    [SerializeField] RandomColoredNoise textureGenerator = null;
 
     // This lets us control the camera in the inspector as if it had a parent transform.
     // Currently, these override changes made directly to the transform.
@@ -123,12 +121,8 @@ public class CameraRig : PrimerObject
         rt = new RenderTexture(resWidth, resHeight, 24);
         cam.targetTexture = rt;
         RenderTexture.active = rt;
-        if (textureGenerator != null) {
-            image = textureGenerator._texture; // Made this public on my local version
-        }
-        else {
-            image = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);
-        }        
+        image = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);
+        
         // Render to image texture
         cam.Render();
         image.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
