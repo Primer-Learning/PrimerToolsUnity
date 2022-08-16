@@ -86,11 +86,7 @@ namespace UnityEditor.LatexRenderer.Timeline
                          nameof(LatexTransitionClip.MorphTransition.beforeChild),
                          nameof(LatexTransitionClip.MorphTransition.afterChild)
                      })
-            {
-                var exposedReference = new ExposedReference<Transform>();
-                exposedReference.Set(null);
-                exposedReference.CopyToSerializedProperty(property.FindPropertyRelative(name));
-            }
+                property.FindPropertyRelative(name).SetExposedReference<Transform>(null, true);
         }
 
         public float GetPropertyHeight()

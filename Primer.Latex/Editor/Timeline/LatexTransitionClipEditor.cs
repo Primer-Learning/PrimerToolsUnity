@@ -1,5 +1,4 @@
 using LatexRenderer.Timeline;
-using UnityEditor.Timeline;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -37,13 +36,6 @@ namespace UnityEditor.LatexRenderer.Timeline
                     morphDrawer.Reset(newElement);
                 }
             };
-        }
-
-        private ExposedReference<Transform> CreateReference(Transform transform)
-        {
-            ExposedReference<Transform> result = new();
-            result.Set(TimelineEditor.inspectedDirector, transform);
-            return result;
         }
 
         public override void OnInspectorGUI()
