@@ -43,8 +43,7 @@ namespace UnityEditor.LatexRenderer.Timeline
 
             var newIndex = EditorGUI.Popup(position, index,
                 options.Select(i => i.DisplayName).ToArray());
-            if (newIndex != index)
-                property.SetExposedReference(options[newIndex].Transform);
+            if (newIndex != index) property.SetExposedReference(options[newIndex].Transform);
         }
 
         public static void DrawLayout(SerializedProperty property, Transform parent)
@@ -55,8 +54,7 @@ namespace UnityEditor.LatexRenderer.Timeline
 
             var newIndex =
                 EditorGUILayout.Popup(index, options.Select(i => i.DisplayName).ToArray());
-            if (newIndex != index)
-                property.SetExposedReference(options[newIndex].Transform);
+            if (newIndex != index) property.SetExposedReference(options[newIndex].Transform);
         }
 
         public struct Option
