@@ -24,7 +24,7 @@ namespace LatexRenderer.Timeline
             "Child of `after`. At the start of the transition, `after` will be moved such that the center of `afterAnchor` lines up exactly with the center of `beforeAnchor`. This allows you to keep the two expressions separated during editing.")]
         public ExposedReference<Transform> afterAnchor;
 
-        public List<MorphTransition> morphTransitions;
+        public List<Transition> morphTransitions;
         public ClipCaps clipCaps => ClipCaps.None;
 
 
@@ -48,7 +48,7 @@ namespace LatexRenderer.Timeline
         }
 
         [Serializable]
-        public class MorphTransition
+        public class Transition
         {
             public ExposedReference<Transform> beforeChild;
             public ExposedReference<Transform> afterChild;

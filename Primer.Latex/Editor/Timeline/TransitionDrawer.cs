@@ -10,7 +10,7 @@ namespace UnityEditor.LatexRenderer.Timeline
     ///     directly by the editor. This is necessary because the ReorderableList is quite manual and we
     ///     can't just give it a drawer.
     /// </remarks>
-    public class MorphDrawer
+    public class TransitionDrawer
     {
         /// <summary>Should have the same value as LatexTransitionClip.after.</summary>
         public readonly Transform after;
@@ -18,7 +18,7 @@ namespace UnityEditor.LatexRenderer.Timeline
         /// <summary>Should have the same value as LatexTransitionClip.before.</summary>
         public readonly Transform before;
 
-        public MorphDrawer(Transform before, Transform after)
+        public TransitionDrawer(Transform before, Transform after)
         {
             this.before = before;
             this.after = after;
@@ -69,22 +69,22 @@ namespace UnityEditor.LatexRenderer.Timeline
         {
             EditorGUI.LabelField(GetSubSection(position, Subsection.TopLeft), "Before");
             ChildDropdown.Draw(GetSubSection(position, Subsection.BottomLeft),
-                property.FindPropertyRelative(
-                    nameof(LatexTransitionClip.MorphTransition.beforeChild)), before);
+                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.beforeChild)),
+                before);
 
             EditorGUI.LabelField(GetSubSection(position, Subsection.TopRight), "After");
             ChildDropdown.Draw(GetSubSection(position, Subsection.BottomRight),
-                property.FindPropertyRelative(
-                    nameof(LatexTransitionClip.MorphTransition.afterChild)), after);
+                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.afterChild)),
+                after);
         }
 
-        /// <summary>Resets a serialized MorphTransition to default values.</summary>
+        /// <summary>Resets a serialized Transition to default values.</summary>
         public void Reset(SerializedProperty property)
         {
             foreach (var name in new[]
                      {
-                         nameof(LatexTransitionClip.MorphTransition.beforeChild),
-                         nameof(LatexTransitionClip.MorphTransition.afterChild)
+                         nameof(LatexTransitionClip.Transition.beforeChild),
+                         nameof(LatexTransitionClip.Transition.afterChild)
                      })
                 property.FindPropertyRelative(name).SetExposedReference<Transform>(null, true);
         }

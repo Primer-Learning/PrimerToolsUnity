@@ -12,7 +12,8 @@ namespace UnityEditor.LatexRenderer.Timeline
 
         private void OnEnable()
         {
-            var morphDrawer = new MorphDrawer(Clip.before.Resolve(), Clip.after.Resolve());
+            var transitionDrawer =
+                new TransitionDrawer(Clip.before.Resolve(), Clip.after.Resolve());
             var morphTransitionsProperty =
                 serializedObject.FindProperty(nameof(LatexTransitionClip.morphTransitions));
             _morphsListElement = new ReorderableList(serializedObject, morphTransitionsProperty)
@@ -25,15 +26,15 @@ namespace UnityEditor.LatexRenderer.Timeline
                 drawElementCallback = (rect, index, focused, active) =>
                 {
                     var element = morphTransitionsProperty.GetArrayElementAtIndex(index);
-                    morphDrawer.OnGUI(rect, element);
+                    transitionDrawer.OnGUI(rect, element);
                 },
-                elementHeightCallback = index => morphDrawer.GetPropertyHeight(),
+                elementHeightCallback = index => transitionDrawer.GetPropertyHeight(),
                 onAddCallback = list =>
                 {
                     var at = list.serializedProperty.arraySize;
                     list.serializedProperty.InsertArrayElementAtIndex(at);
                     var newElement = list.serializedProperty.GetArrayElementAtIndex(at);
-                    morphDrawer.Reset(newElement);
+                    transitionDrawer.Reset(newElement);
                 }
             };
         }
