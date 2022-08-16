@@ -1,6 +1,8 @@
+using System;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
+using Object = UnityEngine.Object;
 
 namespace UnityEditor.LatexRenderer.Timeline
 {
@@ -52,7 +54,33 @@ namespace UnityEditor.LatexRenderer.Timeline
                 .stringValue = exposedReference.exposedName.ToString();
 
             property.FindPropertyRelative(nameof(ExposedReference<Transform>.defaultValue))
-                .objectReferenceValue = null;
+                .objectReferenceValue = exposedReference.defaultValue;
+        }
+
+        /// <summary>Sets a SerializedProperty's `exposedReferenceValue` property.</summary>
+        /// <param name="property">The property to modify.</param>
+        /// <param name="value">The value to set `exposedReferenceValue` to.</param>
+        /// <remarks>
+        ///     The setter of `exposedReferenceValue` will silently fail if SerializedProperty is not
+        ///     attached to a scene properly. This function will instead throw an exception.
+        /// </remarks>
+        public static void SetExposedReference<T>(this SerializedProperty property, T value)
+            where T : Object
+        {
+            if (property.propertyType != SerializedPropertyType.ExposedReference)
+                throw new InvalidOperationException(
+                    "Attempting to set the reference value on a SerializedProperty that is not an ExposedReference.");
+            if (property.serializedObject.context is not IExposedPropertyTable context)
+                throw new InvalidOperationException(
+                    "Attempting to set the reference value on a SerializedProperty that is not attached to a scene.");
+
+            var defaultValueProperty = property.FindPropertyRelative("defaultValue");
+            var exposedNameProperty = property.FindPropertyRelative("exposedName");
+            defaultValueProperty.objectReferenceValue = value;
+            if (string.IsNullOrEmpty(exposedNameProperty.stringValue))
+                exposedNameProperty.stringValue = GUID.Generate().ToString();
+
+            context.SetReferenceValue(exposedNameProperty.stringValue, value);
         }
 
         public static T Resolve<T>(this ref ExposedReference<T> exposedReference) where T : Object
