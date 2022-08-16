@@ -49,7 +49,25 @@ namespace UnityEditor.LatexRenderer.Timeline
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            DrawPropertiesExcluding(serializedObject, "morphTransitions");
+            DrawPropertiesExcluding(serializedObject, nameof(LatexTransitionClip.morphTransitions),
+                nameof(LatexTransitionClip.beforeAnchor), nameof(LatexTransitionClip.afterAnchor));
+
+            var beforeAnchorProperty =
+                serializedObject.FindProperty(nameof(LatexTransitionClip.beforeAnchor));
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel(new GUIContent(beforeAnchorProperty.displayName,
+                beforeAnchorProperty.tooltip));
+            ChildDropdown.DrawLayout(beforeAnchorProperty, Clip.before.Resolve());
+            EditorGUILayout.EndHorizontal();
+
+            var afterAnchorProperty =
+                serializedObject.FindProperty(nameof(LatexTransitionClip.afterAnchor));
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel(new GUIContent(afterAnchorProperty.displayName,
+                afterAnchorProperty.tooltip));
+            ChildDropdown.DrawLayout(afterAnchorProperty, Clip.after.Resolve());
+            EditorGUILayout.EndHorizontal();
+
             _morphsListElement.DoLayoutList();
             serializedObject.ApplyModifiedProperties();
         }

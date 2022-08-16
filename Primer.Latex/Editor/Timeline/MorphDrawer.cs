@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using LatexRenderer.Timeline;
 using UnityEngine;
 
@@ -66,59 +64,18 @@ namespace UnityEditor.LatexRenderer.Timeline
             }
         }
 
-        /// <summary>Generate the dropdown options for a given parent.</summary>
-        /// <param name="parent">Should be either after or before.</param>
-        /// <param name="indexPrefix">
-        ///     Used during recursion to keep track of the stack of indices. Don't
-        ///     specify directly.
-        /// </param>
-        private List<Option> GetOptions(Transform parent, List<int> indexPrefix = null)
-        {
-            List<Option> options = new();
-            options.Add(new Option { Transform = null, Indices = new List<int>() });
-
-            // Within the foreach loop, index of child in list of parent's children
-            var index = 0;
-
-            foreach (Transform child in parent)
-            {
-                var indices = indexPrefix is null ? new List<int>() : new List<int>(indexPrefix);
-                indices.Add(index);
-
-                options.Add(new Option { Transform = child, Indices = indices });
-
-                options.AddRange(GetOptions(child, indices));
-
-                ++index;
-            }
-
-            return options;
-        }
-
-        /// <summary>Draws a dropdown menu for the given property.</summary>
-        private void OptionsField(Rect position, SerializedProperty property, List<Option> options)
-        {
-            var child = property.exposedReferenceValue as Transform;
-            var index = options.FindIndex(i => i.Transform == child);
-
-            var newIndex = EditorGUI.Popup(position, index,
-                options.Select(i => i.DisplayName).ToArray());
-            if (newIndex != index)
-                property.exposedReferenceValue = options[newIndex].Transform;
-        }
-
         /// <summary>Draws property within the given rect.</summary>
         public void OnGUI(Rect position, SerializedProperty property)
         {
             EditorGUI.LabelField(GetSubSection(position, Subsection.TopLeft), "Before");
-            OptionsField(GetSubSection(position, Subsection.BottomLeft),
+            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomLeft),
                 property.FindPropertyRelative(
-                    nameof(LatexTransitionClip.MorphTransition.beforeChild)), GetOptions(before));
+                    nameof(LatexTransitionClip.MorphTransition.beforeChild)), before);
 
             EditorGUI.LabelField(GetSubSection(position, Subsection.TopRight), "After");
-            OptionsField(GetSubSection(position, Subsection.BottomRight),
+            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomRight),
                 property.FindPropertyRelative(
-                    nameof(LatexTransitionClip.MorphTransition.afterChild)), GetOptions(after));
+                    nameof(LatexTransitionClip.MorphTransition.afterChild)), after);
         }
 
         /// <summary>Resets a serialized MorphTransition to default values.</summary>
@@ -139,16 +96,6 @@ namespace UnityEditor.LatexRenderer.Timeline
         public float GetPropertyHeight()
         {
             return EditorGUIUtility.singleLineHeight * 2;
-        }
-
-
-        private struct Option
-        {
-            public Transform Transform;
-            public List<int> Indices;
-
-            public string DisplayName =>
-                Transform ? $"{string.Join(".", Indices)}\t{Transform.gameObject.name}" : "";
         }
 
 
