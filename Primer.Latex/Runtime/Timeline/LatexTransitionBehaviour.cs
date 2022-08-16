@@ -11,6 +11,10 @@ namespace LatexRenderer.Timeline
         private Target _afterTarget;
         private float _morphDuration = 0.5f;
         private List<(MorphTarget beforeChild, MorphTarget afterChild)> _morphTargets = new();
+
+        private List<(MorphTarget beforeChild, MorphTarget afterChild)> _scaleDownAndMoveTargets =
+            new();
+
         private List<Target> _scaleDownTargets = new();
         private List<Target> _scaleUpTargets = new();
 
@@ -19,6 +23,7 @@ namespace LatexRenderer.Timeline
         public Transform Before;
         public Transform BeforeAnchor;
         public List<(Transform beforeChild, Transform afterChild)> MorphTransitions;
+        public List<(Transform beforeChild, Transform afterChild)> ScaleDownAndMoveTransitions;
 
         public float MorphDuration
         {
@@ -35,12 +40,30 @@ namespace LatexRenderer.Timeline
 
         private void UpdateScaleDowns(float timeRatio)
         {
-            var scaleDownTimeRatio = timeRatio / _morphDuration;
+            var morphTimeRatio = timeRatio / _morphDuration;
             foreach (var i in _scaleDownTargets)
             {
                 i.transform.localScale = Vector3.Lerp(i.originalScale, Vector3.zero,
-                    scaleDownTimeRatio);
-                i.transform.gameObject.SetActive(scaleDownTimeRatio < 1);
+                    morphTimeRatio);
+                i.transform.gameObject.SetActive(morphTimeRatio < 1);
+            }
+        }
+
+        private void UpdateScaleDownAndMoves(float timeRatio)
+        {
+            var morphTimeRatio = timeRatio / _morphDuration;
+            var scaleUpTimeRatio = (timeRatio - _morphDuration) / (1 - _morphDuration);
+            foreach (var (beforeChild, afterChild) in _scaleDownAndMoveTargets)
+            {
+                beforeChild.transform.localScale = Vector3.Lerp(beforeChild.originalScale,
+                    Vector3.zero, morphTimeRatio);
+                beforeChild.transform.position = Vector3.Lerp(beforeChild.originalWorldPosition,
+                    afterChild.transform.position, morphTimeRatio);
+                beforeChild.transform.gameObject.SetActive(morphTimeRatio < 1);
+
+                afterChild.transform.localScale = Vector3.Lerp(Vector3.zero,
+                    afterChild.originalScale, scaleUpTimeRatio);
+                afterChild.transform.gameObject.SetActive(scaleUpTimeRatio > 0);
             }
         }
 
@@ -81,6 +104,7 @@ namespace LatexRenderer.Timeline
             UpdateScaleDowns(timeRatio);
             UpdateScaleUps(timeRatio);
             UpdateMorphs(timeRatio);
+            UpdateScaleDownAndMoves(timeRatio);
         }
 
         private static IEnumerable<T> Concatenate<T>(params IEnumerable<T>[] lists)
@@ -92,15 +116,18 @@ namespace LatexRenderer.Timeline
         {
             _afterTarget = null;
             _morphTargets = new List<(MorphTarget beforeChild, MorphTarget afterChild)>();
+            _scaleDownAndMoveTargets =
+                new List<(MorphTarget beforeChild, MorphTarget afterChild)>();
             _scaleDownTargets = new List<Target>();
             _scaleUpTargets = new List<Target>();
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
-            var allTargets =
-                Concatenate(_morphTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
-                    _scaleDownTargets, _scaleUpTargets, new[] { _afterTarget });
+            var allTargets = Concatenate(
+                _morphTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
+                _scaleDownAndMoveTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
+                _scaleDownTargets, _scaleUpTargets, new[] { _afterTarget });
             foreach (var target in allTargets) target.ApplyOriginalValues();
 
             ResetTargets();
@@ -132,16 +159,29 @@ namespace LatexRenderer.Timeline
                 return (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild));
             }).ToList();
 
-            var allMorphChildren =
-                new HashSet<Transform>(
-                    MorphTransitions.SelectMany(i => new[] { i.beforeChild, i.afterChild }));
+            _scaleDownAndMoveTargets = ScaleDownAndMoveTransitions.Select(i =>
+            {
+                if (i.beforeChild.parent != Before)
+                    throw new Exception(
+                        "BeforeChild of scale-down-and-move transition is not child of Before.");
+
+                if (i.afterChild.parent != After)
+                    throw new Exception(
+                        "AfterChild of scale-down-and-move transition is not child of After.");
+
+                return (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild));
+            }).ToList();
+
+            var allTransitionChildren = new HashSet<Transform>(MorphTransitions
+                .Concat(ScaleDownAndMoveTransitions)
+                .SelectMany(i => new[] { i.beforeChild, i.afterChild }));
 
             foreach (Transform i in Before.transform)
-                if (!allMorphChildren.Contains(i))
+                if (!allTransitionChildren.Contains(i))
                     _scaleDownTargets.Add(new Target(i));
 
             foreach (Transform i in After.transform)
-                if (!allMorphChildren.Contains(i))
+                if (!allTransitionChildren.Contains(i))
                     _scaleUpTargets.Add(new Target(i));
         }
 

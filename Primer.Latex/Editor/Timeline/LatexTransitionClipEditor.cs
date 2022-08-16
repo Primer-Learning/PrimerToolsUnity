@@ -1,5 +1,4 @@
 using LatexRenderer.Timeline;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace UnityEditor.LatexRenderer.Timeline
@@ -7,43 +6,27 @@ namespace UnityEditor.LatexRenderer.Timeline
     [CustomEditor(typeof(LatexTransitionClip))]
     public class LatexTransitionClipEditor : Editor
     {
-        private ReorderableList _morphsListElement;
+        private TransitionListDrawer _morphTransitionsDrawer;
+        private TransitionListDrawer _scaleDownAndMoveTransitionsDrawer;
         private LatexTransitionClip Clip => (LatexTransitionClip)target;
 
         private void OnEnable()
         {
-            var transitionDrawer =
-                new TransitionDrawer(Clip.before.Resolve(), Clip.after.Resolve());
-            var morphTransitionsProperty =
-                serializedObject.FindProperty(nameof(LatexTransitionClip.morphTransitions));
-            _morphsListElement = new ReorderableList(serializedObject, morphTransitionsProperty)
-            {
-                displayAdd = true,
-                displayRemove = true,
-                draggable = true,
-                drawHeaderCallback = rect =>
-                    EditorGUI.LabelField(rect, morphTransitionsProperty.displayName),
-                drawElementCallback = (rect, index, focused, active) =>
-                {
-                    var element = morphTransitionsProperty.GetArrayElementAtIndex(index);
-                    transitionDrawer.OnGUI(rect, element);
-                },
-                elementHeightCallback = index => transitionDrawer.GetPropertyHeight(),
-                onAddCallback = list =>
-                {
-                    var at = list.serializedProperty.arraySize;
-                    list.serializedProperty.InsertArrayElementAtIndex(at);
-                    var newElement = list.serializedProperty.GetArrayElementAtIndex(at);
-                    transitionDrawer.Reset(newElement);
-                }
-            };
+            _morphTransitionsDrawer = new TransitionListDrawer(Clip.before.Resolve(),
+                Clip.after.Resolve(),
+                serializedObject.FindProperty(nameof(LatexTransitionClip.morphTransitions)));
+            _scaleDownAndMoveTransitionsDrawer = new TransitionListDrawer(Clip.before.Resolve(),
+                Clip.after.Resolve(),
+                serializedObject.FindProperty(
+                    nameof(LatexTransitionClip.scaleDownAndMoveTransitions)));
         }
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
             DrawPropertiesExcluding(serializedObject, nameof(LatexTransitionClip.morphTransitions),
-                nameof(LatexTransitionClip.beforeAnchor), nameof(LatexTransitionClip.afterAnchor));
+                nameof(LatexTransitionClip.beforeAnchor), nameof(LatexTransitionClip.afterAnchor),
+                nameof(LatexTransitionClip.scaleDownAndMoveTransitions));
 
             var beforeAnchorProperty =
                 serializedObject.FindProperty(nameof(LatexTransitionClip.beforeAnchor));
@@ -61,7 +44,9 @@ namespace UnityEditor.LatexRenderer.Timeline
             ChildDropdown.DrawLayout(afterAnchorProperty, Clip.after.Resolve());
             EditorGUILayout.EndHorizontal();
 
-            _morphsListElement.DoLayoutList();
+            _morphTransitionsDrawer.DrawLayout();
+            _scaleDownAndMoveTransitionsDrawer.DrawLayout();
+
             serializedObject.ApplyModifiedProperties();
         }
     }

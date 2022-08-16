@@ -25,6 +25,7 @@ namespace LatexRenderer.Timeline
         public ExposedReference<Transform> afterAnchor;
 
         public List<Transition> morphTransitions;
+        public List<Transition> scaleDownAndMoveTransitions;
         public ClipCaps clipCaps => ClipCaps.None;
 
 
@@ -41,6 +42,9 @@ namespace LatexRenderer.Timeline
             transition.BeforeAnchor = beforeAnchor.Resolve(resolver);
 
             transition.MorphTransitions = morphTransitions.Select(i =>
+                    (i.beforeChild.Resolve(resolver), i.afterChild.Resolve(resolver)))
+                .Where(i => i.Item1 && i.Item2).ToList();
+            transition.ScaleDownAndMoveTransitions = scaleDownAndMoveTransitions.Select(i =>
                     (i.beforeChild.Resolve(resolver), i.afterChild.Resolve(resolver)))
                 .Where(i => i.Item1 && i.Item2).ToList();
 
