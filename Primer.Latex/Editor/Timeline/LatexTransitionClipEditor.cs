@@ -40,6 +40,8 @@ namespace UnityEditor.LatexRenderer.Timeline
                 EditorGUILayout.HelpBox("OK", MessageType.Info);
             }
 
+            EditorGUILayout.Space(10);
+
             var beforeProperty = serializedObject.FindProperty("before");
             var newBefore = EditorGUILayout.ObjectField(
                 new GUIContent(beforeProperty.displayName, beforeProperty.tooltip),
@@ -49,6 +51,8 @@ namespace UnityEditor.LatexRenderer.Timeline
             var newAfter = EditorGUILayout.ObjectField(
                 new GUIContent(afterProperty.displayName, afterProperty.tooltip),
                 afterProperty.exposedReferenceValue, typeof(Transform), true);
+
+            EditorGUILayout.Space(10);
 
             if (beforeProperty.exposedReferenceValue is null ||
                 afterProperty.exposedReferenceValue is null)
@@ -77,7 +81,10 @@ namespace UnityEditor.LatexRenderer.Timeline
                     afterProperty.exposedReferenceValue as Transform);
                 EditorGUILayout.EndHorizontal();
 
+                EditorGUILayout.Space(10);
+
                 _morphTransitionsDrawer.DrawLayout();
+                EditorGUILayout.Space(10);
                 _scaleDownAndMoveTransitionsDrawer.DrawLayout();
             }
 
