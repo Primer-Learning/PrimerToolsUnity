@@ -13,18 +13,13 @@ namespace UnityEditor.LatexRenderer.Timeline
     /// </remarks>
     public class TransitionListDrawer
     {
-        /// <summary>Should have the same value as LatexTransitionClip._after.</summary>
-        private readonly Transform _after;
-
-        /// <summary>Should have the same value as LatexTransitionClip._before.</summary>
-        private readonly Transform _before;
+        private readonly SerializedProperty _property;
 
         private readonly ReorderableList _reorderableList;
 
-        public TransitionListDrawer(Transform before, Transform after, SerializedProperty property)
+        public TransitionListDrawer(SerializedProperty property)
         {
-            _before = before;
-            _after = after;
+            _property = property;
 
             _reorderableList = new ReorderableList(property.serializedObject, property)
             {
@@ -60,6 +55,12 @@ namespace UnityEditor.LatexRenderer.Timeline
                 }
             };
         }
+
+        private Transform _before =>
+            _property.serializedObject.FindProperty("before").exposedReferenceValue as Transform;
+
+        private Transform _after =>
+            _property.serializedObject.FindProperty("after").exposedReferenceValue as Transform;
 
         /// <summary>Draws list using auto-layout (ie: EditorGUILayout).</summary>
         public void DrawLayout()
@@ -110,14 +111,19 @@ namespace UnityEditor.LatexRenderer.Timeline
         /// <summary>Draws property within the given rect.</summary>
         private void OnGUI(Rect position, SerializedProperty property)
         {
-            EditorGUI.LabelField(GetSubSection(position, Subsection.TopLeft), "Before");
-            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomLeft),
-                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.beforeChild)),
+            var beforeChildProperty =
+                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.beforeChild));
+            EditorGUI.LabelField(GetSubSection(position, Subsection.TopLeft),
+                new GUIContent(beforeChildProperty.displayName, beforeChildProperty.tooltip));
+            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomLeft), beforeChildProperty,
                 _before);
 
-            EditorGUI.LabelField(GetSubSection(position, Subsection.TopRight), "After");
-            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomRight),
-                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.afterChild)),
+
+            var afterChildProperty =
+                property.FindPropertyRelative(nameof(LatexTransitionClip.Transition.afterChild));
+            EditorGUI.LabelField(GetSubSection(position, Subsection.TopRight),
+                new GUIContent(afterChildProperty.displayName, afterChildProperty.tooltip));
+            ChildDropdown.Draw(GetSubSection(position, Subsection.BottomRight), afterChildProperty,
                 _after);
         }
 

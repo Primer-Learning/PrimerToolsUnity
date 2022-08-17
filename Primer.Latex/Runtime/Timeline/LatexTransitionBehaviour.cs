@@ -124,11 +124,12 @@ namespace LatexRenderer.Timeline
 
         public override void OnBehaviourPause(Playable playable, FrameData info)
         {
+            // This function can be called before play, so some of these may be null
             var allTargets = Concatenate(
                 _morphTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
                 _scaleDownAndMoveTargets.SelectMany(i => new[] { i.beforeChild, i.afterChild }),
                 _scaleDownTargets, _scaleUpTargets, new[] { _afterTarget });
-            foreach (var target in allTargets) target.ApplyOriginalValues();
+            foreach (var target in allTargets) target?.ApplyOriginalValues();
 
             ResetTargets();
         }
@@ -148,29 +149,12 @@ namespace LatexRenderer.Timeline
             _afterTarget = new Target(After);
             AlignAnchors();
 
-            _morphTargets = MorphTransitions.Select(i =>
-            {
-                if (i.beforeChild.parent != Before)
-                    throw new Exception("BeforeChild of morph transition is not child of Before.");
-
-                if (i.afterChild.parent != After)
-                    throw new Exception("AfterChild of morph transition is not child of After.");
-
-                return (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild));
-            }).ToList();
+            _morphTargets = MorphTransitions
+                .Select(i => (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild)))
+                .ToList();
 
             _scaleDownAndMoveTargets = ScaleDownAndMoveTransitions.Select(i =>
-            {
-                if (i.beforeChild.parent != Before)
-                    throw new Exception(
-                        "BeforeChild of scale-down-and-move transition is not child of Before.");
-
-                if (i.afterChild.parent != After)
-                    throw new Exception(
-                        "AfterChild of scale-down-and-move transition is not child of After.");
-
-                return (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild));
-            }).ToList();
+                (new MorphTarget(i.beforeChild), new MorphTarget(i.afterChild))).ToList();
 
             var allTransitionChildren = new HashSet<Transform>(MorphTransitions
                 .Concat(ScaleDownAndMoveTransitions)
@@ -183,6 +167,54 @@ namespace LatexRenderer.Timeline
             foreach (Transform i in After.transform)
                 if (!allTransitionChildren.Contains(i))
                     _scaleUpTargets.Add(new Target(i));
+        }
+
+        public List<string> GetValidationErrors()
+        {
+            List<string> errors = new();
+
+            if (!Before) errors.Add("Before is null");
+            if (!After) errors.Add("After is null");
+            if (!BeforeAnchor) errors.Add("Before Anchor is null");
+            if (!AfterAnchor) errors.Add("After Anchor is null");
+
+            for (var i = 0; i < ScaleDownAndMoveTransitions.Count; ++i)
+            {
+                var (beforeChild, afterChild) = ScaleDownAndMoveTransitions[i];
+
+                if (!beforeChild)
+                    errors.Add(
+                        $"Before Child of Scale Down and Move Transition at index {i} is null.");
+                else if (beforeChild.parent != Before)
+                    errors.Add(
+                        $"Before Child of Scale Down and Move Transition at index {i} is not child of Before.");
+
+                if (!afterChild)
+                    errors.Add(
+                        $"After Child of Scale Down and Move Transition at index {i} is null.");
+                else if (afterChild.parent != After)
+                    errors.Add(
+                        $"After Child of Scale Down and Move Transition at index {i} is not child of After.");
+            }
+
+            for (var i = 0; i < MorphTransitions.Count; ++i)
+            {
+                var (beforeChild, afterChild) = MorphTransitions[i];
+
+                if (!beforeChild)
+                    errors.Add($"Before Child of Morph Transition at index {i} is null.");
+                else if (beforeChild.parent != Before)
+                    errors.Add(
+                        $"Before Child of Morph Transition at index {i} is not child of Before.");
+
+                if (!afterChild)
+                    errors.Add($"After Child of Morph Transition at index {i} is null.");
+                else if (afterChild.parent != After)
+                    errors.Add(
+                        $"After Child of Morph Transition at index {i} is not child of After.");
+            }
+
+            return errors;
         }
 
         /// <summary>Target Renderer with its original Transform values.</summary>
