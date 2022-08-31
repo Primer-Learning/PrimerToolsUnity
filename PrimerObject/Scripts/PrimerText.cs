@@ -9,12 +9,12 @@ public class PrimerText : PrimerObject
     public TextMeshPro tmpro;
     public bool flipped;
 
-    float animateableNumber = 0;
-    public float AnimateableNumber {
+    double animateableNumber = 0;
+    public double AnimateableNumber {
         get{ return animateableNumber; }
         set{
             animateableNumber = value; 
-            tmpro.text = FormatFloat(value);
+            tmpro.text = FormatDouble(value);
         }
     }
     public Color Color {
@@ -36,8 +36,9 @@ public class PrimerText : PrimerObject
         }
     }
     // Making this a method in case I want to add different modes
-    string FormatFloat(float numToFormat) {
-        return $"{(int)numToFormat}";
+    string FormatDouble(double numToFormat) {
+        // return numToFormat.ToString("{0:n0}");
+        return string.Format("{0:n0}", numToFormat);
     }
     public void AddToNumber(float numAdded) {
         AnimateableNumber += numAdded;

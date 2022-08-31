@@ -78,7 +78,7 @@ public static class PrimerColor
         PrimerColor.Purple
     };
 
-    static Color UnityColorFromVector4(Vector4 sc) {
+    public static Color UnityColorFromVector4(Vector4 sc) {
         return sc / 255;
     }
 }

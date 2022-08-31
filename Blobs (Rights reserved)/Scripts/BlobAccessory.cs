@@ -28,7 +28,6 @@ public class BlobAccessory : PrimerObject
                 go = Instantiate(Resources.Load<GameObject>("sunglasses"));
                 parentBoneName = "bone_neck";
                 break;
-
             // Textured accessories
             case AccessoryType.beanie:
                 go = Instantiate(Resources.Load<GameObject>("beanie"));
@@ -90,6 +89,24 @@ public class BlobAccessory : PrimerObject
                 baseTextureName = "TEXTURE_woodensign_base_fair";
                 colorMatch = false;
                 break;
+            case AccessoryType.cyborgHelmet:
+                go = Instantiate(Resources.Load<GameObject>("cyborg_helmet"));
+                parentBoneName = "bone_neck";
+                baseTextureName = "cyborg headwear base";
+                colorMatch = false;
+                break;
+            case AccessoryType.unibrow:
+                go = Instantiate(Resources.Load<GameObject>("unibrow"));
+                parentBoneName = "bone_neck";
+                baseTextureName = "unibrow";
+                colorMatch = false;
+                break;
+            case AccessoryType.club:
+                go = Instantiate(Resources.Load<GameObject>("club"));
+                parentBoneName = "bone_arm.r";
+                baseTextureName = "club";
+                colorMatch = false;
+                break;
             case AccessoryType.none:
                 return null;
             default:
@@ -105,6 +122,18 @@ public class BlobAccessory : PrimerObject
         ba.transform.localRotation = Quaternion.identity;
         ba.transform.localScale = Vector3.one;
         ba.SetColor(colorMatch, baseTextureName);
+
+        // More processing
+        switch (accessoryType)
+        {
+            case AccessoryType.cyborgHelmet:
+                ba.transform.FindDeepChild("eyepiece").parent = blob.transform.FindDeepChild("bone_eye_l_open");
+                break;
+            case AccessoryType.club:
+                ba.transform.localPosition = new Vector3(0.023f, 0.15f, -0.008f);
+                ba.transform.localRotation = Quaternion.Euler(-29.693f, 0.009f, 1.809f);
+                break;
+        }
         return ba;
     }
 
@@ -164,7 +193,9 @@ public class BlobAccessory : PrimerObject
         AccessoryType.froggyHat,
         AccessoryType.propellerHat,
         AccessoryType.starShades,
-        AccessoryType.wizardHat
+        AccessoryType.wizardHat,
+        AccessoryType.cyborgHelmet,
+        AccessoryType.unibrow
     };
     static List<AccessoryType> firstMatOnlyAccessories = new List<AccessoryType>() {
         AccessoryType.glasses,
@@ -229,5 +260,8 @@ public enum AccessoryType {
     monocle,
     magnifyingGlass,
     fairSign,
-    cheaterSign
+    cheaterSign,
+    cyborgHelmet,
+    unibrow,
+    club
 }

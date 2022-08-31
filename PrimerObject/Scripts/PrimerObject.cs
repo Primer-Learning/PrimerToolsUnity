@@ -11,6 +11,7 @@ public class PrimerObject : MonoBehaviour
     private float rotateTowardsMaxAngle = 1;
     protected virtual void Awake() {}
     private Dictionary<Material, Color> originalColors = new Dictionary<Material, Color>();
+    IEnumerator rotationCoroutine;
     public Vector2 AnchoredPosition { 
         get { return GetComponent<RectTransform>().anchoredPosition;} 
         set { GetComponent<RectTransform>().anchoredPosition = value;} 
@@ -68,6 +69,9 @@ public class PrimerObject : MonoBehaviour
         else if (type == typeof(float)) {
             return Mathf.Lerp((float)oldVal, (float)newVal, t);
         }
+        else if (type == typeof(double)) {
+            return (double)oldVal + ((double)newVal - (double)oldVal) * (double)t;
+        }
         else if (type == typeof(Vector3)) {
             return Vector3.Lerp((Vector3)oldVal, (Vector3)newVal, t);
         }
@@ -84,6 +88,13 @@ public class PrimerObject : MonoBehaviour
             Debug.LogError("Can't lerp that type unless you fix me.");
             return null;
         }
+    }
+    public void StartCoroutineAfterDelay(IEnumerator aCoroutine, float delay) {
+        StartCoroutine(startCoroutineAfterDelay(aCoroutine, delay));
+    }
+    public IEnumerator startCoroutineAfterDelay(IEnumerator aCoroutine, float delay) {
+        yield return new WaitForSeconds(delay);
+        StartCoroutine(aCoroutine);
     }
 
     public virtual void SetIntrinsicScale(Vector3 scale) {
@@ -393,7 +404,11 @@ public class PrimerObject : MonoBehaviour
         }
     }
     public void RotateContinuously(float revsPerSec, Vector3 axis) {
-        StartCoroutine(rotateContinuously(revsPerSec, axis));
+        rotationCoroutine = rotateContinuously(revsPerSec, axis);
+        StartCoroutine(rotationCoroutine);
+    }
+    public void StopContinuousRotation() {
+        StopCoroutine(rotationCoroutine);
     }
     IEnumerator rotateContinuously(float revsPerSec, Vector3 axis) {
         // Intended to run for the life of the scene
