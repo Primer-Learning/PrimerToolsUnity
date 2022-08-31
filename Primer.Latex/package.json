@@ -1,6 +1,6 @@
 {
     "name": "org.primerlearning.latexrenderer",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Component for rendering LaTeX dynamically in Unity.",
     "displayName": "Latex Renderer",
     "unity": "2021.3",
