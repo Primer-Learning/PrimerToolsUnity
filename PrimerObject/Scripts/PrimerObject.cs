@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,14 +13,13 @@ public class PrimerObject : MonoBehaviour
     protected virtual void Awake() {}
     private Dictionary<Material, Color> originalColors = new Dictionary<Material, Color>();
     IEnumerator rotationCoroutine;
-    public Vector2 AnchoredPosition { 
-        get { return GetComponent<RectTransform>().anchoredPosition;} 
-        set { GetComponent<RectTransform>().anchoredPosition = value;} 
+    public Vector2 AnchoredPosition
+    {
+        get => GetComponent<RectTransform>().anchoredPosition;
+        set => GetComponent<RectTransform>().anchoredPosition = value;
     }
     public Color EmissionColor {
-        get {
-            return GetComponentsInChildren<Renderer>()[0].materials[0].GetColor("_EmissionColor");
-        } 
+        get => GetComponentsInChildren<Renderer>()[0].materials[0].GetColor("_EmissionColor");
         set {
             Renderer[] mrs = GetComponentsInChildren<Renderer>();
             foreach (Renderer mr in mrs) {
@@ -30,7 +30,7 @@ public class PrimerObject : MonoBehaviour
                     // mat.SetFloat("_Glossiness", 0);
                 }
             }
-        } 
+        }
     }
 
     // This is a new way of doing easing. not actually implemented anywhere yet
@@ -61,7 +61,7 @@ public class PrimerObject : MonoBehaviour
         StartCoroutine(animateValue<TProperty>(propertyName, newVal, duration, ease, onFrameFunc));
     }
     // The type checking and casting happens every frame, so it could probably be sped up a bit.
-    object PrimerLerp(object oldVal, object newVal, float t, System.Type type) {
+    object PrimerLerp(object oldVal, object newVal, float t, Type type) {
         if (type == typeof(int)) {
             // Casting to int then float looks silly, but it won't let me go straight to float
             return (int)Mathf.Lerp((float)(int)oldVal, (float)(int)newVal, t);
@@ -112,6 +112,7 @@ public class PrimerObject : MonoBehaviour
     }
 
     public virtual void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
+        if (Application.isEditor) return;
         transform.localScale = Vector3.zero;
         StartCoroutine(scaleTo(intrinsicScale, duration, ease, delay: delay));
     }
@@ -146,8 +147,17 @@ public class PrimerObject : MonoBehaviour
         }
     }
 
-    public virtual void ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-        StartCoroutine(scaleTo(Vector3.zero, duration, ease));
+    public virtual IEnumerator ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, Action onComplete = null) {
+        yield return StartCoroutine(scaleTo(Vector3.zero, duration, ease, onComplete));
+    }
+
+    public virtual void ScaleDownAndDestroy() {
+        if (Application.isEditor) {
+            DestroyImmediate(gameObject);
+        }
+        else {
+            ScaleDownToZero(onComplete: () => Destroy(this));
+        }
     }
 
     public virtual void Disappear(float duration = 0.5f, bool toPool = false, EaseMode ease = EaseMode.Cubic, float delay = 0) {
@@ -157,9 +167,9 @@ public class PrimerObject : MonoBehaviour
         StartCoroutine(disappear(duration, toPool, ease, delay));
     }
 
-    IEnumerator disappear(float duration, bool toPool, EaseMode ease, float delay) {
+    IEnumerator disappear(float duration, bool toPool, EaseMode ease, float delay, Action onComplete = null) {
         if (delay > 0) { yield return new WaitForSeconds(delay); }
-        StartCoroutine(scaleTo(Vector3.zero, duration, ease));
+        StartCoroutine(scaleTo(Vector3.zero, duration, ease, onComplete));
         yield return new WaitForSeconds(duration);
         if (toPool) {
             transform.parent = null;
@@ -168,16 +178,16 @@ public class PrimerObject : MonoBehaviour
         else if (this.gameObject != null) { Destroy(this.gameObject); }
     }
 
-    public void ScaleTo(Vector3 newScale, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, bool intrinsicY = false) {
+    public void ScaleTo(Vector3 newScale, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, bool intrinsicY = false, Action onComplete = null) {
         if (intrinsicY) {
             newScale[1] = intrinsicScale.y;
         }
-        StartCoroutine(scaleTo(newScale, duration, ease));
+        StartCoroutine(scaleTo(newScale, duration, ease, onComplete));
     }
     public void ScaleTo(float newScale, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, bool intrinsicY = false) {
         ScaleTo(new Vector3(newScale, newScale, newScale), duration, ease, intrinsicY);
     }
-    protected virtual IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease, float delay = 0) {
+    protected virtual IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease, float delay = 0, Action onComplete = null) {
         if (delay > 0) {
             yield return new WaitForSeconds(delay);
         }
@@ -192,7 +202,11 @@ public class PrimerObject : MonoBehaviour
             yield return null;
         }
 
-        transform.localScale = newScale; //Ensure we actually get exactly to newScale 
+        transform.localScale = newScale; //Ensure we actually get exactly to newScale
+
+        if (onComplete != null) {
+            onComplete();
+        }
     }
     protected virtual IEnumerator scaleTo(Transform trans, Vector3 newScale, float duration, EaseMode ease) {
         Vector3 initialScale = trans.localScale;
@@ -205,10 +219,10 @@ public class PrimerObject : MonoBehaviour
             trans.localScale = Vector3.Lerp(initialScale, newScale, t);
             yield return null;
         }
-        trans.localScale = newScale; //Ensure we actually get exactly to newScale 
+        trans.localScale = newScale; //Ensure we actually get exactly to newScale
     }
-    protected virtual IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease) {
-        StartCoroutine(scaleTo(newScale, duration, ease, delay: 0));
+    protected virtual IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease, Action onComplete = null) {
+        StartCoroutine(scaleTo(newScale, duration, ease, 0, onComplete));
         yield return null;
     }
 

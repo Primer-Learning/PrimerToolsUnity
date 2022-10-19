@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-
+using UnityEngine;
+using UnityEngine.UI;
 public class CameraRig : PrimerObject
 {
     // Class that handles camera movement and recording
@@ -14,7 +12,7 @@ public class CameraRig : PrimerObject
     [SerializeField] int xDivisions = 3;
     [SerializeField] int yDivisions = 3;
     [SerializeField] int lineWidth = 5;
-    [SerializeField] Slider sliderPrefab = null;
+    // [SerializeField] Slider sliderPrefab = null;
     public Camera cam;
     RenderTexture rt = null;
     Texture2D image = null;

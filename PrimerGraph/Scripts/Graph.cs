@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 /* TODO 
@@ -315,7 +313,7 @@ public class Graph : PrimerObject
     }
 
     public StackedAreaData AddStackedArea(string id = "None", int pointsPerUnit = 1) {
-        if (id == "None") {id = System.Environment.TickCount.ToString();}
+        if (id == "None") {id = Environment.TickCount.ToString();}
         if (stackedAreas.ContainsKey(id)) {
             if (stackedAreas[id] == null) stackedAreas.Remove(id);
             else {
@@ -553,7 +551,7 @@ public class Graph : PrimerObject
     public void AddLine() {
         
     }
-    protected override IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease) {
+    protected override IEnumerator scaleTo(Vector3 newScale, float duration, EaseMode ease, Action onComplete = null) {
         Vector3 initialScale = transform.localScale;
         
         //Assume scale uniform, which should always be the case for graphs
@@ -578,6 +576,10 @@ public class Graph : PrimerObject
             yield return null;
         }
 
-        transform.localScale = newScale; //Ensure we actually get exactly to newScale 
+        transform.localScale = newScale; //Ensure we actually get exactly to newScale
+
+        if (onComplete != null) {
+            onComplete();
+        }
     }
 }

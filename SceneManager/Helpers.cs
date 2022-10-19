@@ -515,7 +515,6 @@ public class PoissonDiscPointSet
         {
             int spawnIndex = UnityEngine.Random.Range(0, spawnPoints.Count);
             Vector2 spawnCenter = spawnPoints[spawnIndex];
-            bool valid = false;
 
             for (int i = 0; i < maxSamples; i++)
             {
