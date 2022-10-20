@@ -2,21 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Object = UnityEngine.Object;
 [AddComponentMenu("Primer Learning / PrimerBehaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
-    protected Vector3 intrinsicScale = new Vector3(1, 1, 1);
-
-    public void SetIntrinsicScale(Vector3 scale) {
-        intrinsicScale = scale;
-    }
-    public void SetIntrinsicScale(float scale) {
-        intrinsicScale = new Vector3(scale, scale, scale);
-    }
-    public void SetIntrinsicScale() {
-        intrinsicScale = transform.localScale;
-    }
-
     public async void ShrinkAndDispose() {
         if (!Application.isEditor) {
             await ScaleDownToZero();
@@ -25,10 +14,17 @@ public class PrimerBehaviour : MonoBehaviour
         gameObject.Dispose();
     }
 
+    public T GenerateChild<T>(T template, Transform parent) where T : Object {
+        var child = Instantiate(template, parent);
+        child.name = $"{GameObjectExtensions.GENERATED_GAME_OBJECT_PREFIX}{template.name}";
+        return child;
+    }
+
     public async Task ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
         if (Application.isEditor) return;
+        var start = transform.localScale;
         transform.localScale = Vector3.zero;
-        await scaleTo(intrinsicScale, duration, ease, delay);
+        await scaleTo(start, duration, ease, delay);
     }
 
     public async Task ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {

@@ -53,12 +53,16 @@ public class Axis2 : PrimerBehaviour
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
     void Start() {
-        gameObject.RemoveEditorGeneratedChildren();
+        RemoveGeneratedChildren();
         Regenerate();
     }
 
     void OnDestroy() {
-        gameObject.RemoveEditorGeneratedChildren();
+        RemoveGeneratedChildren();
+    }
+
+    public void RemoveGeneratedChildren() {
+        container?.gameObject.RemoveGeneratedChildren();
     }
 
     public void Regenerate() {
@@ -79,8 +83,7 @@ public class Axis2 : PrimerBehaviour
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel = Instantiate(primerTextPrefab, container.transform);
-            axisLabel.hideFlags = HideFlags.HideInHierarchy;
+            axisLabel = GenerateChild(primerTextPrefab, container.transform);
             axisLabel.transform.localRotation = Quaternion.Inverse(container.transform.rotation);
         }
 
@@ -124,8 +127,7 @@ public class Axis2 : PrimerBehaviour
         }
 
         if (!endArrow) {
-            endArrow = Instantiate(arrowPrefab, container.transform);
-            endArrow.hideFlags = HideFlags.HideInHierarchy;
+            endArrow = GenerateChild(arrowPrefab, container.transform);
             endArrow.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
         }
 
@@ -136,8 +138,7 @@ public class Axis2 : PrimerBehaviour
         }
 
         if (!originArrow) {
-            originArrow = Instantiate(arrowPrefab, container.transform);
-            originArrow.hideFlags = HideFlags.HideInHierarchy;
+            originArrow = GenerateChild(arrowPrefab, container.transform);
             originArrow.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
         }
     }
@@ -180,8 +181,7 @@ public class Axis2 : PrimerBehaviour
         }
 
         foreach (var data in toAdd) {
-            var newTic = Instantiate(ticPrefab, container.transform);
-            newTic.hideFlags = HideFlags.HideInHierarchy;
+            var newTic = GenerateChild(ticPrefab, container.transform);
             newTic.Initialize(primerTextPrefab, data, ticLabelDistance);
 
             // this weird assignation discards the asynchronous task
