@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using PrimerGraph;
 using TMPro;
@@ -53,7 +54,12 @@ public class Axis2 : PrimerBehaviour
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
     void Start() {
+        graph = GetComponent<Graph2>();
         RemoveGeneratedChildren();
+        Regenerate();
+    }
+
+    void Update() {
         Regenerate();
     }
 
@@ -66,8 +72,6 @@ public class Axis2 : PrimerBehaviour
     }
 
     public void Regenerate() {
-        graph = GetComponent<Graph2>();
-
         container.gameObject.SetActive(!hidden);
 
         UpdateRod();
@@ -199,11 +203,12 @@ public class Axis2 : PrimerBehaviour
 
     List<TicData> CalculateTics() {
         var calculated = new List<TicData>();
+        var step = (float)Math.Round(ticStep);
 
-        for (var i = ticStep; i < max; i += ticStep)
+        for (var i = step; i < max; i += step)
             calculated.Add(new TicData(i, i.ToString()));
 
-        for (var i = -ticStep; i > min; i -= ticStep)
+        for (var i = -step; i > min; i -= step)
             calculated.Add(new TicData(i, i.ToString()));
 
         return calculated;
