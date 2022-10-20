@@ -90,6 +90,10 @@ public class Graph : PrimerObject
     bool labelsFaceCamera = false;
     public List<PrimerObject> allLabels = new List<PrimerObject>();
 
+    void Start() {
+        Initialize();
+    }
+
     void Update() {
         if (labelsFaceCamera) {
             //Vector3 diffVec = Camera.main.transform.position - transform.position;

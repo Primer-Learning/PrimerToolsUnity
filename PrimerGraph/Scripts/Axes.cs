@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-
 public class Axes : PrimerObject
 {
     public Graph graph; //Assigned by parent Graph during initialization 
@@ -56,7 +54,7 @@ public class Axes : PrimerObject
             xAxisRod.transform.localScale.y * graph.xAxisThickness,
             xAxisRod.transform.localScale.z * graph.xAxisThickness
         );
-        
+
         //Axis label
         xAxisLabel = Instantiate(primerTextPrefab, xAxisMasterContainer.transform);
         Vector3 xLabelPos = Vector3.zero;
