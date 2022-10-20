@@ -30,4 +30,12 @@ public class Graph2 : PrimerObject
             axis.Regenerate();
         }
     }
+
+    public void RemoveEditorGeneratedChildren() {
+        gameObject.RemoveEditorGeneratedChildren();
+
+        foreach (var axis in GetComponents<Axis2>()) {
+            axis.container.gameObject.RemoveEditorGeneratedChildren();
+        }
+    }
 }

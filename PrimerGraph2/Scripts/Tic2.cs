@@ -3,6 +3,12 @@ using UnityEngine;
 public class Tic2 : PrimerBehaviour
 {
     public float value;
+    public string label
+    {
+        get => text.tmpro.text;
+        set => text.tmpro.text = value;
+    }
+
     PrimerText text;
 
     public void Initialize(PrimerText primerTextPrefab, TicData data, float distance) {
@@ -17,7 +23,7 @@ public class Tic2 : PrimerBehaviour
         );
 
         value = data.value;
-        text.tmpro.text = data.label;
+        label = data.label;
     }
 }
 

@@ -53,28 +53,15 @@ public class Axis2 : PrimerBehaviour
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
     void Start() {
+        gameObject.RemoveEditorGeneratedChildren();
         Regenerate();
     }
 
     void OnDestroy() {
-        foreach (var tic in tics) {
-            tic.Dispose();
-        }
-
-        axisLabel?.Dispose();
-        originArrow?.Dispose();
-        endArrow?.Dispose();
+        gameObject.RemoveEditorGeneratedChildren();
     }
 
     public void Regenerate() {
-#if UNITY_EDITOR
-        foreach (var tic in container.GetComponentsInChildren<Tic2>()) {
-            if (!tics.Contains(tic)) {
-                tic.ShrinkAndDispose();
-            }
-        }
-#endif
-
         graph = GetComponent<Graph2>();
 
         container.gameObject.SetActive(!hidden);
@@ -93,6 +80,7 @@ public class Axis2 : PrimerBehaviour
     void UpdateLabel() {
         if (!axisLabel) {
             axisLabel = Instantiate(primerTextPrefab, container.transform);
+            axisLabel.hideFlags = HideFlags.HideInHierarchy;
             axisLabel.transform.localRotation = Quaternion.Inverse(container.transform.rotation);
         }
 
@@ -107,7 +95,7 @@ public class Axis2 : PrimerBehaviour
 
         axisLabel.transform.localPosition = labelPos;
         axisLabel.tmpro.text = label;
-        axisLabel.tmpro.alignment = TextAlignmentOptions.Right;
+        axisLabel.tmpro.alignment = TextAlignmentOptions.Midline;
         axisLabel.SetIntrinsicScale();
     }
 
@@ -137,6 +125,7 @@ public class Axis2 : PrimerBehaviour
 
         if (!endArrow) {
             endArrow = Instantiate(arrowPrefab, container.transform);
+            endArrow.hideFlags = HideFlags.HideInHierarchy;
             endArrow.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
         }
 
@@ -148,6 +137,7 @@ public class Axis2 : PrimerBehaviour
 
         if (!originArrow) {
             originArrow = Instantiate(arrowPrefab, container.transform);
+            originArrow.hideFlags = HideFlags.HideInHierarchy;
             originArrow.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
         }
     }
@@ -175,10 +165,11 @@ public class Axis2 : PrimerBehaviour
 
         // Reuse tics that exist in the right place
         foreach (var entry in expectedTics) {
-            var index = toRemove.FindIndex(tic => tic.value == entry.value);
+            var found = toRemove.Find(tic => tic.value == entry.value);
 
-            if (index != -1) {
-                toRemove.RemoveAt(index);
+            if (found) {
+                found.label = entry.label;
+                toRemove.Remove(found);
                 toAdd.Remove(entry);
             }
         }
@@ -190,7 +181,7 @@ public class Axis2 : PrimerBehaviour
 
         foreach (var data in toAdd) {
             var newTic = Instantiate(ticPrefab, container.transform);
-            newTic.hideFlags = HideFlags.HideInHierarchy & HideFlags.DontSave;
+            newTic.hideFlags = HideFlags.HideInHierarchy;
             newTic.Initialize(primerTextPrefab, data, ticLabelDistance);
 
             // this weird assignation discards the asynchronous task
