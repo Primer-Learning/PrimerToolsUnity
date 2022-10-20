@@ -92,13 +92,7 @@ public class Axis2 : PrimerBehaviour
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel =
-// Not sure about this, it may get the wrong child
-#if UNITY_EDITOR
-                container.GetComponentInChildren<PrimerText>() ??
-#endif
-                Instantiate(primerTextPrefab, container.transform);
-
+            axisLabel = Instantiate(primerTextPrefab, container.transform);
             axisLabel.transform.localRotation = Quaternion.Inverse(container.transform.rotation);
         }
 

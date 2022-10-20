@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 [AddComponentMenu("Primer Learning / PrimerBehaviour")]
@@ -44,16 +45,12 @@ public class PrimerBehaviour : MonoBehaviour
             await Task.Delay((int)(delay * 1000));
         }
 
-        await tween(
-            transform.localScale,
-            newScale,
-            duration,
-            ease,
-            x => transform.localScale = x
-        );
+        foreach (var scale in tween(transform.localScale, newScale, duration, ease)) {
+            transform.localScale = scale;
+        }
     }
 
-    async Task tween<T>(T initial, T target, float duration, EaseMode ease, Action<T> execute) {
+    IEnumerable<T> tween<T>(T initial, T target, float duration, EaseMode ease) {
         var startTime = Time.time;
         var Lerp = typeof(T).GetMethod("Lerp");
 
@@ -63,15 +60,14 @@ public class PrimerBehaviour : MonoBehaviour
 
         while (Time.time < startTime + duration) {
             var t = (Time.time - startTime) / duration;
-            var eased = Helpers.ApplyNormalizedEasing(t, ease);
+            var tEased = Helpers.ApplyNormalizedEasing(t, ease);
             var lerp = Lerp.Invoke(null, new object[] {
-                initial, target, eased
+                initial, target, tEased
             });
 
-            execute((T)lerp);
-            await Task.Yield();
+            yield return (T)lerp;
         }
 
-        execute(target);
+        yield return target;
     }
 }
