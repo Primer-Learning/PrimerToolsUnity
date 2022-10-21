@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using Object = UnityEngine.Object;
 [AddComponentMenu("Primer Learning / PrimerBehaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
@@ -12,12 +11,6 @@ public class PrimerBehaviour : MonoBehaviour
         }
 
         gameObject.Dispose();
-    }
-
-    public T GenerateChild<T>(T template, Transform parent) where T : Object {
-        var child = Instantiate(template, parent);
-        child.name = $"{GameObjectExtensions.GENERATED_GAME_OBJECT_PREFIX}{template.name}";
-        return child;
     }
 
     public async Task ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {

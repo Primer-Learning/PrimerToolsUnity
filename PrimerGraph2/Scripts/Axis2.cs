@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using PrimerBase;
 using PrimerGraph;
 using TMPro;
 using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(Graph2))]
-public class Axis2 : PrimerBehaviour
+public class Axis2 : ObjectGenerator
 {
     // Configuration values
     public bool hidden;
@@ -26,15 +27,13 @@ public class Axis2 : PrimerBehaviour
     public List<TicData> manualTics = new List<TicData>();
 
     [Header("Required elements")]
-    // public GameObject arrowPrefab;
-    // public PrimerText primerTextPrefab;
     public PrimerBehaviour container;
     public Transform rod;
 
     // Graph accessors
     Graph2 graph;
     PrimerText primerTextPrefab => graph.primerTextPrefab;
-    GameObject arrowPrefab => graph.arrowPrefab;
+    PrimerBehaviour arrowPrefab => graph.arrowPrefab;
     Tic2 ticPrefab => graph.ticPrefab;
     float paddingFraction => graph.paddingFraction;
     float ticLabelDistance => graph.ticLabelDistanceVertical;
@@ -42,8 +41,8 @@ public class Axis2 : PrimerBehaviour
     // Internal game object containers
     readonly List<Tic2> tics = new List<Tic2>();
     PrimerText axisLabel;
-    GameObject originArrow;
-    GameObject endArrow;
+    PrimerBehaviour originArrow;
+    PrimerBehaviour endArrow;
 
     // Calculated fields
     float lengthMinusPadding => length * (1 - 2 * paddingFraction);
@@ -53,22 +52,37 @@ public class Axis2 : PrimerBehaviour
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
-    void Start() {
+    void Awake() {
+        Debug.Log("Awake");
         graph = GetComponent<Graph2>();
+    }
+
+    void Start() {
+        Debug.Log("Start");
         RemoveGeneratedChildren();
-        Regenerate();
+    }
+
+    void OnValidate() {
+        generatedObjectsContainer = container?.transform;
     }
 
     void Update() {
+        // Debug.Log("Update");
         Regenerate();
     }
 
     void OnDestroy() {
+        Debug.Log("OnDestroy");
         RemoveGeneratedChildren();
     }
 
-    public void RemoveGeneratedChildren() {
-        container?.gameObject.RemoveGeneratedChildren();
+    public new void RemoveGeneratedChildren() {
+        base.RemoveGeneratedChildren();
+        tics.Clear();
+        axisLabel = null;
+        originArrow = null;
+        endArrow = null;
+        lastArrowPresence = ArrowPresence.Neither;
     }
 
     public void Regenerate() {
@@ -87,7 +101,7 @@ public class Axis2 : PrimerBehaviour
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel = GenerateChild(primerTextPrefab, container.transform);
+            axisLabel = GenerateChild(primerTextPrefab);
             axisLabel.transform.localRotation = Quaternion.Inverse(container.transform.rotation);
         }
 
@@ -123,26 +137,26 @@ public class Axis2 : PrimerBehaviour
 
     void RecreateArrowHeads() {
         if (arrowPresence == ArrowPresence.Neither) {
-            endArrow?.Dispose();
+            endArrow?.ShrinkAndDispose();
             endArrow = null;
-            endArrow?.Dispose();
+            originArrow?.ShrinkAndDispose();
             originArrow = null;
             return;
         }
 
         if (!endArrow) {
-            endArrow = GenerateChild(arrowPrefab, container.transform);
+            endArrow = GenerateChild(arrowPrefab);
             endArrow.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
         }
 
         if (arrowPresence == ArrowPresence.Positive) {
-            originArrow?.Dispose();
+            originArrow?.ShrinkAndDispose();
             originArrow = null;
             return;
         }
 
         if (!originArrow) {
-            originArrow = GenerateChild(arrowPrefab, container.transform);
+            originArrow = GenerateChild(arrowPrefab);
             originArrow.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
         }
     }
@@ -185,7 +199,7 @@ public class Axis2 : PrimerBehaviour
         }
 
         foreach (var data in toAdd) {
-            var newTic = GenerateChild(ticPrefab, container.transform);
+            var newTic = GenerateChild(ticPrefab);
             newTic.Initialize(primerTextPrefab, data, ticLabelDistance);
 
             // this weird assignation discards the asynchronous task
@@ -213,5 +227,4 @@ public class Axis2 : PrimerBehaviour
 
         return calculated;
     }
-
 }

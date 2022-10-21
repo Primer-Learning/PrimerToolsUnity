@@ -214,7 +214,7 @@ MonoBehaviour:
   ticLabelDistanceHorizontal: 0.65
   paddingFraction: 0.05
   rightHanded: 1
-  arrowPrefab: {fileID: 2477842104010458270, guid: 74e22401a725c4e4488b7656e7f00289, type: 3}
+  arrowPrefab: {fileID: 4478118126784391353, guid: 74e22401a725c4e4488b7656e7f00289, type: 3}
   primerTextPrefab: {fileID: 1119334554916629558, guid: b888f32d80097df47b221d6a76ebb13a, type: 3}
   ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
 --- !u!114 &2390685873607332832
@@ -229,6 +229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 2390685874144833816}
   hidden: 0
   label: x
   length: 1
@@ -255,6 +256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 2390685874414386538}
   hidden: 0
   label: y
   length: 1
@@ -281,6 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 2390685872680793520}
   hidden: 0
   label: z
   length: 1

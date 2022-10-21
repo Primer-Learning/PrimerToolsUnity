@@ -21,7 +21,7 @@ public class Graph2 : PrimerObject
     public float paddingFraction = 0.05f;
     public bool rightHanded = true;
 
-    public GameObject arrowPrefab;
+    public PrimerBehaviour arrowPrefab;
     public PrimerText primerTextPrefab;
     public Tic2 ticPrefab;
 
@@ -31,7 +31,7 @@ public class Graph2 : PrimerObject
         }
     }
 
-    public void RemoveEditorGeneratedChildren() {
+    public void RemoveGeneratedChildren() {
         foreach (var axis in GetComponents<Axis2>()) {
             axis.RemoveGeneratedChildren();
         }
