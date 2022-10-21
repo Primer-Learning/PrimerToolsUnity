@@ -5,18 +5,17 @@ using PrimerGraph;
 using TMPro;
 using UnityEngine;
 [ExecuteInEditMode]
-[RequireComponent(typeof(Graph2))]
 public class Axis2 : ObjectGenerator
 {
     // Configuration values
     public bool hidden;
     public string label = "Label";
+    public AxisLabelPosition labelPosition = AxisLabelPosition.End;
+    public ArrowPresence arrowPresence = ArrowPresence.Both;
     [Min(0.1f)] public float length = 1;
     public float thinkness = 1;
     public float min;
     public float max = 10;
-    public AxisLabelPosition labelPosition = AxisLabelPosition.End;
-    public ArrowPresence arrowPresence = ArrowPresence.Both;
 
     [Header("Tics")]
     public bool showTics = true;
@@ -26,7 +25,6 @@ public class Axis2 : ObjectGenerator
     public List<TicData> manualTics = new List<TicData>();
 
     [Header("Required elements")]
-    public PrimerBehaviour container;
     public Transform rod;
 
     // Graph accessors
@@ -35,7 +33,7 @@ public class Axis2 : ObjectGenerator
     PrimerBehaviour arrowPrefab => graph.arrowPrefab;
     Tic2 ticPrefab => graph.ticPrefab;
     float paddingFraction => graph.paddingFraction;
-    float ticLabelDistance => graph.ticLabelDistanceVertical;
+    float ticLabelDistance => graph.ticLabelDistance;
 
     // Internal game object containers
     readonly List<Tic2> tics = new List<Tic2>();
@@ -51,18 +49,18 @@ public class Axis2 : ObjectGenerator
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
     void Awake() {
-        graph = GetComponent<Graph2>();
+        graph = transform.parent.GetComponent<Graph2>();
+
+        if (!graph) {
+            // graph = transform.parent.gameObject.AddComponent<Graph2>();
+            Debug.LogError("Axis component requires Graph to be present in parent");
+            throw new Exception("Axis component requires Graph to be present in parent");
+        }
     }
 
-    // OnValidate will ensure references to other objects / components are updated
-    void OnValidate() {
-        graph = GetComponent<Graph2>();
-        generatedObjectsContainer = container?.transform;
 
-    }
-
-    public override void UpdateGeneratedChildren() {
-        container.gameObject.SetActive(!hidden);
+    public override void UpdateChildren() {
+        gameObject.SetActive(!hidden);
 
         if (hidden) {
             RemoveGeneratedChildren();
@@ -75,7 +73,7 @@ public class Axis2 : ObjectGenerator
         UpdateTics();
     }
 
-    protected override void RemoveGeneratedChildrenReferences() {
+    protected override void OnChildrenRemoved() {
         tics.Clear();
         axisLabel = null;
         originArrow = null;
@@ -90,7 +88,7 @@ public class Axis2 : ObjectGenerator
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel = GenerateChild(primerTextPrefab, Quaternion.Inverse(container.transform.rotation));
+            axisLabel = Create(primerTextPrefab, Quaternion.Inverse(transform.rotation));
         }
 
         var labelPos = Vector3.zero;
@@ -133,7 +131,7 @@ public class Axis2 : ObjectGenerator
         }
 
         if (!endArrow) {
-            endArrow = GenerateChild(arrowPrefab, Quaternion.Euler(0f, 90f, 0f));
+            endArrow = Create(arrowPrefab, Quaternion.Euler(0f, 90f, 0f));
         }
 
         if (arrowPresence == ArrowPresence.Positive) {
@@ -143,7 +141,7 @@ public class Axis2 : ObjectGenerator
         }
 
         if (!originArrow) {
-            originArrow = GenerateChild(arrowPrefab, Quaternion.Euler(0f, -90f, 0f));
+            originArrow = Create(arrowPrefab, Quaternion.Euler(0f, -90f, 0f));
         }
     }
 
@@ -185,7 +183,7 @@ public class Axis2 : ObjectGenerator
         }
 
         foreach (var data in toAdd) {
-            var newTic = GenerateChild(ticPrefab);
+            var newTic = Create(ticPrefab);
             newTic.Initialize(primerTextPrefab, data, ticLabelDistance);
 
             // this weird assignation discards the asynchronous task

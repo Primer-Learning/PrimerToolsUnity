@@ -3,24 +3,28 @@ using UnityEngine;
 
 namespace PrimerBase
 {
-    public class ObjectGenerator : MonoBehaviour
+    public abstract class ObjectGenerator : MonoBehaviour
     {
         public static string GENERATED_GAME_OBJECT_PREFIX = "*";
-        public Transform generatedObjectsContainer;
-        bool hasGeneratedChildren;
+
+        /// <summary>
+        ///     Generates all required children and configures them.
+        ///     Generation shhould only happen once, if they haven't been generated yet.
+        /// </summary>
+        public abstract void UpdateChildren();
+
+        /// <summary>
+        ///     Invoked when children have been deleted, remove all references to them.
+        /// </summary>
+        protected abstract void OnChildrenRemoved();
 
 
         #region Lifecycle
         // Update will take ensure animation works in play mode
+        // TODO: this will be replaced with proper Timeline integration
         void Update() {
             if (Application.isPlaying) {
-                UpdateGeneratedChildren();
-            }
-        }
-
-        void OnValidate() {
-            if (generatedObjectsContainer == (object)null) {
-                generatedObjectsContainer = transform;
+                UpdateChildren();
             }
         }
 
@@ -29,9 +33,8 @@ namespace PrimerBase
         // - Script changes
         // - Has been disabled and re-enabled
         void OnEnable() {
-            OnValidate();
             RemoveGeneratedChildren();
-            UpdateGeneratedChildren();
+            UpdateChildren();
         }
 
         void OnDisable() {
@@ -40,56 +43,44 @@ namespace PrimerBase
         #endregion
 
 
-        #region Methods to override
-        /// <summary>
-        ///     Generates all required children and configures them.
-        ///     Generation shhould only happen once, if they haven't been generated yet.
-        /// </summary>
-        public virtual void UpdateGeneratedChildren() { }
+        #region Child generation methods
+        bool hasGeneratedChildren;
 
-        /// <summary>
-        ///     Invoked when children have been deleted, remove all references to them.
-        /// </summary>
-        protected virtual void RemoveGeneratedChildrenReferences() { }
-        #endregion
-
-
-        #region Child generation tools
-        protected T GenerateChild<T>(T template, Quaternion rotation, Vector3 position) where T : MonoBehaviour {
-            var child = GenerateChild(template);
+        public T Create<T>(T template, Quaternion rotation, Vector3 position) where T : MonoBehaviour {
+            var child = Create(template);
             child.transform.localRotation = rotation;
             child.transform.localPosition = position;
             return child;
         }
 
-        protected T GenerateChild<T>(T template, Vector3 position) where T : MonoBehaviour {
-            var child = GenerateChild(template);
+        public T Create<T>(T template, Vector3 position) where T : MonoBehaviour {
+            var child = Create(template);
             child.transform.localPosition = position;
             return child;
         }
 
-        protected T GenerateChild<T>(T template, Quaternion rotation) where T : MonoBehaviour {
-            var child = GenerateChild(template);
+        public T Create<T>(T template, Quaternion rotation) where T : MonoBehaviour {
+            var child = Create(template);
             child.transform.localRotation = rotation;
             return child;
         }
 
-        protected T GenerateChild<T>(T template) where T : MonoBehaviour {
-            var child = Instantiate(template, generatedObjectsContainer);
+        public T Create<T>(T template) where T : MonoBehaviour {
+            var child = Instantiate(template, transform);
             child.gameObject.hideFlags = HideFlags.DontSave;
             child.name = $"{GENERATED_GAME_OBJECT_PREFIX}{template.name}";
             hasGeneratedChildren = true;
             return child;
         }
 
-        protected void RemoveGeneratedChildren(bool force = false) {
+        public void RemoveGeneratedChildren(bool force = false) {
             if (!hasGeneratedChildren && !force) {
                 return;
             }
 
             var toDispose = new List<GameObject>();
 
-            foreach (Transform child in generatedObjectsContainer) {
+            foreach (Transform child in transform) {
                 // Maybe there is a better way to detect generated objects
                 if (child.gameObject.name.StartsWith(GENERATED_GAME_OBJECT_PREFIX)) {
                     toDispose.Add(child.gameObject);
@@ -101,7 +92,8 @@ namespace PrimerBase
             }
 
             hasGeneratedChildren = false;
-            RemoveGeneratedChildrenReferences();
+            OnChildrenRemoved();
+
         }
         #endregion
     }

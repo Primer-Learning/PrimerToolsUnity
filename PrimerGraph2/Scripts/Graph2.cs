@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /* TODO
  * (Core)
@@ -14,9 +15,10 @@
 [ExecuteInEditMode]
 public class Graph2 : PrimerObject
 {
+    [FormerlySerializedAs("ticLabelDistanceVertical")]
     [Header("Other")]
-    public float ticLabelDistanceVertical = 0.25f;
-    public float ticLabelDistanceHorizontal = 0.65f;
+    public float ticLabelDistance = 0.25f;
+    // public float ticLabelDistanceHorizontal = 0.65f;
     [Range(0, 0.5f)]
     public float paddingFraction = 0.05f;
     public bool rightHanded = true;
@@ -26,14 +28,8 @@ public class Graph2 : PrimerObject
     public Tic2 ticPrefab;
 
     public void Regenerate() {
-        foreach (var axis in GetComponents<Axis2>()) {
-            axis.UpdateGeneratedChildren();
+        foreach (var axis in GetComponentsInChildren<Axis2>()) {
+            axis.UpdateChildren();
         }
     }
-
-    // public void RemoveGeneratedChildren() {
-    //     foreach (var axis in GetComponents<Axis2>()) {
-    //         axis.RemoveGeneratedChildren();
-    //     }
-    // }
 }

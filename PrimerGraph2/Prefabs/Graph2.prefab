@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685872680793520}
   - component: {fileID: 2390685872680793535}
+  - component: {fileID: 3736444582310459244}
   m_Layer: 0
   m_Name: Z Axis
   m_TagString: Untagged
@@ -45,6 +46,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef71248b452743059c1f70559594e53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3736444582310459244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2390685872680793521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 2390685872680793520}
+  hidden: 0
+  label: z
+  labelPosition: 1
+  arrowPresence: 2
+  length: 1
+  thinkness: 1
+  min: 0
+  max: 10
+  showTics: 1
+  ticStep: 2
+  maxTics: 5
+  manualTics: []
+  rod: {fileID: 2390685873395727180}
 --- !u!1 &2390685872817166266
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,9 +197,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685873607332846}
   - component: {fileID: 2390685873607332847}
-  - component: {fileID: 2390685873607332832}
-  - component: {fileID: 2390685873607332844}
-  - component: {fileID: 2390685873607332845}
   m_Layer: 0
   m_Name: Graph2
   m_TagString: Untagged
@@ -217,87 +241,6 @@ MonoBehaviour:
   arrowPrefab: {fileID: 4478118126784391353, guid: 74e22401a725c4e4488b7656e7f00289, type: 3}
   primerTextPrefab: {fileID: 1119334554916629558, guid: b888f32d80097df47b221d6a76ebb13a, type: 3}
   ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
---- !u!114 &2390685873607332832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390685873607332833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 2390685874144833816}
-  hidden: 0
-  label: x
-  length: 1
-  thinkness: 1
-  min: 0
-  max: 10
-  labelPosition: 1
-  arrowPresence: 2
-  showTics: 1
-  ticStep: 2
-  maxTics: 5
-  manualTics: []
-  container: {fileID: 2390685874144833831}
-  rod: {fileID: 2390685874061482258}
---- !u!114 &2390685873607332844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390685873607332833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 2390685874414386538}
-  hidden: 0
-  label: y
-  length: 1
-  thinkness: 1
-  min: 0
-  max: 10
-  labelPosition: 1
-  arrowPresence: 2
-  showTics: 1
-  ticStep: 2
-  maxTics: 5
-  manualTics: []
-  container: {fileID: 2390685874414386537}
-  rod: {fileID: 2390685874144523417}
---- !u!114 &2390685873607332845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390685873607332833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 2390685872680793520}
-  hidden: 0
-  label: z
-  length: 1
-  thinkness: 1
-  min: 0
-  max: 10
-  labelPosition: 1
-  arrowPresence: 2
-  showTics: 1
-  ticStep: 2
-  maxTics: 5
-  manualTics: []
-  container: {fileID: 2390685872680793535}
-  rod: {fileID: 2390685873395727180}
 --- !u!1 &2390685873755861806
 GameObject:
   m_ObjectHideFlags: 0
@@ -455,6 +398,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685874144833816}
   - component: {fileID: 2390685874144833831}
+  - component: {fileID: 8960763701479911132}
   m_Layer: 0
   m_Name: X Axis
   m_TagString: Untagged
@@ -490,6 +434,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef71248b452743059c1f70559594e53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8960763701479911132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2390685874144833817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 0}
+  hidden: 0
+  label: x
+  labelPosition: 1
+  arrowPresence: 2
+  length: 1
+  thinkness: 1
+  min: 0
+  max: 10
+  showTics: 1
+  ticStep: 2
+  maxTics: 5
+  manualTics: []
+  rod: {fileID: 2390685874061482258}
 --- !u!1 &2390685874215459253
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,6 +553,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685874414386538}
   - component: {fileID: 2390685874414386537}
+  - component: {fileID: 6456962842851840255}
   m_Layer: 0
   m_Name: Y Axis
   m_TagString: Untagged
@@ -618,3 +589,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef71248b452743059c1f70559594e53d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6456962842851840255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2390685874414386539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generatedObjectsContainer: {fileID: 2390685874414386538}
+  hidden: 0
+  label: y
+  labelPosition: 1
+  arrowPresence: 2
+  length: 1
+  thinkness: 1
+  min: 0
+  max: 10
+  showTics: 1
+  ticStep: 2
+  maxTics: 5
+  manualTics: []
+  rod: {fileID: 2390685874144523417}

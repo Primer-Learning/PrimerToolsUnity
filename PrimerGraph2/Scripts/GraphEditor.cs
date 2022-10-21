@@ -10,9 +10,5 @@ public class GraphEditor : PrimerEditor<Graph2>
         if (EditorGUI.EndChangeCheck()) {
             component.Regenerate();
         }
-
-        // if (GUILayout.Button("Remove generated objects")) {
-        //     component.RemoveGeneratedChildren();
-        // }
     }
 }
