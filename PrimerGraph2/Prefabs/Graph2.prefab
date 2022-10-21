@@ -58,7 +58,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 2390685872680793520}
   hidden: 0
   label: z
   labelPosition: 1
@@ -234,12 +233,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ticLabelDistanceVertical: 0.25
-  ticLabelDistanceHorizontal: 0.65
+  ticLabelDistance: 0.25
   paddingFraction: 0.05
   rightHanded: 1
-  arrowPrefab: {fileID: 4478118126784391353, guid: 74e22401a725c4e4488b7656e7f00289, type: 3}
-  primerTextPrefab: {fileID: 1119334554916629558, guid: b888f32d80097df47b221d6a76ebb13a, type: 3}
+  arrowPrefab: {fileID: 4478118126784391353, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+  primerTextPrefab: {fileID: 1535603213970486014, guid: 8978468c877af45a6ad8576df33001e6, type: 3}
   ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
 --- !u!1 &2390685873755861806
 GameObject:
@@ -446,7 +444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 0}
   hidden: 0
   label: x
   labelPosition: 1
@@ -601,7 +598,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generatedObjectsContainer: {fileID: 2390685874414386538}
   hidden: 0
   label: y
   labelPosition: 1

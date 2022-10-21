@@ -5,21 +5,25 @@ public class Tic2 : PrimerBehaviour
     public float value;
     public string label
     {
-        get => text.tmpro.text;
-        set => text.tmpro.text = value;
+        get => text.text;
+        set => text.text = value;
     }
 
-    PrimerText text;
+    PrimerText2 text;
+    Quaternion lastParentRotation;
 
-    public void Initialize(PrimerText primerTextPrefab, TicData data, float distance) {
+    public void Initialize(PrimerText2 primerTextPrefab, TicData data, float distance) {
         if (text != null) {
             throw new Exception($"Tic {value} has already been initialized");
         }
 
         text = Instantiate(primerTextPrefab, transform);
-        text.transform.SetLocalPositionAndRotation(
-            new Vector3(0f, -distance, 0f),
-            Quaternion.Inverse(transform.parent.rotation)
+        text.invertRotation = transform.parent;
+
+        text.transform.localPosition = new Vector3(0f, -distance, 0f);
+        text.transform.localScale = Vector3.Scale(
+            text.transform.localScale,
+            transform.parent.localScale
         );
 
         value = data.value;

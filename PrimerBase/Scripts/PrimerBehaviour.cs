@@ -39,7 +39,7 @@ public class PrimerBehaviour : MonoBehaviour
         }
     }
 
-    IEnumerable<T> tween<T>(T initial, T target, float duration, EaseMode ease) {
+    protected IEnumerable<T> tween<T>(T initial, T target, float duration, EaseMode ease) {
         var startTime = Time.time;
         var Lerp = typeof(T).GetMethod("Lerp");
 

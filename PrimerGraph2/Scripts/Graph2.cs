@@ -24,7 +24,7 @@ public class Graph2 : PrimerObject
     public bool rightHanded = true;
 
     public PrimerBehaviour arrowPrefab;
-    public PrimerText primerTextPrefab;
+    public PrimerText2 primerTextPrefab;
     public Tic2 ticPrefab;
 
     public void Regenerate() {

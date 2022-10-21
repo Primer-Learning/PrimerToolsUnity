@@ -29,7 +29,7 @@ public class Axis2 : ObjectGenerator
 
     // Graph accessors
     Graph2 graph;
-    PrimerText primerTextPrefab => graph.primerTextPrefab;
+    PrimerText2 primerTextPrefab => graph.primerTextPrefab;
     PrimerBehaviour arrowPrefab => graph.arrowPrefab;
     Tic2 ticPrefab => graph.ticPrefab;
     float paddingFraction => graph.paddingFraction;
@@ -37,7 +37,7 @@ public class Axis2 : ObjectGenerator
 
     // Internal game object containers
     readonly List<Tic2> tics = new List<Tic2>();
-    PrimerText axisLabel;
+    PrimerText2 axisLabel;
     PrimerBehaviour originArrow;
     PrimerBehaviour endArrow;
 
@@ -88,7 +88,8 @@ public class Axis2 : ObjectGenerator
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel = Create(primerTextPrefab, Quaternion.Inverse(transform.rotation));
+            axisLabel = Create(primerTextPrefab);
+            axisLabel.invertRotation = transform;
         }
 
         var labelPos = Vector3.zero;
@@ -101,9 +102,8 @@ public class Axis2 : ObjectGenerator
         }
 
         axisLabel.transform.localPosition = labelPos;
-        axisLabel.tmpro.text = label;
-        axisLabel.tmpro.alignment = TextAlignmentOptions.Midline;
-        axisLabel.SetIntrinsicScale();
+        axisLabel.text = label;
+        axisLabel.alignment = TextAlignmentOptions.Midline;
     }
 
     void UpdateArrowHeads() {
