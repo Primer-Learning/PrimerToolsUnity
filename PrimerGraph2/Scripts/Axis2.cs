@@ -90,6 +90,7 @@ public class Axis2 : ObjectGenerator
         if (!axisLabel) {
             axisLabel = Create(primerTextPrefab);
             axisLabel.invertRotation = transform;
+            axisLabel.ScaleUpFromZero();
         }
 
         var labelPos = Vector3.zero;
@@ -132,6 +133,7 @@ public class Axis2 : ObjectGenerator
 
         if (!endArrow) {
             endArrow = Create(arrowPrefab, Quaternion.Euler(0f, 90f, 0f));
+            endArrow.ScaleUpFromZero();
         }
 
         if (arrowPresence == ArrowPresence.Positive) {
@@ -142,6 +144,7 @@ public class Axis2 : ObjectGenerator
 
         if (!originArrow) {
             originArrow = Create(arrowPrefab, Quaternion.Euler(0f, -90f, 0f));
+            originArrow.ScaleUpFromZero();
         }
     }
 
@@ -189,7 +192,7 @@ public class Axis2 : ObjectGenerator
             // this weird assignation discards the asynchronous task
             // so the execution continues without waiting for the animation to finish
             // a warning would be shown in Unity if we remove it
-            _ = newTic.ScaleUpFromZero();
+            newTic.ScaleUpFromZero();
 
             tics.Add(newTic);
         }

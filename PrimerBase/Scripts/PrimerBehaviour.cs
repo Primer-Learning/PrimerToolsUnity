@@ -5,27 +5,29 @@ using UnityEngine;
 [AddComponentMenu("Primer Learning / PrimerBehaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
+    const int TWEEN_DELAY = 10;
+
     public async void ShrinkAndDispose() {
-        if (!Application.isEditor) {
+        if (Application.isPlaying) {
             await ScaleDownToZero();
         }
 
         gameObject.Dispose();
     }
 
-    public async Task ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
-        if (Application.isEditor) return;
+    public async void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0) {
+        if (!Application.isPlaying) return;
         var start = transform.localScale;
         transform.localScale = Vector3.zero;
         await scaleTo(start, duration, ease, delay);
     }
 
     public async Task ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-        if (Application.isEditor) {
-            transform.localScale = Vector3.zero;
+        if (Application.isPlaying) {
+            await scaleTo(Vector3.zero, duration, ease);
         }
         else {
-            await scaleTo(Vector3.zero, duration, ease);
+            transform.localScale = Vector3.zero;
         }
     }
 
@@ -34,12 +36,14 @@ public class PrimerBehaviour : MonoBehaviour
             await Task.Delay((int)(delay * 1000));
         }
 
-        foreach (var scale in tween(transform.localScale, newScale, duration, ease)) {
+        await foreach (var scale in tween(transform.localScale, newScale, duration, ease)) {
             transform.localScale = scale;
         }
     }
 
-    protected IEnumerable<T> tween<T>(T initial, T target, float duration, EaseMode ease) {
+
+
+    async protected IAsyncEnumerable<T> tween<T>(T initial, T target, float duration, EaseMode ease) {
         var startTime = Time.time;
         var Lerp = typeof(T).GetMethod("Lerp");
 
@@ -55,6 +59,7 @@ public class PrimerBehaviour : MonoBehaviour
             });
 
             yield return (T)lerp;
+            await Task.Delay(TWEEN_DELAY);
         }
 
         yield return target;
