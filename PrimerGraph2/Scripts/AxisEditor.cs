@@ -9,9 +9,7 @@ public class AxisEditor : PrimerEditor<Axis2>
         base.OnInspectorGUI();
 
         if (EditorGUI.EndChangeCheck()) {
-            component.Regenerate();
+            component.UpdateGeneratedChildren();
         }
     }
-
-
 }

@@ -27,13 +27,13 @@ public class Graph2 : PrimerObject
 
     public void Regenerate() {
         foreach (var axis in GetComponents<Axis2>()) {
-            axis.Regenerate();
+            axis.UpdateGeneratedChildren();
         }
     }
 
-    public void RemoveGeneratedChildren() {
-        foreach (var axis in GetComponents<Axis2>()) {
-            axis.RemoveGeneratedChildren();
-        }
-    }
+    // public void RemoveGeneratedChildren() {
+    //     foreach (var axis in GetComponents<Axis2>()) {
+    //         axis.RemoveGeneratedChildren();
+    //     }
+    // }
 }

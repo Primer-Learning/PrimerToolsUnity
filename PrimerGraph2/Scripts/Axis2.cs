@@ -17,7 +17,6 @@ public class Axis2 : ObjectGenerator
     public float max = 10;
     public AxisLabelPosition labelPosition = AxisLabelPosition.End;
     public ArrowPresence arrowPresence = ArrowPresence.Both;
-    // public float paddingFraction = 0.05f;
 
     [Header("Tics")]
     public bool showTics = true;
@@ -45,53 +44,43 @@ public class Axis2 : ObjectGenerator
     PrimerBehaviour endArrow;
 
     // Calculated fields
-    float lengthMinusPadding => length * (1 - 2 * paddingFraction);
-    float positionMultiplier => lengthMinusPadding / (max - min);
+    float positionMultiplier => length * (1 - 2 * paddingFraction) / (max - min);
     float offset => -length * paddingFraction + min * positionMultiplier;
 
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
     void Awake() {
-        Debug.Log("Awake");
         graph = GetComponent<Graph2>();
     }
 
-    void Start() {
-        Debug.Log("Start");
-        RemoveGeneratedChildren();
-    }
-
+    // OnValidate will ensure references to other objects / components are updated
     void OnValidate() {
+        graph = GetComponent<Graph2>();
         generatedObjectsContainer = container?.transform;
+
     }
 
-    void Update() {
-        // Debug.Log("Update");
-        Regenerate();
-    }
-
-    void OnDestroy() {
-        Debug.Log("OnDestroy");
-        RemoveGeneratedChildren();
-    }
-
-    public new void RemoveGeneratedChildren() {
-        base.RemoveGeneratedChildren();
-        tics.Clear();
-        axisLabel = null;
-        originArrow = null;
-        endArrow = null;
-        lastArrowPresence = ArrowPresence.Neither;
-    }
-
-    public void Regenerate() {
+    public override void UpdateGeneratedChildren() {
         container.gameObject.SetActive(!hidden);
+
+        if (hidden) {
+            RemoveGeneratedChildren();
+            return;
+        }
 
         UpdateRod();
         UpdateLabel();
         UpdateArrowHeads();
         UpdateTics();
+    }
+
+    protected override void RemoveGeneratedChildrenReferences() {
+        tics.Clear();
+        axisLabel = null;
+        originArrow = null;
+        endArrow = null;
+        lastArrowPresence = ArrowPresence.Neither;
     }
 
     void UpdateRod() {
@@ -101,8 +90,7 @@ public class Axis2 : ObjectGenerator
 
     void UpdateLabel() {
         if (!axisLabel) {
-            axisLabel = GenerateChild(primerTextPrefab);
-            axisLabel.transform.localRotation = Quaternion.Inverse(container.transform.rotation);
+            axisLabel = GenerateChild(primerTextPrefab, Quaternion.Inverse(container.transform.rotation));
         }
 
         var labelPos = Vector3.zero;
@@ -145,8 +133,7 @@ public class Axis2 : ObjectGenerator
         }
 
         if (!endArrow) {
-            endArrow = GenerateChild(arrowPrefab);
-            endArrow.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            endArrow = GenerateChild(arrowPrefab, Quaternion.Euler(0f, 90f, 0f));
         }
 
         if (arrowPresence == ArrowPresence.Positive) {
@@ -156,8 +143,7 @@ public class Axis2 : ObjectGenerator
         }
 
         if (!originArrow) {
-            originArrow = GenerateChild(arrowPrefab);
-            originArrow.transform.localRotation = Quaternion.Euler(0f, -90f, 0f);
+            originArrow = GenerateChild(arrowPrefab, Quaternion.Euler(0f, -90f, 0f));
         }
     }
 
