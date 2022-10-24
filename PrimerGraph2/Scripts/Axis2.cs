@@ -1,27 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrimerBase;
 using PrimerGraph;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 [ExecuteInEditMode]
 public class Axis2 : ObjectGenerator
 {
     // Configuration values
     public bool hidden;
+    public bool flip;
     public string label = "Label";
     public AxisLabelPosition labelPosition = AxisLabelPosition.End;
     public ArrowPresence arrowPresence = ArrowPresence.Both;
     [Min(0.1f)] public float length = 1;
-    public float thinkness = 1;
+    [FormerlySerializedAs("thinkness")]
+    public float thickness = 1;
     public float min;
     public float max = 10;
+
 
     [Header("Tics")]
     public bool showTics = true;
     [Min(0)] public float ticStep = 2;
-    [Tooltip("Ensures no more ticks are rendered. Leave at 0 to have no limit. NOT IMPLEMENTED")]
-    [Min(0)] public int maxTics = 5;
+    [Tooltip("Ensures no more ticks are rendered.")]
+    [Range(1, 100)] public int maxTics = 50;
     public List<TicData> manualTics = new List<TicData>();
 
     [Header("Required elements")]
@@ -83,7 +89,7 @@ public class Axis2 : ObjectGenerator
 
     void UpdateRod() {
         rod.transform.localPosition = new Vector3(offset, 0f, 0f);
-        rod.transform.localScale = new Vector3(length, thinkness, thinkness);
+        rod.transform.localScale = new Vector3(length, thickness, thickness);
     }
 
     void UpdateLabel() {
@@ -149,7 +155,7 @@ public class Axis2 : ObjectGenerator
     }
 
     void UpdateTics() {
-        if (ticStep <= 0) return;
+        var showTics = this.showTics && ticStep > 0;
 
         if (!showTics) {
             foreach (var tic in tics) {
@@ -162,8 +168,9 @@ public class Axis2 : ObjectGenerator
 
         var expectedTics = manualTics.Count != 0 ? manualTics : CalculateTics();
 
-        if (maxTics != 0 && expectedTics.Count > maxTics) {
+        if (maxTics != 0 && expectedTics.Count() > maxTics) {
             // TODO: reduce amount of tics in a smart way
+            expectedTics = expectedTics.Take(maxTics);
         }
 
         var toAdd = new List<TicData>(expectedTics);
@@ -202,9 +209,13 @@ public class Axis2 : ObjectGenerator
         }
     }
 
-    List<TicData> CalculateTics() {
+    IEnumerable<TicData> CalculateTics() {
         var calculated = new List<TicData>();
-        var step = (float)Math.Round(ticStep);
+        var step = (float)Math.Round(ticStep, 2);
+
+        if (step <= 0) {
+            return calculated;
+        }
 
         for (var i = step; i < max; i += step)
             calculated.Add(new TicData(i, i.ToString()));
