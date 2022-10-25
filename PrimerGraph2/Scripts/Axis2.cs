@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Primer;
 using PrimerGraph;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+[assembly: InternalsVisibleTo("Primer.Graph.Tests")]
 [ExecuteInEditMode]
 public class Axis2 : ObjectGenerator
 {
@@ -54,8 +56,8 @@ public class Axis2 : ObjectGenerator
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
-    void Awake() {
-        graph = transform.parent.GetComponent<Graph2>();
+    internal void Awake() {
+        graph = transform.parent?.GetComponent<Graph2>();
 
         if (!graph) {
             // graph = transform.parent.gameObject.AddComponent<Graph2>();
@@ -88,8 +90,8 @@ public class Axis2 : ObjectGenerator
     }
 
     void UpdateRod() {
-        rod.transform.localPosition = new Vector3(offset, 0f, 0f);
-        rod.transform.localScale = new Vector3(length, thickness, thickness);
+        rod.localPosition = new Vector3(offset, 0f, 0f);
+        rod.localScale = new Vector3(length, thickness, thickness);
     }
 
     void UpdateLabel() {
@@ -154,7 +156,7 @@ public class Axis2 : ObjectGenerator
         }
     }
 
-    void UpdateTics() {
+    internal void UpdateTics() {
         var showTics = this.showTics && ticStep > 0;
 
         if (!showTics) {
