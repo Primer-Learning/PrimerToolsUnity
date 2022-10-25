@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+
 public class PrimerEditor<T> : Editor where T : Object
 {
     readonly Color darkSkinHeaderColor = new Color32(62, 62, 62, 255);

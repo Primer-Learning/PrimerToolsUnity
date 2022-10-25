@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using Primer;
+
 [ExecuteInEditMode]
 [RequireComponent(typeof(TextMeshPro))]
 public class PrimerText2 : PrimerBehaviour
@@ -79,6 +81,6 @@ public class PrimerText2 : PrimerBehaviour
     }
 
     static string FormatDouble(float numToFormat) {
-        return string.Format("{0:n0}", numToFormat);
+        return $"{numToFormat:n0}";
     }
 }

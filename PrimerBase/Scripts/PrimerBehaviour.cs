@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Primer;
+
 [AddComponentMenu("Primer Learning / PrimerBehaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
@@ -53,7 +55,7 @@ public class PrimerBehaviour : MonoBehaviour
 
         while (Time.time < startTime + duration) {
             var t = (Time.time - startTime) / duration;
-            var tEased = Helpers.ApplyNormalizedEasing(t, ease);
+            var tEased = Easing.ApplyNormalizedEasing(t, ease);
             var lerp = Lerp.Invoke(null, new object[] {
                 initial, target, tEased
             });

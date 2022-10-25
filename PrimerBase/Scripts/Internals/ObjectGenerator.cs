@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PrimerBase
+namespace Primer
 {
+
     public abstract class ObjectGenerator : MonoBehaviour
     {
-        public static string GENERATED_GAME_OBJECT_PREFIX = "*";
+        static string GENERATED_GAME_OBJECT_PREFIX = "*";
 
         /// <summary>
         ///     Generates all required children and configures them.
-        ///     Generation shhould only happen once, if they haven't been generated yet.
+        ///     Generation should only happen once, if they haven't been generated yet.
         /// </summary>
         public abstract void UpdateChildren();
 

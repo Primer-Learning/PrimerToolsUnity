@@ -13,7 +13,7 @@ using UnityEngine.Serialization;
 
 
 [ExecuteInEditMode]
-public class Graph2 : PrimerObject
+public class Graph2 : PrimerBehaviour
 {
     [FormerlySerializedAs("ticLabelDistanceVertical")]
     [Header("Other")]
