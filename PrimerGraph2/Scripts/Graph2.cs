@@ -24,6 +24,7 @@ public class Graph2 : PrimerBehaviour
     [Range(0, 0.5f)]
     public float paddingFraction = 0.05f;
     public bool isRightHanded = true;
+    public bool enableZAxis = true;
 
     [Header("Axes")]
     public Axis2 X;
@@ -35,14 +36,13 @@ public class Graph2 : PrimerBehaviour
     public PrimerText2 primerTextPrefab;
     public Tic2 ticPrefab;
 
-    bool lastRightHanded = true;
-
     void OnEnable() {
-        EnsureRightHanded();
+        OnValidate();
     }
 
     void OnValidate() {
         EnsureRightHanded();
+        Z.hidden = !enableZAxis;
     }
 
     public void Regenerate() {
@@ -51,6 +51,7 @@ public class Graph2 : PrimerBehaviour
         if (Z is not null) Z.UpdateChildren();
     }
 
+    bool lastRightHanded = true;
     void EnsureRightHanded() {
         if (isRightHanded == lastRightHanded) return;
         lastRightHanded = isRightHanded;
