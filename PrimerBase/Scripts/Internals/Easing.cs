@@ -2,21 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public enum EaseMode
-    {
-        Cubic,
-        Quadratic,
-        CubicIn,
-        CubicOut,
-        SmoothStep, //Built-in Unity function that's mostly linear but smooths edges
-        DoubleSmoothStep,
-        SmoothIn,
-        SmoothOut,
-        None
-    }
-
-
-    public static class Easing
+   public static class Easing
     {
         public static float ApplyNormalizedEasing(float t, EaseMode ease) {
             switch (ease) {

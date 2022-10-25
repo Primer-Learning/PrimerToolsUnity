@@ -14,7 +14,6 @@ public class Axis2 : ObjectGenerator
 {
     // Configuration values
     public bool hidden;
-    public bool flip;
     public string label = "Label";
     public AxisLabelPosition labelPosition = AxisLabelPosition.End;
     public ArrowPresence arrowPresence = ArrowPresence.Both;
@@ -23,7 +22,6 @@ public class Axis2 : ObjectGenerator
     public float thickness = 1;
     public float min;
     public float max = 10;
-
 
     [Header("Tics")]
     public bool showTics = true;
@@ -65,7 +63,6 @@ public class Axis2 : ObjectGenerator
             throw new Exception("Axis component requires Graph to be present in parent");
         }
     }
-
 
     public override void UpdateChildren() {
         gameObject.SetActive(!hidden);
@@ -220,10 +217,10 @@ public class Axis2 : ObjectGenerator
         }
 
         for (var i = step; i < max; i += step)
-            calculated.Add(new TicData(i, i.ToString()));
+            calculated.Add(new TicData(i));
 
         for (var i = -step; i > min; i -= step)
-            calculated.Add(new TicData(i, i.ToString()));
+            calculated.Add(new TicData(i));
 
         return calculated;
     }

@@ -44,7 +44,7 @@ public class PrimerText2 : PrimerBehaviour
         get => value;
         set {
             this.value = value;
-            mesh.text = FormatDouble(value);
+            mesh.text = Presentation.FormatNumber(value);
         }
     }
 
@@ -78,9 +78,5 @@ public class PrimerText2 : PrimerBehaviour
         TweenColor(newColor, attack, ease);
         await Task.Delay((int)delay);
         TweenColor(originalColor, decay, ease);
-    }
-
-    static string FormatDouble(float numToFormat) {
-        return $"{numToFormat:n0}";
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Primer;
 using UnityEngine;
 public class Tic2 : PrimerBehaviour
 {
@@ -13,7 +14,7 @@ public class Tic2 : PrimerBehaviour
     Quaternion lastParentRotation;
 
     public void Initialize(PrimerText2 primerTextPrefab, TicData data, float distance) {
-        if (text != null) {
+        if (text is not null) {
             throw new Exception($"Tic {value} has already been initialized");
         }
 
@@ -31,15 +32,14 @@ public class Tic2 : PrimerBehaviour
     }
 }
 
-
 [Serializable]
 public class TicData
 {
     public float value;
     public string label;
 
-    public TicData(float value, string label) {
+    public TicData(float value) {
         this.value = value;
-        this.label = label;
+        label = Presentation.FormatNumberWithDecimals(value);
     }
 }

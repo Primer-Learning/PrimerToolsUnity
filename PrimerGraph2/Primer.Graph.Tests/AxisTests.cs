@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 public class AxisTests
 {
     [Test]
-    public void AxisTestsWithEnumeratorPasses() {
+    public void AxisTestSmallTicStep() {
         var axis = createAxis();
         axis.ticStep = 0.01f;
         axis.UpdateTics();

@@ -1,3 +1,6 @@
 {
-  "name": "Primer.Editor"
+  "name": "Primer.Editor",
+  "includePlatforms": [
+    "Editor"
+  ]
 }
