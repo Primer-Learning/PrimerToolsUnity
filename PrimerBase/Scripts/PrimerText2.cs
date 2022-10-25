@@ -67,7 +67,7 @@ public class PrimerText2 : PrimerBehaviour
     }
 
     public async void TweenColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
-        await foreach (var color in tween(Color, newColor, duration, ease)) {
+        await foreach (var color in PrimerAnimation.Tween(Color, newColor, duration, ease)) {
             Color = color;
         }
     }
