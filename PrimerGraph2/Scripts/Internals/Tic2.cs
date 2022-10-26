@@ -7,6 +7,7 @@ namespace Primer.Graph
     public class Tic2 : PrimerBehaviour
     {
         public float value;
+
         public string label
         {
             get => text.text;
@@ -14,7 +15,6 @@ namespace Primer.Graph
         }
 
         PrimerText2 text;
-        Quaternion lastParentRotation;
 
         public void Initialize(PrimerText2 primerTextPrefab, TicData data, float distance) {
             if (text is not null) {
@@ -22,7 +22,6 @@ namespace Primer.Graph
             }
 
             text = Instantiate(primerTextPrefab, transform);
-            text.invertRotation = transform.parent;
 
             text.transform.localPosition = new Vector3(0f, -distance, 0f);
             text.transform.localScale = Vector3.Scale(

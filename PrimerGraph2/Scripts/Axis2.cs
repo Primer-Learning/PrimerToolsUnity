@@ -89,7 +89,6 @@ public class Axis2 : ObjectGenerator
     void UpdateLabel() {
         if (!axisLabel) {
             axisLabel = Create(primerTextPrefab);
-            axisLabel.invertRotation = transform;
             axisLabel.ScaleUpFromZero();
         }
 

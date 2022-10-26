@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
@@ -10,8 +11,7 @@ public class PrimerText2 : PrimerBehaviour
 {
     public bool billboard;
     public bool flipped;
-    public Transform invertRotation;
-    Quaternion lastRotationInverted;
+    public Vector3 orientation = Vector3.forward;
 
     #region Aliases
     TextMeshPro meshCache;
@@ -50,12 +50,11 @@ public class PrimerText2 : PrimerBehaviour
     }
 
     void Update() {
-        if (invertRotation && lastRotationInverted != invertRotation.rotation) {
-            lastRotationInverted = invertRotation.rotation;
-            transform.localRotation = Quaternion.Inverse(invertRotation.rotation);
+        if (!billboard) {
+            transform.LookAt(transform.position + orientation);
+            return;
         }
 
-        if (!billboard) return;
 
         transform.rotation = Quaternion.LookRotation(
             transform.position - mainCamera.transform.position,

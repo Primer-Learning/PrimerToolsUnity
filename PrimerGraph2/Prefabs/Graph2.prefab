@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb9e97b9b8901422f9e6f962579b50b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointPrefab: {fileID: 3950902210509587284, guid: a719c405b52d540a4b4f94b8af699cf9, type: 3}
+  pointPrefab: {fileID: 1423887769361210701, guid: a719c405b52d540a4b4f94b8af699cf9, type: 3}
   points: []
 --- !u!1001 &2088966744532642439
 PrefabInstance:
@@ -86,6 +86,10 @@ PrefabInstance:
     - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: hidden
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: showTics
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
@@ -176,6 +180,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
+    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: showTics
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
       value: X
@@ -252,6 +260,10 @@ PrefabInstance:
     - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: label
       value: y
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: showTics
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
