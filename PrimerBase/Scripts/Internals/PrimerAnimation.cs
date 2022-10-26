@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -12,7 +14,7 @@ namespace Primer
         /// </summary>
         const int TWEEN_DELAY = 1000 / 60;
 
-        public async static IAsyncEnumerable<T> Tween<T>(T initial, T target, float duration, EaseMode ease) {
+        public async static IAsyncEnumerable<T> Tween<T>([EnumeratorCancellation] CancellationToken ct, T initial, T target, float duration, EaseMode ease) {
             var startTime = Time.time;
             var Lerp = typeof(T).GetMethod("Lerp");
 
@@ -20,7 +22,7 @@ namespace Primer
                 throw new ArgumentException($"PrimerAnimation.tween() couldn't find .Lerp() in {typeof(T).FullName}");
             }
 
-            while (Time.time < startTime + duration) {
+            while (!ct.IsCancellationRequested && Time.time < startTime + duration) {
                 var t = (Time.time - startTime) / duration;
                 var tEased = Easing.ApplyNormalizedEasing(t, ease);
                 var lerp = Lerp.Invoke(null, new object[] {
@@ -37,26 +39,36 @@ namespace Primer
         // Instance fields
 
         Vector3? originalScale = null;
+        CancellationTokenSource cancelAnimations = new CancellationTokenSource();
+
+        void OnDestroy() {
+            cancelAnimations.Cancel();
+        }
 
         public async Task ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
             if (!Application.isPlaying) return;
             SaveOriginalScale();
             transform.localScale = Vector3.zero;
-            await scaleTo((Vector3)originalScale, duration, ease);
+            await scaleTo(cancelAnimations.Token, (Vector3)originalScale, duration, ease);
         }
 
         public async Task ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
             if (Application.isPlaying) {
-                await scaleTo(Vector3.zero, duration, ease);
+                await scaleTo(cancelAnimations.Token, Vector3.zero, duration, ease);
             }
             else {
                 transform.localScale = Vector3.zero;
             }
         }
 
-        async Task scaleTo(Vector3 newScale, float duration, EaseMode ease) {
-            await foreach (var scale in Tween(transform.localScale, newScale, duration, ease)) {
-                transform.localScale = scale;
+        async Task scaleTo(CancellationToken ct, Vector3 newScale, float duration, EaseMode ease) {
+            // If the component is already destroyed do nothing
+            if (!this) return;
+
+            await foreach (var scale in Tween(ct, transform.localScale, newScale, duration, ease)) {
+                if (!ct.IsCancellationRequested) {
+                    transform.localScale = scale;
+                }
             }
         }
 

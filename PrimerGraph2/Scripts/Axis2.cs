@@ -172,34 +172,25 @@ public class Axis2 : ObjectGenerator
             expectedTics = expectedTics.Take(maxTics);
         }
 
-        var toAdd = new List<TicData>(expectedTics);
-        var toRemove = new List<Tic2>(tics);
+        var (add, remove, update) = SynchronizeLists(
+            expectedTics,
+            tics,
+            (data, tic) => tic.value == data.value
+        );
 
-        // Reuse tics that exist in the right place
-        foreach (var entry in expectedTics) {
-            var found = toRemove.Find(tic => tic.value == entry.value);
-
-            if (found) {
-                found.label = entry.label;
-                toRemove.Remove(found);
-                toAdd.Remove(entry);
-            }
+        foreach (var (data, tic) in update) {
+                tic.label = data.label;
         }
 
-        foreach (var tic in toRemove) {
+        foreach (var tic in remove) {
             tics.Remove(tic);
-            tic.ShrinkAndDispose();
+            if (tic) tic.ShrinkAndDispose();
         }
 
-        foreach (var data in toAdd) {
+        foreach (var data in add) {
             var newTic = Create(ticPrefab);
             newTic.Initialize(primerTextPrefab, data, ticLabelDistance);
-
-            // this weird assignation discards the asynchronous task
-            // so the execution continues without waiting for the animation to finish
-            // a warning would be shown in Unity if we remove it
             newTic.ScaleUpFromZero();
-
             tics.Add(newTic);
         }
 

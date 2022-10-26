@@ -1,12 +1,13 @@
 using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
-[CustomEditor(typeof(Axis2))]
-public class AxisEditor : PrimerEditor<Axis2>
+[CustomEditor(typeof(PointData2))]
+public class PointDataEditor : PrimerEditor<PointData2>
 {
     public override void OnInspectorGUI() {
         EditorGUI.BeginChangeCheck();
-
-        CustomHeader(component.gameObject.name);
         base.OnInspectorGUI();
 
         if (EditorGUI.EndChangeCheck()) {
@@ -14,3 +15,4 @@ public class AxisEditor : PrimerEditor<Axis2>
         }
     }
 }
+

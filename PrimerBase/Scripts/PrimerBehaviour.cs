@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Primer;
@@ -22,6 +23,9 @@ public class PrimerBehaviour : MonoBehaviour
             await tween.ScaleDownToZero();
         }
 
-        gameObject.Dispose();
+        // This is false if the element has already been destroyed
+        if (this) {
+            gameObject.Dispose();
+        }
     }
 }
