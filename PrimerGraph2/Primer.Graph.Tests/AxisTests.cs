@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Primer.Graph;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -31,10 +32,6 @@ public class AxisTests
 
         var axis = axisGameObject.AddComponent<Axis2>();
         axis.rod = new GameObject().transform;
-
-        // FIXME: why do we have to run Awake manually?
-        //
-        axis.Awake();
 
         return axis;
     }

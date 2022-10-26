@@ -1,4 +1,4 @@
-namespace PrimerGraph
+namespace Primer.Graph
 {
     public enum ArrowPresence
     {

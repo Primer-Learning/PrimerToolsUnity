@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685873607332846}
   - component: {fileID: 2390685873607332847}
+  - component: {fileID: 8628420467546797947}
   m_Layer: 0
   m_Name: Graph2
   m_TagString: Untagged
@@ -49,13 +50,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ticLabelDistance: 0.25
   paddingFraction: 0.05
-  rightHanded: 1
+  isRightHanded: 1
+  enableZAxis: 1
   X: {fileID: 8960763701479911132}
   Y: {fileID: 5548746615421559894}
   Z: {fileID: 3564338468142601028}
   arrowPrefab: {fileID: 4478118126784391353, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
   primerTextPrefab: {fileID: 1535603213970486014, guid: 8978468c877af45a6ad8576df33001e6, type: 3}
   ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+--- !u!114 &8628420467546797947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2390685873607332833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb9e97b9b8901422f9e6f962579b50b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pointPrefab: {fileID: 3950902210509587284, guid: a719c405b52d540a4b4f94b8af699cf9, type: 3}
+  points: []
 --- !u!1001 &2088966744532642439
 PrefabInstance:
   m_ObjectHideFlags: 0

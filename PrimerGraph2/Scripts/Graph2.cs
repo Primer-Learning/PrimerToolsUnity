@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using JetBrains.Annotations;
+using Primer.Graph;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Quaternion = UnityEngine.Quaternion;
@@ -49,6 +50,13 @@ public class Graph2 : PrimerBehaviour
         if (X is not null) X.UpdateChildren();
         if (Y is not null) Y.UpdateChildren();
         if (Z is not null) Z.UpdateChildren();
+    }
+
+    public Vector3 DomainToPosition(Vector3 domain) {
+        var x = X is null ? 0 : X.DomainToPosition(domain.x);
+        var y = Y is null ? 0 : Y.DomainToPosition(domain.y);
+        var z = Z is null ? 0 : Z.DomainToPosition(domain.z);
+        return new Vector3(x, y, z);
     }
 
     bool lastRightHanded = true;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Primer;
-using PrimerGraph;
+using Primer.Graph;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -34,7 +34,8 @@ public class Axis2 : ObjectGenerator
     public Transform rod;
 
     // Graph accessors
-    Graph2 graph;
+    Graph2 _graph;
+    Graph2 graph => _graph ?? (_graph = transform.parent?.GetComponent<Graph2>());
     PrimerText2 primerTextPrefab => graph.primerTextPrefab;
     PrimerBehaviour arrowPrefab => graph.arrowPrefab;
     Tic2 ticPrefab => graph.ticPrefab;
@@ -54,14 +55,8 @@ public class Axis2 : ObjectGenerator
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
-    internal void Awake() {
-        graph = transform.parent?.GetComponent<Graph2>();
-
-        if (!graph) {
-            // graph = transform.parent.gameObject.AddComponent<Graph2>();
-            Debug.LogError("Axis component requires Graph to be present in parent");
-            throw new Exception("Axis component requires Graph to be present in parent");
-        }
+    public float DomainToPosition(float domainValue) {
+        return hidden ? 0 : domainValue * positionMultiplier;
     }
 
     public override void UpdateChildren() {
