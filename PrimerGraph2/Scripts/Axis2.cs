@@ -14,14 +14,17 @@ public class Axis2 : ObjectGenerator
 {
     // Configuration values
     public bool hidden;
-    public string label = "Label";
-    public AxisLabelPosition labelPosition = AxisLabelPosition.End;
     public ArrowPresence arrowPresence = ArrowPresence.Both;
     [Min(0.1f)] public float length = 1;
-    [FormerlySerializedAs("thinkness")]
-    public float thickness = 1;
     public float min;
     public float max = 10;
+    [FormerlySerializedAs("thinkness")]
+    public float thickness = 1;
+
+    [Header("Label")]
+    public string label = "Label";
+    public AxisLabelPosition labelPosition = AxisLabelPosition.End;
+    public Vector3 labelOffset = Vector3.zero;
 
     [Header("Tics")]
     public bool showTics = true;
@@ -101,7 +104,7 @@ public class Axis2 : ObjectGenerator
             labelPos = new Vector3(length + offset + ticLabelDistance * 1.1f, 0f, 0f);
         }
 
-        axisLabel.transform.localPosition = labelPos;
+        axisLabel.transform.localPosition = labelPos + labelOffset;
         axisLabel.text = label;
         axisLabel.alignment = TextAlignmentOptions.Midline;
     }
