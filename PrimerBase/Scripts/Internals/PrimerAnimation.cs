@@ -45,24 +45,46 @@ namespace Primer
             cancelAnimations.Cancel();
         }
 
-        public async Task ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
+        public async Task MoveTo(Vector3 target, float duration, EaseMode ease) {
+            if (!this) return;
+
+            if (Application.isPlaying)
+                await moveTo(cancelAnimations.Token, target, duration, ease);
+            else
+                transform.localPosition = target;
+
+        }
+
+        async Task moveTo(CancellationToken ct, Vector3 target, float duration, EaseMode ease) {
+            // If the component is already destroyed do nothing
+            if (!this) return;
+
+            await foreach (var pos in Tween(ct, transform.localPosition, target, duration, ease)) {
+                if (!ct.IsCancellationRequested) {
+                    transform.localPosition = pos;
+                }
+            }
+        }
+
+        public async Task ScaleUpFromZero(float duration, EaseMode ease) {
+            if (!this) return;
+
             if (!Application.isPlaying) return;
             SaveOriginalScale();
             transform.localScale = Vector3.zero;
             await scaleTo(cancelAnimations.Token, (Vector3)originalScale, duration, ease);
         }
 
-        public async Task ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-            if (Application.isPlaying) {
+        public async Task ScaleDownToZero(float duration, EaseMode ease) {
+            if (!this) return;
+
+            if (Application.isPlaying)
                 await scaleTo(cancelAnimations.Token, Vector3.zero, duration, ease);
-            }
-            else {
+            else
                 transform.localScale = Vector3.zero;
-            }
         }
 
         async Task scaleTo(CancellationToken ct, Vector3 newScale, float duration, EaseMode ease) {
-            // If the component is already destroyed do nothing
             if (!this) return;
 
             await foreach (var scale in Tween(ct, transform.localScale, newScale, duration, ease)) {

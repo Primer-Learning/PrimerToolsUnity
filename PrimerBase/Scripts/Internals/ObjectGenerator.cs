@@ -97,21 +97,33 @@ namespace Primer
         ) SynchronizeLists<T, U>(
             IEnumerable<T> wanted,
             IEnumerable<U> existing,
-            Func<T, U, bool> compare
+            Func<T, U, bool> compare,
+            Func<U, bool> getGameObject = null
         ) where U : Object {
-            var garbageCollected = existing.Where(x => !x).ToArray();
-            var remove = existing.Where(x => x).ToList();
+            if (getGameObject is null) {
+                getGameObject = x => !!x;
+            }
+
+            var garbageCollected = existing.Where(x => !getGameObject(x)).ToArray();
+            var remove = existing.Where(getGameObject).ToList();
             var add = wanted.ToList();
             var update = new List<(T, U)>();
 
             foreach (var entry in wanted) {
                 var found = remove.Find(obj => compare(entry, obj));
 
-                if (found) {
+                if (found is not null) {
                     remove.Remove(found);
                     add.Remove(entry);
                     update.Add((entry, found));
                 }
+            }
+
+            foreach (var obj in garbageCollected) {
+                if (Application.isPlaying)
+                    Destroy(obj);
+                else
+                    DestroyImmediate(obj);
             }
 
             return (add, remove.Concat(garbageCollected), update);
