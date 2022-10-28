@@ -70,7 +70,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb9e97b9b8901422f9e6f962579b50b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointPrefab: {fileID: 1423887769361210701, guid: a719c405b52d540a4b4f94b8af699cf9, type: 3}
+  pointAnimation: 0
+  pointPrefab: {fileID: -8103561349102110043, guid: a719c405b52d540a4b4f94b8af699cf9, type: 3}
   points: []
 --- !u!1001 &2088966744532642439
 PrefabInstance:

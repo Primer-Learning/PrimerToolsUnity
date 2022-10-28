@@ -15,9 +15,24 @@ public class PointData2 : ObjectGenerator
     Graph2 _graph;
     Graph2 graph => _graph ?? (_graph = GetComponent<Graph2>());
 
-    public PrimerBehaviour pointPrefab;
+    public PointAnimation pointAnimation = PointAnimation.ScaleUpFromZero;
+    public PointController2 pointPrefab;
     public List<Vector3> points = new List<Vector3>();
     List<GraphPoint> pointObjects = new List<GraphPoint>();
+
+    public void AddPoint(string xyz) {
+        var parts = xyz.Split('-');
+        var x = float.Parse(parts[0]);
+        var y = float.Parse(parts[1]);
+        var z = float.Parse(parts[2]);
+        var vec = new Vector3(x, y, z);
+        AddPoint(vec);
+    }
+    public void AddPoint(Vector3 pos) {
+        points.Add(pos);
+        UpdateChildren();
+    }
+
 
     public override void UpdateChildren() {
         var (add, remove, update) = SynchronizeLists(
@@ -34,10 +49,10 @@ public class PointData2 : ObjectGenerator
 
         foreach (var domain in add) {
             var pos = graph.DomainToPosition(domain);
-            var pb = Create(pointPrefab, new Vector3(pos.x, 0, pos.z));
+            var pb = Create(pointPrefab, pos);
             var gp = new GraphPoint() { domain = domain, gameObject = pb };
 
-            AnimatePointAppearance(pb, pos);
+            pb.appearance = pointAnimation;
             pointObjects.Add(gp);
         }
     }
@@ -46,12 +61,6 @@ public class PointData2 : ObjectGenerator
         foreach (var point in pointObjects) {
             point.gameObject.ShrinkAndDispose();
         }
-    }
-
-    async void AnimatePointAppearance(PrimerBehaviour point, Vector3 target) {
-        await point.ScaleUpFromZeroAwaitable();
-        await Task.Delay(500);
-        await point.MoveTo(target);
     }
 
     class GraphPoint : Object
