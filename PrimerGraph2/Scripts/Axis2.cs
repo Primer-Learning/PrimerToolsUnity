@@ -8,7 +8,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-[assembly: InternalsVisibleTo("Primer.Graph.Tests")]
 [ExecuteInEditMode]
 public class Axis2 : ObjectGenerator
 {
