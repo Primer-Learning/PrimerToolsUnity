@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using JetBrains.Annotations;
+﻿using System.Collections.Generic;
 using Primer.Graph;
 using UnityEngine;
 using UnityEngine.Serialization;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
 
 /* TODO
  * (Core)
@@ -26,16 +21,24 @@ public class Graph2 : PrimerBehaviour
     public float paddingFraction = 0.05f;
     public bool isRightHanded = true;
     public bool enableZAxis = true;
+    public Transform domain;
 
     [Header("Axes")]
-    public Axis2 X;
-    public Axis2 Y;
-    public Axis2 Z;
+    public Axis2 _x;
+    Axis2 x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
+    public Axis2 _y;
+    Axis2 y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
+    public Axis2 _z;
+    Axis2 z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
 
     [Header("Prefabs")]
     public PrimerBehaviour arrowPrefab;
     public PrimerText2 primerTextPrefab;
     public Tic2 ticPrefab;
+
+    void Update() {
+        EnsureDomainDimensions();
+    }
 
     void OnEnable() {
         OnValidate();
@@ -43,20 +46,48 @@ public class Graph2 : PrimerBehaviour
 
     void OnValidate() {
         EnsureRightHanded();
-        Z.hidden = !enableZAxis;
+        _z.hidden = !enableZAxis;
     }
 
     public void Regenerate() {
-        if (X is not null) X.UpdateChildren();
-        if (Y is not null) Y.UpdateChildren();
-        if (Z is not null) Z.UpdateChildren();
+        if (_x is not null) _x.UpdateChildren();
+        if (_y is not null) _y.UpdateChildren();
+        if (_z is not null) _z.UpdateChildren();
     }
 
     public Vector3 DomainToPosition(Vector3 domain) {
-        var x = X is null ? 0 : X.DomainToPosition(domain.x);
-        var y = Y is null ? 0 : Y.DomainToPosition(domain.y);
-        var z = Z is null ? 0 : Z.DomainToPosition(domain.z);
-        return new Vector3(x, y, z);
+        return new Vector3(
+            x ? x.DomainToPosition(domain.x) : 0,
+            y ? x.DomainToPosition(domain.y) : 0,
+            z ? x.DomainToPosition(domain.z) : 0
+        );
+    }
+
+    void EnsureDomainDimensions() {
+        var scale = new Vector3(
+            x ? x.DomainToPosition(1) : 1,
+            y ? y.DomainToPosition(1) : 1,
+            z ? z.DomainToPosition(1) : 1
+        );
+
+        if (domain is null || domain.localScale == scale) return;
+
+        var childCount = domain.childCount;
+        var children = new List<(Transform, Vector3)>();
+
+        for (var i = childCount - 1; i >= 0; i--) {
+            var child = domain.GetChild(i);
+            children.Add((child, child.localPosition));
+            child.parent = null;
+        }
+
+        domain.localScale = scale;
+
+        for (var i = childCount - 1; i >= 0; i--) {
+            var (child, pos) = children[i];
+            child.parent = domain;
+            child.localPosition = pos;
+        }
     }
 
     bool lastRightHanded = true;
@@ -64,7 +95,7 @@ public class Graph2 : PrimerBehaviour
         if (isRightHanded == lastRightHanded) return;
         lastRightHanded = isRightHanded;
 
-        Z.transform.rotation = isRightHanded
+        z.transform.rotation = isRightHanded
             ? Quaternion.Euler(0, 90, 0)
             : Quaternion.Euler(0, -90, 0);
     }
