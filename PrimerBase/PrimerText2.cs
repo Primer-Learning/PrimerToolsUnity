@@ -1,9 +1,8 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Primer;
 using TMPro;
 using UnityEngine;
-using Primer;
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(TextMeshPro))]
@@ -55,7 +54,6 @@ public class PrimerText2 : PrimerBehaviour
             return;
         }
 
-
         transform.rotation = Quaternion.LookRotation(
             transform.position - mainCamera.transform.position,
             transform.parent.up
@@ -81,7 +79,7 @@ public class PrimerText2 : PrimerBehaviour
         var originalColor = Color;
         var delay = (duration - attack - decay) * 1000;
         TweenColor(ct, newColor, attack, ease);
-        await Task.Delay((int)delay);
+        await Task.Delay((int)delay, ct);
         TweenColor(ct, originalColor, decay, ease);
     }
 }

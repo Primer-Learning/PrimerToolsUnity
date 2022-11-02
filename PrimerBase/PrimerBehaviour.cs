@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using UnityEngine;
 using Primer;
+using UnityEngine;
 
-[AddComponentMenu("Primer Learning / PrimerBehaviour")]
+[AddComponentMenu("Primer Learning / Primer Behaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
     PrimerAnimation _tween;
