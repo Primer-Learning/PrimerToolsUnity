@@ -50,6 +50,9 @@ public class Graph2 : PrimerBehaviour
     }
 
     public void Regenerate() {
+        // we use internal (_) fields because we want them to
+        // update their children even if they are hidden
+        // as this is when they delete all unused objects
         if (_x is not null) _x.UpdateChildren();
         if (_y is not null) _y.UpdateChildren();
         if (_z is not null) _z.UpdateChildren();
@@ -58,8 +61,8 @@ public class Graph2 : PrimerBehaviour
     public Vector3 DomainToPosition(Vector3 domain) {
         return new Vector3(
             x ? x.DomainToPosition(domain.x) : 0,
-            y ? x.DomainToPosition(domain.y) : 0,
-            z ? x.DomainToPosition(domain.z) : 0
+            y ? y.DomainToPosition(domain.y) : 0,
+            z ? z.DomainToPosition(domain.z) : 0
         );
     }
 
