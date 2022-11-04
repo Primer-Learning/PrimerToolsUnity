@@ -14,10 +14,10 @@ namespace Primer.Graph
         public int resolution = 200;
         public int length = 10;
 
-        Polyline line;
-        PlotCurveClip Clip;
+        public Curve Curve { get; set; }
+        public Polyline prefab { get; set; }
 
-        public void SetClip(PlotCurveClip clip) => Clip = clip;
+        Polyline line;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
             if (!line) {
@@ -35,7 +35,7 @@ namespace Primer.Graph
 
             for (var i = 0; i < toRender; i++) {
                 var x = i * step;
-                var vec = new Vector2(x, Clip.Curve(x));
+                var vec = new Vector2(x, Curve.Evaluate(x));
                 points.Add(new PolylinePoint(vec));
             }
 
@@ -44,7 +44,7 @@ namespace Primer.Graph
         }
 
         void Initialize(Graph2 graph) {
-            line = Object.Instantiate(Clip.prefab, graph.domain);
+            line = Object.Instantiate(prefab, graph.domain);
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info) {

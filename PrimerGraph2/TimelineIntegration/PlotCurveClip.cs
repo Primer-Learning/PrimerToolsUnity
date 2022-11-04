@@ -11,22 +11,16 @@ namespace Primer.Graph
     {
         public ClipCaps clipCaps => ClipCaps.None;
         public Polyline prefab;
+
+        [SerializeReference]
+        public Curve curve = new LinearCurve();
         public PlotCurveBehaviour template = new();
 
-        public float Curve(float x) => Mathf.Log(x + 1, 2);
-
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
-            template.SetClip(this);
+            template.prefab = prefab;
+            template.Curve = curve;
 
-            var playable = ScriptPlayable<PlotCurveBehaviour>.Create(graph, template);
-
-            // playable.GetBehaviour().prefab = prefab;
-
-            // var behaviour = playable.GetBehaviour();
-            // adapter.resolver = graph.GetResolver();
-            // behaviour.adapter = adapter;
-
-            return playable;
+            return ScriptPlayable<PlotCurveBehaviour>.Create(graph, template);
         }
     }
 }
