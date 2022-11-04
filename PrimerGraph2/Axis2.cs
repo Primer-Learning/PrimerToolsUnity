@@ -56,9 +56,7 @@ public class Axis2 : ObjectGenerator
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
-    public float DomainToPosition(float domainValue) {
-        return hidden ? 0 : domainValue * positionMultiplier;
-    }
+    public float DomainToPosition(float domainValue, bool ignoreHidden = false) => !ignoreHidden && hidden ? 0 : domainValue * positionMultiplier;
 
     public override void UpdateChildren() {
         gameObject.SetActive(!hidden);

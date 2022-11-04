@@ -11,32 +11,45 @@ namespace Primer.Graph
     public class PlotCurveBehaviour : PlayableBehaviour
     {
         internal double duration;
-        public int resolution = 200;
-        public int length = 10;
 
-        public Curve Curve { get; set; }
-        public Polyline prefab { get; set; }
+        [Tooltip("Starting point for the line. y axis is ignored")]
+        public Vector3 start = Vector3.zero;
+        [Tooltip("Ending point for the line. y axis is ignored")]
+        public Vector3 end = Vector3.one * 10;
+
+        public int resolution = 200;
+        public Polyline prefab;
+
+        [SerializeReference]
+        public Curve curve = new LinearCurve();
 
         Polyline line;
+        Vector3 lastStart;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData) {
-            if (!line) {
-                if (playerData is Graph2 graph)
-                    Initialize(graph);
-                else
-                    throw new TimelineException("PlotCurveBehaviour can only be used in Graph2 tracks");
+            if (playerData is not Graph2 graph) {
+                throw new TimelineException("PlotCurveBehaviour can only be used in Graph2 tracks");
             }
 
+            if (!line) {
+                Initialize(graph);
+            }
+
+            if (start != lastStart) {
+                lastStart = start;
+                line.transform.position = FixZAxis(Vector3.Scale(start, graph.domain.localScale));
+            }
+
+            var pointsToDraw = resolution + 1;
             var time = playable.GetTime() / duration;
-            var totalPointsCount = resolution;
-            var step = length / (float)totalPointsCount;
-            var toRender = Mathf.RoundToInt(totalPointsCount * (float)time);
+            var step = (end - start) / pointsToDraw;
+            var toRender = Mathf.CeilToInt(pointsToDraw * (float)time);
             var points = new List<PolylinePoint>();
 
             for (var i = 0; i < toRender; i++) {
-                var x = i * step;
-                var vec = new Vector2(x, Curve.Evaluate(x));
-                points.Add(new PolylinePoint(vec));
+                var point = i * step;
+                point.y = curve.Evaluate(point.x, point.z);
+                points.Add(new PolylinePoint(FixZAxis(point)));
             }
 
             line.points = points;
@@ -45,12 +58,13 @@ namespace Primer.Graph
 
         void Initialize(Graph2 graph) {
             line = Object.Instantiate(prefab, graph.domain);
+            lastStart = Vector3.zero;
         }
 
         public override void OnBehaviourPause(Playable playable, FrameData info) {
             line?.gameObject?.Dispose();
         }
 
+        Vector3 FixZAxis(Vector3 value) => new(value.x, value.y, -value.z);
     }
-
 }

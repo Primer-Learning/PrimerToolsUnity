@@ -11,7 +11,6 @@ namespace Primer.Graph
     public class GraphTrack : TrackAsset
     {
         protected override Playable CreatePlayable(PlayableGraph graph, GameObject gameObject, TimelineClip clip) {
-            Debug.Log("CREATE PLAYABLE");
             var playable = base.CreatePlayable(graph, gameObject, clip);
 
             var behaviour = ((ScriptPlayable<PlotCurveBehaviour>)playable).GetBehaviour();
