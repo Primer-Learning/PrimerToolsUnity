@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: d8c8f7845e2baaf4391a23ad49d4775e
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Kurier Heavy
+  fontNames:
+  - Kurier Heavy
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: d391977d29dad384d8f7c7851ba55099, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

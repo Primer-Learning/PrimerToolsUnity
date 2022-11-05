@@ -1,0 +1,7 @@
+This folder is for classes that utilize Shapes by Freya.
+https://acegikmo.com/shapes/
+
+
+It's not open source, so I don't include it here. But if you have access to it, you should be able include it in your Unity project and the PrimerShapes classes will make use of them.
+
+I haven't done much with it yet, but I expect to use it a fair bit as time goes on, particularly in graphs.
