@@ -1,3 +1,4 @@
+using Primer.Editor;
 using UnityEditor;
 
 namespace Primer.Timeline.Editor
@@ -8,7 +9,7 @@ namespace Primer.Timeline.Editor
         public override void OnInspectorGUI() {
             serializedObject.Update();
 
-            DerivedTypeSelectorWithProps<ScrubbableAdapter>(nameof(AdapterClip.adapter));
+            DerivedTypeSelector.CreateWithProps<ScrubbableAdapter>(serializedObject, nameof(AdapterClip.adapter));
 
             if (serializedObject.ApplyModifiedProperties()) {
                 // Clear the errors and allow the clip to try and play again. Where best to do this

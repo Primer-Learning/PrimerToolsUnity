@@ -68,10 +68,12 @@ public class Graph2 : PrimerBehaviour
 
     void EnsureDomainDimensions() {
         var scale = new Vector3(
-            x ? x.DomainToPosition(1) : 1,
-            y ? y.DomainToPosition(1) : 1,
-            z ? z.DomainToPosition(1) : 1
+            _x ? _x.DomainToPosition(1, true) : 1,
+            _y ? _y.DomainToPosition(1, true) : 1,
+            _z ? _z.DomainToPosition(1, true) : 1
         );
+
+        if (isRightHanded) scale.z *= -1;
 
         if (domain is null || domain.localScale == scale) return;
 
@@ -95,7 +97,9 @@ public class Graph2 : PrimerBehaviour
 
     bool lastRightHanded = true;
     void EnsureRightHanded() {
+        if (z is null) return;
         if (isRightHanded == lastRightHanded) return;
+
         lastRightHanded = isRightHanded;
 
         z.transform.rotation = isRightHanded

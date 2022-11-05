@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Primer;
 using Primer.Graph;
 using TMPro;
@@ -57,9 +56,7 @@ public class Axis2 : ObjectGenerator
     // Memory
     ArrowPresence lastArrowPresence = ArrowPresence.Neither;
 
-    public float DomainToPosition(float domainValue) {
-        return hidden ? 0 : domainValue * positionMultiplier;
-    }
+    public float DomainToPosition(float domainValue, bool ignoreHidden = false) => !ignoreHidden && hidden ? 0 : domainValue * positionMultiplier;
 
     public override void UpdateChildren() {
         gameObject.SetActive(!hidden);
@@ -203,10 +200,10 @@ public class Axis2 : ObjectGenerator
             return calculated;
         }
 
-        for (var i = step; i < max; i += step)
+        for (var i = step; i <= max; i += step)
             calculated.Add(new TicData(i));
 
-        for (var i = -step; i > min; i -= step)
+        for (var i = -step; i >= min; i -= step)
             calculated.Add(new TicData(i));
 
         return calculated;
