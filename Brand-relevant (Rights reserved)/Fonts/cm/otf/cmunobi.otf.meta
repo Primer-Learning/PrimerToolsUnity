@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 588b84d643c8c83468020c1e91491a89
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - CMU Concrete
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 16094b2bf268df3479d6fc8f17b3431b, type: 3}
+  - {fileID: 12800000, guid: 21c3a5ed1499f4a438eb362650796083, type: 3}
+  - {fileID: 12800000, guid: 383e426e570ed9d4a9945ff0392bf3dc, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

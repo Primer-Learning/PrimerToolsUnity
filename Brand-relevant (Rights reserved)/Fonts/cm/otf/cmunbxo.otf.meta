@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 2a71b3f959a6c2545a0a1deba9984616
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - CMU Bright
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: a35359e1e61ecd74e9a876397a0297c4, type: 3}
+  - {fileID: 12800000, guid: b8d7514dca5850a4c88f8509ef1525ca, type: 3}
+  - {fileID: 12800000, guid: 60d426b37c6e5fd4f94576f4bb7e714b, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
