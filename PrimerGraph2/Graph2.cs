@@ -4,14 +4,6 @@ using Shapes;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-/* TODO
- * (Core)
- * Add precision options for tic labels
- *
- * (When needed)
- * Make padding amount uniform instead of using fraction of each axis length (maybe)
- * Destroy unused tics, animating them to zero scale
- */
 [ExecuteInEditMode]
 public class Graph2 : PrimerBehaviour
 {
