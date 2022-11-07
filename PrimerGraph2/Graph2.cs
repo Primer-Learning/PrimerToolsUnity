@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Primer.Graph;
+using Shapes;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -35,6 +36,7 @@ public class Graph2 : PrimerBehaviour
     public PrimerBehaviour arrowPrefab;
     public PrimerText2 primerTextPrefab;
     public Tic2 ticPrefab;
+    public Polyline linePrefab;
 
     void Update() {
         EnsureDomainDimensions();

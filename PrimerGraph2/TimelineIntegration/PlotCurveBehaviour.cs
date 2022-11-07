@@ -37,7 +37,7 @@ namespace Primer.Graph
 
             if (start != lastStart) {
                 lastStart = start;
-                line.transform.position = FixZAxis(Vector3.Scale(start, graph.domain.localScale));
+                line.transform.position = Vector3.Scale(start, graph.domain.localScale);
             }
 
             var pointsToDraw = resolution + 1;
@@ -49,7 +49,7 @@ namespace Primer.Graph
             for (var i = 0; i < toRender; i++) {
                 var point = i * step;
                 point.y = curve.Evaluate(point.x, point.z);
-                points.Add(new PolylinePoint(FixZAxis(point)));
+                points.Add(new PolylinePoint(point));
             }
 
             line.points = points;
@@ -57,6 +57,7 @@ namespace Primer.Graph
         }
 
         void Initialize(Graph2 graph) {
+            prefab ??= graph.linePrefab;
             line = Object.Instantiate(prefab, graph.domain);
             lastStart = Vector3.zero;
         }
@@ -64,7 +65,5 @@ namespace Primer.Graph
         public override void OnBehaviourPause(Playable playable, FrameData info) {
             line?.gameObject?.Dispose();
         }
-
-        Vector3 FixZAxis(Vector3 value) => new(value.x, value.y, -value.z);
     }
 }
