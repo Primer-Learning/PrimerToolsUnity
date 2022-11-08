@@ -7,14 +7,14 @@ public static class GraphCreateUtility
     [MenuItem("GameObject/Primer/Graph", false, CreateUtility.PRIORITY)]
     public static void Graph() => CreateUtility.Prefab("Graph2");
 
-    [MenuItem("GameObject/Primer/GraphLine", true)]
+    [MenuItem("GameObject/Primer/Line", true)]
     public static bool ValidateLine(MenuCommand command) =>
         // Selection can only be null or a live game object in the hierarchy panel
         // it can never be false null
         // ReSharper disable once Unity.NoNullPropagation
         Selection.activeGameObject?.GetComponent<Graph2>() is not null;
 
-    [MenuItem("GameObject/Primer/GraphLine", false, CreateUtility.PRIORITY)]
+    [MenuItem("GameObject/Primer/Line", false, CreateUtility.PRIORITY)]
     public static void Line(MenuCommand command) {
         if (command.context is not GameObject go) {
             throw new Exception("This should never happen");

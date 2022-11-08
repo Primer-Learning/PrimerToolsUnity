@@ -9,6 +9,7 @@ namespace Primer.Graph
 {
     [DisplayName("Primer Learning / Graph Line Track")]
     [TrackClipType(typeof(PlotEquationClip))]
+    [TrackClipType(typeof(PlotDataClip))]
     [TrackBindingType(typeof(Polyline))]
     public class GraphLineTrack : PrimerTrack
     {

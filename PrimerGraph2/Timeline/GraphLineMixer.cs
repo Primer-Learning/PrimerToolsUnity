@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Primer.Timeline;
 using Shapes;
 using UnityEngine;
@@ -32,14 +33,14 @@ namespace Primer.Graph
                 if (weight == 0) continue;
 
                 var inputPlayable = (ScriptPlayable<PrimerPlayable>)playable.GetInput(i);
+                if (inputPlayable.GetBehaviour() is not ILineBehaviour behaviour) {
+                    continue;
+                }
 
-                // If this conversion fails we'll just skip this input
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                var behaviour = inputPlayable.GetBehaviour() as ILineBehaviour;
+                var points = behaviour?.points;
+                if (points is null) continue;
 
-                if (behaviour?.points is null) continue;
-
-                linesToMix.Add((weight, behaviour.points));
+                linesToMix.Add((weight, points));
                 totalWeight += weight;
             }
 
@@ -54,7 +55,7 @@ namespace Primer.Graph
 
             if (totalWeight < 1) {
                 if (linesToMix.Count == 1 && originalPoints.Count == 0) {
-                    ManipulateOnlyLineAppearance(linesToMix);
+                    ManipulateSingleLine(linesToMix);
                 }
                 else {
                     linesToMix.Add((1 - totalWeight, originalPoints));
@@ -69,8 +70,14 @@ namespace Primer.Graph
             hasModifiedLine = true;
         }
 
-        static void ManipulateOnlyLineAppearance(List<(float weight, List<PolylinePoint> points)> linesToMix) {
-            var onlyLine = linesToMix[0].points;
+        const int MinPoints = 100;
+
+        static void ManipulateSingleLine(IList<(float weight, List<PolylinePoint> points)> linesToMix) {
+            var source = linesToMix[0].points;
+            var onlyLine = source.Count > MinPoints
+                ? source
+                : NormalizeLine(linesToMix[0].points, MinPoints).ToList();
+
             var pointsToInclude = onlyLine.Count * linesToMix[0].weight;
             var lastIndex = Mathf.FloorToInt(pointsToInclude);
 

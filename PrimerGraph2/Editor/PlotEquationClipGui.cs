@@ -17,7 +17,7 @@ namespace Primer.Graph.Editor
             }
             else {
                 var equationName = equation.GetType().Name.Replace("Equation", "");
-                clip.displayName = $"Equation({equationName})";
+                clip.displayName = $"Equation ({equationName})";
             }
 
             base.OnClipChanged(clip);
