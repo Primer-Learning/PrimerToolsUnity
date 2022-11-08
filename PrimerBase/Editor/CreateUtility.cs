@@ -6,15 +6,19 @@ using UnityEngine.SceneManagement;
 
 public static class CreateUtility
 {
-    public static void Prefab(string path) {
+    public const int PRIORITY = 0;
+
+    public static void Prefab(string path) => Prefab(path, null);
+    public static GameObject Prefab(string path, Transform parent) {
         var resource = Resources.Load(path);
 
         if (resource is null) {
             throw new Exception($"Cannot find prefab {path}");
         }
 
-        var newObject = PrefabUtility.InstantiatePrefab(resource) as GameObject;
+        var newObject = PrefabUtility.InstantiatePrefab(resource, parent) as GameObject;
         Place(newObject);
+        return newObject;
     }
 
     public static void Object(string name, params Type[] types) {
