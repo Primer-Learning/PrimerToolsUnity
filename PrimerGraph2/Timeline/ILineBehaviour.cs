@@ -5,6 +5,6 @@ namespace Primer.Graph
 {
     public interface ILineBehaviour
     {
-        List<PolylinePoint> points { get; }
+        List<PolylinePoint> Points { get; }
     }
 }

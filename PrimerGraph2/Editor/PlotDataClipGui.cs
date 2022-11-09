@@ -10,7 +10,7 @@ namespace Primer.Graph.Editor
     {
         public override void OnClipChanged(TimelineClip clip) {
             var plotter = (PlotDataClip)clip.asset;
-            var points = plotter.template?.points;
+            var points = plotter.template?.Points;
 
             clip.displayName = $"Data ({points?.Count ?? 0} points)";
 

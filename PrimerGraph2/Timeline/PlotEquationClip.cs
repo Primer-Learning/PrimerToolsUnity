@@ -6,6 +6,6 @@ namespace Primer.Graph
 {
     [Serializable] public class PlotEquationClip : PrimerClip<PlotEquation>
     {
-        public override ClipCaps clipCaps => ClipCaps.Blending;
+        public override ClipCaps clipCaps => ClipCaps.Extrapolation | ClipCaps.Blending;
     }
 }

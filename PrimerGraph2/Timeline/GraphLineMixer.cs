@@ -37,7 +37,7 @@ namespace Primer.Graph
                     continue;
                 }
 
-                var points = behaviour?.points;
+                var points = behaviour?.Points;
                 if (points is null) continue;
 
                 linesToMix.Add((weight, points));
@@ -123,7 +123,7 @@ namespace Primer.Graph
             var finalPoints = new List<PolylinePoint>();
 
             for (var i = 0; i < maxPoints; i++) {
-                var point = pointsToMix[0].points[i];
+                var point = normalizedLines[0][i];
 
                 for (var j = 1; j < lines; j++) {
                     point = PolylinePoint.Lerp(point, normalizedLines[j][i], pointsToMix[j].weight);

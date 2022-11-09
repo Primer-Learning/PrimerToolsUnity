@@ -1,23 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Primer.Timeline;
 using Shapes;
 using UnityEngine;
-using UnityEngine.Playables;
 
 namespace Primer.Graph
 {
     [Serializable]
-    public class PlotData : PrimerPlayable<Polyline>, ILineBehaviour
+    public class PlotData : PrimerPlayable, ILineBehaviour
     {
-        public List<Vector3> _points = new();
-        public List<PolylinePoint> points => _points.Select(x => new PolylinePoint(x)).ToList();
+        public List<Vector3> points = new();
 
-        public override void Start(Polyline trackTarget) {}
+        public List<PolylinePoint> Points
+        {
+            get {
+                var list = new List<PolylinePoint>();
+                var count = points.Count;
 
-        public override void Stop(Polyline trackTarget) {}
+                for (var i = 0; i < count; i++) {
+                    list.Add(new PolylinePoint(points[i]));
+                }
 
-        public override void Frame(Polyline trackTarget, Playable playable, FrameData info) {}
+                return list;
+            }
+        }
     }
 }
