@@ -15,7 +15,8 @@ namespace Primer.Graph
 
         public override void Start(MeshFilter meshFilter) {
             if (!isMeshInitialized) {
-                CreateContinuousGrid(1, 0);
+                var grid = ContinuousGrid.zero;
+                grid.RenderTo(mesh);
                 isMeshInitialized = true;
             }
 
@@ -33,9 +34,8 @@ namespace Primer.Graph
 
         public override void Frame(MeshFilter meshFilter, Playable playable, FrameData info) {
             var count = playable.GetInputCount();
-            var grids = new List<(float weight, Vector3[] points)>();
+            var grids = new List<(float weight, IGrid grid)>();
             var totalWeight = 0f;
-            var size = lastSize;
 
             for (var i = 0; i < count; i++) {
                 var weight = playable.GetInputWeight(i);
@@ -46,10 +46,10 @@ namespace Primer.Graph
                     continue;
                 }
 
-                var grid = behaviour?.Points;
+                var grid = behaviour.Points;
                 if (grid is null) continue;
 
-                grids.Add((weight, grid));
+                grids.Add((weight, new ContinuousGrid(grid)));
                 totalWeight += weight;
             }
 
@@ -59,79 +59,58 @@ namespace Primer.Graph
             }
 
             if (totalWeight < 1) {
-                if (grids.Count == 1 && originalMesh.vertices.Length == 0) {
-                    ManipulateSingleGrid(grids, out size);
+                if (grids.Count == 1) {
+                    ManipulateSingleGrid(grids);
                 }
                 else {
-                    grids.Add((1 - totalWeight, originalMesh.vertices));
+                    grids.Add((1 - totalWeight, new ContinuousGrid(originalMesh.vertices)));
                 }
             }
 
-            var finalPoints = grids.Count == 1
-                ? GridHelper.EnsureIsGrid(grids[0].points, out size)
-                : MixGrids(grids, out size);
+            var finalGrid = grids.Count == 1
+                ? grids[0].grid
+                : MixGrids(grids);
 
-            SetVertices(finalPoints, size);
+            finalGrid.RenderTo(mesh, true);
         }
 
-        void CreateContinuousGrid(int gridSize, float cellSize) =>
-            SetVertices(GridHelper.CreateContinuousGridVectors(gridSize, cellSize), gridSize);
-
-        void SetVertices(Vector3[] points, int newSize) {
-            mesh.Clear();
-            mesh.vertices = points;
-            mesh.triangles = GridHelper.CreateContinuousGridTriangles(newSize);
-            mesh.RecalculateNormals();
-            lastSize = newSize;
-        }
-
-        static Vector3[] NormalizeSize(Vector3[] points, int expectedSize) =>
-            GridHelper.ResizeGrid(points, expectedSize);
-
-        static void ManipulateSingleGrid(IList<(float weight, Vector3[] points)> gridsToMix, out int finalSize) {
-            var (weight, points) = gridsToMix[0];
-            var onlyGrid = GridHelper.EnsureIsGrid(points, out var size);
-            var cropAt = size * weight;
-
-            finalSize = Mathf.CeilToInt(cropAt);
+        static void ManipulateSingleGrid(IList<(float, IGrid)> gridsToMix) {
+            var (weight, onlyGrid) = gridsToMix[0];
             gridsToMix.Clear();
-            gridsToMix.Add((1, GridHelper.CropGrid(onlyGrid, size, cropAt)));
+            gridsToMix.Add((1, onlyGrid.Crop(onlyGrid.Size * weight)));
         }
 
-        static Vector3[] MixGrids(IReadOnlyList<(float weight, Vector3[] points)> gridsToMix, out int finalSize) {
-            var grids = gridsToMix.Count;
-            var weights = new float[grids];
-            var gridSizes = new int[grids];
-            var vertices = new Vector3[grids][];
+        static IGrid MixGrids(IReadOnlyList<(float weight, IGrid grid)> gridsToMix) {
+            var layers = gridsToMix.Count;
+            var weights = new float[layers];
+            var grids = new IGrid[layers];
             var maxSize = 0;
 
-            for (var i = 0; i < grids; i++) {
+            for (var i = 0; i < layers; i++) {
                 weights[i] = gridsToMix[i].weight;
-                vertices[i] = GridHelper.EnsureIsGrid(gridsToMix[i].points, out var gridSize, minSize: 1);
-                gridSizes[i] = gridSize;
-                if (gridSize > maxSize) maxSize = gridSize;
+                var grid = grids[i] = gridsToMix[i].grid;
+                if (grid.Size > maxSize) maxSize = grid.Size;
             }
 
-            for (var i = 0; i < grids; i++) {
-                if (gridSizes[i] == maxSize) {
-                    vertices[i] = NormalizeSize(vertices[i], maxSize);
+            for (var i = 0; i < layers; i++) {
+                if (grids[i].Size != maxSize) {
+                    grids[i] = grids[i].Resize(maxSize);
                 }
             }
 
             var finalPoints = new Vector3[maxSize];
 
             for (var i = 0; i < maxSize; i++) {
-                var point = vertices[0][i];
+                var point = grids[0].Points[i];
 
-                for (var j = 1; j < grids; j++) {
-                    point = Vector3.Lerp(point, vertices[j][i], weights[j]);
+                for (var j = 1; j < layers; j++) {
+                    point = Vector3.Lerp(point, grids[j].Points[i], weights[j]);
                 }
 
                 finalPoints[i] = point;
             }
 
-            finalSize = maxSize;
-            return finalPoints;
+            return new ContinuousGrid(finalPoints);
         }
     }
 }

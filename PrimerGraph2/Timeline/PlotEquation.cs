@@ -11,6 +11,8 @@ namespace Primer.Graph
     {
         [SerializeReference]
         public ParametricEquation equation = new LinearEquation();
+
+        [Min(1)]
         public int resolution = 100;
 
         int lastResolution;
