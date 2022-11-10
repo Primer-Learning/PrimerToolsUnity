@@ -6,7 +6,26 @@ namespace Primer.Graph
 {
     public readonly struct ContinuousGrid : IGrid
     {
+        #region Static
+
         public static ContinuousGrid zero = new(1);
+
+        public static IGrid Lerp(IGrid a, IGrid b, float weight) {
+            var maxSize = Math.Max(a.Size, b.Size);
+            var pointsPerSide = maxSize + 1;
+            var finalPoints = new Vector3[pointsPerSide * pointsPerSide];
+
+            if (a.Size != maxSize) a = a.Resize(maxSize);
+            if (b.Size != maxSize) b = b.Resize(maxSize);
+
+            for (var i = 0; i < pointsPerSide; i++) {
+                finalPoints[i] = Vector3.Lerp(a.Points[i], b.Points[i], weight);
+            }
+
+            return new ContinuousGrid(finalPoints);
+        }
+        #endregion
+
 
         public Vector3[] Points { get; }
         public int Size { get; }
