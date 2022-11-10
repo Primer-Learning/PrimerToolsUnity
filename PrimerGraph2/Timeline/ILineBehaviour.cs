@@ -3,7 +3,7 @@ using Shapes;
 
 namespace Primer.Graph
 {
-    public interface ILineBehaviour
+    internal interface ILineBehaviour
     {
         List<PolylinePoint> Points { get; }
     }

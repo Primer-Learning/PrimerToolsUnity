@@ -2,6 +2,10 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
+// Selection can only be null or a live game object in the hierarchy panel
+// it can never be false null, so we disable this rule on this file
+// ReSharper disable Unity.NoNullPropagation
+
 public static class GraphCreateUtility
 {
     [MenuItem("GameObject/Primer/Graph", false, CreateUtility.PRIORITY)]
@@ -9,13 +13,27 @@ public static class GraphCreateUtility
 
     [MenuItem("GameObject/Primer/Line", true)]
     public static bool ValidateLine(MenuCommand command) =>
-        // Selection can only be null or a live game object in the hierarchy panel
-        // it can never be false null
-        // ReSharper disable once Unity.NoNullPropagation
         Selection.activeGameObject?.GetComponent<Graph2>() is not null;
 
     [MenuItem("GameObject/Primer/Line", false, CreateUtility.PRIORITY)]
     public static void Line(MenuCommand command) {
+        var graph = GetGraph(command);
+        var line = CreateUtility.Prefab("GraphLine", graph.domain);
+        line.transform.localPosition = Vector3.zero;
+    }
+
+    [MenuItem("GameObject/Primer/Surface", true)]
+    public static bool ValidateSurface(MenuCommand command) =>
+        Selection.activeGameObject?.GetComponent<Graph2>() is not null;
+
+    [MenuItem("GameObject/Primer/Surface", false, CreateUtility.PRIORITY)]
+    public static void Surface(MenuCommand command) {
+        var graph = GetGraph(command);
+        var line = CreateUtility.Prefab("GraphSurface", graph.domain);
+        line.transform.localPosition = Vector3.zero;
+    }
+
+    static Graph2 GetGraph(MenuCommand command) {
         if (command.context is not GameObject go) {
             throw new Exception("This should never happen");
         }
@@ -23,11 +41,9 @@ public static class GraphCreateUtility
         var graph = go.GetComponent<Graph2>();
 
         if (graph is null) {
-            throw new Exception("Create graph line command should only be executed on a graph");
+            throw new Exception("Create graph surface command should only be executed on a graph");
         }
 
-        var line = CreateUtility.Prefab("GraphLine", graph.domain);
-
-        line.transform.localPosition = Vector3.zero;
+        return graph;
     }
 }

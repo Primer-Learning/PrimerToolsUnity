@@ -7,11 +7,11 @@ using UnityEngine;
 namespace Primer.Graph
 {
     [Serializable]
-    public class PlotData : PrimerPlayable, ILineBehaviour
+    public class PlotData : PrimerPlayable, ILineBehaviour, ISurfaceBehaviour
     {
         public List<Vector3> points = new();
 
-        public List<PolylinePoint> Points
+        List<PolylinePoint> ILineBehaviour.Points
         {
             get {
                 var list = new List<PolylinePoint>();
@@ -24,5 +24,7 @@ namespace Primer.Graph
                 return list;
             }
         }
+
+        Vector3[] ISurfaceBehaviour.Points => points.ToArray();
     }
 }
