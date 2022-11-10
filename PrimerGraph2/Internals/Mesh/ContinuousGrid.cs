@@ -75,10 +75,6 @@ namespace Primer.Graph
             var triangles = DefineTriangles(bothSides);
             var points = bothSides ? DuplicatedList(Points) : Points;
 
-            var x = bothSides ? $"BOTH({points.Length} / {triangles.Length / 3f})" : "";
-            var triangleCount = triangles.Length / 3f / (bothSides ? 2f : 1f);
-            Debug.Log($"Rendering {Points.Length} vertices with {triangleCount} triangles {x}");
-
             mesh.Clear();
             mesh.vertices = points;
             mesh.triangles = triangles;
