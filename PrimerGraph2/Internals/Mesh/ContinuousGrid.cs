@@ -87,18 +87,22 @@ namespace Primer.Graph
         public IGrid Resize(int newSize) {
             if (newSize == Size) return this;
 
+            var size = Size;
             var points = Points;
-            var result = new Vector3[PointsCount];
+            var lastIndex = newSize;
+            var pointsPerSide = newSize + 1;
+            var result = new Vector3[pointsPerSide * pointsPerSide];
 
-            for (var x = 0; x < newSize; x++) {
-                for (var y = 0; y < newSize; y++) {
-                    var i = y * newSize + x;
+            for (var x = 0; x < pointsPerSide; x++) {
+                for (var y = 0; y < pointsPerSide; y++) {
+                    var i = y * lastIndex + x;
                     var col = (float)x / newSize * Size;
                     var row = (float)y / newSize * Size;
 
+                    // BUG IN THIS FUNCTION
                     result[i] = IsInteger(col) && IsInteger(row)
-                        ? points[(int)row + (int)col * Size]
-                        : QuadLerp(points, Size, row, col);
+                        ? points[(int)row * size + (int)col]
+                        : QuadLerp(points, size, row, col);
                 }
             }
 
@@ -111,8 +115,8 @@ namespace Primer.Graph
                 throw new Exception("bruh");
             }
 
-            var lastIndex = Mathf.FloorToInt(croppedSize);
             var finalSize = Mathf.CeilToInt(croppedSize);
+            var lastIndex = finalSize;
             var pps = PointsPerSide;
             var pointsCount = finalSize + 1;
             var t = croppedSize % 1;
@@ -127,19 +131,19 @@ namespace Primer.Graph
                 }
             }
 
-            // Lerp right side
+            // Lerp bottom
             for (var x = 0; x < pointsCount; x++) {
                 var y = lastIndex;
-                var a = points[y * pps + x];
-                var b = points[(y + 1) * pps + x];
+                var a = points[(y - 1) * pps + x];
+                var b = points[y * pps + x];
                 copy[y * pointsCount + x] = Vector3.Lerp(a, b, t);
             }
 
-            // Lerp bottom
+            // Lerp right side
             for (var y = 0; y < pointsCount; y++) {
                 var x = lastIndex;
-                var a = points[y * pps + x];
-                var b = points[y * pps + x + 1];
+                var a = points[y * pps + x - 1];
+                var b = points[y * pps + x];
                 copy[y * pointsCount + x] = Vector3.Lerp(a, b, t);
             }
 
@@ -154,8 +158,6 @@ namespace Primer.Graph
         #region Triangles
         int[] DefineTriangles(bool bothSides) {
             var size = Size;
-            if (size == 1) return Array.Empty<int>();
-
             var pointsPerSide = PointsPerSide;
             var pointsCount = PointsCount;
             var trianglesPerSquare = bothSides ? 4 : 2;

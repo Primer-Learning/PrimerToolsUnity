@@ -14,6 +14,8 @@ namespace Primer.Graph
         int lastSize;
 
         public override void Start(MeshFilter meshFilter) {
+            if (hasModifiedMesh) return;
+
             if (!isMeshInitialized) {
                 var grid = ContinuousGrid.zero;
                 grid.RenderTo(mesh);
@@ -57,6 +59,8 @@ namespace Primer.Graph
                 Stop(meshFilter);
                 return;
             }
+
+            Start(meshFilter);
 
             if (totalWeight < 1) {
                 if (grids.Count == 1) {
