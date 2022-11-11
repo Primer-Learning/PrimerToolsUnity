@@ -77,7 +77,8 @@ namespace Primer.Graph
         }
 
 
-        public ILine Crop(float newLength) {
+        public ILine Crop(float newLength) => Crop(newLength, false);
+        public ILine Crop(float newLength, bool fromOrigin) {
             if (newLength.IsInteger() && Length == (int)newLength) {
                 return this;
             }
@@ -87,29 +88,25 @@ namespace Primer.Graph
             }
 
             var finalLength = Mathf.CeilToInt(newLength);
-            var lastIndex = finalLength - 1;
+            if (finalLength <= 1) return zero;
 
-            if (lastIndex == 0) {
-                return zero;
-            }
-
+            var firstIndex = fromOrigin ? Length - finalLength : 0;
+            var lastIndex = firstIndex + finalLength - 1;
             var points = Points;
             var copy = new Vector3[finalLength];
 
-            // Copy unchanged points
+            // Copy unchanged points, including the one to lerp
             for (var i = 0; i < finalLength; i++) {
-                copy[i] = points[i];
+                copy[i] = points[firstIndex + i];
             }
 
-            try {
-                var a = points[lastIndex - 1];
-                var b = points[lastIndex];
-                var t = newLength.GetDecimals();
+            var t = newLength.GetDecimals();
 
-                copy[lastIndex] = Vector3.Lerp(a, b, t);
+            if (fromOrigin) {
+                copy[0] = Vector3.Lerp(copy[0], copy[1], 1 - t);
             }
-            catch (Exception ex) {
-                Debug.Log($"POTATO {lastIndex} {points.Length}");
+            else {
+                copy[lastIndex] = Vector3.Lerp(copy[lastIndex - 1], copy[lastIndex], t);
             }
 
             return new SimpleLine(copy);

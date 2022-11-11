@@ -11,6 +11,7 @@ namespace Primer.Graph
 
         IGrid Resize(int newSize);
         IGrid Crop(float newSize);
+        IGrid Crop(float newSize, bool fromOrigin);
 
 
         public static Vector3[] Lerp(IGrid a, IGrid b, float t) {

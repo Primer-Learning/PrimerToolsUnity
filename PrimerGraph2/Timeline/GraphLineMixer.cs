@@ -27,7 +27,7 @@ namespace Primer.Graph
                 : null;
 
         protected override ILine SingleInput(ILine input, float weight, bool isReverse) =>
-            input.Crop(input.Length * weight);
+            input.Crop(input.Length * weight, isReverse);
 
         protected override void Apply(Polyline line, ILine input) {
             line.points = SimpleLine.ToPolyline(input);

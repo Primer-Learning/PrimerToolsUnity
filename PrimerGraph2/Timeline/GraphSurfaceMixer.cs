@@ -35,7 +35,7 @@ namespace Primer.Graph
                 : null;
 
         protected override IGrid SingleInput(IGrid grid, float weight, bool isReverse) =>
-            grid.Crop(grid.Size * weight);
+            grid.Crop(grid.Size * weight, isReverse);
 
         protected override void Apply(MeshFilter trackTarget, IGrid input) =>
             input.RenderTo(mesh, true);

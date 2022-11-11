@@ -9,6 +9,7 @@ namespace Primer.Graph
 
         ILine Resize(int newLength);
         ILine Crop(float newLength);
+        ILine Crop(float newLength, bool fromOrigin);
 
 
         public static Vector3[] Lerp(ILine a, ILine b, float t) {

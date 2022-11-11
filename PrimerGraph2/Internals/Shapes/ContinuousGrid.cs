@@ -93,14 +93,15 @@ namespace Primer.Graph
 
                     result[i] = col.IsInteger() && row.IsInteger()
                         ? points[(int)row * sideLength + (int)col]
-                        : QuadLerp(row, col);
+                        : QuadLerp(points, sideLength, row, col);
                 }
             }
 
             return new ContinuousGrid(result, newSize);
         }
 
-        public IGrid Crop(float croppedSize) {
+        public IGrid Crop(float newSize) => Crop(newSize, false);
+        public IGrid Crop(float croppedSize, bool fromOrigin) {
             if (croppedSize == 0) return zero;
 
             if (croppedSize.IsInteger() && Size == (int)croppedSize) {
@@ -112,39 +113,57 @@ namespace Primer.Graph
             }
 
             var finalSize = Mathf.CeilToInt(croppedSize);
-            var lastIndex = finalSize;
             var sideLength = SideLength;
-            var newSideLength = finalSize + 1;
-            var t = croppedSize % 1;
+            var length = finalSize + 1;
+            var offset = fromOrigin ? sideLength - length : 0;
+            var t = croppedSize.GetDecimals();
 
             var points = Points;
-            var copy = new Vector3[newSideLength * newSideLength];
+            var copy = new Vector3[length * length];
 
             // Copy unchanged points, including points to lerp
-            for (var x = 0; x < newSideLength; x++) {
-                for (var y = 0; y < newSideLength; y++) {
-                    copy[y * newSideLength + x] = points[y * sideLength + x];
+            for (var x = 0; x < length; x++) {
+                for (var y = 0; y < length; y++) {
+                    copy[y * length + x] = points[(y + offset) * sideLength + x + offset];
                 }
             }
 
-            // Lerp bottom
-            for (var x = 0; x < newSideLength; x++) {
-                var y = lastIndex;
-                var a = points[(y - 1) * sideLength + x];
-                var b = points[y * sideLength + x];
-                copy[y * newSideLength + x] = Vector3.Lerp(a, b, t);
-            }
+            if (fromOrigin) {
+                // Lerp corner
+                copy[0] = Vector3.Lerp(copy[length + 1], copy[0], t);
 
-            // Lerp right side
-            for (var y = 0; y < newSideLength; y++) {
-                var x = lastIndex;
-                var a = points[y * sideLength + x - 1];
-                var b = points[y * sideLength + x];
-                copy[y * newSideLength + x] = Vector3.Lerp(a, b, t);
-            }
+                // Lerp top
+                for (var x = 1; x < length; x++) {
+                    copy[x] = Vector3.Lerp(copy[length + x], copy[x], t);
+                }
 
-            // Lerp corner
-            copy[lastIndex * newSideLength + lastIndex] = QuadLerp(croppedSize, croppedSize);
+                // Lerp left side
+                for (var y = 1; y < length; y++) {
+                    copy[y * length] = Vector3.Lerp(copy[y * length + 1], copy[y * length], t);
+                }
+            }
+            else {
+                var lastIndex = finalSize;
+
+                // Lerp bottom
+                for (var x = 0; x < length; x++) {
+                    var y = lastIndex;
+                    var a = copy[(y - 1) * length + x];
+                    var b = copy[y * length + x];
+                    copy[y * length + x] = Vector3.Lerp(a, b, t);
+                }
+
+                // Lerp right side
+                for (var y = 0; y < length; y++) {
+                    var x = lastIndex;
+                    var a = copy[y * length + x - 1];
+                    var b = copy[y * length + x];
+                    copy[y * length + x] = Vector3.Lerp(a, b, t);
+                }
+
+                // Lerp corner
+                copy[lastIndex * length + lastIndex] = QuadLerp(points, sideLength, croppedSize, croppedSize);
+            }
 
             return new ContinuousGrid(copy, finalSize);
         }
@@ -208,24 +227,24 @@ namespace Primer.Graph
             return copy;
         }
 
-        Vector3 QuadLerp(float row, float col) {
+        static Vector3 QuadLerp(Vector3[] points, int length, float row, float col, bool reverse = false) {
             var top = Mathf.FloorToInt(row);
             var bottom = Mathf.CeilToInt(row);
             var left = Mathf.FloorToInt(col);
             var right = Mathf.CeilToInt(col);
 
-            var topLeft = Points[top * SideLength + left];
-            var topRight = Points[top * SideLength + right];
-            var bottomLeft = Points[bottom * SideLength + left];
-            var bottomRight = Points[bottom * SideLength + right];
+            var topLeft = points[top * length + left];
+            var topRight = points[top * length + right];
+            var bottomLeft = points[bottom * length + left];
+            var bottomRight = points[bottom * length + right];
 
             var tx = col.GetDecimals();
             var ty = row.GetDecimals();
 
-            var a = Vector3.Lerp(topLeft, topRight, tx);
-            var b = Vector3.Lerp(bottomLeft, bottomRight, tx);
+            var a = Vector3.Lerp(topLeft, topRight, reverse ? 1 - tx : tx);
+            var b = Vector3.Lerp(bottomLeft, bottomRight, reverse ? 1 - tx : tx);
 
-            return Vector3.Lerp(a, b, ty);
+            return Vector3.Lerp(a, b, reverse ? 1 - ty : ty);
         }
         #endregion
     }

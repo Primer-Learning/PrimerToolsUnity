@@ -7,7 +7,7 @@ namespace Primer.Timeline
     {
         protected U originalValue;
         float lastTotalWeight;
-
+        double lastTime;
 
         protected abstract U ProcessPlayable(PrimerPlayable behaviour);
         protected abstract U SingleInput(U input, float weight, bool isReverse);
@@ -38,8 +38,10 @@ namespace Primer.Timeline
                 totalWeight += weight;
             }
 
-            var isDecreasing = totalWeight < lastTotalWeight;
+            var isDecreasing = lastTotalWeight > totalWeight;
+            var isBackwards = lastTime > playable.GetTime();
             lastTotalWeight = totalWeight;
+            lastTime = playable.GetTime();
 
             // No weights, we stop mixing
             if (totalWeight == 0) {
@@ -55,7 +57,8 @@ namespace Primer.Timeline
                 // If we have original value we add it to the input list
                 // otherwise we invoke SingleInput() instead of Frame()
                 if (originalValue is null) {
-                    var singleResult = SingleInput(inputs[0], weights[0], isDecreasing);
+                    var isReverse = isBackwards ? !isDecreasing : isDecreasing;
+                    var singleResult = SingleInput(inputs[0], weights[0], isReverse);
                     Apply(trackTarget, singleResult);
                     return;
                 }
