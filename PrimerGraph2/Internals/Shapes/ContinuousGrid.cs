@@ -14,7 +14,7 @@ namespace Primer.Graph
         public Vector3[] Points { get; }
         public int Size { get; }
 
-        int PointsPerSide => Size + 1;
+        int SideLength => Size + 1;
 
 
         ContinuousGrid(Vector3[] points, int size) {
@@ -79,17 +79,20 @@ namespace Primer.Graph
             var size = Size;
             if (newSize == size) return this;
 
-            var pointsPerSide = newSize + 1;
-            var result = new Vector3[pointsPerSide * pointsPerSide];
+            var sideLength = SideLength;
+            var newSideLength = newSize + 1;
 
-            for (var y = 0; y < pointsPerSide; y++) {
-                for (var x = 0; x < pointsPerSide; x++) {
-                    var i = y * pointsPerSide + x;
+            var points = Points;
+            var result = new Vector3[newSideLength * newSideLength];
+
+            for (var y = 0; y < newSideLength; y++) {
+                for (var x = 0; x < newSideLength; x++) {
+                    var i = y * newSideLength + x;
                     var col = (float)x / newSize * size;
                     var row = (float)y / newSize * size;
 
                     result[i] = col.IsInteger() && row.IsInteger()
-                        ? Points[(int)row * PointsPerSide + (int)col]
+                        ? points[(int)row * sideLength + (int)col]
                         : QuadLerp(row, col);
                 }
             }
@@ -98,6 +101,8 @@ namespace Primer.Graph
         }
 
         public IGrid Crop(float croppedSize) {
+            if (croppedSize == 0) return zero;
+
             if (croppedSize.IsInteger() && Size == (int)croppedSize) {
                 return this;
             }
@@ -106,44 +111,40 @@ namespace Primer.Graph
                 throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
             }
 
-            if (croppedSize == 0) {
-                return zero;
-            }
-
             var finalSize = Mathf.CeilToInt(croppedSize);
             var lastIndex = finalSize;
-            var currentPps = PointsPerSide;
-            var newPps = finalSize + 1;
+            var sideLength = SideLength;
+            var newSideLength = finalSize + 1;
             var t = croppedSize % 1;
 
             var points = Points;
-            var copy = new Vector3[newPps * newPps];
+            var copy = new Vector3[newSideLength * newSideLength];
 
             // Copy unchanged points, including points to lerp
-            for (var x = 0; x < newPps; x++) {
-                for (var y = 0; y < newPps; y++) {
-                    copy[y * newPps + x] = points[y * currentPps + x];
+            for (var x = 0; x < newSideLength; x++) {
+                for (var y = 0; y < newSideLength; y++) {
+                    copy[y * newSideLength + x] = points[y * sideLength + x];
                 }
             }
 
             // Lerp bottom
-            for (var x = 0; x < newPps; x++) {
+            for (var x = 0; x < newSideLength; x++) {
                 var y = lastIndex;
-                var a = points[(y - 1) * currentPps + x];
-                var b = points[y * currentPps + x];
-                copy[y * newPps + x] = Vector3.Lerp(a, b, t);
+                var a = points[(y - 1) * sideLength + x];
+                var b = points[y * sideLength + x];
+                copy[y * newSideLength + x] = Vector3.Lerp(a, b, t);
             }
 
             // Lerp right side
-            for (var y = 0; y < newPps; y++) {
+            for (var y = 0; y < newSideLength; y++) {
                 var x = lastIndex;
-                var a = points[y * currentPps + x - 1];
-                var b = points[y * currentPps + x];
-                copy[y * newPps + x] = Vector3.Lerp(a, b, t);
+                var a = points[y * sideLength + x - 1];
+                var b = points[y * sideLength + x];
+                copy[y * newSideLength + x] = Vector3.Lerp(a, b, t);
             }
 
             // Lerp corner
-            copy[lastIndex * newPps + lastIndex] = QuadLerp(croppedSize, croppedSize);
+            copy[lastIndex * newSideLength + lastIndex] = QuadLerp(croppedSize, croppedSize);
 
             return new ContinuousGrid(copy, finalSize);
         }
@@ -153,8 +154,8 @@ namespace Primer.Graph
         #region Triangles
         int[] DefineTriangles(bool bothSides) {
             var size = Size;
-            var pointsPerSide = PointsPerSide;
-            var pointsCount = pointsPerSide * pointsPerSide;
+            var sideLength = SideLength;
+            var pointsCount = sideLength * sideLength;
             var trianglesPerSquare = bothSides ? 4 : 2;
             var edgesPerSquare = trianglesPerSquare * 3;
             var triangles = new int[size * size * edgesPerSquare];
@@ -166,12 +167,12 @@ namespace Primer.Graph
                 for (var y = 0; y < size; y++) {
                     // first triangle
                     triangles[t] = v;
-                    triangles[t + 1] = v + pointsPerSide;
-                    triangles[t + 2] = v + pointsPerSide + 1;
+                    triangles[t + 1] = v + sideLength;
+                    triangles[t + 2] = v + sideLength + 1;
 
                     // second triangle
                     triangles[t + 3] = v;
-                    triangles[t + 4] = v + pointsPerSide + 1;
+                    triangles[t + 4] = v + sideLength + 1;
                     triangles[t + 5] = v + 1;
 
                     if (bothSides) {
@@ -213,10 +214,10 @@ namespace Primer.Graph
             var left = Mathf.FloorToInt(col);
             var right = Mathf.CeilToInt(col);
 
-            var topLeft = Points[top * PointsPerSide + left];
-            var topRight = Points[top * PointsPerSide + right];
-            var bottomLeft = Points[bottom * PointsPerSide + left];
-            var bottomRight = Points[bottom * PointsPerSide + right];
+            var topLeft = Points[top * SideLength + left];
+            var topRight = Points[top * SideLength + right];
+            var bottomLeft = Points[bottom * SideLength + left];
+            var bottomRight = Points[bottom * SideLength + right];
 
             var tx = col.GetDecimals();
             var ty = row.GetDecimals();
