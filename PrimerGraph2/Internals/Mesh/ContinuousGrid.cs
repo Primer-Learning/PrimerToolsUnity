@@ -13,12 +13,13 @@ namespace Primer.Graph
         public static IGrid Lerp(IGrid a, IGrid b, float weight) {
             var maxSize = Math.Max(a.Size, b.Size);
             var pointsPerSide = maxSize + 1;
-            var finalPoints = new Vector3[pointsPerSide * pointsPerSide];
+            var length = pointsPerSide * pointsPerSide;
+            var finalPoints = new Vector3[length];
 
             if (a.Size != maxSize) a = a.Resize(maxSize);
             if (b.Size != maxSize) b = b.Resize(maxSize);
 
-            for (var i = 0; i < pointsPerSide; i++) {
+            for (var i = 0; i < length; i++) {
                 finalPoints[i] = Vector3.Lerp(a.Points[i], b.Points[i], weight);
             }
 
@@ -41,20 +42,9 @@ namespace Primer.Graph
 
 
         #region Public constructors
-        public ContinuousGrid(int size, Func<float, float, Vector3> filler = null) {
-            var points = new Vector3[(size + 1) * (size + 1)];
-            var v = 0;
-
-            for (var x = 0; x < size; x++) {
-                for (var y = 0; y < size; y++) {
-                    points[v++] = filler == null
-                        ? Vector3.zero
-                        : filler((float)x / size, (float)y / size);
-                }
-            }
-
+        public ContinuousGrid(int size) {
             Size = size;
-            Points = points;
+            Points = new Vector3[(size + 1) * (size + 1)];
         }
 
         public ContinuousGrid(
@@ -104,24 +94,22 @@ namespace Primer.Graph
 
         #region Manipulation
         public IGrid Resize(int newSize) {
-            if (newSize == Size) return this;
-
             var size = Size;
-            var points = Points;
-            var lastIndex = newSize;
+            if (newSize == size) return this;
+
             var pointsPerSide = newSize + 1;
             var result = new Vector3[pointsPerSide * pointsPerSide];
 
-            for (var x = 0; x < pointsPerSide; x++) {
-                for (var y = 0; y < pointsPerSide; y++) {
-                    var i = y * lastIndex + x;
-                    var col = (float)x / newSize * Size;
-                    var row = (float)y / newSize * Size;
+            for (var y = 0; y < pointsPerSide; y++) {
+                for (var x = 0; x < pointsPerSide; x++) {
+                    var i = y * pointsPerSide + x;
+                    var col = (float)x / newSize * size;
+                    var row = (float)y / newSize * size;
 
                     // BUG IN THIS FUNCTION
                     result[i] = IsInteger(col) && IsInteger(row)
-                        ? points[(int)row * size + (int)col]
-                        : QuadLerp(points, size, row, col);
+                        ? Points[(int)row * PointsPerSide + (int)col]
+                        : QuadLerp(row, col);
                 }
             }
 
@@ -131,43 +119,43 @@ namespace Primer.Graph
         public IGrid Crop(float croppedSize) {
             if (IsInteger(croppedSize) && Size == (int)croppedSize) return this;
             if (Size < croppedSize) {
-                throw new Exception("bruh");
+                throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
             }
 
             var finalSize = Mathf.CeilToInt(croppedSize);
             var lastIndex = finalSize;
-            var pps = PointsPerSide;
-            var pointsCount = finalSize + 1;
+            var currentPps = PointsPerSide;
+            var newPps = finalSize + 1;
             var t = croppedSize % 1;
 
             var points = Points;
-            var copy = new Vector3[pointsCount * pointsCount];
+            var copy = new Vector3[newPps * newPps];
 
             // Copy unchanged points
-            for (var x = 0; x < pointsCount; x++) {
-                for (var y = 0; y < pointsCount; y++) {
-                    copy[y * pointsCount + x] = points[y * pps + x];
+            for (var x = 0; x < newPps; x++) {
+                for (var y = 0; y < newPps; y++) {
+                    copy[y * newPps + x] = points[y * currentPps + x];
                 }
             }
 
             // Lerp bottom
-            for (var x = 0; x < pointsCount; x++) {
+            for (var x = 0; x < newPps; x++) {
                 var y = lastIndex;
-                var a = points[(y - 1) * pps + x];
-                var b = points[y * pps + x];
-                copy[y * pointsCount + x] = Vector3.Lerp(a, b, t);
+                var a = points[(y - 1) * currentPps + x];
+                var b = points[y * currentPps + x];
+                copy[y * newPps + x] = Vector3.Lerp(a, b, t);
             }
 
             // Lerp right side
-            for (var y = 0; y < pointsCount; y++) {
+            for (var y = 0; y < newPps; y++) {
                 var x = lastIndex;
-                var a = points[y * pps + x - 1];
-                var b = points[y * pps + x];
-                copy[y * pointsCount + x] = Vector3.Lerp(a, b, t);
+                var a = points[y * currentPps + x - 1];
+                var b = points[y * currentPps + x];
+                copy[y * newPps + x] = Vector3.Lerp(a, b, t);
             }
 
             // Lerp corner
-            copy[lastIndex * pointsCount + lastIndex] = QuadLerp(points, Size, croppedSize, croppedSize);
+            copy[lastIndex * newPps + lastIndex] = QuadLerp(croppedSize, croppedSize);
 
             return new ContinuousGrid(copy, finalSize);
         }
@@ -233,17 +221,16 @@ namespace Primer.Graph
             return copy;
         }
 
-        static Vector3 QuadLerp(Vector3[] grid, int size, float row, float col) {
-            var pointsPerSize = size + 1;
+        Vector3 QuadLerp(float row, float col) {
             var top = Mathf.FloorToInt(row);
             var bottom = Mathf.CeilToInt(row);
             var left = Mathf.FloorToInt(col);
             var right = Mathf.CeilToInt(col);
 
-            var topLeft = grid[top * pointsPerSize + left];
-            var topRight = grid[top * pointsPerSize + right];
-            var bottomLeft = grid[bottom * pointsPerSize + left];
-            var bottomRight = grid[bottom * pointsPerSize + right];
+            var topLeft = Points[top * PointsPerSide + left];
+            var topRight = Points[top * PointsPerSide + right];
+            var bottomLeft = Points[bottom * PointsPerSide + left];
+            var bottomRight = Points[bottom * PointsPerSide + right];
 
             var tx = GetDecimals(col);
             var ty = GetDecimals(row);

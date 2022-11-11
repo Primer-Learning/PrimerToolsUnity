@@ -85,6 +85,10 @@ namespace Primer.Graph
         }
 
         static IGrid MixGrids(IReadOnlyList<(float weight, IGrid grid)> gridsToMix) {
+            // ContinuousGrid.Lerp is going to resize the grids
+            // But we calculate max size in advance so grids
+            // only suffer a single transformation
+
             var maxSize = 0;
 
             for (var i = 0; i < gridsToMix.Count; i++) {
@@ -92,11 +96,12 @@ namespace Primer.Graph
                 if (size > maxSize) maxSize = size;
             }
 
-            var result = gridsToMix[0].grid;
+            var result = gridsToMix[0].grid.Resize(maxSize);
 
             for (var i = 1; i < gridsToMix.Count; i++) {
                 var (weight, grid) = gridsToMix[i];
-                result = ContinuousGrid.Lerp(result, grid, weight);
+                result = ContinuousGrid.Lerp(
+                    result, grid, weight);
             }
 
             return result;
