@@ -11,7 +11,8 @@ namespace DefaultNamespace
         public float radius = 1;
         public float length = 10;
 
-        public override Vector3 Evaluate(float t, float u) => offset + new Vector3(
+        public override Vector3 Evaluate(float t, float u) =>
+            offset + new Vector3(
             Mathf.Cos(t * Mathf.PI * 2) * radius,
             u * length,
             Mathf.Sin(t * Mathf.PI * 2) * radius

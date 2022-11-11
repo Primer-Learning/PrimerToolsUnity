@@ -6,7 +6,7 @@ namespace Primer.Graph
 {
     public readonly struct ContinuousGrid : IGrid
     {
-        public static ContinuousGrid zero = new(1);
+        public static ContinuousGrid zero = new(0);
         public static IGrid Lerp(IGrid a, IGrid b, float t) =>
             new ContinuousGrid(IGrid.Lerp(a, b, t));
 
@@ -15,7 +15,6 @@ namespace Primer.Graph
         public int Size { get; }
 
         int PointsPerSide => Size + 1;
-        int PointsCount => PointsPerSide * PointsPerSide;
 
 
         ContinuousGrid(Vector3[] points, int size) {
@@ -46,7 +45,7 @@ namespace Primer.Graph
 
             var fill = fillValue ?? Vector3.zero;
             var newSize = Mathf.Max(Mathf.CeilToInt(originalSize), minSize);
-            var newLength = newSize * newSize;
+            var newLength = (newSize + 1) * (newSize + 1);
             var newVertices = new Vector3[newLength];
 
             vertices.CopyTo(newVertices, 0);
@@ -89,7 +88,6 @@ namespace Primer.Graph
                     var col = (float)x / newSize * size;
                     var row = (float)y / newSize * size;
 
-                    // BUG IN THIS FUNCTION
                     result[i] = col.IsInteger() && row.IsInteger()
                         ? Points[(int)row * PointsPerSide + (int)col]
                         : QuadLerp(row, col);
@@ -108,6 +106,10 @@ namespace Primer.Graph
                 throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
             }
 
+            if (croppedSize == 0) {
+                return zero;
+            }
+
             var finalSize = Mathf.CeilToInt(croppedSize);
             var lastIndex = finalSize;
             var currentPps = PointsPerSide;
@@ -117,7 +119,7 @@ namespace Primer.Graph
             var points = Points;
             var copy = new Vector3[newPps * newPps];
 
-            // Copy unchanged points
+            // Copy unchanged points, including points to lerp
             for (var x = 0; x < newPps; x++) {
                 for (var y = 0; y < newPps; y++) {
                     copy[y * newPps + x] = points[y * currentPps + x];
@@ -152,7 +154,7 @@ namespace Primer.Graph
         int[] DefineTriangles(bool bothSides) {
             var size = Size;
             var pointsPerSide = PointsPerSide;
-            var pointsCount = PointsCount;
+            var pointsCount = pointsPerSide * pointsPerSide;
             var trianglesPerSquare = bothSides ? 4 : 2;
             var edgesPerSquare = trianglesPerSquare * 3;
             var triangles = new int[size * size * edgesPerSquare];

@@ -29,6 +29,7 @@ namespace Primer.Graph
         public Vector3[] Points { get; }
 
 
+        public SimpleLine(int length) => Points = new Vector3[length];
         public SimpleLine(Vector3[] points) => Points = points;
 
         public SimpleLine(List<PolylinePoint> list) {
@@ -45,7 +46,14 @@ namespace Primer.Graph
 
         public ILine Resize(int newLength) {
             var currentLength = Length;
-            if (newLength == currentLength) return this;
+
+            if (newLength == currentLength) {
+                return this;
+            }
+
+            if (currentLength == 0) {
+                return new SimpleLine(newLength);
+            }
 
             var points = Points;
             var result = new Vector3[newLength];

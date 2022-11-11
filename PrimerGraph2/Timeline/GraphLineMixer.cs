@@ -1,101 +1,56 @@
 using System.Collections.Generic;
 using Primer.Timeline;
 using Shapes;
-using UnityEngine.Playables;
 
 namespace Primer.Graph
 {
-    public class GraphLineMixer : PrimerPlayable<Polyline>
+    public class GraphLineMixer : CollectedMixer<Polyline, ILine>
     {
         List<PolylinePoint> originalPoints;
-        ILine originalLine;
-        bool hasModifiedLine;
 
-        public override void Start(Polyline line) {
+        protected override void Start(Polyline line) {
             originalPoints = line.points;
-            originalLine = new SimpleLine(originalPoints);
+            originalValue = originalPoints.Count == 0
+                ? null
+                : new SimpleLine(originalPoints);
         }
 
-        public override void Stop(Polyline line) {
+        protected override void Stop(Polyline line) {
             if (!line) return;
             line.points = originalPoints;
             line.meshOutOfDate = true;
         }
 
-        public override void Frame(Polyline line, Playable playable, FrameData info) {
-            var count = playable.GetInputCount();
+        protected override ILine ProcessPlayable(PrimerPlayable behaviour) =>
+            behaviour is ILineBehaviour {Points: {}} lineBehaviour
+                ? new SimpleLine(lineBehaviour.Points)
+                : null;
 
-            var totalWeight = 0f;
-            var linesToMix = new List<(float weight, ILine points)>();
+        protected override ILine SingleInput(ILine input, float weight, bool isReverse) =>
+            input.Crop(input.Length * weight);
 
-            for (var i = 0; i < count; i++) {
-                var weight = playable.GetInputWeight(i);
-                if (weight == 0) continue;
-
-                var inputPlayable = (ScriptPlayable<PrimerPlayable>)playable.GetInput(i);
-                if (inputPlayable.GetBehaviour() is not ILineBehaviour behaviour) {
-                    continue;
-                }
-
-                var points = behaviour?.Points;
-                if (points is null) continue;
-
-                linesToMix.Add((weight, new SimpleLine(points)));
-                totalWeight += weight;
-            }
-
-            if (totalWeight == 0) {
-                if (hasModifiedLine) {
-                    hasModifiedLine = false;
-                    Stop(line);
-                }
-
-                return;
-            }
-
-            if (totalWeight < 1) {
-                if (linesToMix.Count == 1 && originalPoints.Count == 0) {
-                    ManipulateSingleLine(linesToMix);
-                }
-                else {
-                    linesToMix.Add((1 - totalWeight, originalLine));
-                }
-            }
-
-            var result = linesToMix.Count == 1
-                ? linesToMix[0].points
-                : MixLines(linesToMix);
-
-            line.points = SimpleLine.ToPolyline(result);
+        protected override void Apply(Polyline line, ILine input) {
+            line.points = SimpleLine.ToPolyline(input);
             line.meshOutOfDate = true;
-            hasModifiedLine = true;
         }
 
-
-        static void ManipulateSingleLine(IList<(float weight, ILine line)> linesToMix) {
-            var (weight, onlyLine) = linesToMix[0];
-            linesToMix.Clear();
-            linesToMix.Add((1, onlyLine.Crop(onlyLine.Length * weight)));
-        }
-
-
-        static ILine MixLines(IReadOnlyList<(float weight, ILine line)> linesToMix) {
+        protected override ILine Mix(List<float> weights, List<ILine> inputs) {
             // IGrid.Lerp is going to resize the grids
             // But we calculate max size in advance so grids
             // only suffer a single transformation
 
             var maxPoints = 0;
+            var count = inputs.Count;
 
-            for (var i = 0; i < linesToMix.Count; i++) {
-                var length = linesToMix[i].line.Length;
+            for (var i = 0; i < count; i++) {
+                var length = inputs[i].Length;
                 if (length > maxPoints) maxPoints = length;
             }
 
-            var result = linesToMix[0].line.Resize(maxPoints);
+            var result = inputs[0].Resize(maxPoints);
 
-            for (var i = 1; i < linesToMix.Count; i++) {
-                var (weight, line) = linesToMix[i];
-                result = SimpleLine.Lerp(result, line, weight);
+            for (var i = 1; i < count; i++) {
+                result = SimpleLine.Lerp(result, inputs[i], weights[i]);
             }
 
             return result;
