@@ -6,26 +6,9 @@ namespace Primer.Graph
 {
     public readonly struct ContinuousGrid : IGrid
     {
-        #region Static
-
         public static ContinuousGrid zero = new(1);
-
-        public static IGrid Lerp(IGrid a, IGrid b, float weight) {
-            var maxSize = Math.Max(a.Size, b.Size);
-            var pointsPerSide = maxSize + 1;
-            var length = pointsPerSide * pointsPerSide;
-            var finalPoints = new Vector3[length];
-
-            if (a.Size != maxSize) a = a.Resize(maxSize);
-            if (b.Size != maxSize) b = b.Resize(maxSize);
-
-            for (var i = 0; i < length; i++) {
-                finalPoints[i] = Vector3.Lerp(a.Points[i], b.Points[i], weight);
-            }
-
-            return new ContinuousGrid(finalPoints);
-        }
-        #endregion
+        public static IGrid Lerp(IGrid a, IGrid b, float t) =>
+            new ContinuousGrid(IGrid.Lerp(a, b, t));
 
 
         public Vector3[] Points { get; }
@@ -55,7 +38,7 @@ namespace Primer.Graph
         ) {
             var originalSize = GetSizeFromArray(vertices) - 1;
 
-            if (IsInteger(originalSize) && originalSize >= minSize) {
+            if (originalSize.IsInteger() && originalSize >= minSize) {
                 Size = (int)originalSize;
                 Points = vertices;
                 return;
@@ -107,7 +90,7 @@ namespace Primer.Graph
                     var row = (float)y / newSize * size;
 
                     // BUG IN THIS FUNCTION
-                    result[i] = IsInteger(col) && IsInteger(row)
+                    result[i] = col.IsInteger() && row.IsInteger()
                         ? Points[(int)row * PointsPerSide + (int)col]
                         : QuadLerp(row, col);
                 }
@@ -117,7 +100,10 @@ namespace Primer.Graph
         }
 
         public IGrid Crop(float croppedSize) {
-            if (IsInteger(croppedSize) && Size == (int)croppedSize) return this;
+            if (croppedSize.IsInteger() && Size == (int)croppedSize) {
+                return this;
+            }
+
             if (Size < croppedSize) {
                 throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
             }
@@ -211,8 +197,6 @@ namespace Primer.Graph
 
         #region Helpers
         static float GetSizeFromArray(Vector3[] vertices) => Mathf.Sqrt(vertices.Length);
-        static bool IsInteger(float value) => value % 1 == 0;
-        static float GetDecimals(float value) => value % 1;
 
         static Vector3[] DuplicatedList(Vector3[] list) {
             var copy = new Vector3[list.Length * 2];
@@ -232,8 +216,8 @@ namespace Primer.Graph
             var bottomLeft = Points[bottom * PointsPerSide + left];
             var bottomRight = Points[bottom * PointsPerSide + right];
 
-            var tx = GetDecimals(col);
-            var ty = GetDecimals(row);
+            var tx = col.GetDecimals();
+            var ty = row.GetDecimals();
 
             var a = Vector3.Lerp(topLeft, topRight, tx);
             var b = Vector3.Lerp(bottomLeft, bottomRight, tx);

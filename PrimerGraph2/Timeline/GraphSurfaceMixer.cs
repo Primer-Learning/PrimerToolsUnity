@@ -85,7 +85,7 @@ namespace Primer.Graph
         }
 
         static IGrid MixGrids(IReadOnlyList<(float weight, IGrid grid)> gridsToMix) {
-            // ContinuousGrid.Lerp is going to resize the grids
+            // IGrid.Lerp is going to resize the grids
             // But we calculate max size in advance so grids
             // only suffer a single transformation
 
