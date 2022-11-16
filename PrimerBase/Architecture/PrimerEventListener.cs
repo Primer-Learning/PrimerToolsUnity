@@ -3,13 +3,13 @@ using UnityEngine.Events;
 
 namespace Primer
 {
-    public class PrimerEventListener : MonoBehaviour
+    public class PrimerEventListener : MonoBehaviour, IPrimerEventListener
     {
-        public PrimerEvent _event;
+        public PrimerEvent @event;
         public UnityEvent response;
 
-        void OnEnable() => _event.RegisterListener(this);
-        void OnDisable() => _event.UnregisterListener(this);
+        void OnEnable() => @event.RegisterListener(this);
+        void OnDisable() => @event.UnregisterListener(this);
 
         public void OnEventRaised() => response.Invoke();
     }
