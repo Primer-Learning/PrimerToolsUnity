@@ -20,7 +20,7 @@ public class PointsOnCurve : ScrubbableAdapter
     public virtual float Curve(float x) => x;
 
     public override void Update(UpdateArgs args) {
-        if (Util.IsNull(pointPrefab)) return;
+        if (pointPrefab.IsNull()) return;
 
         points ??= new List<GameObject>();
 
