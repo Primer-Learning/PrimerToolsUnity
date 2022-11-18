@@ -4,17 +4,33 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class DataPersistence
+    public class FileStorage<T>
     {
+        readonly string filename;
+        readonly T initialValue;
+
+        public FileStorage(string filename, T initialValue = default) {
+            this.filename = filename;
+            this.initialValue = initialValue;
+        }
+
+        public void Write(T data) =>
+            SaveToResources(data, filename);
+
+        public T Read() =>
+            LoadFromResources(filename, initialValue);
+
+
+        #region Static methods
         static readonly string resources = Path.Combine(Application.dataPath, "Resources");
 
-        public static void WriteToFile<T>(T data, string filePath) {
+        public static void Write(T data, string filePath) {
             using var stream = File.Open(filePath, FileMode.Create);
             var formatter = new BinaryFormatter();
             formatter.Serialize(stream, data);
         }
 
-        public static T ReadFromFile<T>(string filePath, T defaultValue = default) {
+        public static T Read(string filePath, T defaultValue = default) {
             try {
                 using var stream = File.Open(filePath, FileMode.Open);
                 var formatter = new BinaryFormatter();
@@ -26,18 +42,19 @@ namespace Primer
             }
         }
 
-        public static void SaveToResources<T>(T data, string fileName) {
+        public static void SaveToResources(T data, string fileName) {
             if (!Directory.Exists(resources)) {
                 Directory.CreateDirectory(resources);
             }
 
             var filePath = Path.Combine(resources, fileName);
-            WriteToFile(data, filePath);
+            Write(data, filePath);
         }
 
-        public static T LoadFromResources<T>(string fileName, T defaultValue = default) {
+        public static T LoadFromResources(string fileName, T defaultValue = default) {
             var filePath = Path.Combine(resources, fileName);
-            return ReadFromFile(filePath, defaultValue);
+            return Read(filePath, defaultValue);
         }
+        #endregion
     }
 }
