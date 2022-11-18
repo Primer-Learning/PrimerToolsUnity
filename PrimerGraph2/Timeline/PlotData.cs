@@ -11,7 +11,7 @@ namespace Primer.Graph
     {
         public List<Vector3> points = new();
 
-        List<PolylinePoint> ILineBehaviour.Points
+        ILine ILineBehaviour.Points
         {
             get {
                 var list = new List<PolylinePoint>();
@@ -21,10 +21,10 @@ namespace Primer.Graph
                     list.Add(new PolylinePoint(points[i]));
                 }
 
-                return list;
+                return new SimpleLine(list);
             }
         }
 
-        Vector3[] ISurfaceBehaviour.Points => points.ToArray();
+        IGrid ISurfaceBehaviour.Grid => new ContinuousGrid(points.ToArray());
     }
 }

@@ -23,7 +23,7 @@ namespace Primer.Graph
 
         protected override ILine ProcessPlayable(PrimerPlayable behaviour) =>
             behaviour is ILineBehaviour {Points: {}} lineBehaviour
-                ? new SimpleLine(lineBehaviour.Points)
+                ? lineBehaviour.Points
                 : null;
 
         protected override ILine SingleInput(ILine input, float weight, bool isReverse) =>
@@ -35,7 +35,7 @@ namespace Primer.Graph
         }
 
         protected override ILine Mix(List<float> weights, List<ILine> inputs) {
-            // IGrid.Lerp is going to resize the grids
+            // ILine.Lerp is going to resize the grids
             // But we calculate max size in advance so grids
             // only suffer a single transformation
 

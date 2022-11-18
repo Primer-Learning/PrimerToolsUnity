@@ -30,8 +30,8 @@ namespace Primer.Graph
         }
 
         protected override IGrid ProcessPlayable(PrimerPlayable playable) =>
-            playable is ISurfaceBehaviour {Points: {}} behaviour
-                ? new ContinuousGrid(behaviour.Points)
+            playable is ISurfaceBehaviour {Grid: {}} behaviour
+                ? behaviour.Grid
                 : null;
 
         protected override IGrid SingleInput(IGrid grid, float weight, bool isReverse) =>

@@ -19,7 +19,7 @@ namespace Primer.Graph
         ParametricEquation lastEquation;
 
         List<PolylinePoint> pointsCache;
-        List<PolylinePoint> ILineBehaviour.Points
+        ILine ILineBehaviour.Points
         {
             get {
                 if (resolution != lastResolution || equation != lastEquation) {
@@ -28,12 +28,12 @@ namespace Primer.Graph
                     lastEquation = equation;
                 }
 
-                return pointsCache;
+                return new SimpleLine(pointsCache);
             }
         }
 
         Vector3[] points2dCache;
-        Vector3[] ISurfaceBehaviour.Points
+        IGrid ISurfaceBehaviour.Grid
         {
             get {
                 if (resolution != lastResolution || equation != lastEquation) {
@@ -42,7 +42,7 @@ namespace Primer.Graph
                     lastEquation = equation;
                 }
 
-                return points2dCache;
+                return new ContinuousGrid(points2dCache);
             }
         }
 
