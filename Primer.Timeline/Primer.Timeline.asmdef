@@ -1,0 +1,7 @@
+{
+    "name": "Primer.Timeline",
+    "references": [
+        "Unity.Timeline",
+        "Primer"
+    ]
+}

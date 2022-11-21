@@ -1,0 +1,12 @@
+{
+  "name": "Primer.Timeline.Editor",
+  "references": [
+    "Unity.Timeline.Editor",
+    "Unity.Timeline",
+    "Primer.Editor",
+    "Primer.Timeline"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
