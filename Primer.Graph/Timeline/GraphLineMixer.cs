@@ -42,6 +42,9 @@ namespace Primer.Graph
             var maxPoints = 0;
             var count = inputs.Count;
 
+            // TODO:
+            // var inputs = SimpleLine.SameSize(...inputs);
+
             for (var i = 0; i < count; i++) {
                 var length = inputs[i].Length;
                 if (length > maxPoints) maxPoints = length;

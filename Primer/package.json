@@ -1,0 +1,7 @@
+{
+  "name": "org.primerlearning.primertools.primer",
+  "version": "0.1.0",
+  "description": "Base for primer tools",
+  "displayName": "Primer",
+  "unity": "2021.3"
+}

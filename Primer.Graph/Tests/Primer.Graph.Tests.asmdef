@@ -7,7 +7,7 @@
         "Editor"
     ],
     "references":[
-        "GUID:b91e195edd7e24b808370bfd3281c7b8",
-        "GUID:f6d0939ee404c415a88a984426da0be3"
+        "Primer",
+        "Primer.Graph"
     ]
 }

@@ -1,0 +1,7 @@
+{
+  "name": "org.primerlearning.primertools.primer.timeline",
+  "version": "0.1.0",
+  "description": "Abstraction over Unity's timeline",
+  "displayName": "Primer.Timeline",
+  "unity": "2021.3"
+}

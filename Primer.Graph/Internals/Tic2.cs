@@ -1,5 +1,4 @@
 using System;
-using Primer;
 using UnityEngine;
 
 namespace Primer.Graph
@@ -22,10 +21,11 @@ namespace Primer.Graph
             }
 
             text = Instantiate(primerTextPrefab, transform);
+            var textTransform = text.transform;
 
-            text.transform.localPosition = new Vector3(0f, -distance, 0f);
-            text.transform.localScale = Vector3.Scale(
-                text.transform.localScale,
+            textTransform.localPosition = new Vector3(0f, -distance, 0f);
+            textTransform.localScale = Vector3.Scale(
+                textTransform.localScale,
                 transform.parent.localScale
             );
 
