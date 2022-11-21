@@ -36,7 +36,7 @@ public class Axis2 : ObjectGenerator
 
     // Graph accessors
     Graph2 _graph;
-    Graph2 graph => _graph ?? (_graph = transform.parent?.GetComponent<Graph2>());
+    Graph2 graph => _graph ??= transform.parent?.GetComponent<Graph2>();
     PrimerText2 primerTextPrefab => graph.primerTextPrefab;
     PrimerBehaviour arrowPrefab => graph.arrowPrefab;
     Tic2 ticPrefab => graph.ticPrefab;
@@ -44,7 +44,7 @@ public class Axis2 : ObjectGenerator
     float ticLabelDistance => graph.ticLabelDistance;
 
     // Internal game object containers
-    readonly List<Tic2> tics = new List<Tic2>();
+    readonly List<Tic2> tics = new();
     PrimerText2 axisLabel;
     PrimerBehaviour originArrow;
     PrimerBehaviour endArrow;
@@ -162,7 +162,7 @@ public class Axis2 : ObjectGenerator
 
         if (maxTics != 0 && expectedTics.Count() > maxTics) {
             // TODO: reduce amount of tics in a smart way
-            expectedTics = expectedTics.Take(maxTics);
+            expectedTics = expectedTics.Take(maxTics).ToList();
         }
 
         var (add, remove, update) = SynchronizeLists(
@@ -192,7 +192,7 @@ public class Axis2 : ObjectGenerator
         }
     }
 
-    IEnumerable<TicData> CalculateTics() {
+    List<TicData> CalculateTics() {
         var calculated = new List<TicData>();
         var step = (float)Math.Round(ticStep, 2);
 

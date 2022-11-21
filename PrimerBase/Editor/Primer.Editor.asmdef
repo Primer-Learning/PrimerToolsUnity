@@ -2,5 +2,8 @@
   "name": "Primer.Editor",
   "includePlatforms": [
     "Editor"
+  ],
+  "references": [
+    "GUID:b91e195edd7e24b808370bfd3281c7b8"
   ]
 }

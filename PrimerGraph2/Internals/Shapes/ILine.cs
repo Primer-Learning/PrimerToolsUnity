@@ -8,9 +8,8 @@ namespace Primer.Graph
         Vector3[] Points { get; }
 
         ILine Resize(int newLength);
-        ILine Crop(float newLength);
+        ILine Cut(int newLength, bool fromOrigin);
         ILine Crop(float newLength, bool fromOrigin);
-
 
         public static Vector3[] Lerp(ILine a, ILine b, float t) {
             var length = a.Length > b.Length ? a.Length : b.Length;

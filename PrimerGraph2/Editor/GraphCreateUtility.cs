@@ -11,22 +11,27 @@ public static class GraphCreateUtility
     [MenuItem("GameObject/Primer/Graph", false, CreateUtility.PRIORITY)]
     public static void Graph() => CreateUtility.Prefab("Graph2");
 
-    [MenuItem("GameObject/Primer/Line", true)]
-    public static bool ValidateLine(MenuCommand command) =>
+    [MenuItem("GameObject/Primer/Graph Points", true)]
+    [MenuItem("GameObject/Primer/Graph Line", true)]
+    [MenuItem("GameObject/Primer/Graph Surface", true)]
+    public static bool ValidateIsGraph(MenuCommand command) =>
         Selection.activeGameObject?.GetComponent<Graph2>() is not null;
 
-    [MenuItem("GameObject/Primer/Line", false, CreateUtility.PRIORITY)]
+    [MenuItem("GameObject/Primer/Graph Points", false, CreateUtility.PRIORITY)]
+    public static void Points(MenuCommand command) {
+        var graph = GetGraph(command);
+        var point = CreateUtility.Prefab("GraphPoints", graph.domain);
+        point.transform.localPosition = Vector3.zero;
+    }
+
+    [MenuItem("GameObject/Primer/Graph Line", false, CreateUtility.PRIORITY)]
     public static void Line(MenuCommand command) {
         var graph = GetGraph(command);
         var line = CreateUtility.Prefab("GraphLine", graph.domain);
         line.transform.localPosition = Vector3.zero;
     }
 
-    [MenuItem("GameObject/Primer/Surface", true)]
-    public static bool ValidateSurface(MenuCommand command) =>
-        Selection.activeGameObject?.GetComponent<Graph2>() is not null;
-
-    [MenuItem("GameObject/Primer/Surface", false, CreateUtility.PRIORITY)]
+    [MenuItem("GameObject/Primer/Graph Surface", false, CreateUtility.PRIORITY)]
     public static void Surface(MenuCommand command) {
         var graph = GetGraph(command);
         var line = CreateUtility.Prefab("GraphSurface", graph.domain);

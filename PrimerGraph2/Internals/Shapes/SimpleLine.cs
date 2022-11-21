@@ -76,8 +76,9 @@ namespace Primer.Graph
             return new SimpleLine(result);
         }
 
+        public ILine Cut(int newLength, bool fromOrigin) =>
+            new SimpleLine(CutToArray(newLength, fromOrigin));
 
-        public ILine Crop(float newLength) => Crop(newLength, false);
         public ILine Crop(float newLength, bool fromOrigin) {
             if (newLength.IsInteger() && Length == (int)newLength) {
                 return this;
@@ -92,14 +93,8 @@ namespace Primer.Graph
 
             var firstIndex = fromOrigin ? Length - finalLength : 0;
             var lastIndex = firstIndex + finalLength - 1;
-            var points = Points;
-            var copy = new Vector3[finalLength];
 
-            // Copy unchanged points, including the one to lerp
-            for (var i = 0; i < finalLength; i++) {
-                copy[i] = points[firstIndex + i];
-            }
-
+            var copy = CutToArray(finalLength, fromOrigin);
             var t = newLength.GetDecimals();
 
             if (fromOrigin) {
@@ -110,6 +105,18 @@ namespace Primer.Graph
             }
 
             return new SimpleLine(copy);
+        }
+
+        Vector3[] CutToArray(int newLength, bool fromOrigin) {
+            var firstIndex = fromOrigin ? Length - newLength : 0;
+            var points = Points;
+            var copy = new Vector3[newLength];
+
+            for (var i = 0; i < newLength; i++) {
+                copy[i] = points[firstIndex + i];
+            }
+
+            return copy;
         }
     }
 }
