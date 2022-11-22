@@ -57,7 +57,7 @@ MonoBehaviour:
   _y: {fileID: 5548746615421559894}
   _z: {fileID: 3564338468142601028}
   arrowPrefab: {fileID: 4478118126784391353, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
-  primerTextPrefab: {fileID: 1535603213970486014, guid: 8978468c877af45a6ad8576df33001e6, type: 3}
+  primerTextPrefab: {fileID: 1535603213970486014, guid: 8ed9c479ed4d3430eb96d5bb60304a84, type: 3}
   ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
   linePrefab: {fileID: 2912696055847981207, guid: fe11ba990086b4d3e97c43dfc0df729a, type: 3}
 --- !u!1 &6847249481812309779

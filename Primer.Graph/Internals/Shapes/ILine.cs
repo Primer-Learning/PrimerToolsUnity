@@ -1,29 +1,53 @@
+using System;
 using UnityEngine;
 
 namespace Primer.Graph
 {
     public interface ILine
     {
-        int Length { get; }
+        int Segments { get; }
         Vector3[] Points { get; }
 
-        ILine Resize(int newLength);
-        ILine Cut(int newLength, bool fromOrigin);
-        ILine Crop(float newLength, bool fromOrigin);
+        ILine Resize(int newSize);
+        ILine Crop(int newSize, bool fromOrigin);
+        ILine SmoothCut(float newSize, bool fromOrigin);
 
-        public static Vector3[] Lerp(ILine a, ILine b, float t) {
-            var length = a.Length > b.Length ? a.Length : b.Length;
-            var result = new Vector3[length];
 
-            if (a.Length != length) a = a.Resize(length);
-            if (b.Length != length) b = b.Resize(length);
+        public static T Lerp<T>(T a, T b, float t) where T : ILine {
+            var size = a.Segments > b.Segments ? a.Segments : b.Segments;
+            var length = size + 1;
+            var finalPoints = new Vector3[length];
+
+            if (a.Segments != size) a = (T)a.Resize(size);
+            if (b.Segments != size) b = (T)b.Resize(size);
 
             for (var i = 0; i < length; i++) {
-                result[i] = Vector3.Lerp(a.Points[i], b.Points[i], t);
+                finalPoints[i] = Vector3.Lerp(a.Points[i], b.Points[i], t);
             }
 
-            return result;
+            return (T)Activator.CreateInstance(a.GetType(), finalPoints);
+        }
+
+        /// <summary>
+        ///     Use this when resizing several grids at the same time
+        ///     this ensures grids don't suffer more than one transformation
+        /// </summary>
+        public static ILine[] Resize(params ILine[] inputs) {
+            var copy = new ILine[inputs.Length];
+            var maxSize = 0;
+
+            for (var i = 0; i < inputs.Length; i++) {
+                var size = inputs[i].Segments;
+                if (size > maxSize) maxSize = size;
+            }
+
+            for (var i = 0; i < inputs.Length; i++) {
+                copy[i] = inputs[i].Segments == maxSize
+                    ? inputs[i]
+                    : inputs[i].Resize(maxSize);
+            }
+
+            return copy;
         }
     }
-
 }

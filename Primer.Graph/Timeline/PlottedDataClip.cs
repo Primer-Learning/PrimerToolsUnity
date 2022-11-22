@@ -4,7 +4,7 @@ using UnityEngine.Timeline;
 
 namespace Primer.Graph
 {
-    [Serializable] public class PlotEquationClip : PrimerClip<PlotEquation>
+    [Serializable] public class PlottedDataClip : PrimerClip<PlotData>
     {
         public override ClipCaps clipCaps => ClipCaps.Extrapolation | ClipCaps.Blending;
     }

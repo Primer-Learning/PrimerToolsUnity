@@ -9,9 +9,6 @@ namespace Primer.Graph
     {
         public static ILine zero = new SimpleLine(new[] {Vector3.zero});
 
-        public static ILine Lerp(ILine a, ILine b, float t) =>
-            new SimpleLine(ILine.Lerp(a, b, t));
-
         public static List<PolylinePoint> ToPolyline(ILine line) {
             var points = line.Points;
             var length = points.Length;
@@ -25,7 +22,7 @@ namespace Primer.Graph
         }
 
 
-        public int Length => Points.Length;
+        public int Segments => Points.Length - 1;
         public Vector3[] Points { get; }
 
 
@@ -44,22 +41,22 @@ namespace Primer.Graph
         }
 
 
-        public ILine Resize(int newLength) {
-            var currentLength = Length;
+        public ILine Resize(int newSize) {
+            var currentSize = Segments;
 
-            if (newLength == currentLength) {
+            if (newSize == currentSize) {
                 return this;
             }
 
-            if (currentLength == 0) {
-                return new SimpleLine(newLength);
+            if (currentSize == 0) {
+                return new SimpleLine(newSize);
             }
 
             var points = Points;
-            var result = new Vector3[newLength];
+            var result = new Vector3[newSize + 1];
 
-            for (var i = 0; i < newLength; i++) {
-                var currentIndex = (float)i / newLength * currentLength;
+            for (var i = 0; i <= newSize; i++) {
+                var currentIndex = (float)i / newSize * currentSize;
 
                 if (currentIndex.IsInteger()) {
                     result[i] = points[(int)currentIndex];
@@ -76,26 +73,26 @@ namespace Primer.Graph
             return new SimpleLine(result);
         }
 
-        public ILine Cut(int newLength, bool fromOrigin) =>
-            new SimpleLine(CutToArray(newLength, fromOrigin));
+        public ILine Crop(int newSize, bool fromOrigin) =>
+            new SimpleLine(CutToArray(newSize + 1, fromOrigin));
 
-        public ILine Crop(float newLength, bool fromOrigin) {
-            if (newLength.IsInteger() && Length == (int)newLength) {
+        public ILine SmoothCut(float newSize, bool fromOrigin) {
+            if (newSize.IsInteger() && Segments == (int)newSize) {
                 return this;
             }
 
-            if (Length < newLength) {
-                throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
+            if (Segments < newSize) {
+                throw new Exception("Crop size is bigger than grid area. Do you want ILine.Resize()?");
             }
 
-            var finalLength = Mathf.CeilToInt(newLength);
-            if (finalLength <= 1) return zero;
+            var finalSize = Mathf.CeilToInt(newSize);
+            if (finalSize < 1) return zero;
 
-            var firstIndex = fromOrigin ? Length - finalLength : 0;
-            var lastIndex = firstIndex + finalLength - 1;
+            var firstIndex = fromOrigin ? Segments - finalSize : 0;
+            var lastIndex = firstIndex + finalSize;
 
-            var copy = CutToArray(finalLength, fromOrigin);
-            var t = newLength.GetDecimals();
+            var copy = CutToArray(finalSize + 1, fromOrigin);
+            var t = newSize.GetDecimals();
 
             if (fromOrigin) {
                 copy[0] = Vector3.Lerp(copy[0], copy[1], 1 - t);
@@ -108,12 +105,18 @@ namespace Primer.Graph
         }
 
         Vector3[] CutToArray(int newLength, bool fromOrigin) {
-            var firstIndex = fromOrigin ? Length - newLength : 0;
             var points = Points;
             var copy = new Vector3[newLength];
 
+            var firstIndex = fromOrigin ? points.Length - newLength : 0;
+
             for (var i = 0; i < newLength; i++) {
+                // try {
                 copy[i] = points[firstIndex + i];
+                // }
+                // catch (Exception ex) {
+                //     Debug.Log("Oh mamma");
+                // }
             }
 
             return copy;

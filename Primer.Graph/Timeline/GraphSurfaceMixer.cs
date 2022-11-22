@@ -35,27 +35,17 @@ namespace Primer.Graph
                 : null;
 
         protected override IGrid SingleInput(IGrid grid, float weight, bool isReverse) =>
-            grid.Crop(grid.Size * weight, isReverse);
+            grid.SmoothCut(grid.Size * weight, isReverse);
 
         protected override void Apply(MeshFilter trackTarget, IGrid input) =>
             input.RenderTo(mesh, true);
 
         protected override IGrid Mix(List<float> weights, List<IGrid> inputs) {
-            // IGrid.Lerp is going to resize the grids
-            // But we calculate max size in advance so grids
-            // only suffer a single transformation
-
-            var maxSize = 0;
-
-            for (var i = 0; i < inputs.Count; i++) {
-                var size = inputs[i].Size;
-                if (size > maxSize) maxSize = size;
-            }
-
-            var result = inputs[0].Resize(maxSize);
+            var grids = IGrid.Resize(inputs.ToArray());
+            var result = grids[0];
 
             for (var i = 1; i < inputs.Count; i++) {
-                result = ContinuousGrid.Lerp(result, inputs[i], weights[i]);
+                result = IGrid.Lerp(result, grids[i], weights[i]);
             }
 
             return result;

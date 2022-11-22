@@ -124,7 +124,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8141656979337668103}
-  - component: {fileID: 8141656979337668152}
   - component: {fileID: 3281596752345348547}
   m_Layer: 0
   m_Name: Axis
@@ -149,18 +148,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8141656979337668152
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8141656979337668102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef71248b452743059c1f70559594e53d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3281596752345348547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,13 +161,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hidden: 0
-  label: x
-  labelPosition: 1
   arrowPresence: 2
   length: 1
-  thinkness: 1
   min: 0
   max: 10
+  thickness: 1
+  label: x
+  labelPosition: 1
+  labelOffset: {x: 0, y: 0, z: 0}
   showTics: 1
   ticStep: 2
   maxTics: 5

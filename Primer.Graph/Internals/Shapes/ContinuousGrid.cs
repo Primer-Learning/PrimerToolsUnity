@@ -1,15 +1,12 @@
 using System;
-using System.ComponentModel;
 using UnityEngine;
 
 namespace Primer.Graph
 {
     public readonly struct ContinuousGrid : IGrid
     {
+        const int minSize = 1;
         public static ContinuousGrid zero = new(0);
-        public static IGrid Lerp(IGrid a, IGrid b, float t) =>
-            new ContinuousGrid(IGrid.Lerp(a, b, t));
-
 
         public Vector3[] Points { get; }
         public int Size { get; }
@@ -29,12 +26,7 @@ namespace Primer.Graph
             Points = new Vector3[(size + 1) * (size + 1)];
         }
 
-        public ContinuousGrid(
-            Vector3[] vertices,
-            [DefaultValue("Vector3.zero")]
-            Vector3? fillValue = null,
-            int minSize = 1
-        ) {
+        public ContinuousGrid(Vector3[] vertices) {
             var originalSize = GetSizeFromArray(vertices) - 1;
 
             if (originalSize.IsInteger() && originalSize >= minSize) {
@@ -43,17 +35,11 @@ namespace Primer.Graph
                 return;
             }
 
-            var fill = fillValue ?? Vector3.zero;
             var newSize = Mathf.Max(Mathf.CeilToInt(originalSize), minSize);
             var newLength = (newSize + 1) * (newSize + 1);
             var newVertices = new Vector3[newLength];
 
             vertices.CopyTo(newVertices, 0);
-
-            // Fill places required to make a grid out of it
-            for (var i = vertices.Length; i < newLength; i++) {
-                newVertices[i] = fill;
-            }
 
             Size = newSize;
             Points = newVertices;
@@ -100,8 +86,8 @@ namespace Primer.Graph
             return new ContinuousGrid(result, newSize);
         }
 
-        public IGrid Crop(float newSize) => Crop(newSize, false);
-        public IGrid Crop(float croppedSize, bool fromOrigin) {
+        public IGrid Crop(float newSize) => SmoothCut(newSize, false);
+        public IGrid SmoothCut(float croppedSize, bool fromOrigin) {
             if (croppedSize == 0) return zero;
 
             if (croppedSize.IsInteger() && Size == (int)croppedSize) {

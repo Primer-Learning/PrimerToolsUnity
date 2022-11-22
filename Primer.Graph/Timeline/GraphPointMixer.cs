@@ -27,7 +27,7 @@ namespace Primer.Graph
         protected override void Apply(GraphPoint target, ILine input) {
             EnsurePointsCountMatches(target, input);
 
-            for (var i = 0; i < input.Length; i++) {
+            for (var i = 0; i < input.Points.Length; i++) {
                 points[i].localPosition = input.Points[i];
                 points[i].localScale = Vector3.one;
             }
@@ -39,51 +39,40 @@ namespace Primer.Graph
         }
 
         protected override ILine SingleInput(ILine input, float weight, bool isReverse) {
-            var reduction = input.Length * weight;
+            var reduction = input.Segments * weight;
             var newLength = Mathf.CeilToInt(reduction);
             var t = reduction.GetDecimals();
 
             isFadeOut = isReverse;
             fadeModifier = t;
 
-            return input.Cut(newLength, isReverse);
+            return input.Crop(newLength, isReverse);
         }
 
         protected override ILine Mix(List<float> weights, List<ILine> inputs) {
             // this tells Apply() we're not scaling any point
             fadeModifier = -1;
 
-            // ILine.Lerp is going to resize the grids
-            // But we calculate max size in advance so grids
-            // only suffer a single transformation
+            var lines = ILine.Resize(inputs.ToArray());
+            var result = lines[0];
 
-            var maxPoints = 0;
-            var count = inputs.Count;
-
-            for (var i = 0; i < count; i++) {
-                var length = inputs[i].Length;
-                if (length > maxPoints) maxPoints = length;
-            }
-
-            var result = inputs[0].Resize(maxPoints);
-
-            for (var i = 1; i < count; i++) {
-                result = SimpleLine.Lerp(result, inputs[i], weights[i]);
+            for (var i = 1; i < lines.Length; i++) {
+                result = ILine.Lerp(result, lines[i], weights[i]);
             }
 
             return result;
         }
 
         void EnsurePointsCountMatches(GraphPoint target, ILine input) {
-            if (points.Count > input.Length) {
-                points.GetRange(input.Length, points.Count - input.Length).DisposeAll();
-                points.RemoveRange(input.Length, points.Count - input.Length);
+            var inputLength = input.Points.Length;
+
+            if (points.Count > inputLength) {
+                points.GetRange(inputLength, points.Count - inputLength).DisposeAll();
+                points.RemoveRange(inputLength, points.Count - inputLength);
                 return;
             }
 
-            // var graph = target.GetComponentInParent<Graph2>();
-
-            for (var i = points.Count; i < input.Length; i++) {
+            for (var i = points.Count; i < inputLength; i++) {
                 var copy = Object.Instantiate(target.prefab, target.transform);
                 copy.hideFlags = HideFlags.DontSave;
                 points.Add(copy);

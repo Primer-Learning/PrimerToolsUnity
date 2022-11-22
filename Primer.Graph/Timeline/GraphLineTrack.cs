@@ -8,8 +8,8 @@ using UnityEngine.Timeline;
 namespace Primer.Graph
 {
     [DisplayName("Primer / Line Track")]
-    [TrackClipType(typeof(PlotEquationClip))]
-    [TrackClipType(typeof(PlotDataClip))]
+    [TrackClipType(typeof(PlottedEquationClip))]
+    [TrackClipType(typeof(PlottedDataClip))]
     [TrackBindingType(typeof(Polyline))]
     public class GraphLineTrack : PrimerTrack
     {

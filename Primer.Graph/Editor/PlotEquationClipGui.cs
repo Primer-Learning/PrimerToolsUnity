@@ -4,12 +4,12 @@ using UnityEngine.Timeline;
 
 namespace Primer.Graph.Editor
 {
-    [CustomTimelineEditor(typeof(PlotEquationClip))]
+    [CustomTimelineEditor(typeof(PlottedEquationClip))]
     [UsedImplicitly]
     public class PlotEquationClipGui : ClipEditor
     {
         public override void OnClipChanged(TimelineClip clip) {
-            var plotter = (PlotEquationClip)clip.asset;
+            var plotter = (PlottedEquationClip)clip.asset;
             var equation = plotter.template?.equation;
 
             if (equation is null) {
