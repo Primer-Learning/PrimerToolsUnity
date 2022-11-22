@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -37,7 +38,8 @@ namespace Primer
                 var deserialized = formatter.Deserialize(stream);
                 return (T)deserialized;
             }
-            catch {
+            catch (Exception ex) {
+                Debug.Log($"Unable to deserialize {filePath}:\n{ex}");
                 return defaultValue;
             }
         }
