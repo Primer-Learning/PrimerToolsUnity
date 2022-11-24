@@ -40,7 +40,7 @@ namespace Primer.Latex
         }
 
 
-        public void OnPlayerLoop(LatexRenderer renderer) {
+        public void OnPlayerLoop(MonoBehaviour renderer) {
             if (!svgToBuildSpritesFor.HasValue) return;
             var (result, svg) = svgToBuildSpritesFor.Value;
 

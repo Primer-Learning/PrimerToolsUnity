@@ -47,17 +47,13 @@ namespace Primer.Latex
         #endregion
 
 
-        internal readonly DirectoryInfo rootBuildDirectory;
+        internal readonly TempDir rootBuildDirectory;
         internal readonly LatexToSvg latexToSvg;
         internal readonly SvgToSprites svgToSprites = new();
         internal readonly SpriteDirectRenderer spritesRenderer = new();
 
         public LatexRenderer() {
-            var tempPath = Path.GetTempPath();
-            var guid = Guid.NewGuid().ToString();
-            var processTmpDir = Path.Combine(tempPath, $"unity-latex-{guid}");
-
-            rootBuildDirectory = Directory.CreateDirectory(processTmpDir);
+            rootBuildDirectory = new TempDir();
             latexToSvg = new LatexToSvg(rootBuildDirectory);
         }
 
