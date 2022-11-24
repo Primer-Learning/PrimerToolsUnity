@@ -1,76 +1,69 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using LatexRenderer;
+using UnityEditor;
 using UnityEngine;
+using ReleasedLatexRenderer = Primer.Latex.ReleasedLatexRendererContainer.ReleasedLatexRenderer;
 
-namespace UnityEditor.LatexRenderer
+namespace Primer.Latex.Editor
 {
-    [CustomEditor(typeof(ReleasedLatexRendererContainer.ReleasedLatexRenderer))]
-    public class ReleasedLatexRendererEditor : Editor
+    [CustomEditor(typeof(ReleasedLatexRenderer))]
+    public class ReleasedLatexRendererEditor : UnityEditor.Editor
     {
-        private bool headersVisible;
-        private bool unreleaseVisible;
+        bool headersVisible;
+        bool unreleaseVisible;
 
-        public ReleasedLatexRendererContainer.ReleasedLatexRenderer ReleasedLatexRenderer =>
-            (ReleasedLatexRendererContainer.ReleasedLatexRenderer)target;
+        public ReleasedLatexRenderer ReleasedRenderer => (ReleasedLatexRenderer)target;
 
-        private static List<string> GetStringArrayValue(SerializedProperty array)
-        {
-            var result = new List<string>();
-            for (var i = 0; i < array.arraySize; ++i)
-                result.Add(array.GetArrayElementAtIndex(i).stringValue);
+        public override void OnInspectorGUI() {
+            var latex = serializedObject.FindProperty("latex").stringValue;
+            var headers = serializedObject.FindProperty("headers").GetStringArrayValue();
 
-            return result;
-        }
-
-        public override void OnInspectorGUI()
-        {
             GUILayout.Label("Latex (read-only)");
-            GUILayout.TextArea(serializedObject.FindProperty("_latex").stringValue,
-                GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 6));
+            GUILayout.TextArea(latex, LatexRendererEditor.latexInputHeight);
 
             headersVisible = EditorGUILayout.Foldout(headersVisible, "Headers (read-only)");
-            if (headersVisible)
-                GUILayout.TextArea(
-                    string.Join(Environment.NewLine,
-                        GetStringArrayValue(serializedObject.FindProperty("_headers"))),
-                    GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 30));
+            if (headersVisible) {
+                var headersInputHeight = GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 30);
+                GUILayout.TextArea(string.Join(Environment.NewLine, headers), headersInputHeight);
+            }
 
             unreleaseVisible = EditorGUILayout.Foldout(unreleaseVisible, "Un-release SVG Parts");
-            if (unreleaseVisible)
-            {
-                if (ReleasedLatexRenderer.gameObject
-                        .GetComponent<global::LatexRenderer.LatexRenderer>() is null)
-                {
-                    EditorGUILayout.HelpBox("Un-releasing will delete all children game objects.",
-                        MessageType.Warning);
-                    if (GUILayout.Button("Un-release SVG Parts"))
-                    {
-                        Undo.SetCurrentGroupName("Un-release SVG Parts");
+            if (!unreleaseVisible) return;
 
-                        var latexRenderer = ReleasedLatexRenderer.gameObject
-                            .AddComponent<global::LatexRenderer.LatexRenderer>();
-                        latexRenderer.material = ReleasedLatexRenderer.Material;
-                        LatexRendererEditor.PendSetLatex(latexRenderer, ReleasedLatexRenderer.Latex,
-                            ReleasedLatexRenderer.Headers.ToList());
-                        Undo.RegisterCreatedObjectUndo(latexRenderer, "");
+            if (ReleasedRenderer.gameObject.GetComponent<LatexRenderer>() is null) {
+                EditorGUILayout.HelpBox(
+                    "Un-releasing will delete all children game objects.",
+                    MessageType.Warning
+                );
 
-                        var toDelete =
-                            (from Transform i in ReleasedLatexRenderer.transform select i).ToList();
-                        foreach (var child in toDelete)
-                            Undo.DestroyObjectImmediate(child.gameObject);
-
-                        Undo.DestroyObjectImmediate(ReleasedLatexRenderer);
-                    }
-                }
-                else
-                {
-                    EditorGUILayout.HelpBox(
-                        "Cannot un-release when there is an existing LatexRenderer component.",
-                        MessageType.Error);
-                }
+                if (GUILayout.Button("Un-release SVG Parts"))
+                    UnreleaseSvgParts();
             }
+            else {
+                EditorGUILayout.HelpBox(
+                    "Cannot un-release when there is an existing LatexRenderer component.",
+                    MessageType.Error
+                );
+            }
+        }
+
+        void UnreleaseSvgParts() {
+            Undo.SetCurrentGroupName("Un-release SVG Parts");
+
+            var latexRenderer = ReleasedRenderer.gameObject.AddComponent<LatexRenderer>();
+            latexRenderer.material = ReleasedRenderer.Material;
+            LatexRendererEditor.PendRenderingRequest(latexRenderer, ReleasedRenderer.Config);
+
+            Undo.RegisterCreatedObjectUndo(latexRenderer, "");
+
+            // we create a copy of the list because we're going to remove them as we go
+            var children = ReleasedRenderer.transform.Cast<Transform>().ToArray();
+
+            foreach (var child in children) {
+                Undo.DestroyObjectImmediate(child.gameObject);
+            }
+
+            Undo.DestroyObjectImmediate(ReleasedRenderer);
         }
     }
 }
