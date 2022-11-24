@@ -9,23 +9,24 @@ namespace Primer.Latex
 {
     internal static class LatexBinaries
     {
+        internal static readonly DirectoryInfo rootTempDir;
         internal static string latexBinDir;
         internal static string xelatex;
         internal static string dvisvgm;
 
 
-        public static CliProgram.ExecutionResult Xelatex(string cwd, string[] args, CancellationToken ct) {
+        public static CliProgram.ExecutionResult Xelatex(TempDir cwd, string[] args, CancellationToken ct) {
             var program = GetCliProgram(xelatex, "xelatex");
-            return program.Execute(cwd, args, ct);
+            return program.Execute(cwd.FullPath, args, ct);
         }
 
-        public static CliProgram.ExecutionResult Dvisvgm(string cwd, string[] args, CancellationToken ct) {
+        public static CliProgram.ExecutionResult Dvisvgm(TempDir cwd, string[] args, CancellationToken ct) {
             var program = GetCliProgram(dvisvgm, "dvisvgm");
-            return program.Execute(cwd, args, ct);
+            return program.Execute(cwd.FullPath, args, ct);
         }
 
-        public static string GetXelatexErrorLogsFrom(string workingDirectory, string filename) {
-            var logFile = Path.Combine(workingDirectory, filename);
+        public static string GetXelatexErrorLogsFrom(TempDir cwd, string filename) {
+            var logFile = cwd.GetChildPath(filename);
             if (!File.Exists(logFile)) return null;
 
             var errors =
