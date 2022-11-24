@@ -6,15 +6,14 @@ namespace Primer.Latex
 {
     internal class SpriteDirectRenderer
     {
-        internal record   DrawSpec(Mesh Mesh, Material Material, Vector3 Position);
+        internal record DrawSpec(Mesh Mesh, Material Material, Vector3 Position);
 
-        internal DrawSpec[] drawSpecs = { };
+        internal DrawSpec[] drawSpecs = {};
 
         /// <summary>The last values given to SetSprites.</summary>
         (Sprite[] sprites, Vector3[] spritePositions, Material material) lastSeenSprites;
 
-        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material material)
-        {
+        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material material) {
             var args = (sprites, spritePositions, material);
             if (args == lastSeenSprites) return;
 
@@ -62,8 +61,7 @@ namespace Primer.Latex
             Everything = 0b111
         }
 
-        public void DrawWireGizmos(Transform parent, GizmoMode features = GizmoMode.Nothing)
-        {
+        public void DrawWireGizmos(Transform parent, GizmoMode features = GizmoMode.Nothing) {
             foreach (var drawSpec in drawSpecs) {
                 if (features.HasFlag(GizmoMode.WireFrame)) {
                     Gizmos.color = Color.cyan;
