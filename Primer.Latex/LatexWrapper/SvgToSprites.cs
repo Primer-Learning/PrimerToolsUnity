@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Unity.VectorGraphics;
 using UnityEditor;
 using UnityEngine;
@@ -13,60 +14,24 @@ namespace Primer.Latex
     internal class SvgToSprites
     {
         const float SVG_PIXELS_PER_UNIT = 10f;
+        static readonly VectorUtils.TessellationOptions tessellationOptions = new() {
+            StepDistance = 100.0f,
+            MaxCordDeviation = 0.5f,
+            MaxTanAngleDeviation = 0.1f,
+            SamplingStepSize = 0.01f
+        };
 
-        /// <summary>Represents a single request to build an SVG.</summary>
-        /// <remarks>
-        ///     <para>Used to pass an SVG into the player loop for BuildSprites() to build.</para>
-        ///     <para>buildSpritesResult will always return null if successful.</para>
-        /// </remarks>
-        (TaskCompletionSource<LatexAsSprites> result, string svg)? svgToBuildSpritesFor;
+        record CreateSprites(
+            List<VectorUtils.Geometry> Geometry,
+            TaskCompletionSource<LatexAsSprites> Result,
+            CancellationToken CancellationToken
+        );
 
+        [CanBeNull] CreateSprites waitingToProcess;
 
         public async Task<LatexAsSprites> ConvertToSprites(string svg, CancellationToken ct) {
-            var completionSource = new TaskCompletionSource<LatexAsSprites>();
-
             ct.ThrowIfCancellationRequested();
-            svgToBuildSpritesFor = (completionSource, svg);
 
-#if UNITY_EDITOR
-            // Update normally gets called only sporadically in the editor
-            if (!Application.isPlaying)
-                EditorApplication.QueuePlayerLoopUpdate();
-#endif
-
-            var result = await completionSource.Task;
-            ct.ThrowIfCancellationRequested();
-            return result;
-        }
-
-
-        public void OnPlayerLoop(MonoBehaviour renderer) {
-            if (!svgToBuildSpritesFor.HasValue) return;
-            var (result, svg) = svgToBuildSpritesFor.Value;
-
-            try {
-                var spritesWithPosition = BuildSprites(svg);
-
-#if UNITY_EDITOR
-                if (!Application.isPlaying)
-                    Undo.RecordObject(renderer, "Set LaTeX");
-#endif
-
-                var sprites = spritesWithPosition.Select(i => i.Item2).ToArray();
-                var positions = spritesWithPosition.Select(i => (Vector3)i.Item1).ToArray();
-                result.SetResult(new LatexAsSprites(sprites, positions));
-            }
-            catch (Exception err) {
-                result.SetException(err);
-            }
-            finally {
-                svgToBuildSpritesFor = null;
-            }
-        }
-
-
-        /// <remarks>Must be run inside the player loop.</remarks>
-        static List<(Vector2 position, Sprite sprite)> BuildSprites(string svg) {
             SVGParser.SceneInfo sceneInfo;
 
             try {
@@ -77,24 +42,72 @@ namespace Primer.Latex
                 return null;
             }
 
-            var tessellationOptions = new VectorUtils.TessellationOptions {
-                StepDistance = 100.0f,
-                MaxCordDeviation = 0.5f,
-                MaxTanAngleDeviation = 0.1f,
-                SamplingStepSize = 0.01f
-            };
+            var taskCompletionSource = new TaskCompletionSource<LatexAsSprites>();
 
-            var allGeometry = VectorUtils.TessellateScene(sceneInfo.Scene, tessellationOptions);
+            waitingToProcess = new CreateSprites(
+                VectorUtils.TessellateScene(sceneInfo.Scene, tessellationOptions),
+                taskCompletionSource,
+                ct
+            );
+
+            // See
+            UnityEventHook.OnUpdate += ProcessGeometry;
+
+#if UNITY_EDITOR
+            // Update normally gets called only sporadically in the editor
+            if (!Application.isPlaying)
+                EditorApplication.QueuePlayerLoopUpdate();
+#endif
+
+            var result = await taskCompletionSource.Task;
+            ct.ThrowIfCancellationRequested();
+            return result;
+        }
+
+        /// <remarks>
+        ///     VectorUtils.BuildSprite (in ConvertGeometryToSprites) has to be called on the Player update loop
+        ///     we're already out of it since we waited for LaTeX to generate the SVG
+        ///     so we need to force another update and hook to it
+        ///     we can then use VectorUtils.BuildSprite without throwing
+        ///     "Not allowed to override geometry on sprite"
+        /// <remarks>
+        void ProcessGeometry() {
+            UnityEventHook.OnUpdate -= ProcessGeometry;
+            if (waitingToProcess is null) return;
+
+            var allGeometry = waitingToProcess.Geometry;
+            var result = waitingToProcess.Result;
+            var ct = waitingToProcess.CancellationToken;
+
+            waitingToProcess = null;
+
+            if (ct.IsCancellationRequested) {
+                result.SetCanceled();
+                return;
+            }
+
+            try {
+                ct.ThrowIfCancellationRequested();
+                result.SetResult(ConvertGeometryToSprites(allGeometry));
+            }
+            catch (Exception ex) {
+                result.SetException(ex);
+            }
+        }
+
+        static LatexAsSprites ConvertGeometryToSprites(List<VectorUtils.Geometry> allGeometry) {
+            var sprites = new Sprite[allGeometry.Count];
+            var positions = new Vector3[allGeometry.Count];
+
             var scaledBounds = VectorUtils.Bounds(
                 from geometry in allGeometry
                 from vertex in geometry.Vertices
                 select geometry.WorldTransform * vertex / SVG_PIXELS_PER_UNIT
             );
 
-            // Holds an (offset, sprite) for each shape in the SVG
-            var sprites = new List<(Vector2, Sprite)>(allGeometry.Count);
+            for (var i = 0; i < allGeometry.Count; i++) {
+                var geometry = allGeometry[i];
 
-            foreach (var geometry in allGeometry) {
                 var offset = VectorUtils.Bounds(
                     from vertex in geometry.Vertices
                     select geometry.WorldTransform * vertex / SVG_PIXELS_PER_UNIT
@@ -115,10 +128,11 @@ namespace Primer.Latex
                     true
                 );
 
-                sprites.Add((offset, buildSprite));
+                sprites[i] = buildSprite;
+                positions[i] = offset;
             }
 
-            return sprites;
+            return new LatexAsSprites(sprites, positions);
         }
     }
 }

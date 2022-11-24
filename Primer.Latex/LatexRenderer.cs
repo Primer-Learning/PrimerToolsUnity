@@ -117,10 +117,9 @@ namespace Primer.Latex
             spritesPositions = renderedSprites.Positions;
         }
 
-
-        void Update() {
-            svgToSprites.OnPlayerLoop(this);
-
+        // We mess with the update loop when rendering the sprites
+        // so LateUpdate is required here
+        void LateUpdate() {
             if (AreSpritesValid && spritesPositions is not null) {
                 spritesRenderer.SetSprites(sprites, spritesPositions, material);
                 spritesRenderer.Draw(transform);
