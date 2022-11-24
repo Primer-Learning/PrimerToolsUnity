@@ -11,7 +11,8 @@ namespace Primer.Timeline
         public virtual ClipCaps clipCaps => ClipCaps.None;
         public T template = new();
 
-        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) =>
-            ScriptPlayable<T>.Create(graph, template);
+        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner) {
+            return ScriptPlayable<T>.Create(graph, template);
+        }
     }
 }

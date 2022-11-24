@@ -7,42 +7,42 @@ namespace Primer
     [RequireComponent(typeof(TextMeshPro))]
     public class PrimerText2 : PrimerBehaviour
     {
-        const string GAME_OBJECT_NAME_PREFIX = "txt";
+        const string GAME_OBJECT_NAME_PREFIX = "@";
 
         [Multiline]
         public string text = "Primer";
         public float fontSize = 12;
         public Color color = Color.white;
-        public Vector3 orientation = Vector3.forward;
         public TextAlignmentOptions alignment = TextAlignmentOptions.Center;
 
         TextMeshPro meshCache;
-        TextMeshPro textMeshPro => meshCache ??= GetComponent<TextMeshPro>();
+        TextMeshPro TextMeshPro => meshCache ??= GetComponent<TextMeshPro>();
 
         float numericValue = 0;
-        public float asNumber
+        public float AsNumber
         {
             get => numericValue;
             set {
                 numericValue = value;
                 text = Presentation.FormatNumber(value);
-                textMeshPro.text = text;
+                TextMeshPro.text = text;
             }
         }
 
         void OnValidate() {
-            var mesh = textMeshPro;
+            var mesh = TextMeshPro;
             mesh.text = text;
             mesh.color = color;
             mesh.fontSize = fontSize;
             mesh.alignment = alignment;
 
-            transform.LookAt(transform.position + orientation);
+            UpdateGameObjectName();
+        }
 
-            var name = gameObject.name;
-
-            if (name == "PrimerLabel" || name.StartsWith($"{GAME_OBJECT_NAME_PREFIX} ")) {
-                gameObject.name = $"{GAME_OBJECT_NAME_PREFIX} {text}";
+        void UpdateGameObjectName() {
+            if (name == "PrimerLabel" || name.StartsWith(GAME_OBJECT_NAME_PREFIX)) {
+                var chunk = text.Length > 15 ? text[..15] : text;
+                name = $"{GAME_OBJECT_NAME_PREFIX}{chunk}";
             }
         }
     }

@@ -3,23 +3,23 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public abstract class CollectedMixer<T, U> : PrimerMixer<T>
+    public abstract class CollectedMixer<TTrackTarget, TData> : PrimerMixer<TTrackTarget>
     {
-        protected U originalValue;
+        protected TData originalValue;
         float lastTotalWeight;
         double lastTime;
 
-        protected abstract U ProcessPlayable(PrimerPlayable behaviour);
-        protected abstract U SingleInput(U input, float weight, bool isReverse);
-        protected abstract U Mix(List<float> weights, List<U> inputs);
-        protected abstract void Apply(T trackTarget, U input);
+        protected abstract TData ProcessPlayable(PrimerPlayable behaviour);
+        protected abstract TData SingleInput(TData input, float weight, bool isReverse);
+        protected abstract TData Mix(List<float> weights, List<TData> inputs);
+        protected abstract void Apply(TTrackTarget trackTarget, TData input);
 
 
-        protected override void Frame(T trackTarget, Playable playable, FrameData info) {
+        protected override void Frame(TTrackTarget trackTarget, Playable playable, FrameData info) {
             var count = playable.GetInputCount();
 
             var weights = new List<float>();
-            var inputs = new List<U>();
+            var inputs = new List<TData>();
             var totalWeight = 0f;
 
             for (var i = 0; i < count; i++) {

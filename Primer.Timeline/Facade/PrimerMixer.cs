@@ -25,6 +25,8 @@ namespace Primer.Timeline
                 throw new Exception($"Expected track target to be {typeof(T).Name} but {playerData?.GetType().Name} found");
             }
 
+            this.trackTarget = trackTarget;
+
             if (!isInitialized) {
                 RunStart(trackTarget);
             }
