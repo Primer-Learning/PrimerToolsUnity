@@ -1,0 +1,17 @@
+{
+    "name": "Primer.LatexRenderer",
+    "rootNamespace": "",
+    "references": [
+        "Unity.VectorGraphics",
+        "Unity.Timeline"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
