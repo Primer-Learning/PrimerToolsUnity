@@ -93,3 +93,5 @@ $RECYCLE.BIN/
 # Audio
 *.wav*
 *.pkf*
+
+.idea
