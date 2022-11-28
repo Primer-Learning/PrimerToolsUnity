@@ -50,7 +50,7 @@ namespace Primer.Latex
                 ct
             );
 
-            // See
+            // See ProcessGeometry docs to know why
             UnityEventHook.OnUpdate += ProcessGeometry;
 
 #if UNITY_EDITOR

@@ -23,9 +23,7 @@ namespace Primer.Latex
         public TempDir RootTempDir { get; }
 
 
-        #region Creation/Destruction
         public LatexToSvg(TempDir rootTempDir) => RootTempDir = rootTempDir;
-        #endregion
 
 
         public Task<string> RenderToSvg(LatexRenderConfig config, CancellationToken ct) {

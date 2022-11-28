@@ -78,7 +78,7 @@ namespace Primer.Latex
         }
 
         static IEnumerable<string> PathEnvVar() {
-            var delimiter = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ";" : ":";
+            var delimiter = Path.PathSeparator;
             var path = Environment.GetEnvironmentVariable("PATH");
             return path?.Split(delimiter) ?? new string[] { };
         }
