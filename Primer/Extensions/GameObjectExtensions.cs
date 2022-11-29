@@ -10,12 +10,12 @@ namespace Primer
         public static bool IsNull(this GameObject gameObject) => gameObject == null;
 
         public static void Dispose(this GameObject gameObject) {
-            if (Application.isEditor) {
+#if UNITY_EDITOR
+            if (Application.isEditor && !Application.isPlaying)
                 Object.DestroyImmediate(gameObject);
-            }
-            else {
+            else
+#endif
                 Object.Destroy(gameObject);
-            }
         }
 
         public static void DisposeAll(this IEnumerable<GameObject> list) {
