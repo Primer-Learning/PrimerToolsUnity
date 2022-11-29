@@ -11,15 +11,25 @@ namespace Simulation.BasketShot.Editor
     {
         const bool ALLOW_EMPTY = false;
 
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
+            var ite = property.Copy();
+            var totalHeight = EditorGUI.GetPropertyHeight(property, label, true) + EditorGUIUtility.standardVerticalSpacing;
+
+            while (ite.NextVisible(true)) {
+                totalHeight += EditorGUI.GetPropertyHeight(ite, label, true) + EditorGUIUtility.standardVerticalSpacing;
+            }
+
+            return totalHeight;
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             EditorGUI.BeginProperty(position, label, property);
             CreateDropdown(position, property);
+            EditorGUI.EndProperty();
 
             EditorGUI.indentLevel++;
             ChildPropertyFields(position, property, label);
             EditorGUI.indentLevel--;
-
-            EditorGUI.EndProperty();
         }
 
         void CreateDropdown(Rect position, SerializedProperty property) {
@@ -31,7 +41,14 @@ namespace Simulation.BasketShot.Editor
             if (selectedIndex == -1) selectedIndex = 0;
 
             var labels = choices.Select(x => x is null ? "None" : x.Name).ToArray();
-            var newIndex = EditorGUI.Popup(position, property.displayName, selectedIndex, labels);
+            var newRect = new Rect(
+                position.x,
+                position.y,
+                position.width,
+                EditorGUIUtility.singleLineHeight
+            );
+
+            var newIndex = EditorGUI.Popup(newRect, property.displayName, selectedIndex, labels);
             var newType = choices[newIndex];
 
             if (newType == property.managedReferenceValue?.GetType()) {
@@ -41,17 +58,6 @@ namespace Simulation.BasketShot.Editor
             property.managedReferenceValue = newType is null
                 ? null
                 : Activator.CreateInstance(newType);
-        }
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            var ite = property.Copy();
-            var totalHeight = EditorGUI.GetPropertyHeight(property, label, true) + EditorGUIUtility.standardVerticalSpacing;
-
-            while (ite.NextVisible(true)) {
-                totalHeight += EditorGUI.GetPropertyHeight(ite, label, true) + EditorGUIUtility.standardVerticalSpacing;
-            }
-
-            return totalHeight;
         }
 
         static void ChildPropertyFields(Rect position, SerializedProperty property, GUIContent label) {
