@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Primer.Editor
 {
+    [Obsolete("Extend StrategyPattern class instead, it has a custom drawer")]
     public static class DerivedTypeSelector
     {
         public static void CreateWithProps<TParentType>(SerializedObject serializedObject, string propertyName, bool allowEmpty = true) =>
