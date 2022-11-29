@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Primer
 {
@@ -20,6 +22,8 @@ namespace Primer
 
         public T Read() =>
             LoadFromResources(filename, initialValue);
+
+        public void OpenFolder() => Process.Start(resources);
 
 
         #region Static methods
