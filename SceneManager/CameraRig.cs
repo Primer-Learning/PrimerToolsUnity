@@ -95,7 +95,7 @@ public class CameraRig : PrimerObject
     }
     
     void Start() {
-        cam = SceneManager.instance.cam;
+        //cam = SceneManager.instance.cam;
     }
     public void GrabLight() {
         GameObject light = GameObject.Find("Directional Light");
