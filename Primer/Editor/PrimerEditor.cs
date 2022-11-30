@@ -10,6 +10,11 @@ namespace Primer.Editor
 
         protected T component => target as T;
 
+        protected static void Space() => GUILayout.Space(16);
+        protected void PropertyField(string name) =>
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(name), true);
+
+
         protected void CustomHeader(string title) {
             var rect = EditorGUILayout.GetControlRect(false, 0f);
             rect.height = EditorGUIUtility.singleLineHeight * 1.1f;
