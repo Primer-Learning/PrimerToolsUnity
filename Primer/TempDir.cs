@@ -5,17 +5,16 @@ namespace Primer
 {
     public class TempDir : IDisposable
     {
-        readonly Guid guid = Guid.NewGuid();
         readonly DirectoryInfo info;
         int childrenCount = 0;
-        bool isRoot = false;
+        readonly bool isRoot;
         bool exists = false;
 
         public string FullPath => info.FullName;
 
         public TempDir() {
             var tempPath = Path.GetTempPath();
-            var tmpDir = Path.Combine(tempPath, $"unity-primer-{guid}");
+            var tmpDir = Path.Combine(tempPath, $"unity-primer-{Guid.NewGuid()}");
             info = Directory.CreateDirectory(tmpDir);
             isRoot = true;
             exists = true;
