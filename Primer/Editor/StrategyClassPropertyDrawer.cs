@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using DefaultNamespace;
 using Primer;
 using UnityEditor;
 using UnityEngine;
@@ -12,11 +13,11 @@ namespace Simulation.BasketShot.Editor
         const bool ALLOW_EMPTY = false;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            var ite = property.Copy();
-            var totalHeight = EditorGUI.GetPropertyHeight(property, label, true) + EditorGUIUtility.standardVerticalSpacing;
+            var spacing = EditorGUIUtility.standardVerticalSpacing;
+            var totalHeight = EditorGUI.GetPropertyHeight(property, label, true) + spacing;
 
-            while (ite.NextVisible(true)) {
-                totalHeight += EditorGUI.GetPropertyHeight(ite, label, true) + EditorGUIUtility.standardVerticalSpacing;
+            foreach (var child in property.GetChildProperties()) {
+                totalHeight += EditorGUI.GetPropertyHeight(child, label, true) + spacing;
             }
 
             return totalHeight;
@@ -33,20 +34,23 @@ namespace Simulation.BasketShot.Editor
         }
 
         void CreateDropdown(Rect position, SerializedProperty property) {
+            var newRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+
             var baseType = fieldInfo.FieldType;
             var choices = TypeCache.GetTypesDerivedFrom(baseType).ToList();
             if (ALLOW_EMPTY) choices.Insert(0, null);
+
+            if (choices.Count == 0) {
+                var isBaseStrategy = baseType.BaseType == typeof(StrategyPattern);
+                var message = isBaseStrategy ? $"No subtypes of {baseType.Name}" : "";
+                EditorGUI.LabelField(newRect, property.displayName, message);
+                return;
+            }
 
             var selectedIndex = choices.IndexOf(property.managedReferenceValue?.GetType());
             if (selectedIndex == -1) selectedIndex = 0;
 
             var labels = choices.Select(x => x is null ? "None" : x.Name).ToArray();
-            var newRect = new Rect(
-                position.x,
-                position.y,
-                position.width,
-                EditorGUIUtility.singleLineHeight
-            );
 
             var newIndex = EditorGUI.Popup(newRect, property.displayName, selectedIndex, labels);
             var newType = choices[newIndex];
@@ -61,19 +65,18 @@ namespace Simulation.BasketShot.Editor
         }
 
         static void ChildPropertyFields(Rect position, SerializedProperty property, GUIContent label) {
-            var ite = property.Copy();
             var prevHeight = EditorGUI.GetPropertyHeight(property, label, true);
 
-            while (ite.NextVisible(true)) {
+            foreach (var child in property.GetChildProperties()) {
                 var newRect = new Rect(
                     position.x,
                     position.y + prevHeight + EditorGUIUtility.standardVerticalSpacing,
                     position.width,
-                    EditorGUI.GetPropertyHeight(ite, label, true)
+                    EditorGUI.GetPropertyHeight(child, label, true)
                 );
 
                 prevHeight += newRect.height + EditorGUIUtility.standardVerticalSpacing;
-                EditorGUI.PropertyField(newRect, ite);
+                EditorGUI.PropertyField(newRect, child);
             }
         }
     }
