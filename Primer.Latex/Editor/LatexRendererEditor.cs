@@ -1,18 +1,99 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
-using ReleasedLatexRenderer = Primer.Latex.ReleasedLatexRendererContainer.ReleasedLatexRenderer;
 
 namespace Primer.Latex.Editor
 {
     [CustomEditor(typeof(LatexRenderer))]
-    public class LatexRendererEditor : UnityEditor.Editor
+    public class LatexRendererEditor : PrimerEditor<LatexRenderer>
     {
+        /// <summary>The last values for latex and headers seen on the serializedObject.</summary>
+        private LatexRenderConfig lastSeenConfig;
+        /// <summary>The last values sent to the LatexRenderer to execute.</summary>
+        private LatexRenderConfig executedConfig;
+
+        /// <summary>
+        ///     Used instead of the actual serialized object for new latex and headers values.
+        ///     So we can make sure they're only actually changed when a build finishes.
+        /// </summary>
+        private SerializedObject bufferObject => bufferCache ??= new SerializedObject(target);
+
+        private SerializedObject bufferCache;
+
+        /// <summary>Will be true if we are editing a preset.</summary>
+        /// <remarks>
+        ///     This condition was found through exploration... There is no documented way to determine
+        ///     whether we're currently editing a preset. There's likely to be other cases where this is true
+        ///     that we'll want to figure out how to exclude. But we'll handle those as needed.
+        /// </remarks>
+        private bool isTargetAPreset => component.gameObject.scene.handle == 0;
+
+
+        #region Rendering request queue
+        private static readonly Dictionary<LatexRenderer, LatexRenderConfig> pendingSetLatex = new();
+
+        /// <summary>
+        ///     Pends an attempt to set the latex and headers for a given LatexRenderer. Whenever an
+        ///     editor for that LatexRenderer is rendered it will attempt to build the latex and headers given,
+        ///     as if the user had entered the values themselves.
+        /// </summary>
+        internal static void PendRenderingRequest(LatexRenderer latexRenderer, LatexRenderConfig config) =>
+            pendingSetLatex.Add(latexRenderer, config);
+        #endregion
+
+
+        private LatexRenderConfig GetConfig(SerializedObject obj) => new(
+            obj.FindProperty(nameof(component.latex)).stringValue,
+            obj.FindProperty(nameof(component.headers)).GetStringArrayValue()
+        );
+        private void SetConfig(SerializedObject obj, LatexRenderConfig config)
+        {
+            obj.FindProperty(nameof(component.latex)).stringValue = config.Latex;
+            obj.FindProperty(nameof(component.headers)).SetStringArrayValue(config.Headers);
+        }
+
+
+        public override bool RequiresConstantRepaint() => true;
+        private void OnEnable() => lastSeenConfig = GetConfig(serializedObject);
+
+
+        public override void OnInspectorGUI()
+        {
+            if (HandleIfPreset()) {
+                base.OnInspectorGUI();
+                return;
+            }
+
+            UpdateBufferObject();
+            ProcessPendingTasks();
+
+            GetStatusBox().Render();
+
+            RenderOpenBuildDirButton();
+            RenderCancelButton();
+
+            Space();
+            RenderBufferedLatexAndHeadersFields();
+            Space();
+            PropertyField(nameof(component.material));
+            Space();
+            PropertyField("gizmos");
+            Space();
+
+            if (RenderReleaseSvgPartsButton())
+                return;
+
+            if (!component.isRunning && NeedsExecution())
+                ExecuteRender();
+
+            serializedObject.ApplyModifiedProperties();
+            lastSeenConfig = GetConfig(serializedObject);
+        }
+
+
+        #region OnInspectorGUI parts
         public static readonly GUILayoutOption latexInputHeight =
             GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 6);
 
@@ -21,186 +102,109 @@ namespace Primer.Latex.Editor
             "you apply the preset to an actual LatexRenderer component."
         );
 
-        static readonly Dictionary<LatexRenderer, LatexRenderConfig> pendingSetLatex = new();
+        private bool HandleIfPreset()
+        {
+            if (!isTargetAPreset) return false;
 
-        (CancellationTokenSource cancellationSource, Task task)? currentTask;
-        LatexRenderConfig currentConfig;
-
-        /// <summary>
-        ///     The last values for latex and headers MaybeUpdateStagingObject has seen on the
-        ///     serializedObject.
-        /// </summary>
-        LatexRenderConfig lastSeenConfig;
-
-        /// <summary>
-        ///     Used instead of the actual serialized object for new latex and headers values.
-        ///     So we can make sure they're only actually changed when a build finishes.
-        /// </summary>
-        SerializedObject stagingObject;
-        SerializedObject StagingObject => stagingObject ??= new SerializedObject(target);
-
-
-        LatexRenderer Renderer => (LatexRenderer)target;
-
-        /// <summary>Gets the latex and headers properties of serializedObject.</summary>
-        LatexRenderConfig CurrentConfig => new(
-            serializedObject.FindProperty("latex").stringValue,
-            serializedObject.FindProperty("headers")?.GetStringArrayValue()
-        );
-
-        LatexRenderConfig StagingConfig => new(
-            StagingObject.FindProperty("latex").stringValue,
-            StagingObject.FindProperty("headers")?.GetStringArrayValue()
-        );
-
-        /// <summary>Will be true if we are editing a preset.</summary>
-        /// <remarks>
-        ///     This condition was found through exploration... There is no documented way to determine
-        ///     whether we're currently editing a preset. There's likely to be other cases where this is true
-        ///     that we'll want to figure out how to exclude. But we'll handle those as needed.
-        /// </remarks>
-        bool IsTargetAPreset => Renderer.gameObject.scene.handle == 0;
-
-
-        void OnEnable() => lastSeenConfig = CurrentConfig;
-        public override bool RequiresConstantRepaint() => true;
-
-
-        /// <summary>
-        ///     Pends an attempt to set the latex and headers for a given LatexRenderer. Whenever an
-        ///     editor for that LatexRenderer is rendered it will attempt to build the latex and headers given,
-        ///     as if the user had entered the values themselves.
-        /// </summary>
-        internal static void PendRenderingRequest(LatexRenderer latexRenderer, LatexRenderConfig config) {
-            pendingSetLatex.Add(latexRenderer, config);
-        }
-
-
-        public override void OnInspectorGUI() {
-            if (IsTargetAPreset) {
-                Renderer.sprites = new Sprite[] {null};
-                Renderer.spritesPositions = null;
-                serializedObject.Update();
-
-                base.OnInspectorGUI();
-                targetIsPresetWarning.Render();
-                return;
-            }
-
+            component.characters = Array.Empty<LatexChar>();
             serializedObject.Update();
-            MaybeUpdateStagingObject();
-            GetStatusHelpBox()?.Render();
-
-            var isTaskRunning = currentTask?.task.IsCompleted == false;
-
-            if (GUILayout.Button("Open Build Directory"))
-                Process.Start($"{Renderer.rootBuildDirectory}{Path.DirectorySeparatorChar}");
-
-            EditorGUI.BeginDisabledGroup(!isTaskRunning);
-            if (GUILayout.Button("Cancel Rendering Task"))
-                currentTask?.cancellationSource.Cancel();
-            EditorGUI.EndDisabledGroup();
-
-            var latexProperty = StagingObject.FindProperty("latex");
-            var headersProperty = StagingObject.FindProperty("headers");
-
-            if (pendingSetLatex.TryGetValue(Renderer, out var pending)) {
-                latexProperty.stringValue = pending.Latex;
-                headersProperty.SetStringArrayValue(pending.Headers);
-                pendingSetLatex.Remove(Renderer);
-            }
-
-            EditorGUILayout.PropertyField(latexProperty, latexInputHeight);
-            EditorGUILayout.PropertyField(headersProperty);
-            EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("material"));
-            EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("gizmos"));
-            EditorGUILayout.Space(10);
-
-            if (GUILayout.Button("Release SVG Parts")) {
-                ReleaseSvgParts();
-                return;
-            }
-
-            if (!isTaskRunning) {
-                var stagedConfig = StagingConfig;
-                var needsRebuild = !Renderer.AreSpritesValid;
-                var didTaskFail = currentTask?.task.IsFaulted == true;
-                var isStagingDifferent = stagedConfig != Renderer.Config;
-                var isDifferentThanLastTask = stagedConfig != currentConfig;
-
-                if ((needsRebuild && (isDifferentThanLastTask || !didTaskFail)) || (isStagingDifferent && isDifferentThanLastTask)) {
-                    var cancellationTokenSource = new CancellationTokenSource();
-                    currentConfig = stagedConfig;
-                    currentTask = (
-                        cancellationTokenSource,
-                        Renderer.RenderLatex(stagedConfig, cancellationTokenSource.Token)
-                    );
-                }
-            }
-
-            serializedObject.ApplyModifiedProperties();
-            lastSeenConfig = CurrentConfig;
+            targetIsPresetWarning.Render();
+            return true;
         }
 
+        /// <summary>Updates bufferObject if it was changed outside of this class (ex: by an undo operation).</summary>
+        private void UpdateBufferObject()
+        {
+            serializedObject.Update();
 
-        void ReleaseSvgParts() {
-            Undo.SetCurrentGroupName("Release SVG Parts");
+            var currentConfig = GetConfig(serializedObject);
+            if (currentConfig == lastSeenConfig && currentConfig == executedConfig) return;
 
-            var drawSpecs = Renderer.spritesRenderer.drawSpecs;
-
-            for (var i = 0; i < drawSpecs.Length; i++) {
-                var drawSpec = drawSpecs[i];
-                var obj = new GameObject($"SvgPart {i}");
-
-                obj.AddComponent<MeshFilter>().sharedMesh = drawSpec.Mesh;
-                obj.AddComponent<MeshRenderer>().material = Renderer.material;
-
-                obj.transform.SetParent(Renderer.transform, false);
-                obj.transform.localPosition = drawSpec.Position;
-
-                Undo.RegisterCreatedObjectUndo(obj, "");
-            }
-
-            var releasedRenderer = Renderer.gameObject.AddComponent<ReleasedLatexRenderer>();
-            releasedRenderer.SetLatex(Renderer.Config, Renderer.material);
-
-            Undo.RegisterCreatedObjectUndo(releasedRenderer, "Released SVG parts");
-            Undo.DestroyObjectImmediate(Renderer);
+            bufferObject.Update();
+            bufferObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        EditorHelpBox GetStatusHelpBox() {
-            if (!currentTask.HasValue) {
-                return EditorHelpBox.Info("Ok");
+        private EditorHelpBox GetStatusBox()
+        {
+            if (component.isCancelled && component.isRunning) {
+                return EditorHelpBox.Warning("Cancelling...");
             }
 
-            var (cancellationSource, task) = currentTask.Value;
-
-            if (cancellationSource.IsCancellationRequested) {
-                if (task.IsCompleted)
-                    currentTask = null;
-                else
-                    return EditorHelpBox.Warning("Cancelling...");
-            }
-
-            if (!task.IsCompleted)
+            if (component.isRunning)
                 return EditorHelpBox.Warning("Rendering LaTeX...");
 
-            if (task.Exception is not null && Renderer.Config != StagingConfig)
-                return EditorHelpBox.Error(task.Exception.Message);
+            if (component.renderError is not null)
+                return EditorHelpBox.Error(component.renderError.Message);
 
             return EditorHelpBox.Info("Ok");
         }
 
-        /// <summary>Updates stagingObject if it was changed outside of this class (ex: by an undo operation).</summary>
-        void MaybeUpdateStagingObject() {
-            var currentValues = CurrentConfig;
-            if (currentValues == lastSeenConfig) return;
+        private void ProcessPendingTasks()
+        {
+            if (!pendingSetLatex.TryGetValue(component, out var pending))
+                return;
 
-            StagingObject.Update();
-            StagingObject.ApplyModifiedPropertiesWithoutUndo();
-            lastSeenConfig = currentValues;
+            SetConfig(bufferObject, pending);
+            pendingSetLatex.Remove(component);
         }
+
+        private void RenderOpenBuildDirButton()
+        {
+            if (GUILayout.Button("Open Build Directory"))
+                component.OpenBuildDir();
+        }
+
+        private void RenderCancelButton()
+        {
+            EditorGUI.BeginDisabledGroup(!component.isRunning);
+            if (GUILayout.Button("Cancel Rendering Task"))
+                component.CancelRender();
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void RenderBufferedLatexAndHeadersFields()
+        {
+            var latex = bufferObject.FindProperty(nameof(component.latex)).stringValue;
+
+            EditorGUILayout.LabelField("Latex");
+            EditorGUILayout.TextArea(latex, latexInputHeight);
+            Space();
+            EditorGUILayout.PropertyField(bufferObject.FindProperty(nameof(component.headers)));
+        }
+
+        private bool RenderReleaseSvgPartsButton()
+        {
+            if (!GUILayout.Button("Release SVG Parts")) return false;
+
+            Undo.SetCurrentGroupName("Release SVG Parts");
+            var releasedRenderer = component.ReleaseSvgParts();
+            Undo.RegisterCreatedObjectUndo(releasedRenderer, "Released SVG parts");
+            Undo.DestroyObjectImmediate(component);
+            return true;
+        }
+
+        private bool NeedsExecution()
+        {
+            var bufferedConfig = GetConfig(bufferObject);
+            var lastAppliedConfig = component.Config;
+            var isBufferDifferentThanLastExecution = bufferedConfig != executedConfig;
+
+            if (bufferedConfig != lastAppliedConfig && isBufferDifferentThanLastExecution)
+                return true;
+
+            if (component.isValid)
+                return false;
+
+            return isBufferDifferentThanLastExecution || component.renderError is not null;
+        }
+
+        private async void ExecuteRender()
+        {
+            executedConfig = GetConfig(bufferObject);
+            await component.Render(executedConfig);
+            SetConfig(serializedObject, executedConfig);
+            serializedObject.ApplyModifiedProperties();
+        }
+        #endregion
     }
 }

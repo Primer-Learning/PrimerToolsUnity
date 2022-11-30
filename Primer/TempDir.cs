@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Primer
@@ -28,6 +29,9 @@ namespace Primer
 
         ~TempDir() => CleanUpResources();
         public void Dispose() => CleanUpResources();
+
+        public void Open() =>
+            Process.Start($"{FullPath}{Path.DirectorySeparatorChar}");
 
         public string GetChildPath(string filename) =>
             Path.Combine(info.FullName, filename);

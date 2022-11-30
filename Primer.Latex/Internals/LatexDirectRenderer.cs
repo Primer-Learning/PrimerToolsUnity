@@ -4,29 +4,35 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    internal class SpriteDirectRenderer
+    internal class LatexDirectRenderer
     {
         internal record DrawSpec(Mesh Mesh, Material Material, Vector3 Position);
 
         internal DrawSpec[] drawSpecs = {};
 
-        /// <summary>The last values given to SetSprites.</summary>
-        (Sprite[] sprites, Vector3[] spritePositions, Material material) lastSeenSprites;
+        private LatexChar[] lastCharacters;
+        private Material lastMaterial;
 
-        public void SetSprites(Sprite[] sprites, Vector3[] spritePositions, Material material) {
-            var args = (sprites, spritePositions, material);
-            if (args == lastSeenSprites) return;
 
-            drawSpecs = sprites.Zip(
-                spritePositions,
-                (sprite, position) => new DrawSpec(CreateMesh(sprite), material, position)
-            ).ToArray();
+        public void SetCharacters(LatexChar[] chars, Material material)
+        {
+            if (chars == lastCharacters && material == lastMaterial) return;
 
-            lastSeenSprites = args;
+            drawSpecs = new DrawSpec[chars.Length];
+
+            for (var i = 0; i < chars.Length; i++) {
+                drawSpecs[i] = new DrawSpec(CreateMesh(chars[i].sprite), material, chars[i].position);
+            }
+
+            lastCharacters = chars;
+            lastMaterial = material;
         }
 
-        public void Draw(Transform parent) {
-            foreach (var drawSpec in drawSpecs) {
+        public void Draw(Transform parent)
+        {
+            for (var i = 0; i < drawSpecs.Length; i++) {
+                var drawSpec = drawSpecs[i];
+
                 Graphics.DrawMesh(
                     drawSpec.Mesh,
                     parent.localToWorldMatrix * Matrix4x4.Translate(drawSpec.Position),
@@ -36,7 +42,8 @@ namespace Primer.Latex
             }
         }
 
-        static Mesh CreateMesh(Sprite sprite) {
+        private static Mesh CreateMesh(Sprite sprite)
+        {
             return new Mesh {
                 vertices = Array.ConvertAll(sprite.vertices, i => (Vector3)i),
                 triangles = Array.ConvertAll(sprite.triangles, i => (int)i),
@@ -54,8 +61,8 @@ namespace Primer.Latex
         [Flags]
         public enum GizmoMode
         {
-            Nothing = 0,
-            WireFrame = 1,
+            Nothing = 0b0,
+            WireFrame = 0b1,
             Normals = 0b10,
             Tangents = 0b100,
             Everything = 0b111

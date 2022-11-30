@@ -20,10 +20,7 @@ namespace Primer.Latex
         readonly object executionLock = new();
         Task<string> currentTask;
 
-        public TempDir RootTempDir { get; }
-
-
-        public LatexToSvg(TempDir rootTempDir) => RootTempDir = rootTempDir;
+        internal TempDir rootTempDir = new();
 
 
         public Task<string> RenderToSvg(LatexRenderConfig config, CancellationToken ct) {
@@ -39,7 +36,7 @@ namespace Primer.Latex
         string RenderToSvgSync(LatexRenderConfig config, CancellationToken ct) {
             ct.ThrowIfCancellationRequested();
 
-            var dir = RootTempDir.CreateChild("build-", autoIncrement: true);
+            var dir = rootTempDir.CreateChild("build-", true);
             var sourcePath = dir.GetChildPath("source.tex");
             var outputPath = dir.GetChildPath("output.svg");
 

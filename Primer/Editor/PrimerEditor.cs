@@ -10,9 +10,12 @@ namespace Primer.Editor
 
         protected T component => target as T;
 
-        protected static void Space() => GUILayout.Space(16);
-        protected void PropertyField(string name) =>
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(name), true);
+        protected float spacingPixels = 16;
+        protected void Space() => GUILayout.Space(spacingPixels);
+        protected static void Space(float pixels) => GUILayout.Space(pixels);
+
+        protected void PropertyField(string name, bool includeChildren = false) =>
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(name), includeChildren);
 
 
         protected void CustomHeader(string title) {

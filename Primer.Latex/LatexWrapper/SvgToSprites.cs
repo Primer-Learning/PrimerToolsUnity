@@ -23,13 +23,13 @@ namespace Primer.Latex
 
         record CreateSprites(
             List<VectorUtils.Geometry> Geometry,
-            TaskCompletionSource<LatexAsSprites> Result,
+            TaskCompletionSource<LatexChar[]> Result,
             CancellationToken CancellationToken
         );
 
         [CanBeNull] CreateSprites waitingToProcess;
 
-        public async Task<LatexAsSprites> ConvertToSprites(string svg, CancellationToken ct) {
+        public async Task<LatexChar[]> ConvertToSprites(string svg, CancellationToken ct) {
             ct.ThrowIfCancellationRequested();
 
             SVGParser.SceneInfo sceneInfo;
@@ -42,7 +42,7 @@ namespace Primer.Latex
                 return null;
             }
 
-            var taskCompletionSource = new TaskCompletionSource<LatexAsSprites>();
+            var taskCompletionSource = new TaskCompletionSource<LatexChar[]>();
 
             waitingToProcess = new CreateSprites(
                 VectorUtils.TessellateScene(sceneInfo.Scene, tessellationOptions),
@@ -95,9 +95,9 @@ namespace Primer.Latex
             }
         }
 
-        static LatexAsSprites ConvertGeometryToSprites(List<VectorUtils.Geometry> allGeometry) {
-            var sprites = new Sprite[allGeometry.Count];
-            var positions = new Vector3[allGeometry.Count];
+        static LatexChar[] ConvertGeometryToSprites(List<VectorUtils.Geometry> allGeometry)
+        {
+            var chars = new LatexChar[allGeometry.Count];
 
             var scaledBounds = VectorUtils.Bounds(
                 from geometry in allGeometry
@@ -128,11 +128,10 @@ namespace Primer.Latex
                     true
                 );
 
-                sprites[i] = buildSprite;
-                positions[i] = offset;
+                chars[i] = new LatexChar(buildSprite, offset);
             }
 
-            return new LatexAsSprites(sprites, positions);
+            return chars;
         }
     }
 }
