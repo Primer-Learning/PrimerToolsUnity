@@ -29,7 +29,8 @@ namespace Primer.Latex
 
         [CanBeNull] CreateSprites waitingToProcess;
 
-        public async Task<LatexChar[]> ConvertToSprites(string svg, CancellationToken ct) {
+        public async Task<LatexChar[]> ConvertToSprites(string svg, CancellationToken ct)
+        {
             ct.ThrowIfCancellationRequested();
 
             SVGParser.SceneInfo sceneInfo;
@@ -71,7 +72,8 @@ namespace Primer.Latex
         ///     we can then use VectorUtils.BuildSprite without throwing
         ///     "Not allowed to override geometry on sprite"
         /// <remarks>
-        void ProcessGeometry() {
+        private void ProcessGeometry()
+        {
             UnityEventHook.OnUpdate -= ProcessGeometry;
             if (waitingToProcess is null) return;
 

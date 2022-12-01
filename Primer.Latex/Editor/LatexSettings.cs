@@ -6,22 +6,22 @@ namespace Primer.Latex.Editor
     [InitializeOnLoad]
     public static class LatexSettings
     {
-        const SettingsScope SCOPE = SettingsScope.User;
-        const string PACKAGE = "org.primerlearning.primertools";
-        const string LATEX_BIN = "general.latexBinariesDirectory";
-        const string XELATEX_KEY = "general.xelatexExecutablePath";
-        const string DVISVGM_KEY = "general.dvisvgmExecutablePath";
-        static readonly Settings settings;
+        private const SettingsScope SCOPE = SettingsScope.User;
+        private const string PACKAGE = "org.primerlearning.primertools";
+        private const string LATEX_BIN = "general.latexBinariesDirectory";
+        private const string XELATEX_KEY = "general.xelatexExecutablePath";
+        private const string DVISVGM_KEY = "general.dvisvgmExecutablePath";
+        private static readonly Settings settings;
 
 
         [UserSetting("General Settings", "LaTeX Binaries Directory")]
-        static readonly UserSetting<string> binDir;
+        private static readonly UserSetting<string> binDir;
 
         [UserSetting("General Settings", "Xelatex Executable Path")]
-        static readonly UserSetting<string> xelatexPath;
+        private static readonly UserSetting<string> xelatexPath;
 
         [UserSetting("General Settings", "Dvisvgm Executable Path")]
-        static readonly UserSetting<string> dvisvgmPath;
+        private static readonly UserSetting<string> dvisvgmPath;
 
 
         // static constructor with [InitializeOnLoad]
@@ -40,7 +40,7 @@ namespace Primer.Latex.Editor
 
 
         [SettingsProvider]
-        static SettingsProvider CreateLatexSettingsProvider() {
+        private static SettingsProvider CreateLatexSettingsProvider() {
             return new UserSettingsProvider(
                 "Preferences/LaTeX Renderer",
                 settings,
@@ -48,7 +48,7 @@ namespace Primer.Latex.Editor
             );
         }
 
-        static void ReadSettings() {
+        private static void ReadSettings() {
             LatexBinaries.latexBinDir = binDir.value;
             LatexBinaries.xelatex = xelatexPath.value;
             LatexBinaries.dvisvgm = dvisvgmPath.value;

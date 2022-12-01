@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Primer.Latex
@@ -15,17 +14,20 @@ namespace Primer.Latex
         internal static string dvisvgm;
 
 
-        public static CliProgram.ExecutionResult Xelatex(TempDir cwd, string[] args, CancellationToken ct) {
+        public static CliProgram.ExecutionResult Xelatex(TempDir cwd, string[] args, CancellationToken ct)
+        {
             var program = GetCliProgram(xelatex, "xelatex");
             return program.Execute(cwd.FullPath, args, ct);
         }
 
-        public static CliProgram.ExecutionResult Dvisvgm(TempDir cwd, string[] args, CancellationToken ct) {
+        public static CliProgram.ExecutionResult Dvisvgm(TempDir cwd, string[] args, CancellationToken ct)
+        {
             var program = GetCliProgram(dvisvgm, "dvisvgm");
             return program.Execute(cwd.FullPath, args, ct);
         }
 
-        public static string GetXelatexErrorLogsFrom(TempDir cwd, string filename) {
+        public static string GetXelatexErrorLogsFrom(TempDir cwd, string filename)
+        {
             var logFile = cwd.GetChildPath(filename);
             if (!File.Exists(logFile)) return null;
 
@@ -38,7 +40,8 @@ namespace Primer.Latex
         }
 
 
-        static CliProgram GetCliProgram(string setting, string filename) {
+        private static CliProgram GetCliProgram(string setting, string filename)
+        {
             var path = GetBinary(setting, filename);
             if (string.IsNullOrWhiteSpace(path)) return null;
 
@@ -51,7 +54,8 @@ namespace Primer.Latex
             return cli;
         }
 
-        static string GetBinary(string setting, string filename) {
+        private static string GetBinary(string setting, string filename)
+        {
             if (!string.IsNullOrWhiteSpace(setting)) {
                 return setting;
             }
@@ -69,7 +73,8 @@ namespace Primer.Latex
             throw new FileNotFoundException($"Could not find {filename} in your PATH. You can configure it in Unity editor preferences.");
         }
 
-        static string FindBinary(string path, string filename) {
+        private static string FindBinary(string path, string filename)
+        {
             var plain = Path.Combine(path, filename);
             if (File.Exists(plain)) return plain;
 
@@ -77,10 +82,11 @@ namespace Primer.Latex
             return File.Exists(exe) ? exe : null;
         }
 
-        static IEnumerable<string> PathEnvVar() {
+        private static IEnumerable<string> PathEnvVar()
+        {
             var delimiter = Path.PathSeparator;
             var path = Environment.GetEnvironmentVariable("PATH");
-            return path?.Split(delimiter) ?? new string[] { };
+            return path?.Split(delimiter) ?? new string[] {};
         }
     }
 }

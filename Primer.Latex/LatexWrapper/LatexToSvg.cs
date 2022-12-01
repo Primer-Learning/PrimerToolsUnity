@@ -7,13 +7,13 @@ namespace Primer.Latex
 {
     internal class LatexToSvg
     {
-        static readonly string[] xelatexArguments = new [] {
+        private static readonly string[] xelatexArguments = {
             "-no-pdf",
             "-interaction=batchmode",
             "-halt-on-error"
         };
 
-        static readonly string[] dvisvgmArguments = new [] {
+        private static readonly string[] dvisvgmArguments = {
             "--no-fonts=1"
         };
 
@@ -23,7 +23,8 @@ namespace Primer.Latex
         internal TempDir rootTempDir = new();
 
 
-        public Task<string> RenderToSvg(LatexRenderConfig config, CancellationToken ct) {
+        public Task<string> RenderToSvg(LatexRenderConfig config, CancellationToken ct)
+        {
             lock (executionLock) {
                 if (currentTask is not null && !currentTask.IsCompleted) {
                     throw new Exception("A LaTeX rendering task is already running.");
@@ -33,7 +34,8 @@ namespace Primer.Latex
             }
         }
 
-        string RenderToSvgSync(LatexRenderConfig config, CancellationToken ct) {
+        private string RenderToSvgSync(LatexRenderConfig config, CancellationToken ct)
+        {
             ct.ThrowIfCancellationRequested();
 
             var dir = rootTempDir.CreateChild("build-", true);
@@ -56,7 +58,8 @@ namespace Primer.Latex
             return File.ReadAllText(outputPath);
         }
 
-        void ExecuteXelatex(TempDir tmpDir, string sourcePath, CancellationToken ct) {
+        private void ExecuteXelatex(TempDir tmpDir, string sourcePath, CancellationToken ct)
+        {
             ct.ThrowIfCancellationRequested();
 
             var args = xelatexArguments.Append($"-output-directory={tmpDir}", sourcePath);
@@ -71,7 +74,8 @@ namespace Primer.Latex
             }
         }
 
-        void ExecuteDvisvgm(TempDir workingDirectory, string outputPath, CancellationToken ct) {
+        private void ExecuteDvisvgm(TempDir workingDirectory, string outputPath, CancellationToken ct)
+        {
             ct.ThrowIfCancellationRequested();
 
             var dviPath = workingDirectory.GetChildPath("source.xdv");
@@ -85,7 +89,8 @@ namespace Primer.Latex
             }
         }
 
-        static void DumpStandardOutputs(TempDir workingDirectory, CliProgram.ExecutionResult result, string name) {
+        private static void DumpStandardOutputs(TempDir workingDirectory, CliProgram.ExecutionResult result, string name)
+        {
             var stdout = workingDirectory.GetChildPath($"{name}.stdout");
             File.WriteAllText(stdout, result.stdout);
 
@@ -94,3 +99,4 @@ namespace Primer.Latex
         }
     }
 }
+

@@ -68,7 +68,8 @@ namespace Primer.Latex
             Everything = 0b111
         }
 
-        public void DrawWireGizmos(Transform parent, GizmoMode features = GizmoMode.Nothing) {
+        public void DrawWireGizmos(Transform parent, GizmoMode features = GizmoMode.Nothing)
+        {
             foreach (var drawSpec in drawSpecs) {
                 if (features.HasFlag(GizmoMode.WireFrame)) {
                     Gizmos.color = Color.cyan;

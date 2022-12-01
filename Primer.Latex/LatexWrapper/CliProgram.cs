@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using Debug = UnityEngine.Debug;
 
 namespace Primer.Latex
 {
@@ -23,7 +22,8 @@ namespace Primer.Latex
         public CliProgram(string bin) => binaryPath = bin;
 
 
-        public ExecutionResult Execute(string cwd, string[] args, CancellationToken ct) {
+        public ExecutionResult Execute(string cwd, string[] args, CancellationToken ct)
+        {
             ct.ThrowIfCancellationRequested();
 
             using var process = new Process {
@@ -56,7 +56,8 @@ namespace Primer.Latex
             throw new TimeoutException($"Process {binaryPath} was killed.");
         }
 
-        static bool WaitForCompletion(CancellationToken ct, Process process) {
+        private static bool WaitForCompletion(CancellationToken ct, Process process)
+        {
             process.Start();
 
             while (!process.HasExited && !ct.IsCancellationRequested) {
@@ -69,7 +70,8 @@ namespace Primer.Latex
             return forceStop;
         }
 
-        ProcessStartInfo CreateStartInfo(string[] args, string cwd) {
+        private ProcessStartInfo CreateStartInfo(string[] args, string cwd)
+        {
             var startInfo = new ProcessStartInfo(binaryPath) {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,

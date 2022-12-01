@@ -11,7 +11,8 @@ namespace Primer.Latex.Editor
     {
         private bool unreleaseVisible;
 
-        public override void OnInspectorGUI() {
+        public override void OnInspectorGUI()
+        {
             // EditorGUILayout.LabelField("Latex (read-only)", component.latex);
             using (new EditorGUI.DisabledScope(true)) {
                 PropertyField(nameof(component.latex));

@@ -44,7 +44,5 @@ namespace Primer.Latex
 
             return renderedSprites;
         }
-
-
     }
 }
