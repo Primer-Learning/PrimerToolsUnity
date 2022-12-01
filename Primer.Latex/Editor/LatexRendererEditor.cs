@@ -10,9 +10,9 @@ namespace Primer.Latex.Editor
     public class LatexRendererEditor : PrimerEditor<LatexRenderer>
     {
         /// <summary>The last values for latex and headers seen on the serializedObject.</summary>
-        private LatexRenderConfig lastSeenConfig;
+        private LatexInput lastSeenConfig;
         /// <summary>The last values sent to the LatexRenderer to execute.</summary>
-        private LatexRenderConfig executedConfig;
+        private LatexInput executedConfig;
 
         /// <summary>
         ///     Used instead of the actual serialized object for new latex and headers values.
@@ -32,23 +32,23 @@ namespace Primer.Latex.Editor
 
 
         #region Rendering request queue
-        private static readonly Dictionary<LatexRenderer, LatexRenderConfig> pendingSetLatex = new();
+        private static readonly Dictionary<LatexRenderer, LatexInput> pendingSetLatex = new();
 
         /// <summary>
         ///     Pends an attempt to set the latex and headers for a given LatexRenderer. Whenever an
         ///     editor for that LatexRenderer is rendered it will attempt to build the latex and headers given,
         ///     as if the user had entered the values themselves.
         /// </summary>
-        internal static void PendRenderingRequest(LatexRenderer latexRenderer, LatexRenderConfig config) =>
+        internal static void PendRenderingRequest(LatexRenderer latexRenderer, LatexInput config) =>
             pendingSetLatex.Add(latexRenderer, config);
         #endregion
 
 
-        private LatexRenderConfig GetConfig(SerializedObject obj) => new(
+        private LatexInput GetConfig(SerializedObject obj) => new(
             obj.FindProperty(nameof(component.latex)).stringValue,
             obj.FindProperty(nameof(component.headers)).GetStringArrayValue()
         );
-        private void SetConfig(SerializedObject obj, LatexRenderConfig config)
+        private void SetConfig(SerializedObject obj, LatexInput config)
         {
             obj.FindProperty(nameof(component.latex)).stringValue = config.Latex;
             obj.FindProperty(nameof(component.headers)).SetStringArrayValue(config.Headers);
@@ -57,6 +57,7 @@ namespace Primer.Latex.Editor
 
         public override bool RequiresConstantRepaint() => true;
         private void OnEnable() => lastSeenConfig = GetConfig(serializedObject);
+
 
 
         public override void OnInspectorGUI()
@@ -164,10 +165,7 @@ namespace Primer.Latex.Editor
 
         private void RenderBufferedLatexAndHeadersFields()
         {
-            var latex = bufferObject.FindProperty(nameof(component.latex)).stringValue;
-
-            EditorGUILayout.LabelField("Latex");
-            EditorGUILayout.TextArea(latex, latexInputHeight);
+            EditorGUILayout.PropertyField(bufferObject.FindProperty(nameof(component.latex)), latexInputHeight);
             Space();
             EditorGUILayout.PropertyField(bufferObject.FindProperty(nameof(component.headers)));
         }

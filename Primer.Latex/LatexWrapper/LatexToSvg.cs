@@ -23,7 +23,7 @@ namespace Primer.Latex
         internal TempDir rootTempDir = new();
 
 
-        public Task<string> RenderToSvg(LatexRenderConfig config, CancellationToken ct)
+        public Task<string> RenderToSvg(LatexInput config, CancellationToken ct)
         {
             lock (executionLock) {
                 if (currentTask is not null && !currentTask.IsCompleted) {
@@ -34,7 +34,7 @@ namespace Primer.Latex
             }
         }
 
-        private string RenderToSvgSync(LatexRenderConfig config, CancellationToken ct)
+        private string RenderToSvgSync(LatexInput config, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 

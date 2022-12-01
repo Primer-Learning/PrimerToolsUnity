@@ -16,17 +16,17 @@ namespace Primer.Latex
         [TextArea]
         public string latex = "";
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
-        public List<string> headers = LatexRenderConfig.GetDefaultHeaders();
+        public List<string> headers = LatexInput.GetDefaultHeaders();
         public Material material;
 
 
         #region Internal fields
+        internal readonly LatexProcessor latexProcessor = new();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
-        internal readonly LatexToSprites latexToSprites = new();
-        internal readonly LatexDirectRenderer directRenderer = new();
 
-        internal bool isValid => this != null && (Config.IsEmpty || characters.Length != 0 && characters.AreSpritesValid());
-        internal LatexRenderConfig Config => new(latex, headers);
+        internal bool isValid => characters.All(x => x.isSpriteValid);
+        internal bool hasContent => Config.IsEmpty || characters.Length > 0;
+        internal LatexInput Config => new(latex, headers);
         #endregion
 
 
@@ -34,9 +34,11 @@ namespace Primer.Latex
         // so LateUpdate is required here
         private void LateUpdate()
         {
-            if (!isValid) return;
-            directRenderer.SetCharacters(characters, material);
-            directRenderer.Draw(transform);
+            if (!hasContent || !isValid) return;
+
+            for (var i = 0; i < characters.Length; i++) {
+                characters[i].Draw(transform, material);
+            }
         }
 
 
@@ -50,7 +52,7 @@ namespace Primer.Latex
             internal List<string> headers;
             [SerializeField] [HideInInspector]
             internal Material material;
-            internal LatexRenderConfig config => new(latex, headers);
+            internal LatexInput config => new(latex, headers);
         }
 
 
@@ -58,11 +60,16 @@ namespace Primer.Latex
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
         [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         [SerializeField]
-        private LatexDirectRenderer.GizmoMode gizmos = LatexDirectRenderer.GizmoMode.Nothing;
+        private LatexChar.GizmoMode gizmos = LatexChar.GizmoMode.Nothing;
 
 
         #region Unity events
-        private void OnDrawGizmos() => directRenderer.DrawWireGizmos(transform, gizmos);
+        private void OnDrawGizmos()
+        {
+            for (var i = 0; i < characters.Length; i++) {
+                characters[i].DrawWireGizmos(transform, gizmos);
+            }
+        }
 
         private void Reset()
         {
@@ -77,7 +84,7 @@ namespace Primer.Latex
 
         private async void OnEnable()
         {
-            if (!isValid) {
+            if (hasContent && !isValid) {
                 await Render(Config);
                 LateUpdate();
             }
@@ -86,18 +93,18 @@ namespace Primer.Latex
 
 
         #region Proxy LatexToSprites
-        public bool isRunning => latexToSprites.isRunning;
-        public bool isCancelled => latexToSprites.isCancelled;
-        public Exception renderError => latexToSprites.renderError;
+        public bool isRunning => latexProcessor.isRunning;
+        public bool isCancelled => latexProcessor.isCancelled;
+        public Exception renderError => latexProcessor.renderError;
 
-        public void CancelRender() => latexToSprites.Cancel();
-        public void OpenBuildDir() => latexToSprites.OpenBuildDir();
+        public void CancelRender() => latexProcessor.Cancel();
+        public void OpenBuildDir() => latexProcessor.OpenBuildDir();
 
-        public async Task Render(LatexRenderConfig config)
+        public async Task Render(LatexInput config)
         {
             characters = config.IsEmpty
                 ? Array.Empty<LatexChar>()
-                : await latexToSprites.Render(config);
+                : await latexProcessor.Render(config);
 
             latex = config.Latex;
             headers = config.Headers.ToList();
@@ -107,17 +114,15 @@ namespace Primer.Latex
 
         public Released ReleaseSvgParts()
         {
-            var drawSpecs = directRenderer.drawSpecs;
-
-            for (var i = 0; i < drawSpecs.Length; i++) {
-                var drawSpec = drawSpecs[i];
+            for (var i = 0; i < characters.Length; i++) {
+                var character = characters[i];
                 var obj = new GameObject($"SvgPart {i}");
 
-                obj.AddComponent<MeshFilter>().sharedMesh = drawSpec.Mesh;
+                obj.AddComponent<MeshFilter>().sharedMesh = character.mesh;
                 obj.AddComponent<MeshRenderer>().material = material;
 
                 obj.transform.SetParent(transform, false);
-                obj.transform.localPosition = drawSpec.Position;
+                obj.transform.localPosition = character.position;
 
                 Undo.RegisterCreatedObjectUndo(obj, "");
             }

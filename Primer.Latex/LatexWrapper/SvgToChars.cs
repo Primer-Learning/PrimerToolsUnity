@@ -11,9 +11,8 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    internal class SvgToSprites
+    internal class SvgToChars
     {
-        const float SVG_PIXELS_PER_UNIT = 10f;
         static readonly VectorUtils.TessellationOptions tessellationOptions = new() {
             StepDistance = 100.0f,
             MaxCordDeviation = 0.5f,
@@ -29,7 +28,7 @@ namespace Primer.Latex
 
         [CanBeNull] CreateSprites waitingToProcess;
 
-        public async Task<LatexChar[]> ConvertToSprites(string svg, CancellationToken ct)
+        public async Task<LatexChar[]> ConvertToLatexChar(string svg, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -51,7 +50,7 @@ namespace Primer.Latex
                 ct
             );
 
-            // See ProcessGeometry docs to know why
+            // See ProcessGeometry's <remarks> to know why
             UnityEventHook.OnUpdate += ProcessGeometry;
 
 #if UNITY_EDITOR
@@ -66,7 +65,7 @@ namespace Primer.Latex
         }
 
         /// <remarks>
-        ///     VectorUtils.BuildSprite (in ConvertGeometryToSprites) has to be called on the Player update loop
+        ///     VectorUtils.BuildSprite (in LatexChar) has to be called on the Player update loop
         ///     we're already out of it since we waited for LaTeX to generate the SVG
         ///     so we need to force another update and hook to it
         ///     we can then use VectorUtils.BuildSprite without throwing
@@ -90,48 +89,28 @@ namespace Primer.Latex
 
             try {
                 ct.ThrowIfCancellationRequested();
-                result.SetResult(ConvertGeometryToSprites(allGeometry));
+                result.SetResult(ConvertGeometryToChars(allGeometry));
             }
             catch (Exception ex) {
                 result.SetException(ex);
             }
         }
 
-        static LatexChar[] ConvertGeometryToSprites(List<VectorUtils.Geometry> allGeometry)
+        private static LatexChar[] ConvertGeometryToChars(List<VectorUtils.Geometry> allGeometry)
         {
-            var chars = new LatexChar[allGeometry.Count];
-
-            var scaledBounds = VectorUtils.Bounds(
+            var bounds = VectorUtils.Bounds(
                 from geometry in allGeometry
                 from vertex in geometry.Vertices
-                select geometry.WorldTransform * vertex / SVG_PIXELS_PER_UNIT
+                select geometry.WorldTransform * vertex / LatexChar.SVG_PIXELS_PER_UNIT
             );
 
+            var chars = new LatexChar[allGeometry.Count];
+
             for (var i = 0; i < allGeometry.Count; i++) {
-                var geometry = allGeometry[i];
-
-                var offset = VectorUtils.Bounds(
-                    from vertex in geometry.Vertices
-                    select geometry.WorldTransform * vertex / SVG_PIXELS_PER_UNIT
-                ).center;
-
-                offset -= scaledBounds.center;
-
-                // This matches the way flipYAxis would work in BuildSprite if we gave it all of the geometry in the SVG
-                // rather than just one at a time.
-                offset.y = -offset.y;
-
-                var buildSprite = VectorUtils.BuildSprite(
-                    new List<VectorUtils.Geometry> {geometry},
-                    SVG_PIXELS_PER_UNIT,
-                    VectorUtils.Alignment.Center,
-                    Vector2.zero,
-                    128,
-                    true
-                );
-
-                chars[i] = new LatexChar(buildSprite, offset);
+                chars[i] = new LatexChar(allGeometry[i], bounds.center);
             }
+
+            chars[0].Equals(chars[1]);
 
             return chars;
         }
