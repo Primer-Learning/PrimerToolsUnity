@@ -1,6 +1,6 @@
 {
     "name": "Primer.Latex.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "Primer.Latex.Editor",
     "references": [
         "GUID:49818357e697641afb75d2f8acaf1861",
         "GUID:02f771204943f4a40949438e873e3eff",
@@ -10,13 +10,5 @@
     ],
     "includePlatforms": [
         "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    ]
 }

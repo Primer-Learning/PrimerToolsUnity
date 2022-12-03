@@ -1,5 +1,6 @@
 {
   "name": "Primer.Editor",
+  "rootNamespace": "Primer.Editor",
   "includePlatforms": [
     "Editor"
   ],

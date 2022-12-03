@@ -1,12 +1,13 @@
 {
     "name": "Primer.Graph.Tests",
+    "rootNamespace": "Primer.Graph.Tests",
     "optionalUnityReferences": [
         "TestAssemblies"
     ],
     "includePlatforms": [
         "Editor"
     ],
-    "references":[
+    "references": [
         "Primer",
         "Primer.Graph"
     ]
