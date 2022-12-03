@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 namespace Primer
 {
     public static class Presentation
