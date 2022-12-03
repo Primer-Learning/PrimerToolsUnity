@@ -1,0 +1,11 @@
+{
+  "name": "org.primerlearning.primer-latex",
+  "displayName": "Primer.Latex",
+  "version": "1.0.0",
+  "description": "LaTeX renderer for unity",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.unity.vectorgraphics": "2.0.0-preview.19",
+    "org.primerlearning.primer": "1.0.0"
+  }
+}

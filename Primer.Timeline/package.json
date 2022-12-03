@@ -1,0 +1,10 @@
+{
+  "name": "org.primerlearning.primer-timeline",
+  "displayName": "Primer.Timeline",
+  "version": "1.0.0",
+  "description": "Primer wrapper for Unity Timeline API",
+  "unity": "2021.3",
+  "dependencies": {
+    "org.primerlearning.primer": "1.0.0"
+  }
+}
