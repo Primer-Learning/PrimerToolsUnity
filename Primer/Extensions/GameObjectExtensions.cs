@@ -18,14 +18,6 @@ namespace Primer
                 Object.Destroy(gameObject);
         }
 
-        public static void DisposeAll(this IEnumerable<GameObject> list) {
-            var array = list.ToArray();
-
-            for (var i = array.Length - 1; i >= 0; i--) {
-                Dispose(array[i]);
-            }
-        }
-
         public static void DisposeAll(this IEnumerable<Transform> list) {
             var array = list.ToArray();
 
