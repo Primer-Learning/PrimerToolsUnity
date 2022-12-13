@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Primer
+namespace Primer.Scene
 {
     [ExecuteAlways]
     [RequireComponent(typeof(Camera))]

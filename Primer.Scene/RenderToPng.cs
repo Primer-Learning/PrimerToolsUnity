@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using System.IO;
-using Unity.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Primer
+namespace Primer.Scene
 {
     public class RenderToPng : MonoBehaviour
     {
@@ -14,16 +15,11 @@ namespace Primer
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
-        [ReadOnly]
-        private int framesSaved = 0;
+        internal int framesSaved = 0;
 
 
-        private void OnEnable()
-        {
-            if (!string.IsNullOrWhiteSpace(frameOutDir)) return;
-            frameOutDir = Directory.GetCurrentDirectory();
-            Debug.LogWarning($"Frame capture directory not set. Setting to {frameOutDir}.");
-        }
+        internal static string defaultOutDir => Directory.GetCurrentDirectory();
+
 
         private void Update()
         {
@@ -34,12 +30,30 @@ namespace Primer
 
             framesSaved++;
 
-            var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
-            var path = Path.Combine(frameOutDir, "png", dirname, $"{framesSaved:000000}.png");
+            var dirname = GetContainerDirectory();
+            var path = Path.Combine(dirname, $"{framesSaved:000000}.png");
 
             RenderToPNG(path, resolutionWidth, resolutionHeight);
         }
 
+
+        private readonly List<string> createdDirs = new();
+        private string GetContainerDirectory()
+        {
+            var outDir = string.IsNullOrWhiteSpace(frameOutDir)
+                ? defaultOutDir
+                : frameOutDir;
+
+            var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
+            var path = Path.Combine(outDir, "png", dirname);
+
+            if (!createdDirs.Contains(path)) {
+                Directory.CreateDirectory(path);
+                createdDirs.Add(path);
+            }
+
+            return path;
+        }
 
         private void RenderToPNG(string path, int resWidth, int resHeight)
         {
