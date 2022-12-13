@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Primer.Scene
 {
+    [RequireComponent(typeof(Camera))]
     public class RenderToPng : MonoBehaviour
     {
         private Camera cameraCache;

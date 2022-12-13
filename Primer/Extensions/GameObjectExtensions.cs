@@ -9,7 +9,10 @@ namespace Primer
         // Extension methods work on null values!
         public static bool IsNull(this GameObject gameObject) => gameObject == null;
 
-        public static void Dispose(this GameObject gameObject) {
+        public static void Dispose(this GameObject gameObject)
+        {
+            if (gameObject == null) return;
+
 #if UNITY_EDITOR
             if (Application.isEditor && !Application.isPlaying)
                 Object.DestroyImmediate(gameObject);

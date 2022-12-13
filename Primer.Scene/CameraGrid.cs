@@ -13,17 +13,22 @@ namespace Primer.Scene
         [Min(0)] public int yDivisions = 3;
         [Min(1)] public int lineWidth = 5;
 
-        private void OnDisable() => GameObject.Find("Canvas")?.Dispose();
+
+        private Canvas canvas;
 
 
-        private void OnDrawGizmos()
+        private void OnDisable() => canvas.Dispose();
+
+
+        private void OnValidate()
         {
             if (!enabled) return;
 
-            var canvas = GetOrCreateChild<Canvas>("Canvas", (component, go) => {
+            canvas = GetOrCreate<Canvas>("Canvas", (component, go) => {
                 component.renderMode = RenderMode.ScreenSpaceOverlay;
                 go.AddComponent<CanvasScaler>();
                 go.AddComponent<GraphicRaycaster>();
+                go.hideFlags = HideFlags.HideAndDontSave;
             });
 
             var sizeDelta = canvas.GetComponent<RectTransform>().sizeDelta;
@@ -50,7 +55,7 @@ namespace Primer.Scene
         private static void DrawGridLayout(Component parent, string name, int divisions,
             GridLayoutGroup.Constraint constraint, Vector2 cellSize, Vector3 spacing)
         {
-            var group = GetOrCreateChild<GridLayoutGroup>(name, (component, go) => {
+            var group = GetOrCreate<GridLayoutGroup>(name, (component, go) => {
                 go.transform.parent = parent.transform;
 
                 var rect = go.GetComponent<RectTransform>();
@@ -81,21 +86,19 @@ namespace Primer.Scene
             }
         }
 
-        private static T GetOrCreateChild<T>(string name, Action<T, GameObject> initializer = null) where T : Component
+        private static T GetOrCreate<T>(string name, Action<T, GameObject> initializer = null) where T : Component
         {
             var child = GameObject.Find(name);
-            T component;
 
-            if (child == null) {
-                child = new GameObject { name = name };
-                component = child.AddComponent<T>();
+            if (child != null) {
+                return child.GetComponent<T>();
+            }
 
-                if (initializer is not null)
-                    initializer(component, child);
-            }
-            else {
-                component = child.GetComponent<T>();
-            }
+            var newChild = new GameObject {name = name};
+            var component = newChild.AddComponent<T>();
+
+            if (initializer is not null)
+                initializer(component, newChild);
 
             return component;
         }
