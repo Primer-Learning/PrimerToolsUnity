@@ -12,9 +12,19 @@ namespace Primer
         /// <summary>
         ///     Frequency in milliseconds for an animation execution
         /// </summary>
-        const int TWEEN_DELAY = 1000 / 60;
+        private const int TWEEN_DELAY = 1000 / 60;
 
-        public async static IAsyncEnumerable<T> Tween<T>([EnumeratorCancellation] CancellationToken ct, T initial, T target, float duration, EaseMode ease) {
+        public const float DEFAULT_DURATION = 0.5f;
+        public const EaseMode DEFAULT_EASING = EaseMode.SmoothStep;
+
+        public async static IAsyncEnumerable<T> Tween<T>(
+            [EnumeratorCancellation]
+            CancellationToken ct,
+            T initial,
+            T target,
+            float duration = DEFAULT_DURATION,
+            EaseMode ease = DEFAULT_EASING)
+        {
             var startTime = Time.time;
             var lerp = typeof(T).GetMethod("Lerp");
 
@@ -38,14 +48,16 @@ namespace Primer
 
         // Instance fields
 
-        Vector3? originalScale;
-        readonly CancellationTokenSource cancelAnimations = new();
+        private Vector3? originalScale;
+        private readonly CancellationTokenSource cancelAnimations = new();
 
-        void OnDestroy() {
+        private void OnDestroy()
+        {
             cancelAnimations.Cancel();
         }
 
-        public async Task MoveTo(Vector3 target, float duration, EaseMode ease) {
+        public async Task MoveTo(Vector3 target, float duration, EaseMode ease)
+        {
             if (!this) return;
 
             if (Application.isPlaying)
@@ -55,7 +67,8 @@ namespace Primer
 
         }
 
-        async Task moveTo(CancellationToken ct, Vector3 target, float duration, EaseMode ease) {
+        private async Task moveTo(CancellationToken ct, Vector3 target, float duration, EaseMode ease)
+        {
             // If the component is already destroyed do nothing
             if (!this) return;
 
@@ -66,7 +79,8 @@ namespace Primer
             }
         }
 
-        public async Task ScaleUpFromZero(float duration, EaseMode ease) {
+        public async Task ScaleUpFromZero(float duration, EaseMode ease)
+        {
             if (!this) return;
 
             if (!Application.isPlaying) return;
@@ -75,7 +89,8 @@ namespace Primer
             await scaleTo(cancelAnimations.Token, (Vector3)originalScale, duration, ease);
         }
 
-        public async Task ScaleDownToZero(float duration, EaseMode ease) {
+        public async Task ScaleDownToZero(float duration, EaseMode ease)
+        {
             if (!this) return;
 
             if (Application.isPlaying)
@@ -84,7 +99,8 @@ namespace Primer
                 transform.localScale = Vector3.zero;
         }
 
-        async Task scaleTo(CancellationToken ct, Vector3 newScale, float duration, EaseMode ease) {
+        private async Task scaleTo(CancellationToken ct, Vector3 newScale, float duration, EaseMode ease)
+        {
             if (!this) return;
 
             await foreach (var scale in Tween(ct, transform.localScale, newScale, duration, ease)) {
@@ -94,7 +110,8 @@ namespace Primer
             }
         }
 
-        void SaveOriginalScale() {
+        private void SaveOriginalScale()
+        {
             if (originalScale is null) {
                 originalScale = transform.localScale;
             }
