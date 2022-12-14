@@ -15,7 +15,7 @@ namespace Primer
         private const int TWEEN_DELAY = 1000 / 60;
 
         public const float DEFAULT_DURATION = 0.5f;
-        public const EaseMode DEFAULT_EASING = EaseMode.SmoothStep;
+        public const EaseMode DEFAULT_EASING = EaseMode.Cubic;
 
         public async static IAsyncEnumerable<T> Tween<T>(
             [EnumeratorCancellation]
