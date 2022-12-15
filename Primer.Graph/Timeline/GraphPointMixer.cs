@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Primer.Animation;
 using Primer.Timeline;
 using Unity.Plastic.Antlr3.Runtime.Misc;
 using UnityEngine;

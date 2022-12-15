@@ -1,0 +1,12 @@
+{
+  "name": "Primer.Animation.Editor",
+  "rootNamespace": "Primer.Animation.Editor",
+  "includePlatforms": [
+    "Editor"
+  ],
+  "references": [
+    "Primer",
+    "Primer.Animation",
+    "Primer.Editor"
+  ]
+}

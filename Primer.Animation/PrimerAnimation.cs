@@ -6,7 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace Primer
+namespace Primer.Animation
 {
     public record PrimerAnimation(float duration = 0.5f, EaseMode ease = EaseMode.Cubic);
 

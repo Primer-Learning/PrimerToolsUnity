@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Animation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -88,7 +89,7 @@ namespace Primer.Graph
         void UpdateLabel() {
             if (!axisLabel) {
                 axisLabel = Create(primerTextPrefab);
-                axisLabel.ScaleUpFromZero();
+                axisLabel.transform.ScaleUpFromZero();
             }
 
             var labelPos = Vector3.zero;

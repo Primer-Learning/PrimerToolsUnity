@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Primer
+namespace Primer.Animation
 {
     [Serializable]
     public class NoAnimator : PrimerAnimator

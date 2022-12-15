@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;

@@ -8,7 +8,8 @@
         "Primer",
         "Primer.Editor",
         "Primer.Timeline",
-        "Primer.Graph"
+        "Primer.Graph",
+        "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
     ],
     "includePlatforms": [
         "Editor"

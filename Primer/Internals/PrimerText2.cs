@@ -5,7 +5,7 @@ namespace Primer
 {
     [ExecuteAlways]
     [RequireComponent(typeof(TextMeshPro))]
-    public class PrimerText2 : PrimerBehaviour
+    public class PrimerText2 : MonoBehaviour
     {
         [Multiline]
         public string text = "Primer";
