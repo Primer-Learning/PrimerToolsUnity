@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -7,47 +6,45 @@ namespace Primer.Extensions
 {
     public static class TransformExtensions
     {
-        public static Dictionary<Transform, Vector3> originalScales = new();
-
-        public async static UniTask ScaleUpFromZero(
-            this Transform transform,
-            float duration = PrimerAnimation.DEFAULT_DURATION,
-            EaseMode ease = PrimerAnimation.DEFAULT_EASING)
+        public async static UniTask ScaleUpFromZero(this Transform transform, PrimerAnimation animation = null)
         {
-            if (transform == null) return;
-
-            var originalScale = transform.localScale;
-
-            if (!originalScales.TryAdd(transform, originalScale))
-                originalScale = originalScales[transform];
-
-            transform.localScale = Vector3.zero;
-            await scaleTo(transform, originalScale, duration, ease);
-
-            originalScales.Remove(transform);
+            await transform.GetOrAddComponent<PrimerBehaviour>().ScaleUpFromZero(animation);
         }
 
-        public async static UniTask ScaleDownToZero(
-            this Transform transform,
-            float duration = PrimerAnimation.DEFAULT_DURATION,
-            EaseMode ease = PrimerAnimation.DEFAULT_EASING)
+        public async static UniTask ScaleDownToZero(this Transform transform, PrimerAnimation animation = null)
         {
-            if (transform == null || transform.localScale == Vector3.zero) return;
-
-            var originalScale = transform.localScale;
-
-            if (!originalScales.TryAdd(transform, originalScale))
-                originalScales[transform] = originalScale;
-
-            await scaleTo(transform, Vector3.zero, duration, ease);
+            await transform.GetOrAddComponent<PrimerBehaviour>().ScaleDownToZero(animation);
         }
 
-        private async static UniTask scaleTo(Transform transform, Vector3 newScale, float duration, EaseMode ease)
+        public async static UniTask ScaleTo(this Transform transform, Vector3 newScale,
+            PrimerAnimation animation = null, CancellationToken ct = default)
         {
-            var ct = new CancellationToken();
+            if (transform == null || transform.localScale == newScale) return;
 
-            await foreach (var scale in PrimerAnimation.Tween(ct, transform.localScale, newScale, duration, ease)) {
+            if (!Application.isPlaying) {
+                transform.localScale = newScale;
+                return;
+            }
+
+            await foreach (var scale in animation.Tween(transform.localScale, newScale, ct)) {
+                if (ct.IsCancellationRequested) return;
                 transform.localScale = scale;
+            }
+        }
+
+        public async static UniTask MoveTo(this Transform transform, Vector3 newPosition,
+            PrimerAnimation animation = null, CancellationToken ct = default)
+        {
+            if (transform == null || transform.localPosition == newPosition) return;
+
+            if (!Application.isPlaying) {
+                transform.localPosition = newPosition;
+                return;
+            }
+
+            await foreach (var pos in animation.Tween(transform.localPosition, newPosition, ct)) {
+                if (ct.IsCancellationRequested) return;
+                transform.localPosition = pos;
             }
         }
     }

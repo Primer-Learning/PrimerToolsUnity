@@ -1,36 +1,62 @@
-using System.Threading.Tasks;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Primer;
+using Primer.Extensions;
 using UnityEngine;
 
-// This class has to be global
-// you should be able to extend it from anywhere without husle
-// ReSharper disable once CheckNamespace
 [AddComponentMenu("Primer Learning / Primer Behaviour")]
 public class PrimerBehaviour : MonoBehaviour
 {
-    PrimerAnimation tweenCache;
-    protected PrimerAnimation tween => tweenCache ??= gameObject.AddComponent<PrimerAnimation>();
+    #region Lifetime cancellation token
+    private readonly CancellationTokenSource lifetimeCancellation = new();
+    private CancellationToken lifetime => lifetimeCancellation.Token;
 
-    public async Task MoveTo(Vector3 target, float duration = 0.5f, EaseMode ease = EaseMode.Cubic) =>
-        await tween.MoveTo(target, duration, ease);
+    private void OnDestroy() => lifetimeCancellation.Cancel();
+    #endregion
 
-    public async void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) =>
-        await ScaleUpFromZeroAwaitable(duration, ease);
 
-    public async Task ScaleUpFromZeroAwaitable(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) =>
-        await tween.ScaleUpFromZero(duration, ease);
+    #region Intrinsic scale
+    private Vector3? intrinsicScaleNullable;
+    public Vector3 intrinsicScale {
+        get => ReadIntrinsicScale();
+        set => intrinsicScaleNullable = value;
+    }
 
-    public async void ScaleDownToZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) =>
-        await tween.ScaleUpFromZero(duration, ease);
+    public Vector3 ReadIntrinsicScale()
+    {
+        if (intrinsicScaleNullable.HasValue)
+            return intrinsicScaleNullable.Value;
 
-    public async void ShrinkAndDispose(float duration = 0.5f, EaseMode ease = EaseMode.Cubic) {
-        if (Application.isPlaying) {
-            await tween.ScaleDownToZero(duration, ease);
-        }
+        // We don't have intrinsic scale but the transform's scale is 0...
+        if (transform.localScale == Vector3.zero)
+            return Vector3.zero;
+
+        var scale = transform.localScale;
+        intrinsicScaleNullable = scale;
+        return scale;
+    }
+    #endregion
+
+
+    public async UniTask ScaleUpFromZero(PrimerAnimation anim = null)
+    {
+        ReadIntrinsicScale();
+        transform.localScale = Vector3.zero;
+        await transform.ScaleTo(intrinsicScale, anim, lifetime);
+    }
+
+    public async UniTask ScaleDownToZero(PrimerAnimation anim = null)
+    {
+        ReadIntrinsicScale();
+        await transform.ScaleTo(Vector3.zero, anim, lifetime);
+    }
+
+    public async void ShrinkAndDispose(PrimerAnimation anim = null) {
+        if (Application.isPlaying)
+            await ScaleDownToZero(anim);
 
         // This is false if the element has already been destroyed
-        if (this) {
+        if (this)
             gameObject.Dispose();
-        }
     }
 }

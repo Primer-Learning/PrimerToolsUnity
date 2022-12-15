@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Primer
@@ -8,12 +6,13 @@ namespace Primer
     {
         public static void Dispose(this Component component)
         {
-            if (component != null) {
+            if (component != null)
                 component.gameObject.Dispose();
-            }
         }
 
-        public static T GetOrAddComponent<T>(this Component component) where T : Component =>
-            component.GetComponent<T>() ?? component.gameObject.AddComponent<T>();
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
+        {
+            return component.GetComponent<T>() ?? component.gameObject.AddComponent<T>();
+        }
     }
 }
