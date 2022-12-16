@@ -9,6 +9,13 @@ namespace Primer
         // Extension methods work on null values!
         public static bool IsNull(this GameObject gameObject) => gameObject == null;
 
+        public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
+        {
+            var found = gameObject.GetComponent<T>();
+            if (found != null) return found;
+            return gameObject.AddComponent<T>();
+        }
+
         public static void Dispose(this GameObject gameObject)
         {
             if (gameObject == null) return;

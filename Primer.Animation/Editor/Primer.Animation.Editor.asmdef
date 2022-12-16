@@ -7,6 +7,8 @@
   "references": [
     "Primer",
     "Primer.Animation",
-    "Primer.Editor"
+    "Primer.Editor",
+    "Unity.Timeline",
+    "Unity.Timeline.Editor"
   ]
 }
