@@ -6,18 +6,18 @@ namespace Primer.Animation
 {
     public static class TransformExtensions
     {
-        public async static UniTask ScaleUpFromZero(this Transform transform, PrimerAnimation animation = null)
+        public async static UniTask ScaleUpFromZero(this Transform transform, Tweener animation = null)
         {
             await transform.GetOrAddComponent<PrimerBehaviour>().ScaleUpFromZero(animation);
         }
 
-        public async static UniTask ScaleDownToZero(this Transform transform, PrimerAnimation animation = null)
+        public async static UniTask ScaleDownToZero(this Transform transform, Tweener animation = null)
         {
             await transform.GetOrAddComponent<PrimerBehaviour>().ScaleDownToZero(animation);
         }
 
         public async static UniTask ScaleTo(this Transform transform, Vector3 newScale,
-            PrimerAnimation animation = null, CancellationToken ct = default)
+            Tweener animation = null, CancellationToken ct = default)
         {
             if (transform == null || transform.localScale == newScale) return;
 
@@ -33,7 +33,7 @@ namespace Primer.Animation
         }
 
         public async static UniTask MoveTo(this Transform transform, Vector3 newPosition,
-            PrimerAnimation animation = null, CancellationToken ct = default)
+            Tweener animation = null, CancellationToken ct = default)
         {
             if (transform == null || transform.localPosition == newPosition) return;
 

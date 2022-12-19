@@ -8,16 +8,16 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public record PrimerAnimation(float duration = 0.5f, EaseMode ease = EaseMode.Cubic);
+    public record Tweener(float duration = 0.5f, EaseMode ease = EaseMode.Cubic);
 
 
     /// <summary>
     ///     These methods are implemented as extensions so they can be called even on `null` objects
     /// </summary>
-    public static class PrimerAnimationExtensions {
-        private static readonly PrimerAnimation @default = new();
+    public static class TweenerExtensions {
+        private static readonly Tweener @default = new();
 
-        public static T Lerp<T>(this PrimerAnimation config, T a, T b, float t)
+        public static T Lerp<T>(this Tweener config, T a, T b, float t)
         {
             var animation = config ?? @default;
             var lerp = GetLerpMethod<T>();
@@ -28,7 +28,7 @@ namespace Primer.Animation
             return (T)lerped;
         }
 
-        public async static IAsyncEnumerable<T> Tween<T>(this PrimerAnimation config, T initial, T target,
+        public async static IAsyncEnumerable<T> Tween<T>(this Tweener config, T initial, T target,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             var startTime = Time.time;

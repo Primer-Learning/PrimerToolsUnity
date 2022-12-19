@@ -39,20 +39,20 @@ namespace Primer.Animation
         #endregion
 
 
-        public async UniTask ScaleUpFromZero(PrimerAnimation anim = null)
+        public async UniTask ScaleUpFromZero(Tweener anim = null)
         {
             ReadIntrinsicScale();
             transform.localScale = Vector3.zero;
             await transform.ScaleTo(intrinsicScale, anim, lifetime);
         }
 
-        public async UniTask ScaleDownToZero(PrimerAnimation anim = null)
+        public async UniTask ScaleDownToZero(Tweener anim = null)
         {
             ReadIntrinsicScale();
             await transform.ScaleTo(Vector3.zero, anim, lifetime);
         }
 
-        public async void ShrinkAndDispose(PrimerAnimation anim = null) {
+        public async void ShrinkAndDispose(Tweener anim = null) {
             if (Application.isPlaying)
                 await ScaleDownToZero(anim);
 
