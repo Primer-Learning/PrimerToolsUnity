@@ -14,9 +14,9 @@ namespace Primer.Animation
             var endTime = time + duration;
 
             clip.AddCurves<Transform>(new Dictionary<string, AnimationCurve> {
-                { "m_LocalScale.x", IPrimerAnimation.CubicCurve(time, scale.x, endTime, 0) },
-                { "m_LocalScale.y", IPrimerAnimation.CubicCurve(time, scale.y, endTime, 0) },
-                { "m_LocalScale.z", IPrimerAnimation.CubicCurve(time, scale.z, endTime, 0) },
+                ["m_LocalScale.x"] = IPrimerAnimation.CubicCurve(time, scale.x, endTime, 0),
+                ["m_LocalScale.y"] = IPrimerAnimation.CubicCurve(time, scale.y, endTime, 0),
+                ["m_LocalScale.z"] = IPrimerAnimation.CubicCurve(time, scale.z, endTime, 0),
             });
         }
     }
