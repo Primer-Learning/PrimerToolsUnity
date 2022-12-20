@@ -24,8 +24,8 @@ namespace Primer.Latex
         internal readonly LatexProcessor latexProcessor = new();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
-        internal bool isValid => characters.All(x => x.isSpriteValid);
-        internal bool hasContent => Config.IsEmpty || characters.Length > 0;
+        internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
+        internal bool hasContent => !Config.IsEmpty || characters.Length > 0;
         internal LatexInput Config => new(latex, headers);
         #endregion
 
@@ -86,7 +86,7 @@ namespace Primer.Latex
         {
             if (hasContent && !isValid) {
                 await Render(Config);
-                LateUpdate();
+                if (this != null) LateUpdate();
             }
         }
         #endregion
