@@ -15,10 +15,11 @@ namespace Primer.Animation.Editor
         public static void ScaleUpFromZero(MenuCommand command)
         {
             var director = TimelineEditor.inspectedDirector;
-            var selected = command.GetSelectedElement();
-            var animation = new ScaleUpFromZero(selected.transform.localScale, director.time);
 
-            director.CreateAnimation(selected, animation);
+            foreach (var selected in command.GetSelectedElements()) {
+                var animation = new ScaleUpFromZero(selected.transform.localScale, director.time);
+                director.CreateAnimation(selected, animation);
+            }
 
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
@@ -27,10 +28,11 @@ namespace Primer.Animation.Editor
         public static void ScaleDownToZero(MenuCommand command)
         {
             var director = TimelineEditor.inspectedDirector;
-            var selected = command.GetSelectedElement();
-            var animation = new ScaleDownToZero(selected.transform.localScale, director.time);
 
-            director.CreateAnimation(selected, animation);
+            foreach (var selected in command.GetSelectedElements()) {
+                var animation = new ScaleDownToZero(selected.transform.localScale, director.time);
+                director.CreateAnimation(selected, animation);
+            }
 
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
