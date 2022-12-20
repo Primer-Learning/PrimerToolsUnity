@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -7,6 +9,7 @@ namespace Primer.Latex
 {
     public class LatexProcessor
     {
+        private static readonly Dictionary<LatexInput, Task<LatexChar[]>> cache = new();
         private readonly LatexToSvg latexToSvg = new();
         private readonly SvgToChars svgToChars = new();
 
@@ -27,9 +30,19 @@ namespace Primer.Latex
 
         public Task<LatexChar[]> Render(LatexInput config)
         {
+            var cached = GetFromCache(config);
+            if (cached is not null) return cached;
+
             cancellationSource = new CancellationTokenSource();
             currentTask = Render(config, cancellationSource.Token);
+            cache.Add(config, currentTask);
             return currentTask;
+        }
+
+        private static Task<LatexChar[]> GetFromCache(LatexInput config)
+        {
+            var foundKey = cache.Keys.FirstOrDefault(x => x.Equals(config));
+            return foundKey is null ? null : cache[foundKey];
         }
 
         private async Task<LatexChar[]> Render(LatexInput config, CancellationToken ct)
