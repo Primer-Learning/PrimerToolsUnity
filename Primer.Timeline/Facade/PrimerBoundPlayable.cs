@@ -1,9 +1,10 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public abstract class PrimerMixer<T> : PrimerPlayable
+    public abstract class PrimerBoundPlayable<T> : PrimerPlayable
     {
         protected abstract void Start(T trackTarget);
         protected abstract void Stop(T trackTarget);

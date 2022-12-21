@@ -8,11 +8,13 @@ using UnityEngine;
 namespace Primer.Latex
 {
     [Serializable]
-    public sealed record LatexChar
+    public sealed class LatexChar
     {
-        [SerializeField] public readonly VectorUtils.Geometry geometry;
-        [SerializeField] public readonly Vector3 position;
-        [NonSerialized] public readonly Sprite sprite;
+        public readonly VectorUtils.Geometry geometry;
+        public readonly Vector3 position;
+        public float scale;
+
+        [NonSerialized] private readonly Sprite sprite;
 
         [NonSerialized] private Mesh meshCache;
         [CanBeNull] public Mesh mesh => meshCache ??= CreateMesh(sprite);
@@ -51,21 +53,31 @@ namespace Primer.Latex
 
 
         #region Equality (comparison to others)
-        public bool IsSamePosition(LatexChar other) => other != null && position == other.position;
+        private bool IsSameScale(LatexChar other) =>
+            Math.Abs(scale - other.scale) < 0.01f;
 
-        // TODO: this must be tested, how do we know if two geometries are identical?
-        public bool IsSameGeometry(LatexChar other) => other != null && Equals(geometry, other.geometry);
+        public bool IsSamePosition(LatexChar other) =>
+            other != null && position == other.position;
 
-        public bool Equals(LatexChar other) =>
-            IsSamePosition(other) && IsSameGeometry(other);
+        public bool IsSameGeometry(LatexChar other) =>
+            other != null && geometry.Vertices.SequenceEqual(other.geometry.Vertices);
 
-        public override int GetHashCode() => HashCode.Combine(geometry, position);
+        public override bool Equals(object other)
+        {
+            return other is LatexChar otherChar &&
+                   // IsSameScale(otherChar) &&
+                   // IsSamePosition(otherChar) &&
+                   IsSameGeometry(otherChar);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(scale, geometry, position);
         #endregion
 
 
-        public LatexChar(VectorUtils.Geometry geometry, Vector2 offset)
+        public LatexChar(VectorUtils.Geometry geometry, Vector2 offset, float scale = 1)
         {
             this.geometry = geometry;
+            this.scale = scale;
             position = CalculatePosition(geometry, offset);
             // TODO: try moving sprite generation to Draw()
             sprite = ConvertGeometryToSprite(geometry);

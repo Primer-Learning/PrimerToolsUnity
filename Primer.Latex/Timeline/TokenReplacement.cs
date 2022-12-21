@@ -1,36 +1,42 @@
 using System;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using Primer.Timeline;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Latex
 {
     [Serializable]
-    public class TokenReplacement : PrimerMixer<LatexRenderer>
+    public class TokenReplacement : PrimerBoundPlayable<LatexRenderer>, ILatexCharProvider
     {
-        private LatexInput originalConfig;
+        internal LatexProcessor processor;
+        [CanBeNull] private LatexInput lastUsedConfig;
+
         public string searchToken = "";
         public string replaceWith = "";
 
-        protected override void Start(LatexRenderer latex)
-        {
-            originalConfig = latex.Config;
-        }
 
-        protected override void Stop(LatexRenderer latex)
-        {
-            latex.Render(originalConfig).FireAndForget();
-        }
+        public bool isReady { get; private set; } = false;
+        public LatexChar[] characters { get; private set; }
 
-        protected override void Frame(LatexRenderer latex, Playable playable, FrameData info)
+        protected override void Start(LatexRenderer trackTarget) {}
+
+        protected override void Stop(LatexRenderer trackTarget) {}
+
+        protected override async void Frame(LatexRenderer trackTarget, Playable playable, FrameData info)
         {
+            var originalFormula = trackTarget.config.code;
             var replacer = new Regex(searchToken);
-            var newLatex = replacer.Replace(originalConfig.Latex, replaceWith);
-            var newConfig = latex.Config with {Latex = newLatex};
+            var newFormula = replacer.Replace(originalFormula, replaceWith);
+            var newConfig = trackTarget.config with {code = newFormula};
 
-            if (!latex.Config.Equals(newConfig)) {
-                latex.Render(newConfig).FireAndForget();
-            }
+            if (lastUsedConfig is not null && lastUsedConfig.Equals(newConfig))
+                return;
+
+            lastUsedConfig = newConfig;
+            characters = await processor.Process(newConfig);
+            isReady = true;
         }
     }
 }

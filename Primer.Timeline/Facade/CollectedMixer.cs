@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public abstract class CollectedMixer<TTrackTarget, TData> : PrimerMixer<TTrackTarget>
+    public abstract class CollectedMixer<TTrackTarget, TData> : PrimerBoundPlayable<TTrackTarget>
     {
         protected TData originalValue;
         float lastTotalWeight;
