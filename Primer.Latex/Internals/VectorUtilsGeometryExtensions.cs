@@ -11,7 +11,9 @@ namespace Primer.Latex
         public const float SVG_PIXELS_PER_UNIT = 10f;
 
         // Magic number, we fiddled with it until we got the expected result
-        private const float TOLERANCE = 25f;
+        // If a character scales up and down in the same animation increase
+        // If a character transforms in a different one decrease
+        private const float TOLERANCE = 125;
 
 
         public static bool IsSimilarEnough(this VectorUtils.Geometry geometry, VectorUtils.Geometry other)

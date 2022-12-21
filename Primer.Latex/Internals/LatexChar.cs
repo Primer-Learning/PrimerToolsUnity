@@ -6,21 +6,19 @@ namespace Primer.Latex
     [Serializable]
     public sealed record LatexChar(LatexSymbol symbol, Vector3 position, float scale = 1)
     {
-        public static LatexChar Lerp(LatexChar a, LatexChar b, float t)
+        public static LatexChar Lerp(LatexChar left, LatexChar right, float t)
         {
-            if (!a.IsSameSymbol(b))
+            if (!left.IsSameSymbol(right))
                 throw new ArgumentException("Can't lerp latex characters for different symbols");
 
-            return a with {
-                position = Vector3.Lerp(a.position, b.position, t),
-                scale = Mathf.Lerp(a.scale, b.scale, t)
+            return left with {
+                position = Vector3.Lerp(left.position, right.position, t),
+                scale = Mathf.Lerp(left.scale, right.scale, t)
             };
         }
 
-        public static LatexChar LerpScale(LatexChar a, float t)
-        {
-            return a with { scale = Mathf.Lerp(0, a.scale, t) };
-        }
+        public static LatexChar LerpScale(LatexChar @char, float t) =>
+            @char with { scale = Mathf.Lerp(0, @char.scale, t) };
 
 
         public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
@@ -33,6 +31,9 @@ namespace Primer.Latex
             symbol.Draw(parent, material, position, scale);
 
 #if UNITY_EDITOR
+        // for debug proposes
+        public (string code, int i) source;
+
         public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
             symbol.DrawWireGizmos(parent, position,features);
 #endif

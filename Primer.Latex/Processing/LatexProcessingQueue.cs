@@ -4,6 +4,13 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
+    /// <summary>
+    /// Allows only one request in at a time, only one request in the queue too
+    ///
+    /// If a new request arrives and the queue is occupied,
+    ///   the previous request will throw `OperationCanceledException`
+    ///   and the newer will replace it in the queue
+    /// </summary>
     internal class LatexProcessingQueue : ProcessingPipeline
     {
         private LatexInput queue;

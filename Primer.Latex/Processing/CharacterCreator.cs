@@ -43,15 +43,26 @@ namespace Primer.Latex
 
             ct.ThrowIfCancellationRequested();
 
-            var renderedSprites = await svgToChars.ConvertToLatexChar(svg, ct);
+            var characters = await svgToChars.ConvertToLatexChar(svg, ct);
 
             ct.ThrowIfCancellationRequested();
 
-            return renderedSprites;
+#if UNITY_EDITOR
+            AddDebugInformation(config, characters);
+#endif
+
+            return characters;
         }
 
 #if UNITY_EDITOR
         public void OpenBuildDir() => latexToSvg.rootTempDir.Open();
+
+        private void AddDebugInformation(LatexInput input, LatexChar[] characters)
+        {
+            for (var i = 0; i < characters.Length; i++) {
+                characters[i].source = (input.code, i);
+            }
+        }
 #endif
 
     }
