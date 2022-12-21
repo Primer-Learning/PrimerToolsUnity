@@ -21,7 +21,7 @@ namespace Primer.Latex
 
 
         #region Internal fields
-        internal readonly LatexProcessor latexProcessor = new();
+        internal readonly CancellableLatexProcessor processor = new();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
         internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
@@ -29,6 +29,15 @@ namespace Primer.Latex
         internal LatexInput Config => new(latex, headers);
         #endregion
 
+
+        #region Unity events
+        private async void OnEnable()
+        {
+            if (hasContent && !isValid) {
+                await Render(Config);
+                if (this != null) LateUpdate();
+            }
+        }
 
         // We mess with the update loop when rendering the sprites
         // so LateUpdate is required here
@@ -40,6 +49,16 @@ namespace Primer.Latex
                 characters[i].Draw(transform, material);
             }
         }
+        #endregion
+
+
+        public async Task Render(LatexInput config)
+        {
+            (latex, headers) = config;
+            characters = await processor.Render(config);
+        }
+
+        public void CancelRender() => processor.Cancel();
 
 
         // Using LatexRenderer as container like this prevents the ReleasedLatexRenderer from being created by the
@@ -63,7 +82,6 @@ namespace Primer.Latex
         private LatexChar.GizmoMode gizmos = LatexChar.GizmoMode.Nothing;
 
 
-        #region Unity events
         private void OnDrawGizmos()
         {
             for (var i = 0; i < characters.Length; i++) {
@@ -82,33 +100,14 @@ namespace Primer.Latex
             }
         }
 
-        private async void OnEnable()
-        {
-            if (hasContent && !isValid) {
-                await Render(Config);
-                if (this != null) LateUpdate();
-            }
-        }
-        #endregion
 
+        #region Proxy LatexProcessor
+        internal bool isRunning => processor.state == LatexProcessingState.Processing;
+        internal bool isCancelled => processor.state == LatexProcessingState.Cancelled;
 
-        #region Proxy LatexToSprites
-        public bool isRunning => latexProcessor.isRunning;
-        public bool isCancelled => latexProcessor.isCancelled;
-        public Exception renderError => latexProcessor.renderError;
+        public Exception renderError => processor.renderError;
 
-        public void CancelRender() => latexProcessor.Cancel();
-        public void OpenBuildDir() => latexProcessor.OpenBuildDir();
-
-        public async Task Render(LatexInput config)
-        {
-            characters = config.IsEmpty
-                ? Array.Empty<LatexChar>()
-                : await latexProcessor.Render(config);
-
-            latex = config.Latex;
-            headers = config.Headers.ToList();
-        }
+        public void OpenBuildDir() => processor.OpenBuildDir();
         #endregion
 
 

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Primer.Latex
 {
-    public sealed record LatexInput(string Latex, IReadOnlyList<string> Headers)
+    public sealed record LatexInput(string Latex, List<string> Headers)
     {
         public bool IsEmpty => string.IsNullOrWhiteSpace(Latex);
 
