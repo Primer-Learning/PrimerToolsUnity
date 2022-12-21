@@ -53,17 +53,17 @@ namespace Primer.Timeline
             RunStart(trackTarget);
 
             // Weight lower that 1 means
-            // the only playable is appearing / disappearing
+            // the only clip is appearing / disappearing
             if (totalWeight < 1) {
-                // If we have original value we add it to the input list
-                // otherwise we invoke SingleInput() instead of Frame()
                 if (originalValue is null) {
+                    // we call implementor's SingleInput() instead of Mix()
                     var isReverse = isBackwards ? !isDecreasing : isDecreasing;
                     var singleResult = SingleInput(inputs[0], weights[0], isReverse);
                     Apply(trackTarget, singleResult);
                     return;
                 }
 
+                // If we have `originalValue` we add it to the input list
                 weights.Add(1 - totalWeight);
                 inputs.Add(originalValue);
             }

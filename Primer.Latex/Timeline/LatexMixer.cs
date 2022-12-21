@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Timeline;
 using UnityEngine;
-using UnityEngine.Playables;
 
 namespace Primer.Latex
 {
@@ -47,8 +45,8 @@ namespace Primer.Latex
 
         /// <summary>
         ///     For LaXex track `input` can't be more than two items:
-        ///      - gameObject's characters
         ///      - the characters modified by a clip
+        ///      - gameObject's original characters
         ///
         ///     each one with it's weights
         ///     this function does the magic of transition between them
@@ -91,20 +89,21 @@ namespace Primer.Latex
 
         private static List<LatexSymbol> FindCommonSymbols(IEnumerable<LatexChar[]> inputs)
         {
+            var common = new List<LatexSymbol>();
             var symbols = inputs
                 .Select(input => input.Select(character => character.symbol).ToList())
                 .ToList();
 
-            var unique = GetUniqueSymbols(symbols[0]);
-            var common = new List<LatexSymbol>();
 
-            foreach (var character in unique) {
+            foreach (var character in GetUniqueSymbols(symbols[0])) {
                 var repetitions = symbols.Min(chars =>  chars.Count(x => x.Equals(character)));
 
                 for (var i = 0; i < repetitions; i++) {
                     common.Add(character);
                 }
             }
+
+            Debug.Log($"Common {string.Join('\n', common.Select(x => x.Source))}");
 
             return common;
         }

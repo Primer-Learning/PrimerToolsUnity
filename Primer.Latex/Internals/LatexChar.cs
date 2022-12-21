@@ -32,7 +32,10 @@ namespace Primer.Latex
 
 #if UNITY_EDITOR
         // for debug proposes
-        public (string code, int i) source;
+        public (string code, int i) source {
+            get => symbol.source;
+            set => symbol.source = value;
+        }
 
         public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
             symbol.DrawWireGizmos(parent, position,features);

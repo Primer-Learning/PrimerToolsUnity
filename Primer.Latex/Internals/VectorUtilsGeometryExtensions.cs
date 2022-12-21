@@ -13,7 +13,9 @@ namespace Primer.Latex
         // Magic number, we fiddled with it until we got the expected result
         // If a character scales up and down in the same animation increase
         // If a character transforms in a different one decrease
-        private const float TOLERANCE = 125;
+        // - 125 tweens opposite parenthesis
+        // - 100 removes and re-appears all parenthesis
+        private const float TOLERANCE = 110;
 
 
         public static bool IsSimilarEnough(this VectorUtils.Geometry geometry, VectorUtils.Geometry other)

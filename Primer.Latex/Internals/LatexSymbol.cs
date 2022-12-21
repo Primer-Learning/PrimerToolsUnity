@@ -47,6 +47,7 @@ namespace Primer.Latex
         public bool isSpriteValid => (bool)sprite;
 
 
+
         public override bool Equals(object other) =>
             other is LatexSymbol otherChar && geometry.IsSimilarEnough(otherChar.geometry);
 
@@ -89,6 +90,15 @@ namespace Primer.Latex
 
 
 #if UNITY_EDITOR
+        // for debug proposes
+        public (string code, int index) source;
+
+        // Render latex Matias
+        // You know how to do that
+        // `CliProgram`
+        public string Source => $"{source.code} ({source.index})";
+
+
         public void DrawWireGizmos(Transform parent, Vector3 position, LatexGizmoMode features = LatexGizmoMode.Nothing)
         {
             // Invoking the property only once per call as this is called every update in the editor
