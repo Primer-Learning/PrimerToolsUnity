@@ -3,7 +3,7 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public abstract class PrimerMixer<T> : PlayableBehaviour
+    public abstract class PrimerMixer<T> : PrimerPlayable
     {
         protected abstract void Start(T trackTarget);
         protected abstract void Stop(T trackTarget);
