@@ -37,12 +37,12 @@ namespace Primer.Latex
             }
         }
 
-        private static LatexProcessingCache CreateProcessor()
+        private static ILatexProcessor CreateProcessor()
         {
-            var charCreator = new LatexCharCreator();
-            var withQueue = new LatexProcessingQueue(charCreator);
-            var withQueueAndCache = new LatexProcessingCache(withQueue);
-            return withQueueAndCache;
+            var processor = new LatexCharCreator();
+            var processorWithCache = new LatexProcessingCache(processor);
+            var processorWithQueueAndCache = new LatexProcessingQueue(processorWithCache);
+            return processorWithQueueAndCache;
         }
     }
 }
