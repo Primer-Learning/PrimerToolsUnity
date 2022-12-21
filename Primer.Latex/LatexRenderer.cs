@@ -22,7 +22,7 @@ namespace Primer.Latex
         private List<string> headers = LatexInput.GetDefaultHeaders();
         public Material material;
 
-        public LatexInput Config => new(latex, headers);
+        public LatexInput config => new(latex, headers);
         public UnityEvent<LatexChar[]> onChange = new();
 
 
@@ -31,7 +31,7 @@ namespace Primer.Latex
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
         internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
-        internal bool hasContent => !Config.IsEmpty || characters.Length > 0;
+        internal bool hasContent => !config.IsEmpty || characters.Length > 0;
         #endregion
 
 
@@ -39,7 +39,7 @@ namespace Primer.Latex
         private async void OnEnable()
         {
             if (hasContent && !isValid) {
-                await Process(Config);
+                await Process(config);
 
                 // the component is destroyed after calling OnEnabled() when starting play mode
                 if (this != null)

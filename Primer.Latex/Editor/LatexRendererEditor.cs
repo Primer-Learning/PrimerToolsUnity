@@ -40,7 +40,7 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
-            var initialConfig = component.Config;
+            var initialConfig = component.config;
 
             base.OnInspectorGUI();
 
@@ -57,7 +57,7 @@ namespace Primer.Latex.Editor
             if (RenderReleaseSvgPartsButton())
                 return;
 
-            var newConfig = component.Config;
+            var newConfig = component.config;
 
             if (!initialConfig.Equals(newConfig)) {
                 component.Process(newConfig).FireAndForget();

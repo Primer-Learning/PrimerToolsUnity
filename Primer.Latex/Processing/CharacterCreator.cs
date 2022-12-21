@@ -13,7 +13,7 @@ namespace Primer.Latex
 
         public async Task<LatexChar[]> Process(LatexInput config, CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(config.Latex)) {
+            if (string.IsNullOrWhiteSpace(config.code)) {
                 state = LatexProcessingState.Completed;
                 return Array.Empty<LatexChar>();
             }

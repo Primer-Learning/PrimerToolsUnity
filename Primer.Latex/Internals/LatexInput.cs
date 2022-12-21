@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace Primer.Latex
 {
-    public sealed record LatexInput(string Latex, List<string> Headers)
+    public sealed record LatexInput(string code, List<string> headers)
     {
-        public bool IsEmpty => string.IsNullOrWhiteSpace(Latex);
+        public bool IsEmpty => string.IsNullOrWhiteSpace(code);
 
         public bool Equals(LatexInput other) => other != null &&
-                                                Latex == other.Latex &&
+                                                code == other.code &&
                                                 // We compare them with == because we want to know if both of them are null
                                                 // or both o them are the same object, in both cases we don't compare their content
                                                 // ReSharper disable once PossibleUnintendedReferenceComparison
-                                                (Headers == other.Headers || Headers.SequenceEqual(other.Headers));
+                                                (headers == other.headers || headers.SequenceEqual(other.headers));
 
-        public override int GetHashCode() => HashCode.Combine(Latex, Headers);
+        public override int GetHashCode() => HashCode.Combine(code, headers);
 
         public static List<string> GetDefaultHeaders() => new() {
             @"\documentclass[preview]{standalone}",

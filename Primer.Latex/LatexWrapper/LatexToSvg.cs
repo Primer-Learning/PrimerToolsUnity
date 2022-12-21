@@ -44,10 +44,10 @@ namespace Primer.Latex
 
             ct.ThrowIfCancellationRequested();
             File.WriteAllText(sourcePath, @$"
-                {string.Join(Environment.NewLine, config.Headers)}
+                {string.Join(Environment.NewLine, config.headers)}
                 \begin{{document}}
                 \color{{white}}
-                {config.Latex}
+                {config.code}
                 \end{{document}}
             ");
 
