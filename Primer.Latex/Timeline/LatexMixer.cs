@@ -16,47 +16,84 @@ namespace Primer.Latex
             trackTarget.onChange.AddListener(UpdateCharacters);
         }
 
-        protected override void Stop(LatexRenderer trackTarget) =>
+        protected override void Stop(LatexRenderer trackTarget)
+        {
             trackTarget.onChange.RemoveListener(UpdateCharacters);
+            trackTarget.characters = originalValue;
+        }
 
         private void UpdateCharacters(LatexChar[] newChars) =>
             originalValue = newChars;
         #endregion
 
-        protected override LatexChar[] ProcessPlayable(PrimerPlayable behaviour) =>
-            behaviour is ILatexCharProvider {isReady: true} chars
+        protected override LatexChar[] ProcessPlayable(PrimerPlayable behaviour)
+        {
+            return behaviour is ILatexCharProvider {isReady: true} chars
                 ? chars.characters
                 : null;
+        }
 
-        protected override LatexChar[] SingleInput(LatexChar[] input, float weight, bool isReverse) =>
-            input;
-
-        protected override LatexChar[] Mix(List<float> weights, List<LatexChar[]> inputs)
+        protected override LatexChar[] SingleInput(LatexChar[] input, float weight, bool isReverse)
         {
-            // var presentInAll = inputs.
-            var hashes = inputs.Select(x => x.ToHashSet()).ToArray();
-            var firstHash = hashes[0];
-            var rest = hashes.Skip(1).ToArray();
-            var common = new List<LatexChar>();
-
-            foreach (var myChar in firstHash) {
-                if (rest.All(x => x.Contains(myChar))) {
-                    common.Add(myChar);
-                }
-            }
-
-            var a = inputs[0][0];
-            var b = inputs[1][0];
-
-            var equal = a.IsSameGeometry(b);
-
-            Debug.Log("Common");
-            return common.ToArray();
+            return weight == 1
+                ? input
+                : input.Select(x => LatexChar.LerpScale(x, weight)).ToArray();
         }
 
         protected override void Apply(LatexRenderer trackTarget, LatexChar[] input)
         {
             trackTarget.characters = input;
+        }
+
+        protected override LatexChar[] Mix(List<float> weights, List<LatexChar[]> inputs)
+        {
+            var setsToMerge = inputs.Select(x => x.ToList()).ToList();
+            var common = FindCommonSymbols(inputs);
+            var result = new List<LatexChar>();
+
+            foreach (var symbol in common) {
+                LatexChar lerped = null;
+
+                for (var i = 0; i < setsToMerge.Count; i++) {
+                    var set = setsToMerge[i];
+
+                    var character = set.Find(x => x.symbol.Equals(symbol));
+                    set.Remove(character);
+
+                    lerped = lerped is null
+                        ? character
+                        : LatexChar.Lerp(lerped, character, weights[i]);
+                }
+
+                result.Add(lerped);
+            }
+
+            for (var i = 0; i < setsToMerge.Count; i++) {
+                var lerpedSet = setsToMerge[i].Select(character => LatexChar.LerpScale(character, weights[i]));
+                result.AddRange(lerpedSet);
+            }
+
+            return result.ToArray();
+        }
+
+        private static List<LatexSymbol> FindCommonSymbols(IEnumerable<LatexChar[]> inputs)
+        {
+            var symbols = inputs
+                .Select(input => input.Select(character => character.symbol).ToList())
+                .ToList();
+
+            var first = symbols[0].ToHashSet();
+            var common = new List<LatexSymbol>();
+
+            foreach (var character in first) {
+                var repetitions = symbols.Min(chars =>  chars.Count(x => x.Equals(character)));
+
+                for (var i = 0; i < repetitions; i++) {
+                    common.Add(character);
+                }
+            }
+
+            return common;
         }
     }
 }

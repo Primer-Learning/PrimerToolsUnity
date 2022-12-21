@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -92,7 +91,7 @@ namespace Primer.Latex
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
         [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         [SerializeField]
-        private LatexChar.GizmoMode gizmos = LatexChar.GizmoMode.Nothing;
+        private LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
 
 
         private void OnDrawGizmos()
@@ -120,7 +119,7 @@ namespace Primer.Latex
                 var character = characters[i];
                 var obj = new GameObject($"SvgPart {i}");
 
-                obj.AddComponent<MeshFilter>().sharedMesh = character.mesh;
+                obj.AddComponent<MeshFilter>().sharedMesh = character.symbol.mesh;
                 obj.AddComponent<MeshRenderer>().material = material;
 
                 obj.transform.SetParent(transform, false);

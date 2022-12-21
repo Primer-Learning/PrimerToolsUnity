@@ -96,23 +96,18 @@ namespace Primer.Latex
             }
         }
 
-        private static LatexChar[] ConvertGeometryToChars(List<VectorUtils.Geometry> allGeometry)
+        private static LatexChar[] ConvertGeometryToChars(IReadOnlyCollection<VectorUtils.Geometry> allGeometry)
         {
-            var bounds = VectorUtils.Bounds(
-                from geometry in allGeometry
-                from vertex in geometry.Vertices
-                select geometry.WorldTransform * vertex / LatexChar.SVG_PIXELS_PER_UNIT
-            );
+            var allVertices = allGeometry.SelectMany(geometry => geometry.TransformVertices());
+            var bounds = VectorUtils.Bounds(allVertices);
 
-            var chars = new LatexChar[allGeometry.Count];
+            var chars = allGeometry.Select(geometry => {
+                var symbol = LatexSymbolStorage.FromGeometry(geometry);
+                var position = geometry.CalculatePosition(bounds.center);
+                return new LatexChar(symbol, position);
+            });
 
-            for (var i = 0; i < allGeometry.Count; i++) {
-                chars[i] = new LatexChar(allGeometry[i], bounds.center);
-            }
-
-            chars[0].Equals(chars[1]);
-
-            return chars;
+            return chars.ToArray();
         }
     }
 }
