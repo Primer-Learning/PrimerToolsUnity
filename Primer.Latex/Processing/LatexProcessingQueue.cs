@@ -4,32 +4,25 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    public class LatexProcessingQueue : ILatexProcessor
+    internal class LatexProcessingQueue : ProcessingPipeline
     {
-        private readonly ILatexProcessor processor;
         private LatexInput queue;
         private TaskCompletionSource<LatexChar[]> queuedTask;
 
-        public LatexProcessingState state => processor.state;
+        public LatexProcessingQueue(ILatexProcessor innerProcessor) : base(innerProcessor) {}
 
 
-        public LatexProcessingQueue(ILatexProcessor innerProcessor)
-        {
-            processor = innerProcessor;
-        }
-
-
-        public Task<LatexChar[]> Render(LatexInput config, CancellationToken cancellationToken = default)
+        public override Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default)
         {
             return processor.state == LatexProcessingState.Processing
                 ? SetQueue(config)
-                : Process(config, cancellationToken);
+                : DelegateProcessing(config, cancellationToken);
 
         }
 
-        private async Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken)
+        private async Task<LatexChar[]> DelegateProcessing(LatexInput config, CancellationToken cancellationToken)
         {
-            var result = await processor.Render(config, cancellationToken);
+            var result = await processor.Process(config, cancellationToken);
             ProcessQueue();
             return result;
         }
@@ -63,15 +56,11 @@ namespace Primer.Latex
             queuedTask = null;
 
             try {
-                completionSource.SetResult(await Render(config));
+                completionSource.SetResult(await Process(config));
             }
             catch (Exception err) {
                 completionSource.SetException(err);
             }
         }
-
-#if UNITY_EDITOR
-        public void OpenBuildDir() => processor.OpenBuildDir();
-#endif
     }
 }

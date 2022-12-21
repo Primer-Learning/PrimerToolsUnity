@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    public interface ILatexProcessor
+    internal interface ILatexProcessor
     {
         LatexProcessingState state { get; }
 
-        Task<LatexChar[]> Render(LatexInput config, CancellationToken cancellationToken = default);
+        Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default);
 
 #if UNITY_EDITOR
         void OpenBuildDir();

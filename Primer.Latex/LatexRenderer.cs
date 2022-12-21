@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Primer.Latex
 {
@@ -13,21 +15,23 @@ namespace Primer.Latex
     [AddComponentMenu("Primer/Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
-        [TextArea]
-        public string latex = "";
+        [SerializeField][TextArea]
+        private string latex = "";
+        [SerializeField]
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
-        public List<string> headers = LatexInput.GetDefaultHeaders();
+        private List<string> headers = LatexInput.GetDefaultHeaders();
         public Material material;
+
+        public LatexInput Config => new(latex, headers);
+        public UnityEvent<LatexChar[]> onChange = new();
 
 
         #region Internal fields
-        internal readonly CancellableLatexProcessor processor = new();
+        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
-        internal LatexProcessingState state => processor.state;
         internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
         internal bool hasContent => !Config.IsEmpty || characters.Length > 0;
-        internal LatexInput Config => new(latex, headers);
         #endregion
 
 
@@ -35,8 +39,11 @@ namespace Primer.Latex
         private async void OnEnable()
         {
             if (hasContent && !isValid) {
-                await Render(Config);
-                if (this != null) LateUpdate();
+                await Process(Config);
+
+                // the component is destroyed after calling OnEnabled() when starting play mode
+                if (this != null)
+                    LateUpdate();
             }
         }
 
@@ -44,22 +51,27 @@ namespace Primer.Latex
         // so LateUpdate is required here
         private void LateUpdate()
         {
-            if (!hasContent || !isValid) return;
-
-            for (var i = 0; i < characters.Length; i++) {
-                characters[i].Draw(transform, material);
-            }
+            if (hasContent && isValid)
+                Render();
         }
         #endregion
 
 
-        public async Task Render(LatexInput config)
+        public async Task Process(LatexInput input)
         {
-            (latex, headers) = config;
-            characters = await processor.Render(config);
+            var prevCharacters = characters;
+            characters = await processor.Process(input);
+
+            if (!prevCharacters.SequenceEqual(characters))
+                onChange.Invoke(characters);
         }
 
-        public void CancelRender() => processor.Cancel();
+        private void Render()
+        {
+            for (var i = 0; i < characters.Length; i++) {
+                characters[i].Draw(transform, material);
+            }
+        }
 
 
         // Using LatexRenderer as container like this prevents the ReleasedLatexRenderer from being created by the
@@ -100,16 +112,6 @@ namespace Primer.Latex
                 material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
             }
         }
-
-
-        #region Proxy LatexProcessor
-        internal bool isRunning => processor.state == LatexProcessingState.Processing;
-        internal bool isCancelled => processor.state == LatexProcessingState.Cancelled;
-
-        public Exception renderError => processor.renderError;
-
-        public void OpenBuildDir() => processor.OpenBuildDir();
-        #endregion
 
 
         public Released ReleaseSvgParts()

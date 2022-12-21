@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    public class LatexCharCreator : ILatexProcessor
+    internal class CharacterCreator : ILatexProcessor
     {
         private readonly LatexToSvg latexToSvg = new();
         private readonly SvgToChars svgToChars = new();
 
         public LatexProcessingState state { get; private set; } = LatexProcessingState.Initialized;
 
-        public async Task<LatexChar[]> Render(LatexInput config, CancellationToken ct = default)
+        public async Task<LatexChar[]> Process(LatexInput config, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(config.Latex)) {
                 state = LatexProcessingState.Completed;

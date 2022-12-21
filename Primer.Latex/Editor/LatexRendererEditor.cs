@@ -9,6 +9,10 @@ namespace Primer.Latex.Editor
     [CustomEditor(typeof(LatexRenderer))]
     public class LatexRendererEditor : PrimerEditor<LatexRenderer>
     {
+        private LatexProcessor processor => component.processor;
+        private bool isRunning => processor.state == LatexProcessingState.Processing;
+        private bool isCancelled => processor.state == LatexProcessingState.Cancelled;
+
         /// <summary>Will be true if we are editing a preset.</summary>
         /// <remarks>
         ///     This condition was found through exploration... There is no documented way to determine
@@ -56,7 +60,7 @@ namespace Primer.Latex.Editor
             var newConfig = component.Config;
 
             if (!initialConfig.Equals(newConfig)) {
-                component.Render(newConfig).FireAndForget();
+                component.Process(newConfig).FireAndForget();
             }
         }
 
@@ -80,15 +84,15 @@ namespace Primer.Latex.Editor
 
         private EditorHelpBox GetStatusBox()
         {
-            if (component.isCancelled && component.isRunning) {
+            if (isCancelled && isRunning) {
                 return EditorHelpBox.Warning("Cancelling...");
             }
 
-            if (component.isRunning)
+            if (isRunning)
                 return EditorHelpBox.Warning("Rendering LaTeX...");
 
-            if (component.renderError is not null)
-                return EditorHelpBox.Error(component.renderError.Message);
+            if (processor.renderError is not null)
+                return EditorHelpBox.Error(processor.renderError.Message);
 
             return EditorHelpBox.Info("Ok");
         }
@@ -98,21 +102,21 @@ namespace Primer.Latex.Editor
             if (!pendingSetLatex.TryGetValue(component, out var pending))
                 return;
 
-            component.Render(pending).FireAndForget();
+            component.Process(pending).FireAndForget();
             pendingSetLatex.Remove(component);
         }
 
         private void RenderOpenBuildDirButton()
         {
             if (GUILayout.Button("Open Build Directory"))
-                component.OpenBuildDir();
+                processor.OpenBuildDir();
         }
 
         private void RenderCancelButton()
         {
-            EditorGUI.BeginDisabledGroup(!component.isRunning);
+            EditorGUI.BeginDisabledGroup(!isRunning);
             if (GUILayout.Button("Cancel Rendering Task"))
-                component.CancelRender();
+                processor.Cancel();
             EditorGUI.EndDisabledGroup();
         }
 
