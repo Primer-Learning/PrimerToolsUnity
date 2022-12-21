@@ -24,6 +24,7 @@ namespace Primer.Latex
         internal readonly CancellableLatexProcessor processor = new();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
+        internal LatexProcessingState state => processor.state;
         internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
         internal bool hasContent => !Config.IsEmpty || characters.Length > 0;
         internal LatexInput Config => new(latex, headers);

@@ -21,11 +21,15 @@ namespace Primer.Latex
 
         public Task<LatexChar[]> Render(LatexInput config, CancellationToken cancellationToken = default)
         {
-            if (processor.state == LatexProcessingState.Processing) {
-                return SetQueue(config);
-            }
+            return processor.state == LatexProcessingState.Processing
+                ? SetQueue(config)
+                : Process(config, cancellationToken);
 
-            var result = processor.Render(config, cancellationToken);
+        }
+
+        private async Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken)
+        {
+            var result = await processor.Render(config, cancellationToken);
             ProcessQueue();
             return result;
         }
@@ -36,8 +40,9 @@ namespace Primer.Latex
                 if (queue.Equals(config))
                     return queuedTask.Task;
 
-                queuedTask.SetException(new Exception("Scheduled execution removed"));
+                queuedTask.SetException(new OperationCanceledException("Scheduled execution removed"));
             }
+
 
             queue = config;
             queuedTask = new TaskCompletionSource<LatexChar[]>();
@@ -46,6 +51,11 @@ namespace Primer.Latex
 
         private async void ProcessQueue()
         {
+            if (queue is null) return;
+
+            // Release thread and continue after
+            await Task.Yield();
+
             var config = queue;
             var completionSource = queuedTask;
 

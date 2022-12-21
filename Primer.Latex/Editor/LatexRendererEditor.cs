@@ -9,19 +9,6 @@ namespace Primer.Latex.Editor
     [CustomEditor(typeof(LatexRenderer))]
     public class LatexRendererEditor : PrimerEditor<LatexRenderer>
     {
-        /// <summary>The last values for latex and headers seen on the serializedObject.</summary>
-        private LatexInput lastSeenConfig;
-        /// <summary>The last values sent to the LatexRenderer to execute.</summary>
-        private LatexInput executedConfig;
-
-        /// <summary>
-        ///     Used instead of the actual serialized object for new latex and headers values.
-        ///     So we can make sure they're only actually changed when a build finishes.
-        /// </summary>
-        private SerializedObject bufferObject => bufferCache ??= new SerializedObject(target);
-
-        private SerializedObject bufferCache;
-
         /// <summary>Will be true if we are editing a preset.</summary>
         /// <remarks>
         ///     This condition was found through exploration... There is no documented way to determine
@@ -44,60 +31,37 @@ namespace Primer.Latex.Editor
         #endregion
 
 
-        private LatexInput GetConfig(SerializedObject obj) => new(
-            obj.FindProperty(nameof(component.latex)).stringValue,
-            obj.FindProperty(nameof(component.headers)).GetStringArrayValue()
-        );
-        private void SetConfig(SerializedObject obj, LatexInput config)
-        {
-            obj.FindProperty(nameof(component.latex)).stringValue = config.Latex;
-            obj.FindProperty(nameof(component.headers)).SetStringArrayValue(config.Headers);
-        }
-
-
         public override bool RequiresConstantRepaint() => true;
-        private void OnEnable() => lastSeenConfig = GetConfig(serializedObject);
-
 
 
         public override void OnInspectorGUI()
         {
-            if (HandleIfPreset()) {
-                base.OnInspectorGUI();
-                return;
-            }
+            var initialConfig = component.Config;
 
-            UpdateBufferObject();
+            base.OnInspectorGUI();
+
+            if (HandleIfPreset()) return;
+
             ProcessPendingTasks();
 
+            Space();
             GetStatusBox().Render();
-
+            Space();
             RenderOpenBuildDirButton();
             RenderCancelButton();
-
-            Space();
-            RenderBufferedLatexAndHeadersFields();
-            Space();
-            PropertyField(nameof(component.material));
-            Space();
-            PropertyField("gizmos");
-            Space();
 
             if (RenderReleaseSvgPartsButton())
                 return;
 
-            if (!component.isRunning && NeedsExecution())
-                ExecuteRender();
+            var newConfig = component.Config;
 
-            serializedObject.ApplyModifiedProperties();
-            lastSeenConfig = GetConfig(serializedObject);
+            if (!initialConfig.Equals(newConfig)) {
+                component.Render(newConfig).FireAndForget();
+            }
         }
 
 
         #region OnInspectorGUI parts
-        public static readonly GUILayoutOption latexInputHeight =
-            GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 6);
-
         public static readonly EditorHelpBox targetIsPresetWarning = EditorHelpBox.Warning(
             "You are editing a preset and the LaTeX will not be built until " +
             "you apply the preset to an actual LatexRenderer component."
@@ -113,17 +77,6 @@ namespace Primer.Latex.Editor
             return true;
         }
 
-        /// <summary>Updates bufferObject if it was changed outside of this class (ex: by an undo operation).</summary>
-        private void UpdateBufferObject()
-        {
-            serializedObject.Update();
-
-            var currentConfig = GetConfig(serializedObject);
-            if (currentConfig == lastSeenConfig && currentConfig == executedConfig) return;
-
-            bufferObject.Update();
-            bufferObject.ApplyModifiedPropertiesWithoutUndo();
-        }
 
         private EditorHelpBox GetStatusBox()
         {
@@ -145,7 +98,7 @@ namespace Primer.Latex.Editor
             if (!pendingSetLatex.TryGetValue(component, out var pending))
                 return;
 
-            SetConfig(bufferObject, pending);
+            component.Render(pending).FireAndForget();
             pendingSetLatex.Remove(component);
         }
 
@@ -163,13 +116,6 @@ namespace Primer.Latex.Editor
             EditorGUI.EndDisabledGroup();
         }
 
-        private void RenderBufferedLatexAndHeadersFields()
-        {
-            EditorGUILayout.PropertyField(bufferObject.FindProperty(nameof(component.latex)), latexInputHeight);
-            Space();
-            EditorGUILayout.PropertyField(bufferObject.FindProperty(nameof(component.headers)));
-        }
-
         private bool RenderReleaseSvgPartsButton()
         {
             if (!GUILayout.Button("Release SVG Parts")) return false;
@@ -179,29 +125,6 @@ namespace Primer.Latex.Editor
             Undo.RegisterCreatedObjectUndo(releasedRenderer, "Released SVG parts");
             Undo.DestroyObjectImmediate(component);
             return true;
-        }
-
-        private bool NeedsExecution()
-        {
-            var bufferedConfig = GetConfig(bufferObject);
-            var lastAppliedConfig = component.Config;
-            var isBufferDifferentThanLastExecution = bufferedConfig != executedConfig;
-
-            if (bufferedConfig != lastAppliedConfig && isBufferDifferentThanLastExecution)
-                return true;
-
-            if (component.isValid)
-                return false;
-
-            return isBufferDifferentThanLastExecution || component.renderError is not null;
-        }
-
-        private async void ExecuteRender()
-        {
-            executedConfig = GetConfig(bufferObject);
-            await component.Render(executedConfig);
-            SetConfig(serializedObject, executedConfig);
-            serializedObject.ApplyModifiedProperties();
         }
         #endregion
     }
