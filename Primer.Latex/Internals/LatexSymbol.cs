@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Unity.VectorGraphics;
 using UnityEngine;
@@ -59,7 +60,7 @@ namespace Primer.Latex
             => other is LatexSymbol otherChar && geometry.IsSimilarEnough(otherChar.geometry);
 
         public override int GetHashCode()
-            => geometry.CalculateHashCode();
+            => throw new NotImplementedException();
 
 
         public void Draw(Transform parent, Material material, Vector3 position, float scale)
@@ -94,10 +95,24 @@ namespace Primer.Latex
         // for debug proposes
         public (string code, int index) source;
 
-        // Render latex Matias
-        // You know how to do that
-        // `CliProgram`
-        public string Source => $"{source.code} ({source.index})";
+        public string Source {
+            get {
+                var (code, index) = source;
+                var keyword = new Regex(@"\\\w+");
+
+                var latex = keyword.Replace(code, "/")
+                                   .Replace("$", "")
+                                   .Replace("{", "(")
+                                   .Replace("}", ")")
+                                   .Replace(" ", "");
+
+                var start = latex[..index];
+                var middle = index < latex.Length ? latex[index] : ' ';
+                var end = latex[(index + 1)..];
+
+                return $"{start} >>> {middle} <<< {end} ({index})";
+            }
+        }
 
 
         public void DrawWireGizmos(Transform parent, Vector3 position, LatexGizmoMode features = LatexGizmoMode.Nothing)

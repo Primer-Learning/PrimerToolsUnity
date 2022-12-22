@@ -6,9 +6,8 @@ namespace Primer.Latex
     [Serializable]
     public sealed record LatexChar(LatexSymbol symbol, Vector3 position, float scale = 1)
     {
-
-
         public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
+
         public static LatexChar Lerp(LatexChar left, LatexChar right, float t)
         {
             if (!left.IsSameSymbol(right))
@@ -16,29 +15,30 @@ namespace Primer.Latex
 
             return left with {
                 position = Vector3.Lerp(left.position, right.position, t),
-                scale = Mathf.Lerp(left.scale, right.scale, t)
+                scale = Mathf.Lerp(left.scale, right.scale, t),
             };
         }
 
-        public static LatexChar LerpScale(LatexChar @char, float t) =>
-            @char with {scale = Mathf.Lerp(0, @char.scale, t)};
 
+        public bool IsSameSymbol(LatexChar other)
+            => other is not null && symbol.Equals(other.symbol);
 
-        public bool IsSameSymbol(LatexChar other) =>
-            other is not null && symbol.Equals(other.symbol);
+        public void Draw(Transform parent, Material material)
+            => symbol.Draw(parent, material, position, scale);
 
-        public void Draw(Transform parent, Material material) =>
-            symbol.Draw(parent, material, position, scale);
+        public LatexChar LerpScale(float t)
+            => this with { scale = Mathf.Lerp(0, scale, t) };
 
 #if UNITY_EDITOR
+
         // for debug proposes
         public (string code, int i) source {
             get => symbol.source;
             set => symbol.source = value;
         }
 
-        public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
-            symbol.DrawWireGizmos(parent, position, features);
+        public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing)
+            => symbol.DrawWireGizmos(parent, position, features);
 #endif
     }
 }

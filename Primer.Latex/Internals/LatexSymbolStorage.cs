@@ -5,18 +5,18 @@ namespace Primer.Latex
 {
     public static class LatexSymbolStorage
     {
-        private static readonly Dictionary<int, LatexSymbol> storage = new();
+        private static readonly List<LatexSymbol> storage = new();
 
         public static LatexSymbol FromGeometry(VectorUtils.Geometry geometry)
         {
-            var hash = geometry.CalculateHashCode();
+            var existing = storage.Find(x => x.geometry.IsSimilarEnough(geometry));
 
-            if (storage.ContainsKey(hash)) {
-                return storage[hash];
+            if (existing is not null) {
+                return existing;
             }
 
             var newSymbol = new LatexSymbol(geometry);
-            storage.Add(hash, newSymbol);
+            storage.Add(newSymbol);
             return newSymbol;
         }
     }
