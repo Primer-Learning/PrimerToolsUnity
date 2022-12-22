@@ -14,46 +14,15 @@ namespace Primer.Latex
     [AddComponentMenu("Primer/Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
-        [SerializeField][TextArea]
+        [SerializeField] [TextArea]
         private string latex = "";
         [SerializeField]
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
         private List<string> headers = LatexInput.GetDefaultHeaders();
         public Material material;
-
-        public LatexInput config => new(latex, headers);
         public UnityEvent<LatexChar[]> onChange = new();
 
-
-        #region Internal fields
-        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
-        [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
-
-        internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
-        internal bool hasContent => !config.IsEmpty || characters.Length > 0;
-        #endregion
-
-
-        #region Unity events
-        private async void OnEnable()
-        {
-            if (hasContent && !isValid) {
-                await Process(config);
-
-                // the component is destroyed after calling OnEnabled() when starting play mode
-                if (this != null)
-                    LateUpdate();
-            }
-        }
-
-        // We mess with the update loop when rendering the sprites
-        // so LateUpdate is required here
-        private void LateUpdate()
-        {
-            if (hasContent && isValid)
-                Render();
-        }
-        #endregion
+        public LatexInput config => new(latex, headers);
 
 
         public async Task Process(LatexInput input)
@@ -85,6 +54,37 @@ namespace Primer.Latex
             internal Material material;
             internal LatexInput config => new(latex, headers);
         }
+
+
+        #region Internal fields
+        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
+        [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
+
+        internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
+        internal bool hasContent => !config.IsEmpty || characters.Length > 0;
+        #endregion
+
+
+        #region Unity events
+        private async void OnEnable()
+        {
+            if (hasContent && !isValid) {
+                await Process(config);
+
+                // the component is destroyed after calling OnEnabled() when starting play mode
+                if (this != null)
+                    LateUpdate();
+            }
+        }
+
+        // We mess with the update loop when rendering the sprites
+        // so LateUpdate is required here
+        private void LateUpdate()
+        {
+            if (hasContent && isValid)
+                Render();
+        }
+        #endregion
 
 
 #if UNITY_EDITOR

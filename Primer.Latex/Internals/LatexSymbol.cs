@@ -12,6 +12,14 @@ namespace Primer.Latex
         public readonly VectorUtils.Geometry geometry;
         [NonSerialized] private readonly Sprite sprite;
         [NonSerialized] private Mesh meshCache;
+
+
+        internal LatexSymbol(VectorUtils.Geometry geometry)
+        {
+            this.geometry = geometry;
+            sprite = geometry.ConvertToSprite();
+        }
+
         [CanBeNull] public Mesh mesh => meshCache ??= CreateMesh(sprite);
 
 
@@ -47,19 +55,11 @@ namespace Primer.Latex
         public bool isSpriteValid => (bool)sprite;
 
 
+        public override bool Equals(object other)
+            => other is LatexSymbol otherChar && geometry.IsSimilarEnough(otherChar.geometry);
 
-        public override bool Equals(object other) =>
-            other is LatexSymbol otherChar && geometry.IsSimilarEnough(otherChar.geometry);
-
-        public override int GetHashCode() =>
-            geometry.CalculateHashCode();
-
-
-        internal LatexSymbol(VectorUtils.Geometry geometry)
-        {
-            this.geometry = geometry;
-            sprite = geometry.ConvertToSprite();
-        }
+        public override int GetHashCode()
+            => geometry.CalculateHashCode();
 
 
         public void Draw(Transform parent, Material material, Vector3 position, float scale)
@@ -80,16 +80,17 @@ namespace Primer.Latex
                 triangles = Array.ConvertAll(sprite.triangles, i => (int)i),
                 normals =
                     Enumerable.Repeat(new Vector3(0f, 0f, -1f), sprite.vertices.Length)
-                        .ToArray(),
+                              .ToArray(),
                 tangents =
                     Enumerable.Repeat(new Vector4(1f, 0f, 0f, -1f), sprite.vertices.Length)
-                        .ToArray(),
-                uv = sprite.vertices
+                              .ToArray(),
+                uv = sprite.vertices,
             };
         }
 
 
 #if UNITY_EDITOR
+
         // for debug proposes
         public (string code, int index) source;
 
@@ -107,6 +108,7 @@ namespace Primer.Latex
 
             if (features.HasFlag(LatexGizmoMode.WireFrame)) {
                 Gizmos.color = Color.cyan;
+
                 Gizmos.DrawWireMesh(
                     mesh,
                     parent.TransformPoint(position),
@@ -118,6 +120,7 @@ namespace Primer.Latex
                 // This is useful to do because the editor will select our game object if they
                 // click on this gizmo (despite being transparent).
                 Gizmos.color = Color.clear;
+
                 Gizmos.DrawMesh(
                     mesh,
                     parent.TransformPoint(position),
@@ -126,8 +129,7 @@ namespace Primer.Latex
                 );
             }
 
-            if (!features.HasFlag(LatexGizmoMode.Normals) &&
-                !features.HasFlag(LatexGizmoMode.Tangents)) return;
+            if (!features.HasFlag(LatexGizmoMode.Normals) && !features.HasFlag(LatexGizmoMode.Tangents)) return;
 
             var vertices = mesh.vertices;
             var normals = mesh.normals;

@@ -6,6 +6,9 @@ namespace Primer.Latex
     [Serializable]
     public sealed record LatexChar(LatexSymbol symbol, Vector3 position, float scale = 1)
     {
+
+
+        public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
         public static LatexChar Lerp(LatexChar left, LatexChar right, float t)
         {
             if (!left.IsSameSymbol(right))
@@ -18,10 +21,7 @@ namespace Primer.Latex
         }
 
         public static LatexChar LerpScale(LatexChar @char, float t) =>
-            @char with { scale = Mathf.Lerp(0, @char.scale, t) };
-
-
-        public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
+            @char with {scale = Mathf.Lerp(0, @char.scale, t)};
 
 
         public bool IsSameSymbol(LatexChar other) =>
@@ -38,7 +38,7 @@ namespace Primer.Latex
         }
 
         public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
-            symbol.DrawWireGizmos(parent, position,features);
+            symbol.DrawWireGizmos(parent, position, features);
 #endif
     }
 }
