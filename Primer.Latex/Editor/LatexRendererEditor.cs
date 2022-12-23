@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +8,14 @@ namespace Primer.Latex.Editor
     [CustomEditor(typeof(LatexRenderer))]
     public class LatexRendererEditor : PrimerEditor<LatexRenderer>
     {
+        public static readonly EditorHelpBox targetIsPresetWarning = EditorHelpBox.Warning(
+            "You are editing a preset and the LaTeX will not be built until "
+          + "you apply the preset to an actual LatexRenderer component."
+        );
+
+        private int charPreviewSize = 50;
+        private bool internalsVisible;
+
         private LatexProcessor processor => component.processor;
         private bool isRunning => processor.state == LatexProcessingState.Processing;
         private bool isCancelled => processor.state == LatexProcessingState.Cancelled;
@@ -21,59 +28,59 @@ namespace Primer.Latex.Editor
         /// </remarks>
         private bool isTargetAPreset => component.gameObject.scene.handle == 0;
 
-
-        #region Rendering request queue
-        private static readonly Dictionary<LatexRenderer, LatexInput> pendingSetLatex = new();
-
-        /// <summary>
-        ///     Pends an attempt to set the latex and headers for a given LatexRenderer. Whenever an
-        ///     editor for that LatexRenderer is rendered it will attempt to build the latex and headers given,
-        ///     as if the user had entered the values themselves.
-        /// </summary>
-        internal static void PendRenderingRequest(LatexRenderer latexRenderer, LatexInput config) =>
-            pendingSetLatex.Add(latexRenderer, config);
-        #endregion
-
-
-        public override bool RequiresConstantRepaint() => true;
-
+        public override bool RequiresConstantRepaint()
+        {
+            return true;
+        }
 
         public override void OnInspectorGUI()
         {
             var initialConfig = component.config;
 
-            base.OnInspectorGUI();
-
-            if (HandleIfPreset()) return;
-
-            ProcessPendingTasks();
-
-            Space();
             GetStatusBox().Render();
-            Space();
-            RenderOpenBuildDirButton();
-            RenderCancelButton();
+            PropertyField(nameof(component.latex));
 
-            if (RenderReleaseSvgPartsButton())
+            internalsVisible = EditorGUILayout.Foldout(internalsVisible, "Details");
+
+            if (internalsVisible) {
+                PropertyField(nameof(component.material));
+                PropertyField(nameof(component.gizmos));
+                Space();
+                PropertyField(nameof(component.headers), true);
+                Space();
+                PropertyField(nameof(component.onChange));
+            }
+
+            if (HandleIfPreset())
                 return;
 
-            var newConfig = component.config;
+            Space();
 
-            if (!initialConfig.Equals(newConfig)) {
-                component.Process(newConfig).FireAndForget();
+            if (GUILayout.Button("Open Build Directory"))
+                processor.OpenBuildDir();
+
+            using (new EditorGUI.DisabledScope(!isRunning)) {
+                if (GUILayout.Button("Cancel Rendering Task"))
+                    processor.Cancel();
             }
+
+            if (GUILayout.Button("Update children"))
+                component.UpdateChildren();
+
+            if (component.characters.Length > 0)
+                RenderGroupDefinition();
+
+            serializedObject.ApplyModifiedProperties();
+
+            if (!initialConfig.Equals(component.config))
+                component.Process(component.config).FireAndForget();
         }
 
 
-        #region OnInspectorGUI parts
-        public static readonly EditorHelpBox targetIsPresetWarning = EditorHelpBox.Warning(
-            "You are editing a preset and the LaTeX will not be built until " +
-            "you apply the preset to an actual LatexRenderer component."
-        );
-
         private bool HandleIfPreset()
         {
-            if (!isTargetAPreset) return false;
+            if (!isTargetAPreset)
+                return false;
 
             component.characters = Array.Empty<LatexChar>();
             serializedObject.Update();
@@ -84,9 +91,8 @@ namespace Primer.Latex.Editor
 
         private EditorHelpBox GetStatusBox()
         {
-            if (isCancelled && isRunning) {
+            if (isCancelled && isRunning)
                 return EditorHelpBox.Warning("Cancelling...");
-            }
 
             if (isRunning)
                 return EditorHelpBox.Warning("Rendering LaTeX...");
@@ -97,38 +103,69 @@ namespace Primer.Latex.Editor
             return EditorHelpBox.Info("Ok");
         }
 
-        private void ProcessPendingTasks()
-        {
-            if (!pendingSetLatex.TryGetValue(component, out var pending))
-                return;
 
-            component.Process(pending).FireAndForget();
-            pendingSetLatex.Remove(component);
+        #region Groups controls
+        private void RenderGroupDefinition()
+        {
+            GroupsHeader();
+
+            var width = Screen.width;
+            var cols = width / (charPreviewSize + 10);
+
+            var chars = component.characters;
+            var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexes));
+            var groups = serializedGroups.GetIntArrayValue();
+            var ranges = chars.GetRanges(groups);
+            var hasChanges = false;
+
+            for (var i = 0; i < ranges.Count; i++) {
+                var (start, end) = ranges[i];
+
+                using (new GUILayout.HorizontalScope()) {
+                    GUILayout.Label($"Group {i + 1} (chars {start + 1} to {end})");
+                    GUILayout.FlexibleSpace();
+
+                    if ((i != 0) && GUILayout.Button("X")) {
+                        groups.RemoveAt(i - 1);
+                        hasChanges = true;
+                        break;
+                    }
+                }
+
+                var textures = LatexCharEditor.GetPreviewsFor(chars, start, end, charPreviewSize);
+                var selected = GUILayout.SelectionGrid(0, textures, cols);
+
+                if (selected == 0)
+                    continue;
+
+                groups.Insert(i, start + selected);
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+                serializedGroups.SetIntArrayValue(groups);
         }
 
-        private void RenderOpenBuildDirButton()
+        private void GroupsHeader()
         {
-            if (GUILayout.Button("Open Build Directory"))
-                processor.OpenBuildDir();
-        }
+            Space();
 
-        private void RenderCancelButton()
-        {
-            EditorGUI.BeginDisabledGroup(!isRunning);
-            if (GUILayout.Button("Cancel Rendering Task"))
-                processor.Cancel();
-            EditorGUI.EndDisabledGroup();
-        }
+            using (new GUILayout.HorizontalScope()) {
+                GUILayout.Label(
+                    "Groups",
+                    new GUIStyle {
+                        fontSize = 16,
+                        alignment = TextAnchor.MiddleCenter,
+                        fontStyle = FontStyle.Bold,
+                        normal = { textColor = Color.white },
+                    }
+                );
 
-        private bool RenderReleaseSvgPartsButton()
-        {
-            if (!GUILayout.Button("Release SVG Parts")) return false;
+                GUILayout.Space(32);
+                charPreviewSize = EditorGUILayout.IntSlider(charPreviewSize, 10, 100);
+            }
 
-            Undo.SetCurrentGroupName("Release SVG Parts");
-            var releasedRenderer = component.ReleaseSvgParts();
-            Undo.RegisterCreatedObjectUndo(releasedRenderer, "Released SVG parts");
-            Undo.DestroyObjectImmediate(component);
-            return true;
+            Space();
         }
         #endregion
     }

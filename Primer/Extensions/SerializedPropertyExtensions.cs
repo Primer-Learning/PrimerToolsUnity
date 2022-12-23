@@ -5,7 +5,8 @@ namespace Primer
 {
     public static class SerializedPropertyExtensions
     {
-        public static IEnumerable<SerializedProperty> GetChildProperties(this SerializedProperty property) {
+        public static IEnumerable<SerializedProperty> GetChildProperties(this SerializedProperty property)
+        {
             var sibling = property.Copy();
             sibling.NextVisible(false);
 
@@ -13,27 +14,32 @@ namespace Primer
 
             while (iterator.NextVisible(true)) {
                 // We reached the sibling
-                if (iterator.propertyPath == sibling.propertyPath) break;
+                if (iterator.propertyPath == sibling.propertyPath)
+                    break;
+
                 yield return iterator;
             }
         }
 
-        public static List<string> GetStringArrayValue(this SerializedProperty array) {
-            var result = new List<string>();
+        public static List<int> GetIntArrayValue(this SerializedProperty array)
+        {
+            var result = new List<int>();
 
             for (var i = 0; i < array.arraySize; i++) {
-                result.Add(array.GetArrayElementAtIndex(i).stringValue);
+                result.Add(array.GetArrayElementAtIndex(i).intValue);
             }
 
             return result;
         }
 
-        public static void SetStringArrayValue(this SerializedProperty array, IReadOnlyList<string> value) {
+
+        public static void SetIntArrayValue(this SerializedProperty array, IReadOnlyList<int> value)
+        {
             array.ClearArray();
 
             for (var i = 0; i < value.Count; i++) {
                 array.InsertArrayElementAtIndex(i);
-                array.GetArrayElementAtIndex(i).stringValue = value[i];
+                array.GetArrayElementAtIndex(i).intValue = value[i];
             }
         }
     }
