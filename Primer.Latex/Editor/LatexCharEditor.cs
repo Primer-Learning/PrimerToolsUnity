@@ -6,7 +6,7 @@ namespace Primer.Latex.Editor
 {
     public static class LatexCharEditor
     {
-        public static Texture[] GetPreviewsFor(LatexChar[] chars, int start, int end, int size)
+        private static Texture[] GetPreviewsFor(LatexChar[] chars, int start, int end, int size)
         {
             return (
                 from character in chars.Skip(start).Take(end - start)
@@ -33,6 +33,15 @@ namespace Primer.Latex.Editor
             RenderTexture.active = null;
             RenderTexture.ReleaseTemporary(temporary);
             return newTexture;
+        }
+
+        public static int ShowGroup(LatexChar[] chars, int start, int end, int size)
+        {
+            var width = Screen.width;
+            var cols = width / (size + 10);
+
+            var textures = GetPreviewsFor(chars, start, end, size);
+            return GUILayout.SelectionGrid(0, textures, cols);
         }
     }
 }

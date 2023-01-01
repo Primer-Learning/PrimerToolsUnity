@@ -82,6 +82,7 @@ namespace Primer.Latex
         [SerializeField]
         internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
 
+        internal List<(int, int)> ranges => characters.GetRanges(groupIndexes);
 
         private void OnDrawGizmos()
         {

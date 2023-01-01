@@ -109,9 +109,6 @@ namespace Primer.Latex.Editor
         {
             GroupsHeader();
 
-            var width = Screen.width;
-            var cols = width / (charPreviewSize + 10);
-
             var chars = component.characters;
             var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexes));
             var groups = serializedGroups.GetIntArrayValue();
@@ -132,8 +129,7 @@ namespace Primer.Latex.Editor
                     }
                 }
 
-                var textures = LatexCharEditor.GetPreviewsFor(chars, start, end, charPreviewSize);
-                var selected = GUILayout.SelectionGrid(0, textures, cols);
+                var selected = LatexCharEditor.ShowGroup(chars, start, end, charPreviewSize);
 
                 if (selected == 0)
                     continue;

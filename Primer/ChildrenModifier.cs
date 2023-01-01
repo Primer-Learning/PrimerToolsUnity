@@ -9,7 +9,6 @@ namespace Primer
         private readonly List<Transform> after = new();
         private readonly List<Transform> before = new();
         private readonly Transform parent;
-        private int cursor;
 
         public ChildrenModifier(Transform parent)
         {
@@ -17,9 +16,16 @@ namespace Primer
             ReadChildren();
         }
 
+        public int NextIndex { get; private set; }
+
         public Transform NextMustBeCalled(string name)
         {
-            return GetOrCreate(cursor++, name);
+            return GetOrCreate(NextIndex++, name);
+        }
+
+        public void NextMustBe(Transform transform)
+        {
+            after.Add(transform);
         }
 
         public void Apply()
