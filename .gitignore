@@ -95,3 +95,4 @@ $RECYCLE.BIN/
 *.pkf*
 
 .idea
+.DS_Store
