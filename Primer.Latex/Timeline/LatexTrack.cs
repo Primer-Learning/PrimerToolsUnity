@@ -9,7 +9,7 @@ namespace Primer.Latex
     [DisplayName("Primer / Latex track")]
     [TrackClipType(typeof(GroupTransformerClip))]
     [TrackBindingType(typeof(LatexRenderer))]
-    public class GraphLineTrack : PrimerTrack
+    public class LatexTrack : PrimerTrack
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {

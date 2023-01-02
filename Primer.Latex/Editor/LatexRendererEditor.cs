@@ -71,9 +71,6 @@ namespace Primer.Latex.Editor
                 RenderGroupDefinition();
 
             serializedObject.ApplyModifiedProperties();
-
-            if (!initialConfig.Equals(component.config))
-                component.Process(component.config).FireAndForget();
         }
 
 

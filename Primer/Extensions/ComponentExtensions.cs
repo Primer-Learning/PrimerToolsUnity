@@ -18,5 +18,10 @@ namespace Primer
                 ? exists
                 : component.gameObject.AddComponent<T>();
         }
+
+        public static PrimerBehaviour GetPrimer(this Component component)
+        {
+            return GetOrAddComponent<PrimerBehaviour>(component);
+        }
     }
 }

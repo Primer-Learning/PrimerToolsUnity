@@ -9,6 +9,17 @@ namespace Primer.Latex
 {
     public class LatexMixer : PrimerBoundPlayable<LatexRenderer>
     {
+        private static void Hide(GameObject go)
+        {
+            go.GetPrimer().SaveIntrinsicScale();
+            go.transform.localScale = Vector3.zero;
+        }
+
+        private static void Show(GameObject go)
+        {
+            go.GetPrimer().RestoreIntrinsicScale();
+        }
+
         private GameObject applied;
         private GameObject original;
         private GameObject transformable;
@@ -18,14 +29,14 @@ namespace Primer.Latex
             Debug.Log("START");
             original = trackTarget.gameObject;
             RestoreOriginal();
-            original.SetActive(false);
+            Hide(original);
         }
 
         protected override void Stop(LatexRenderer trackTarget)
         {
             Debug.Log("STOP");
             transformable.Dispose();
-            original.SetActive(true);
+            Show(original);
             applied = null;
         }
 
@@ -37,7 +48,7 @@ namespace Primer.Latex
             Debug.Log("RestoreOriginal");
             transformable.Dispose();
             transformable = Object.Instantiate(original);
-            transformable.SetActive(true);
+            Show(transformable);
             applied = original;
         }
 
@@ -51,8 +62,11 @@ namespace Primer.Latex
             if (applied == target.gameObject)
                 return;
 
+            Show(original);
+            Show(target.gameObject);
+
             Debug.Log("ApplyBehaviour");
-            var modifier = new ChildrenModifier(target);
+            var modifier = new ChildrenModifier(transformable.transform);
             var orig = original.transform;
 
             var originalCursor = -1;
@@ -72,15 +86,18 @@ namespace Primer.Latex
                     ? target.GetChild(behaviourCursor)
                     : orig.GetChild(originalCursor);
 
-                modifier.NextMustBe(child);
+                modifier.NextMustBe(Object.Instantiate(child));
             }
+
+            Hide(original);
+            Hide(target.gameObject);
 
             modifier.Apply();
 
             // transformable.Dispose();
             // transformable = Object.Instantiate(target);
             // transformable.transform.localPosition = original.transform.localPosition;
-            // transformable.SetActive(true);
+            // Show(transformable);
             // applied = target;
         }
 
@@ -133,11 +150,16 @@ namespace Primer.Latex
             Debug.Log("DisableBehaviour");
 
             if (behaviour.transformTo != null)
-                behaviour.transformTo.gameObject.SetActive(false);
+                Hide(behaviour.transformTo.gameObject);
         }
 
         private void MixBehaviourWithOriginal(GroupTransformer behaviour, float weight)
         {
+            if (behaviour.transformTo == null) {
+                RestoreOriginal();
+                return;
+            }
+
             Debug.Log("MixBehaviourWithOriginal");
             var transitions = behaviour.transitions;
             var disappearWeight = 1 - Mathf.Clamp(weight * 2, 0, 1);
