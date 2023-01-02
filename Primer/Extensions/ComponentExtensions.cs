@@ -12,7 +12,16 @@ namespace Primer
 
         public static T GetOrAddComponent<T>(this Component component) where T : Component
         {
-            return component.GetComponent<T>() ?? component.gameObject.AddComponent<T>();
+            var exists = component.GetComponent<T>();
+
+            return exists != null
+                ? exists
+                : component.gameObject.AddComponent<T>();
+        }
+
+        public static PrimerBehaviour GetPrimer(this Component component)
+        {
+            return GetOrAddComponent<PrimerBehaviour>(component);
         }
     }
 }
