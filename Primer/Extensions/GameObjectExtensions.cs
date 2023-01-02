@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Primer
@@ -11,12 +12,14 @@ namespace Primer
             if (gameObject == null)
                 return;
 
+            EditorApplication.delayCall += () => {
 #if UNITY_EDITOR
-            if (Application.isEditor && !Application.isPlaying)
-                Object.DestroyImmediate(gameObject);
-            else
+                if (Application.isEditor && !Application.isPlaying)
+                    Object.DestroyImmediate(gameObject);
+                else
 #endif
-                Object.Destroy(gameObject);
+                    Object.Destroy(gameObject);
+            };
         }
 
         public static void DisposeAll(this IEnumerable<Transform> list)

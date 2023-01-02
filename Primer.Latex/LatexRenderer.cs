@@ -11,49 +11,22 @@ using UnityEngine.Events;
 namespace Primer.Latex
 {
     [ExecuteAlways]
-    [AddComponentMenu("Primer/Latex Renderer")]
+    [AddComponentMenu("Primer / Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
-        [SerializeField][TextArea]
-        private string latex = "";
+        [SerializeField] [TextArea]
+        internal string latex = "";
         [SerializeField]
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
-        private List<string> headers = LatexInput.GetDefaultHeaders();
+        internal List<string> headers = LatexInput.GetDefaultHeaders();
         public Material material;
-
-        public LatexInput config => new(latex, headers);
+        [HideInInspector] public List<int> groupIndexes = new();
         public UnityEvent<LatexChar[]> onChange = new();
 
-
-        #region Internal fields
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
         [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
-        internal bool isValid => characters.Length > 0 && characters.All(x => x.isSpriteValid);
-        internal bool hasContent => !config.IsEmpty || characters.Length > 0;
-        #endregion
-
-
-        #region Unity events
-        private async void OnEnable()
-        {
-            if (hasContent && !isValid) {
-                await Process(config);
-
-                // the component is destroyed after calling OnEnabled() when starting play mode
-                if (this != null)
-                    LateUpdate();
-            }
-        }
-
-        // We mess with the update loop when rendering the sprites
-        // so LateUpdate is required here
-        private void LateUpdate()
-        {
-            if (hasContent && isValid)
-                Render();
-        }
-        #endregion
+        public LatexInput config => new(latex, headers);
 
 
         public async Task Process(LatexInput input)
@@ -65,34 +38,13 @@ namespace Primer.Latex
                 onChange.Invoke(characters);
         }
 
-        private void Render()
-        {
-            for (var i = 0; i < characters.Length; i++) {
-                characters[i].Draw(transform, material);
-            }
-        }
-
-
-        // Using LatexRenderer as container like this prevents the ReleasedLatexRenderer from being created by the
-        // editor user (ie: it won't appear in any menus or searches).
-        public class Released : MonoBehaviour
-        {
-            [SerializeField] [HideInInspector]
-            internal string latex;
-            [SerializeField] [HideInInspector]
-            internal List<string> headers;
-            [SerializeField] [HideInInspector]
-            internal Material material;
-            internal LatexInput config => new(latex, headers);
-        }
-
 
 #if UNITY_EDITOR
+
         // This needs to be private (or internal) because SpriteDirectRenderer is internal
         [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         [SerializeField]
-        private LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
-
+        internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
 
         private void OnDrawGizmos()
         {
@@ -112,27 +64,49 @@ namespace Primer.Latex
             }
         }
 
-
-        public Released ReleaseSvgParts()
+        private async void OnValidate()
         {
-            for (var i = 0; i < characters.Length; i++) {
-                var character = characters[i];
-                var obj = new GameObject($"SvgPart {i}");
+            await Process(config);
+            UpdateChildren();
+        }
 
-                obj.AddComponent<MeshFilter>().sharedMesh = character.symbol.mesh;
-                obj.AddComponent<MeshRenderer>().material = material;
+        public void UpdateChildren()
+        {
+            var ranges = characters.GetRanges(groupIndexes);
+            var zero = characters.GetCenter();
+            var groups = new ChildrenModifier(transform);
 
-                obj.transform.SetParent(transform, false);
-                obj.transform.localPosition = character.position;
+            Debug.Log($"{gameObject.name} - {zero}");
 
-                Undo.RegisterCreatedObjectUndo(obj, "");
+            foreach (var (start, end) in ranges) {
+                var group = groups.NextMustBeCalled($"Group (chars {start} to {end - 1})");
+                var children = new ChildrenModifier(group);
+                var chars = characters.Skip(start).Take(end - start).ToArray();
+                var center = chars.GetCenter();
+
+                Debug.Log($"{gameObject.name} > {group.gameObject.name} - {center - zero}");
+
+                if (group.gameObject.name == "Group (chars 12 to 16)") {
+                    chars.GetCenter();
+                }
+
+                group.localPosition = center - zero;
+
+                foreach (var character in chars) {
+                    var charTransform = children.NextMustBeCalled($"LatexChar {character.position}");
+                    charTransform.localPosition = character.position - center + zero;
+
+                    var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
+                    meshFilter.sharedMesh = character.symbol.mesh;
+
+                    var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
+                    meshRenderer.material = material;
+                }
+
+                children.Apply();
             }
 
-            var releasedRenderer = gameObject.AddComponent<Released>();
-            releasedRenderer.latex = latex;
-            releasedRenderer.headers = headers;
-            releasedRenderer.material = material;
-            return releasedRenderer;
+            groups.Apply();
         }
 #endif
     }
