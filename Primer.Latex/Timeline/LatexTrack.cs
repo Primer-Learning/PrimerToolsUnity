@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -7,11 +8,17 @@ using UnityEngine.Timeline;
 namespace Primer.Latex
 {
     [DisplayName("Primer / Latex track")]
-    [TrackClipType(typeof(TokenReplacementClip))]
+    [TrackClipType(typeof(LatexTransformerClip))]
     [TrackBindingType(typeof(LatexRenderer))]
-    public class GraphLineTrack : PrimerTrack
+    public class LatexTrack : PrimerTrack
     {
-        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) =>
-            ScriptPlayable<LatexMixer>.Create(graph, inputCount);
+        public AnimationCurve curve = IPrimerAnimation.cubic;
+
+        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        {
+            var playable = ScriptPlayable<LatexMixer>.Create(graph, inputCount);
+            playable.GetBehaviour().curve = curve;
+            return playable;
+        }
     }
 }

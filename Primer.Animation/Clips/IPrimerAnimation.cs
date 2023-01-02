@@ -4,8 +4,7 @@ namespace Primer.Animation
 {
     public interface IPrimerAnimation
     {
-        string name { get; }
-        void ApplyTo(AnimationClip clip);
+        public static AnimationCurve cubic = CubicCurve(0, 0, 1, 1);
 
         public static AnimationCurve CubicCurve(float startTime, float startValue, float endTime, float endValue)
         {
@@ -24,5 +23,9 @@ namespace Primer.Animation
 
             return new AnimationCurve(start, end);
         }
+
+        string name { get; }
+
+        void ApplyTo(AnimationClip clip);
     }
 }

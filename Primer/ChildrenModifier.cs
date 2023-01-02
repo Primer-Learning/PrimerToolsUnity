@@ -18,17 +18,14 @@ namespace Primer
 
         public int nextIndex { get; private set; }
 
-        public Transform NextMustBeCalled(string name)
-        {
-            return GetOrCreate(nextIndex++, name);
-        }
+        public Transform NextMustBeCalled(string name) => GetOrCreate(nextIndex++, name);
 
         public void NextMustBe(Transform transform)
         {
             after.Add(transform);
         }
 
-        public void Apply()
+        public List<Transform> Apply()
         {
             var needsReorder = false;
 
@@ -49,6 +46,8 @@ namespace Primer
                 child.localPosition = pos;
                 needsReorder = true;
             }
+
+            return after;
         }
 
         private void Set(int index, Transform child)

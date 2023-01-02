@@ -1,25 +1,27 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Primer
 {
     public static class GameObjectExtensions
     {
-        public static void Dispose(this GameObject gameObject)
+        public static async void Dispose(this GameObject gameObject, bool urgent = false)
         {
-            if (gameObject == null)
+            if (!gameObject)
                 return;
 
-            EditorApplication.delayCall += () => {
+
+            if (!urgent)
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
+
 #if UNITY_EDITOR
-                if (Application.isEditor && !Application.isPlaying)
-                    Object.DestroyImmediate(gameObject);
-                else
+            if (Application.isEditor && !Application.isPlaying)
+                Object.DestroyImmediate(gameObject);
+            else
 #endif
-                    Object.Destroy(gameObject);
-            };
+                Object.Destroy(gameObject);
         }
 
         public static void DisposeAll(this IEnumerable<Transform> list)
@@ -40,14 +42,33 @@ namespace Primer
         }
 
         public static PrimerBehaviour GetPrimer(this GameObject gameObject)
-        {
-            return GetOrAddComponent<PrimerBehaviour>(gameObject);
-        }
+            => GetOrAddComponent<PrimerBehaviour>(gameObject);
 
         // Extension methods work on null values!
-        public static bool IsNull(this GameObject gameObject)
+        public static bool IsNull(this GameObject gameObject) => gameObject == null;
+
+        #region Visibility
+        public static void Hide(this GameObject go)
         {
-            return gameObject == null;
+            var pos = go.transform.position;
+
+            if (pos.z <= 0)
+                return;
+
+            pos.z *= -1;
+            go.transform.position = pos;
         }
+
+        public static void Show(this GameObject go)
+        {
+            var pos = go.transform.position;
+
+            if (pos.z >= 0)
+                return;
+
+            pos.z *= -1f;
+            go.transform.position = pos;
+        }
+        #endregion
     }
 }

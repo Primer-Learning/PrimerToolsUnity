@@ -14,17 +14,16 @@ namespace Primer.Latex
     [AddComponentMenu("Primer / Latex Renderer")]
     public class LatexRenderer : MonoBehaviour
     {
-        [SerializeField] [TextArea]
-        internal string latex = "";
+        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
+        [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
+        [HideInInspector] public List<int> groupIndexes = new();
         [SerializeField]
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
         internal List<string> headers = LatexInput.GetDefaultHeaders();
+        [SerializeField] [TextArea]
+        internal string latex = "";
         public Material material;
-        [HideInInspector] public List<int> groupIndexes = new();
         public UnityEvent<LatexChar[]> onChange = new();
-
-        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
-        [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
 
         public LatexInput config => new(latex, headers);
 
@@ -45,6 +44,8 @@ namespace Primer.Latex
         [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         [SerializeField]
         internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
+
+        internal List<(int, int)> ranges => characters.GetRanges(groupIndexes);
 
         private void OnDrawGizmos()
         {
@@ -73,22 +74,18 @@ namespace Primer.Latex
         public void UpdateChildren()
         {
             var ranges = characters.GetRanges(groupIndexes);
+
+            if (characters.Length == 0 || IsEmptyRange(ranges))
+                return;
+
             var zero = characters.GetCenter();
             var groups = new ChildrenModifier(transform);
-
-            Debug.Log($"{gameObject.name} - {zero}");
 
             foreach (var (start, end) in ranges) {
                 var group = groups.NextMustBeCalled($"Group (chars {start} to {end - 1})");
                 var children = new ChildrenModifier(group);
                 var chars = characters.Skip(start).Take(end - start).ToArray();
                 var center = chars.GetCenter();
-
-                Debug.Log($"{gameObject.name} > {group.gameObject.name} - {center - zero}");
-
-                if (group.gameObject.name == "Group (chars 12 to 16)") {
-                    chars.GetCenter();
-                }
 
                 group.localPosition = center - zero;
 
@@ -108,6 +105,9 @@ namespace Primer.Latex
 
             groups.Apply();
         }
+
+        private static bool IsEmptyRange(List<(int start, int end)> ranges)
+            => (ranges.Count == 1) && (ranges[0] == (0, 0));
 #endif
     }
 }

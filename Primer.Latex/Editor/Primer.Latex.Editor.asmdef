@@ -1,14 +1,15 @@
 {
-    "name": "Primer.Latex.Editor",
-    "rootNamespace": "Primer.Latex.Editor",
-    "references": [
-        "GUID:49818357e697641afb75d2f8acaf1861",
-        "GUID:02f771204943f4a40949438e873e3eff",
-        "Primer",
-        "Primer.Editor",
-        "Primer.Latex"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ]
+  "name": "Primer.Latex.Editor",
+  "rootNamespace": "Primer.Latex.Editor",
+  "references": [
+    "GUID:49818357e697641afb75d2f8acaf1861",
+    "GUID:02f771204943f4a40949438e873e3eff",
+    "Primer",
+    "Primer.Editor",
+    "Primer.Latex",
+    "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
 }

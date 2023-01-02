@@ -1,99 +1,173 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
+using Object = UnityEngine.Object;
 
 namespace Primer.Latex
 {
-    public class LatexMixer : CollectedMixer<LatexRenderer, LatexChar[]>
+    public class LatexMixer : PrimerBoundPlayable<LatexRenderer>
     {
-        #region Save and restore original characters
+        private GameObject applied;
+        public AnimationCurve curve = IPrimerAnimation.cubic;
+        private GameObject original;
+        private GameObject transformable;
+
         protected override void Start(LatexRenderer trackTarget)
         {
-            originalValue = trackTarget.characters;
-            trackTarget.onChange.AddListener(UpdateCharacters);
+            original = trackTarget.gameObject;
+            RestoreOriginal();
+            original.Hide();
         }
 
         protected override void Stop(LatexRenderer trackTarget)
         {
-            trackTarget.onChange.RemoveListener(UpdateCharacters);
-            trackTarget.characters = originalValue;
+            transformable.Dispose(urgent: true);
+            original.Show();
+            applied = null;
         }
 
-        private void UpdateCharacters(LatexChar[] newChars) =>
-            originalValue = newChars;
-        #endregion
-
-        protected override LatexChar[] ProcessPlayable(PrimerPlayable behaviour)
+        private List<Transform> RestoreOriginal()
         {
-            return behaviour is ILatexCharProvider {isReady: true} chars
-                ? chars.characters
-                : null;
+            if (applied == original)
+                return null;
+
+            transformable.Dispose();
+            transformable = Object.Instantiate(original);
+            transformable.Show();
+            original.Hide();
+            applied = original;
+            return null;
         }
 
-        protected override LatexChar[] SingleInput(LatexChar[] input, float weight, bool isReverse)
+        private void DisableBehaviour(LatexTransformer behaviour)
         {
-            return weight == 1
-                ? input
-                : input.Select(x => LatexChar.LerpScale(x, weight)).ToArray();
+            if (behaviour.transformTo)
+                behaviour.transformTo.gameObject.Hide();
         }
 
-        protected override void Apply(LatexRenderer trackTarget, LatexChar[] input)
+        private List<Transform> ApplyState(LatexTransformer behaviour)
         {
-            trackTarget.characters = input;
+            if (behaviour.transformTo == null)
+                return null;
+
+            var target = behaviour.transformTo.transform;
+
+            if (applied == target.gameObject)
+                return null;
+
+            var modifier = new ChildrenModifier(transformable.transform);
+            var originalCursor = -1;
+            var behaviourCursor = -1;
+
+            foreach (var transition in behaviour.transitions) {
+                originalCursor++;
+
+                if (transition == TransitionType.Remove)
+                    continue;
+
+                behaviourCursor++;
+
+                var child = transition == TransitionType.Replace
+                    ? target.GetChild(behaviourCursor)
+                    : original.transform.GetChild(originalCursor);
+
+                modifier.NextMustBe(Object.Instantiate(child));
+            }
+
+            applied = target.gameObject;
+            return modifier.Apply();
         }
 
-        protected override LatexChar[] Mix(List<float> weights, List<LatexChar[]> inputs)
+        protected override void Frame(LatexRenderer trackTarget, Playable playable, FrameData info)
         {
-            var setsToMerge = inputs.Select(x => x.ToList()).ToList();
-            var common = FindCommonSymbols(inputs);
-            var result = new List<LatexChar>();
+            var count = playable.GetInputCount();
+            var weights = new List<float>();
+            var behaviours = new List<LatexTransformer>();
+            var totalWeight = 0f;
 
-            foreach (var symbol in common) {
-                LatexChar lerped = null;
+            for (var i = 0; i < count; i++) {
+                var weight = playable.GetInputWeight(i);
 
-                for (var i = 0; i < setsToMerge.Count; i++) {
-                    var set = setsToMerge[i];
+                var inputPlayable = (ScriptPlayable<PrimerPlayable>)playable.GetInput(i);
 
-                    var character = set.Find(x => x.symbol.Equals(symbol));
-                    set.Remove(character);
+                if (inputPlayable.GetBehaviour() is not LatexTransformer behaviour)
+                    continue;
 
-                    lerped = lerped is null
-                        ? character
-                        : LatexChar.Lerp(lerped, character, weights[i]);
+                if (weight == 0) {
+                    DisableBehaviour(behaviour);
+                    continue;
                 }
 
-                result.Add(lerped);
+                if (weight >= 1) {
+                    ApplyState(behaviour);
+                    return;
+                }
+
+                weights.Add(weight);
+                behaviours.Add(behaviour);
+                totalWeight += weight;
             }
 
-            for (var i = 0; i < setsToMerge.Count; i++) {
-                var lerpedSet = setsToMerge[i].Select(character => LatexChar.LerpScale(character, weights[i]));
-                result.AddRange(lerpedSet);
+            if (totalWeight == 0) {
+                RunStop();
+                return;
             }
 
-            return result.ToArray();
+            RunStart(trackTarget);
+
+            if (totalWeight >= 1)
+                MixStates(weights, behaviours);
+            else
+                MixStatesWithOriginal(behaviours[0], weights[0]);
         }
 
-        private static List<LatexSymbol> FindCommonSymbols(IEnumerable<LatexChar[]> inputs)
+        private void MixStatesWithOriginal(LatexTransformer behaviour, float weight)
         {
-            var symbols = inputs
-                .Select(input => input.Select(character => character.symbol).ToList())
-                .ToList();
-
-            var first = symbols[0].ToHashSet();
-            var common = new List<LatexSymbol>();
-
-            foreach (var character in first) {
-                var repetitions = symbols.Min(chars =>  chars.Count(x => x.Equals(character)));
-
-                for (var i = 0; i < repetitions; i++) {
-                    common.Add(character);
-                }
+            if (!behaviour.transformTo) {
+                RestoreOriginal();
+                return;
             }
 
-            return common;
+            var originalCursor = 0;
+            var behaviourCursor = 0;
+            var transformableCursor = 0;
+            var cubic = curve.Evaluate(weight);
+            var isFirstHalf = weight < 0.5f;
+
+            var children =
+                (isFirstHalf ? RestoreOriginal() : ApplyState(behaviour))
+                ?? transformable.transform.GetChildren();
+
+            foreach (var transition in behaviour.transitions) {
+                if (!isFirstHalf && (transition == TransitionType.Remove)) {
+                    originalCursor++;
+                    continue;
+                }
+
+                var originalGroup = original.transform.GetChild(originalCursor++);
+                var behaviourGroup = behaviour.transformTo.transform.GetChild(behaviourCursor++);
+                var transformableGroup = children[transformableCursor++];
+
+                transformableGroup.localPosition = Vector3.Lerp(
+                    originalGroup.localPosition,
+                    behaviourGroup.localPosition,
+                    cubic
+                );
+
+                if (transition == TransitionType.Replace) {
+                    var scale = isFirstHalf ? originalGroup.localScale : behaviourGroup.localScale;
+                    transformableGroup.localScale = Mathf.Abs((cubic - 0.5f) * 2) * scale;
+                }
+            }
+        }
+
+        private void MixStates(List<float> weights, List<LatexTransformer> behaviours)
+        {
+            // Debug.Log("MixBehaviours");
+            throw new NotImplementedException();
         }
     }
 }
