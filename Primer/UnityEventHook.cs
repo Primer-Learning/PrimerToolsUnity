@@ -3,20 +3,10 @@ using UnityEngine;
 
 namespace Primer
 {
-
     public static class UnityEventHook
     {
-        const string GAME_OBJECT_TAG = "[Unity event hook]";
-
-        [ExecuteAlways]
-        class EventCatcher : MonoBehaviour
-        {
-            void Update() => UpdateEvent?.Invoke();
-        }
-
-        public static event Action UpdateEvent;
-        public static event Action OnUpdate
-        {
+        private const string GAME_OBJECT_TAG = "[Unity event hook]";
+        public static event Action OnUpdate {
             add {
                 EnsureMonoBehaviourIsInScene();
                 UpdateEvent += value;
@@ -27,9 +17,18 @@ namespace Primer
             }
         }
 
-        #region GameObject with Component creation / removal
+        public static event Action UpdateEvent;
 
-        static UnityEventHook() {
+        [ExecuteAlways]
+        private class EventCatcher : MonoBehaviour
+        {
+            private void Update() => UpdateEvent?.Invoke();
+        }
+
+
+        #region GameObject with Component creation / removal
+        static UnityEventHook()
+        {
             // Create tag to identify them later
             UnityTagManager.CreateTag(GAME_OBJECT_TAG);
 
@@ -38,22 +37,28 @@ namespace Primer
             }
         }
 
-        static EventCatcher catcher;
+        private static EventCatcher catcher;
 
-        static void EnsureMonoBehaviourIsInScene() {
-            if (catcher != null) return;
+        private static void EnsureMonoBehaviourIsInScene()
+        {
+            if (catcher != null)
+                return;
 
-            var gameObject = new GameObject(GAME_OBJECT_TAG);
-
-            gameObject.tag = GAME_OBJECT_TAG;
-            gameObject.hideFlags = HideFlags.DontSave;
+            var gameObject = new GameObject(GAME_OBJECT_TAG) {
+                tag = GAME_OBJECT_TAG,
+                hideFlags = HideFlags.DontSave,
+            };
 
             catcher = gameObject.AddComponent<EventCatcher>();
         }
 
-        static void RemoveMonoBehaviourIfNoListeners() {
-            if (UpdateEvent != null) return;
-            catcher.gameObject.Dispose();
+        private static void RemoveMonoBehaviourIfNoListeners()
+        {
+            if (UpdateEvent != null)
+                return;
+
+            catcher.Dispose();
+            catcher = null;
         }
         #endregion
     }
