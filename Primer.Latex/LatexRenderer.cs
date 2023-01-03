@@ -87,11 +87,11 @@ namespace Primer.Latex
                 var chars = characters.Skip(start).Take(end - start).ToArray();
                 var center = chars.GetCenter();
 
-                group.localPosition = center - zero;
+                group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
 
                 foreach (var character in chars) {
                     var charTransform = children.NextMustBeCalled($"LatexChar {character.position}");
-                    charTransform.localPosition = character.position - center + zero;
+                    charTransform.localPosition = character.position - group.localPosition; //- center + zero;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
                     meshFilter.sharedMesh = character.symbol.mesh;

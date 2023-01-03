@@ -55,7 +55,7 @@ namespace Primer
             if (pos.z <= 0)
                 return;
 
-            pos.z *= -1;
+            pos.z *= -10;
             go.transform.position = pos;
         }
 
@@ -66,7 +66,7 @@ namespace Primer
             if (pos.z >= 0)
                 return;
 
-            pos.z *= -1f;
+            pos.z *= -0.1f;
             go.transform.position = pos;
         }
         #endregion
