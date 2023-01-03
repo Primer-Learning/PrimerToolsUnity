@@ -68,7 +68,9 @@ namespace Primer.Latex
         private async void OnValidate()
         {
             await Process(config);
-            UpdateChildren();
+
+            if (this)
+                UpdateChildren();
         }
 
         public void UpdateChildren()
