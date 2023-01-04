@@ -13,14 +13,11 @@ namespace Primer.Latex
 
             return a with {
                 position = Vector3.Lerp(a.position, b.position, t),
-                scale = Mathf.Lerp(a.scale, b.scale, t)
+                scale = Mathf.Lerp(a.scale, b.scale, t),
             };
         }
 
-        public static LatexChar LerpScale(LatexChar a, float t)
-        {
-            return a with { scale = Mathf.Lerp(0, a.scale, t) };
-        }
+        public static LatexChar LerpScale(LatexChar a, float t) => a with { scale = Mathf.Lerp(0, a.scale, t) };
 
 
         public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
@@ -34,7 +31,7 @@ namespace Primer.Latex
 
 #if UNITY_EDITOR
         public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
-            symbol.DrawWireGizmos(parent, position,features);
+            symbol.DrawWireGizmos(parent, position, features);
 #endif
     }
 }
