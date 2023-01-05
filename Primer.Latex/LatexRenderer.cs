@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
@@ -15,27 +13,56 @@ namespace Primer.Latex
     public class LatexRenderer : MonoBehaviour
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
-        [NotNull] internal LatexChar[] characters = Array.Empty<LatexChar>();
-        [HideInInspector] public List<int> groupIndexes = new();
+        internal LatexExpression expression = new();
+
+
         [SerializeField]
         [Tooltip(@"These will be inserted into the LaTeX template before \begin{document}.")]
         internal List<string> headers = LatexInput.GetDefaultHeaders();
         [SerializeField] [TextArea]
         internal string latex = "";
         public Material material;
-        public UnityEvent<LatexChar[]> onChange = new();
 
-        public LatexInput config => new(latex, headers);
+        public UnityEvent<LatexExpression> onChange = new();
 
 
         public async Task Process(LatexInput input)
         {
-            var prevCharacters = characters;
-            characters = await processor.Process(input);
+            var prevExpression = expression;
+            expression = await processor.Process(input);
 
-            if (!prevCharacters.SequenceEqual(characters))
-                onChange.Invoke(characters);
+            if (!prevExpression.IsSame(expression))
+                onChange.Invoke(expression);
         }
+
+
+        #region Group management
+        public LatexInput config => new(latex, headers);
+
+        private LatexTransitionState stateCache;
+
+        internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
+            transform,
+            expression.Split(groupIndexes)
+        );
+
+        [SerializeField] [HideInInspector]
+        internal List<int> groupIndexesInternal = new();
+        public List<int> groupIndexes {
+            get => groupIndexesInternal;
+            set {
+                if (value is null || groupIndexesInternal.SequenceEqual(value))
+                    return;
+
+                groupIndexesInternal = value;
+
+                stateCache = new LatexTransitionState(
+                    transform,
+                    expression.Split(groupIndexesInternal)
+                );
+            }
+        }
+        #endregion
 
 
 #if UNITY_EDITOR
@@ -45,13 +72,12 @@ namespace Primer.Latex
         [SerializeField]
         internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
 
-        internal List<(int, int)> ranges => characters.GetRanges(groupIndexes);
+        public List<(int start, int end)> ranges => expression.CalculateRanges(groupIndexes);
 
         private void OnDrawGizmos()
         {
-            for (var i = 0; i < characters.Length; i++) {
-                characters[i].DrawWireGizmos(transform, gizmos);
-            }
+            foreach (var character in expression)
+                character.DrawWireGizmos(transform, gizmos);
         }
 
         private void Reset()
@@ -75,23 +101,18 @@ namespace Primer.Latex
 
         public void UpdateChildren()
         {
-            var ranges = characters.GetRanges(groupIndexes);
+            var zero = expression.GetCenter();
+            var groupGameObjects = new ChildrenModifier(transform);
 
-            if (characters.Length == 0 || IsEmptyRange(ranges))
-                return;
-
-            var zero = characters.GetCenter();
-            var groups = new ChildrenModifier(transform);
-
-            foreach (var (start, end) in ranges) {
-                var group = groups.NextMustBeCalled($"Group (chars {start} to {end - 1})");
+            foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
+                var chunk = expression.Slice(start, end);
+                var group = groupGameObjects.NextMustBeCalled($"Group (chars {start} to {end - 1})");
                 var children = new ChildrenModifier(group);
-                var chars = characters.Skip(start).Take(end - start).ToArray();
-                var center = chars.GetCenter();
+                var center = chunk.GetCenter();
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
 
-                foreach (var character in chars) {
+                foreach (var character in chunk) {
                     var charTransform = children.NextMustBeCalled($"LatexChar {character.position}");
                     charTransform.localPosition = character.position - group.localPosition; //- center + zero;
 
@@ -105,11 +126,8 @@ namespace Primer.Latex
                 children.Apply();
             }
 
-            groups.Apply();
+            groupGameObjects.Apply();
         }
-
-        private static bool IsEmptyRange(List<(int start, int end)> ranges)
-            => (ranges.Count == 1) && (ranges[0] == (0, 0));
 #endif
     }
 }

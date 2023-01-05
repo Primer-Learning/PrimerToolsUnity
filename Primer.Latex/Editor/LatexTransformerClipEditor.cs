@@ -42,13 +42,13 @@ namespace Primer.Latex.Editor
 
                 var (fromStart, fromEnd) = fromGroups[i];
 
-                LatexCharEditor.ShowGroup(fromRenderer.characters, fromStart, fromEnd);
+                LatexCharEditor.ShowGroup(fromRenderer.expression.Slice(fromStart, fromEnd));
 
                 if (trans[i] == TransitionType.Remove || toIndex == toGroups.Count)
                     continue;
 
                 var (toStart, toEnd) = toGroups[toIndex];
-                LatexCharEditor.ShowGroup(toRenderer.characters, toStart, toEnd);
+                LatexCharEditor.ShowGroup(toRenderer.expression.Slice(toStart, toEnd));
                 toIndex++;
             }
 
@@ -61,7 +61,7 @@ namespace Primer.Latex.Editor
             for (var i = toIndex; i < toGroups.Count; i++) {
                 var (toStart, toEnd) = toGroups[i];
                 GUILayout.Label($"Clip's group {i}");
-                LatexCharEditor.ShowGroup(toRenderer.characters, toStart, toEnd);
+                LatexCharEditor.ShowGroup(toRenderer.expression.Slice(toStart, toEnd));
             }
         }
     }

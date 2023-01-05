@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -10,7 +10,7 @@ namespace Primer.Latex.Editor
     {
         public static readonly EditorHelpBox targetIsPresetWarning = EditorHelpBox.Warning(
             "You are editing a preset and the LaTeX will not be built until "
-          + "you apply the preset to an actual LatexRenderer component."
+            + "you apply the preset to an actual LatexRenderer component."
         );
 
         private bool internalsVisible;
@@ -27,15 +27,10 @@ namespace Primer.Latex.Editor
         /// </remarks>
         private bool isTargetAPreset => component.gameObject.scene.handle == 0;
 
-        public override bool RequiresConstantRepaint()
-        {
-            return true;
-        }
+        public override bool RequiresConstantRepaint() => true;
 
         public override void OnInspectorGUI()
         {
-            var initialConfig = component.config;
-
             GetStatusBox().Render();
             PropertyField(nameof(component.latex));
 
@@ -66,7 +61,7 @@ namespace Primer.Latex.Editor
             if (GUILayout.Button("Update children"))
                 component.UpdateChildren();
 
-            if (component.characters.Length > 0)
+            if (!component.expression.isEmpty)
                 RenderGroupDefinition();
 
             serializedObject.ApplyModifiedProperties();
@@ -78,7 +73,7 @@ namespace Primer.Latex.Editor
             if (!isTargetAPreset)
                 return false;
 
-            component.characters = Array.Empty<LatexChar>();
+            component.expression = new LatexExpression();
             serializedObject.Update();
             targetIsPresetWarning.Render();
             return true;
@@ -105,10 +100,9 @@ namespace Primer.Latex.Editor
         {
             GroupsHeader();
 
-            var chars = component.characters;
-            var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexes));
-            var groups = serializedGroups.GetIntArrayValue();
-            var ranges = chars.GetRanges(groups);
+            var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexesInternal));
+            var groupIndexes = serializedGroups.GetIntArrayValue();
+            var ranges = component.expression.CalculateRanges(groupIndexes);
             var hasChanges = false;
 
             for (var i = 0; i < ranges.Count; i++) {
@@ -119,23 +113,23 @@ namespace Primer.Latex.Editor
                     GUILayout.FlexibleSpace();
 
                     if ((i != 0) && GUILayout.Button("X")) {
-                        groups.RemoveAt(i - 1);
+                        groupIndexes.RemoveAt(i - 1);
                         hasChanges = true;
                         break;
                     }
                 }
 
-                var selected = LatexCharEditor.ShowGroup(chars, start, end);
+                var selected = LatexCharEditor.ShowGroup(component.expression.Slice(start, end));
 
                 if (selected == 0)
                     continue;
 
-                groups.Insert(i, start + selected);
+                groupIndexes.Insert(i, start + selected);
                 hasChanges = true;
             }
 
             if (hasChanges)
-                serializedGroups.SetIntArrayValue(groups);
+                serializedGroups.SetIntArrayValue(groupIndexes);
         }
 
         private void GroupsHeader()

@@ -7,27 +7,24 @@ namespace Primer.Latex
     internal class LatexProcessingQueue : ProcessingPipeline
     {
         private LatexInput queue;
-        private TaskCompletionSource<LatexChar[]> queuedTask;
+        private TaskCompletionSource<LatexExpression> queuedTask;
 
         public LatexProcessingQueue(ILatexProcessor innerProcessor) : base(innerProcessor) {}
 
 
-        public override Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default)
-        {
-            return processor.state == LatexProcessingState.Processing
+        public override Task<LatexExpression> Process(LatexInput config, CancellationToken cancellationToken = default)
+            => processor.state == LatexProcessingState.Processing
                 ? SetQueue(config)
                 : DelegateProcessing(config, cancellationToken);
 
-        }
-
-        private async Task<LatexChar[]> DelegateProcessing(LatexInput config, CancellationToken cancellationToken)
+        private async Task<LatexExpression> DelegateProcessing(LatexInput config, CancellationToken cancellationToken)
         {
             var result = await processor.Process(config, cancellationToken);
             ProcessQueue();
             return result;
         }
 
-        private Task<LatexChar[]> SetQueue(LatexInput config)
+        private Task<LatexExpression> SetQueue(LatexInput config)
         {
             if (queue is not null) {
                 if (queue.Equals(config))
@@ -38,13 +35,14 @@ namespace Primer.Latex
 
 
             queue = config;
-            queuedTask = new TaskCompletionSource<LatexChar[]>();
+            queuedTask = new TaskCompletionSource<LatexExpression>();
             return queuedTask.Task;
         }
 
         private async void ProcessQueue()
         {
-            if (queue is null) return;
+            if (queue is null)
+                return;
 
             // Release thread and continue after
             await Task.Yield();

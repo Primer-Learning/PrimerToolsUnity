@@ -13,10 +13,10 @@ namespace Primer.Latex.Editor
             charPreviewSize = EditorGUILayout.IntSlider(charPreviewSize, 10, 100);
         }
 
-        private static Texture[] GetPreviewsFor(LatexChar[] chars, int start, int end)
+        private static Texture[] GetPreviewsFor(LatexExpression expression)
         {
             return (
-                from character in chars.Skip(start).Take(end - start)
+                from character in expression
                 select character.symbol?.mesh into mesh
                 where mesh is not null
                 select AssetPreview.GetAssetPreview(mesh) into texture
@@ -42,12 +42,12 @@ namespace Primer.Latex.Editor
             return newTexture;
         }
 
-        public static int ShowGroup(LatexChar[] chars, int start, int end)
+        public static int ShowGroup(LatexExpression expression)
         {
             var width = Screen.width;
             var cols = width / (charPreviewSize + 10);
 
-            var textures = GetPreviewsFor(chars, start, end);
+            var textures = GetPreviewsFor(expression);
             return GUILayout.SelectionGrid(0, textures, cols);
         }
     }

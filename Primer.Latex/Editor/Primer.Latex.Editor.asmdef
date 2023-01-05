@@ -7,7 +7,9 @@
     "Primer",
     "Primer.Editor",
     "Primer.Latex",
-    "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
+    "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5",
+    "GUID:f06555f75b070af458a003d92f9efb00",
+    "GUID:4ff74c95bf504425f893d81a5f99d0f0"
   ],
   "includePlatforms": [
     "Editor"

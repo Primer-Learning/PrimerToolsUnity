@@ -4,18 +4,18 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    internal class CharacterCreator : ILatexProcessor
+    internal class FormulaCreator : ILatexProcessor
     {
         private readonly LatexToSvg latexToSvg = new();
         private readonly SvgToChars svgToChars = new();
 
         public LatexProcessingState state { get; private set; } = LatexProcessingState.Initialized;
 
-        public async Task<LatexChar[]> Process(LatexInput config, CancellationToken ct = default)
+        public async Task<LatexExpression> Process(LatexInput config, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(config.code)) {
                 state = LatexProcessingState.Completed;
-                return Array.Empty<LatexChar>();
+                return new LatexExpression();
             }
 
             state = LatexProcessingState.Processing;
@@ -23,7 +23,7 @@ namespace Primer.Latex
             try {
                 var renderedSprites = await DelegateRendering(config, ct);
                 state = LatexProcessingState.Completed;
-                return renderedSprites;
+                return new LatexExpression(renderedSprites);
             }
             catch (OperationCanceledException) {
                 state = LatexProcessingState.Cancelled;
@@ -34,6 +34,10 @@ namespace Primer.Latex
                 throw;
             }
         }
+
+#if UNITY_EDITOR
+        public void OpenBuildDir() => latexToSvg.rootTempDir.Open();
+#endif
 
         private async Task<LatexChar[]> DelegateRendering(LatexInput config, CancellationToken ct)
         {
@@ -49,10 +53,5 @@ namespace Primer.Latex
 
             return renderedSprites;
         }
-
-#if UNITY_EDITOR
-        public void OpenBuildDir() => latexToSvg.rootTempDir.Open();
-#endif
-
     }
 }

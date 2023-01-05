@@ -7,7 +7,7 @@ namespace Primer.Latex
     {
         LatexProcessingState state { get; }
 
-        Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default);
+        Task<LatexExpression> Process(LatexInput config, CancellationToken cancellationToken = default);
 
 #if UNITY_EDITOR
         void OpenBuildDir();

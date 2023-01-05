@@ -6,24 +6,24 @@ namespace Primer.Latex
 {
     internal class LatexProcessor : ProcessingPipeline
     {
-        // Not sure if all latex rendering processes need to share the same instance or not
-        // If that ever changes only this line will need to be changed
-        public static LatexProcessor GetInstance() => new();
-
-
         private static CancellableLatexProcessor CreateInnerProcessor()
         {
-            var processor = new CharacterCreator();
+            var processor = new FormulaCreator();
             var withCache = new LatexProcessingCache(processor);
             var andQueue = new LatexProcessingQueue(withCache);
             var andCancellable = new CancellableLatexProcessor(andQueue);
             return andCancellable;
         }
 
+        // Not sure if all latex rendering processes need to share the same instance or not
+        // If that ever changes only this line will need to be changed
+        public static LatexProcessor GetInstance() => new();
+
 
         public LatexProcessor() : base(CreateInnerProcessor()) {}
 
-        public override async Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default)
+        public override async Task<LatexExpression> Process(LatexInput config,
+            CancellationToken cancellationToken = default)
         {
             renderError = null;
 

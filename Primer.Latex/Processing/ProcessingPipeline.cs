@@ -7,20 +7,16 @@ namespace Primer.Latex
     {
         protected readonly ILatexProcessor processor;
 
+        protected ProcessingPipeline(ILatexProcessor innerProcessor) => processor = innerProcessor;
+
         public LatexProcessingState state => processor.state;
 
-        protected ProcessingPipeline(ILatexProcessor innerProcessor)
-        {
-            processor = innerProcessor;
-        }
 
-
-        public abstract Task<LatexChar[]> Process(LatexInput config, CancellationToken cancellationToken = default);
+        public abstract Task<LatexExpression> Process(LatexInput config, CancellationToken cancellationToken = default);
 
 
 #if UNITY_EDITOR
         public void OpenBuildDir() => processor.OpenBuildDir();
 #endif
-
     }
 }
