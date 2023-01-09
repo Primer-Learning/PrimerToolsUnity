@@ -20,8 +20,6 @@ namespace Primer.Latex
         private readonly TransformSnapshot snapshot;
         private readonly GameObject source;
 
-        public Transform transform => source.transform;
-
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
             source = renderer.gameObject;
@@ -36,10 +34,15 @@ namespace Primer.Latex
             groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
         }
 
+        public Transform transform => source.transform;
+
         public void Restore()
         {
             snapshot.Restore();
         }
+
+        public IEnumerable<GroupState> GroupsToAddTransitioningTo(LatexTransitionState other)
+            => other.GroupsToRemoveTransitioningTo(this);
 
         public IEnumerable<GroupState> GroupsToRemoveTransitioningTo(LatexTransitionState other)
         {
@@ -49,7 +52,10 @@ namespace Primer.Latex
                 var group = groups[i];
                 var otherGroup = other.groups[i];
 
-                if (group.isReplaced || otherGroup.isReplaced || group.isRemoved && !other.groups[i].isRemoved)
+                var isReplaced = group.isReplaced || otherGroup.isReplaced;
+                var hasToRemove = group.isRemoved && !otherGroup.isRemoved;
+
+                if (isReplaced || hasToRemove)
                     yield return group;
             }
         }

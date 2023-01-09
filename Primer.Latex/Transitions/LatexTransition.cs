@@ -43,19 +43,19 @@ namespace Primer.Latex
             var easeIn = Mathf.Clamp(t * 2 - 1, 0, 1);
 
             foreach (var group in start.GroupsToRemoveTransitioningTo(end)) {
-                var transform = transforms[group];
-                transform.localScale = group.scale * easeOut;
+                var groupTransform = transforms[group];
+                groupTransform.localScale = group.scale * easeOut;
             }
 
-            foreach (var group in end.GroupsToRemoveTransitioningTo(start)) {
-                var transform = transforms[group];
-                transform.localScale = group.scale * easeIn;
+            foreach (var group in start.GroupsToAddTransitioningTo(end)) {
+                var groupTransform = transforms[group];
+                groupTransform.localScale = group.scale * easeIn;
             }
 
             foreach (var (before, after) in start.GetCommonGroups(end)) {
-                var transform = transforms[before];
-                transform.localScale = Vector3.Lerp(before.scale, after.scale, eased);
-                transform.localPosition = Vector3.Lerp(before.position, after.position, eased);
+                var groupTransform = transforms[before];
+                groupTransform.localScale = Vector3.Lerp(before.scale, after.scale, eased);
+                groupTransform.localPosition = Vector3.Lerp(before.position, after.position, eased);
             }
         }
 
@@ -65,21 +65,21 @@ namespace Primer.Latex
             var result = new Dictionary<GroupState, Transform>();
 
             foreach (var (before, after) in start.GetCommonGroups(end)) {
-                var transform = Object.Instantiate(before.transform, parent);
-                result.Add(before, transform);
-                result.Add(after, transform);
+                var groupTransform = Object.Instantiate(before.transform, parent);
+                result.Add(before, groupTransform);
+                result.Add(after, groupTransform);
             }
 
             foreach (var group in start.GroupsToRemoveTransitioningTo(end)) {
-                var transform = Object.Instantiate(group.transform, parent);
-                transform.localScale = Vector3.zero;
-                result.Add(group, transform);
+                var groupTransform = Object.Instantiate(group.transform, parent);
+                groupTransform.localScale = Vector3.zero;
+                result.Add(group, groupTransform);
             }
 
             foreach (var group in end.GroupsToRemoveTransitioningTo(start)) {
-                var transform = Object.Instantiate(group.transform, parent);
-                transform.localScale = Vector3.zero;
-                result.Add(group, transform);
+                var groupTransform = Object.Instantiate(group.transform, parent);
+                groupTransform.localScale = Vector3.zero;
+                result.Add(group, groupTransform);
             }
 
             return result;
