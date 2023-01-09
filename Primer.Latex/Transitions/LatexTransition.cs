@@ -13,13 +13,14 @@ namespace Primer.Latex
         private readonly AnimationCurve curve;
 
         private readonly LatexTransitionState end;
+        private readonly Vector3 offset;
         private readonly LatexTransitionState start;
         private readonly Dictionary<GroupState, Transform> transforms;
 
         public LatexTransition(LatexTransitionState from, LatexTransitionState to, AnimationCurve curve)
         {
             this.curve = curve;
-
+            offset = from.GetOffsetWith(to);
             start = from;
             end = to;
 
@@ -29,6 +30,7 @@ namespace Primer.Latex
 
             transforms = CreateTransforms();
         }
+
 
         public Transform transform => container.transform;
 
@@ -54,8 +56,12 @@ namespace Primer.Latex
 
             foreach (var (before, after) in start.GetCommonGroups(end)) {
                 var groupTransform = transforms[before];
+
+                if (after.isAnchor)
+                    Debug.Log("Anchor");
+
                 groupTransform.localScale = Vector3.Lerp(before.scale, after.scale, eased);
-                groupTransform.localPosition = Vector3.Lerp(before.position, after.position, eased);
+                groupTransform.localPosition = Vector3.Lerp(before.position, after.position + offset, eased);
             }
         }
 
@@ -66,6 +72,7 @@ namespace Primer.Latex
 
             foreach (var (before, after) in start.GetCommonGroups(end)) {
                 var groupTransform = Object.Instantiate(before.transform, parent);
+                groupTransform.localPosition += offset;
                 result.Add(before, groupTransform);
                 result.Add(after, groupTransform);
             }
@@ -78,6 +85,7 @@ namespace Primer.Latex
 
             foreach (var group in start.GroupsToAddTransitioningTo(end)) {
                 var groupTransform = Object.Instantiate(group.transform, parent);
+                groupTransform.localPosition += offset;
                 groupTransform.localScale = Vector3.zero;
                 result.Add(group, groupTransform);
             }

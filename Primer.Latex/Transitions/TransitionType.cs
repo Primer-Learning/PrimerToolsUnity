@@ -2,6 +2,9 @@ namespace Primer.Latex
 {
     public enum TransitionType
     {
-        Transition, Replace, Remove,
+        Transition,
+        Replace,
+        Remove,
+        Anchor,
     }
 }

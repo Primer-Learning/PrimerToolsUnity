@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -59,6 +60,28 @@ namespace Primer.Timeline
             Stop(trackTarget);
             isInitialized = false;
             trackTarget = default(T);
+        }
+
+
+        protected (List<float> weights, List<T> states) CollectInputs<T>(Playable playable)
+            where T : class, IPlayableBehaviour, new()
+        {
+            var count = playable.GetInputCount();
+            var weights = new List<float>();
+            var states = new List<T>();
+
+            for (var i = 0; i < count; i++) {
+                var weight = playable.GetInputWeight(i);
+                var inputPlayable = (ScriptPlayable<T>)playable.GetInput(i);
+
+                if (weight == 0 || inputPlayable.GetBehaviour() is not T behaviour)
+                    continue;
+
+                weights.Add(weight);
+                states.Add(behaviour);
+            }
+
+            return (weights, states);
         }
     }
 }

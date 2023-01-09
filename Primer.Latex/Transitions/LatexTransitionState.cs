@@ -7,7 +7,8 @@ namespace Primer.Latex
 {
     internal class LatexTransitionState
     {
-        private static void EnsureGroupsHaveSameLength<T, U>(IEnumerable<T> left, IEnumerable<U> right)
+        private static void EnsureGroupsHaveSameLength<TLeft, TRight>(IEnumerable<TLeft> left,
+            IEnumerable<TRight> right)
             => EnsureGroupsHaveSameLength(left.Count(), right.Count());
 
         private static void EnsureGroupsHaveSameLength(int left, int right)
@@ -65,9 +66,30 @@ namespace Primer.Latex
             EnsureGroupsHaveSameLength(groups, other.groups);
 
             for (var i = 0; i < groups.Length; i++) {
-                if (groups[i].isLerped && other.groups[i].isLerped)
-                    yield return (groups[i], other.groups[i]);
+                var group = groups[i];
+                var otherGroup = other.groups[i];
+
+                if (group.isStaying && otherGroup.isStaying)
+                    yield return (group, otherGroup);
             }
+        }
+
+        public Vector3 GetOffsetWith(LatexTransitionState other)
+        {
+            EnsureGroupsHaveSameLength(groups, other.groups);
+
+            for (var i = 0; i < groups.Length; i++) {
+                var group = groups[i];
+                var otherGroup = other.groups[i];
+
+                var areShared = group.isStaying && otherGroup.isStaying;
+                var oneIsAnchor = group.isAnchor || otherGroup.isAnchor;
+
+                if (areShared && oneIsAnchor)
+                    return group.position - otherGroup.position;
+            }
+
+            return Vector3.zero;
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
@@ -10,26 +9,6 @@ namespace Primer.Latex
 {
     public class LatexMixer : PrimerBoundPlayable<LatexRenderer>
     {
-        private static (List<float> weights, List<LatexTransitionState> states) CollectInputs(Playable playable)
-        {
-            var count = playable.GetInputCount();
-            var weights = new List<float>();
-            var states = new List<LatexTransitionState>();
-
-            for (var i = 0; i < count; i++) {
-                var weight = playable.GetInputWeight(i);
-                var inputPlayable = (ScriptPlayable<PrimerPlayable>)playable.GetInput(i);
-
-                if (weight == 0 || inputPlayable.GetBehaviour() is not LatexTransformerClip.Playable behaviour)
-                    continue;
-
-                weights.Add(weight);
-                states.Add(behaviour.state);
-            }
-
-            return (weights, states);
-        }
-
         private LatexTransitionState currentState;
         private LatexTransition currentTransition;
         public AnimationCurve curve = IPrimerAnimation.cubic;
@@ -62,7 +41,8 @@ namespace Primer.Latex
 
         protected override void Frame(LatexRenderer trackTarget, Playable playable, FrameData info)
         {
-            var (weights, states) = CollectInputs(playable);
+            var (weights, behaviours) = CollectInputs<LatexTransformerClip.Playable>(playable);
+            var states = behaviours.Select(x => x.state).ToList();
             var totalWeight = weights.Sum();
 
             if (totalWeight == 0) {
@@ -74,7 +54,7 @@ namespace Primer.Latex
 
             if (states.Count == 1) {
                 if (weights[0] >= 1) {
-                    ApplyState(states[0]);
+                    ApplyState(trackTarget.state, states[0]);
                     return;
                 }
 
@@ -83,10 +63,11 @@ namespace Primer.Latex
             }
 
             Assert.IsTrue(states.Count == 2, "LatexMixer can't handle more than two states");
-            Transition(states[0], states[1], weights[1]);
+            Transition(trackTarget.state, states[0], states[1], weights[1]);
         }
 
-        private void Transition(LatexTransitionState state1, LatexTransitionState state2, float t)
+        private void Transition(LatexTransitionState initialState, LatexTransitionState state1,
+            LatexTransitionState state2, float t)
         {
             RemoveState();
 
@@ -96,21 +77,24 @@ namespace Primer.Latex
             if (currentTransition is null) {
                 currentTransition = new LatexTransition(state1, state2, curve);
                 snapshot.ApplyTo(currentTransition.transform);
+                currentTransition.transform.localPosition += initialState.GetOffsetWith(state1);
             }
 
             currentTransition.Apply(t);
         }
 
-        private void ApplyState(LatexTransitionState state)
+        private void ApplyState(LatexTransitionState initial, LatexTransitionState state)
         {
             RemoveTransition();
 
             if (currentState is not null && (currentState != state))
                 RemoveState();
 
-            if (currentState is null)
-                snapshot.ApplyTo(state.transform);
+            if (currentState is not null)
+                return;
 
+            snapshot.ApplyTo(state.transform);
+            state.transform.localPosition += initial.GetOffsetWith(state);
             currentState = state;
         }
     }
