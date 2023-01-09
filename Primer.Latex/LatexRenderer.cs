@@ -111,6 +111,7 @@ namespace Primer.Latex
                 var center = chunk.GetCenter();
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
+                group.localScale = Vector3.one;
 
                 foreach (var character in chunk) {
                     var charTransform = children.NextMustBeCalled($"LatexChar {character.position}");

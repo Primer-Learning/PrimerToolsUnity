@@ -44,18 +44,17 @@ namespace Primer
         public static PrimerBehaviour GetPrimer(this GameObject gameObject)
             => GetOrAddComponent<PrimerBehaviour>(gameObject);
 
-        // Extension methods work on null values!
-        public static bool IsNull(this GameObject gameObject) => gameObject == null;
-
         #region Visibility
+        private const int HIDE_THRESHOLD = -100;
+
         public static void Hide(this GameObject go)
         {
             var pos = go.transform.position;
 
-            if (pos.z <= 0)
+            if (pos.z < HIDE_THRESHOLD)
                 return;
 
-            pos.z *= -10;
+            pos.z = -pos.z + HIDE_THRESHOLD;
             go.transform.position = pos;
         }
 
@@ -63,10 +62,10 @@ namespace Primer
         {
             var pos = go.transform.position;
 
-            if (pos.z >= 0)
+            if (pos.z > HIDE_THRESHOLD)
                 return;
 
-            pos.z *= -0.1f;
+            pos.z = -(pos.z - HIDE_THRESHOLD);
             go.transform.position = pos;
         }
         #endregion

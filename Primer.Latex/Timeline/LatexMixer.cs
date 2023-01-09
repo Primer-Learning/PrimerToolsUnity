@@ -48,6 +48,7 @@ namespace Primer.Latex
                 if (weight == 0 || inputPlayable.GetBehaviour() is not LatexTransformerClip.Playable behaviour)
                     continue;
 
+                behaviour.Hide();
                 weights.Add(weight);
                 states.Add(behaviour.transition);
                 totalWeight += weight;
