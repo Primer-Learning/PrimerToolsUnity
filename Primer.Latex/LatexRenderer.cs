@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Primer.Latex
 {
@@ -14,6 +15,10 @@ namespace Primer.Latex
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
         internal LatexExpression expression = new();
+
+        [SerializeField] [HideInInspector]
+        [FormerlySerializedAs("groupIndexesInternal")]
+        internal List<int> groupIndexes = new();
 
 
         [SerializeField]
@@ -25,6 +30,25 @@ namespace Primer.Latex
 
         public UnityEvent<LatexExpression> onChange = new();
 
+        private LatexTransitionState stateCache;
+
+
+        public LatexInput config => new(latex, headers);
+
+        internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
+            transform,
+            expression.Split(groupIndexes)
+        );
+
+
+        private async void OnValidate()
+        {
+            await Process(config);
+
+            // Comment this to disable automatic children update
+            if (this)
+                UpdateChildren();
+        }
 
         public async Task Process(LatexInput input)
         {
@@ -34,35 +58,6 @@ namespace Primer.Latex
             if (!prevExpression.IsSame(expression))
                 onChange.Invoke(expression);
         }
-
-
-        #region Group management
-        public LatexInput config => new(latex, headers);
-
-        private LatexTransitionState stateCache;
-
-        internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
-            transform,
-            expression.Split(groupIndexes)
-        );
-
-        [SerializeField] [HideInInspector]
-        internal List<int> groupIndexesInternal = new();
-        public List<int> groupIndexes {
-            get => groupIndexesInternal;
-            set {
-                if (value is null || groupIndexesInternal.SequenceEqual(value))
-                    return;
-
-                groupIndexesInternal = value;
-
-                stateCache = new LatexTransitionState(
-                    transform,
-                    expression.Split(groupIndexesInternal)
-                );
-            }
-        }
-        #endregion
 
 
 #if UNITY_EDITOR
@@ -89,14 +84,6 @@ namespace Primer.Latex
             if (presets.All(preset => preset.excludedProperties.Contains("material"))) {
                 material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
             }
-        }
-
-        private async void OnValidate()
-        {
-            await Process(config);
-
-            if (this)
-                UpdateChildren();
         }
 
         public void UpdateChildren()

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -100,7 +99,7 @@ namespace Primer.Latex.Editor
         {
             GroupsHeader();
 
-            var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexesInternal));
+            var serializedGroups = serializedObject.FindProperty(nameof(component.groupIndexes));
             var groupIndexes = serializedGroups.GetIntArrayValue();
             var ranges = component.expression.CalculateRanges(groupIndexes);
             var hasChanges = false;
