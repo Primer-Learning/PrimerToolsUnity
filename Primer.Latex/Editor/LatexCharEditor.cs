@@ -13,19 +13,19 @@ namespace Primer.Latex.Editor
             charPreviewSize = EditorGUILayout.IntSlider(charPreviewSize, 10, 100);
         }
 
-        private static Texture[] GetPreviewsFor(LatexExpression expression)
-        {
-            return (
-                from character in expression
-                select character.symbol?.mesh into mesh
-                where mesh is not null
-                select AssetPreview.GetAssetPreview(mesh) into texture
-                select ResizeAndFlip(texture, charPreviewSize, charPreviewSize)
-            ).ToArray();
-        }
+        private static Texture[] GetPreviewsFor(LatexExpression expression) => (
+            from character in expression
+            select character.symbol?.mesh into mesh
+            where mesh is not null
+            select AssetPreview.GetAssetPreview(mesh) into texture
+            select ResizeAndFlip(texture, charPreviewSize, charPreviewSize)
+        ).ToArray();
 
         private static Texture ResizeAndFlip(Texture source, int newWidth, int newHeight)
         {
+            if (!source)
+                return source;
+
             var temporary = RenderTexture.GetTemporary(newWidth, newHeight);
             var newTexture = new Texture2D(newWidth, newHeight);
 
