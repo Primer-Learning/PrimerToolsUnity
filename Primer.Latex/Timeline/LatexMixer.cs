@@ -13,12 +13,12 @@ namespace Primer.Latex
         public AnimationCurve curve = IPrimerAnimation.cubic;
         private LatexTransitionState initial;
         private Transform parent;
-        private Vector3 position;
+        private TransformSnapshot snapshot;
 
         protected override void Start(LatexRenderer trackTarget)
         {
             parent = trackTarget.transform.parent;
-            position = trackTarget.transform.position;
+            snapshot = trackTarget.transform.Snapshot();
             trackTarget.gameObject.Hide();
         }
 
@@ -73,7 +73,7 @@ namespace Primer.Latex
 
             if (currentTransition is null) {
                 currentTransition = new LatexTransition(states[0], states[1], curve);
-                currentTransition.Place(parent, position);
+                currentTransition.Place(parent, snapshot);
             }
 
             currentTransition.Apply(weights[1]);

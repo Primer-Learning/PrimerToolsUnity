@@ -34,13 +34,10 @@ namespace Primer.Latex
 
         public bool Is(LatexTransitionState from, LatexTransitionState to) => (start == from) && (end == to);
 
-        public void Place(Transform parent, Vector3 position)
+        public void Place(Transform parent, TransformSnapshot snapshot)
         {
-            var transform = container.transform;
-            var scale = transform.localScale;
-            transform.parent = parent;
-            transform.position = position;
-            transform.localScale = scale;
+            container.transform.parent = parent;
+            snapshot.CopyTo(container.transform);
         }
 
         public void Apply(float t)
