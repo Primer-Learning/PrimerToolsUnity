@@ -76,7 +76,7 @@ namespace Primer.Latex
                 result.Add(group, groupTransform);
             }
 
-            foreach (var group in end.GroupsToRemoveTransitioningTo(start)) {
+            foreach (var group in start.GroupsToAddTransitioningTo(end)) {
                 var groupTransform = Object.Instantiate(group.transform, parent);
                 groupTransform.localScale = Vector3.zero;
                 result.Add(group, groupTransform);
