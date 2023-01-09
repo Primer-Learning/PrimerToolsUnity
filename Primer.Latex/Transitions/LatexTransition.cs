@@ -36,8 +36,11 @@ namespace Primer.Latex
 
         public void Place(Transform parent, Vector3 position)
         {
-            container.transform.parent = parent;
-            container.transform.position = position;
+            var transform = container.transform;
+            var scale = transform.localScale;
+            transform.parent = parent;
+            transform.position = position;
+            transform.localScale = scale;
         }
 
         public void Apply(float t)

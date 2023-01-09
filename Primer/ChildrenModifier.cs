@@ -20,12 +20,7 @@ namespace Primer
 
         public Transform NextMustBeCalled(string name) => GetOrCreate(nextIndex++, name);
 
-        public void NextMustBe(Transform transform)
-        {
-            after.Add(transform);
-        }
-
-        public List<Transform> Apply()
+        public void Apply()
         {
             var needsReorder = false;
 
@@ -34,6 +29,7 @@ namespace Primer
 
             foreach (var child in after) {
                 var pos = child.localPosition;
+                var scale = child.localScale;
 
                 if (child.parent == parent) {
                     if (needsReorder)
@@ -44,10 +40,9 @@ namespace Primer
 
                 child.parent = parent;
                 child.localPosition = pos;
+                child.localScale = scale;
                 needsReorder = true;
             }
-
-            return after;
         }
 
         private void Set(int index, Transform child)
@@ -63,7 +58,7 @@ namespace Primer
         private Transform GetOrCreate(int index, string name)
         {
             var child = before.Find(x => x.gameObject.name == name)
-                     ?? new GameObject { name = name }.transform;
+                        ?? new GameObject { name = name }.transform;
 
             Set(index, child);
             return child;

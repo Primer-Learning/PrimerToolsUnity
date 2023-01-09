@@ -51,7 +51,7 @@ namespace Primer
         {
             var pos = go.transform.position;
 
-            if (pos.z < HIDE_THRESHOLD)
+            if (pos.z <= HIDE_THRESHOLD)
                 return;
 
             pos.z = -pos.z + HIDE_THRESHOLD;
