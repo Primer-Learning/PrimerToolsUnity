@@ -30,15 +30,11 @@ namespace Primer.Latex
             transforms = CreateTransforms();
         }
 
+        public Transform transform => container.transform;
+
         public void Dispose() => container.Dispose(urgent: true);
 
         public bool Is(LatexTransitionState from, LatexTransitionState to) => (start == from) && (end == to);
-
-        public void Place(Transform parent, TransformSnapshot snapshot)
-        {
-            container.transform.parent = parent;
-            snapshot.CopyTo(container.transform);
-        }
 
         public void Apply(float t)
         {

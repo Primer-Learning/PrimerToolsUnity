@@ -36,7 +36,7 @@ namespace Primer.Latex
         public LatexInput config => new(latex, headers);
 
         internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
-            transform,
+            this,
             expression.Split(groupIndexes)
         );
 

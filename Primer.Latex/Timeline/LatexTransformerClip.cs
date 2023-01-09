@@ -20,8 +20,8 @@ namespace Primer.Latex
             var behaviour = playable.GetBehaviour();
             var renderer = transformTo.Resolve(graph.GetResolver());
 
-            behaviour.gameObject = renderer.gameObject;
-            behaviour.transition = new LatexTransitionState(renderer.transform, transitions);
+            renderer.gameObject.Hide();
+            behaviour.state = new LatexTransitionState(renderer, transitions);
 
             return playable;
         }
@@ -29,12 +29,7 @@ namespace Primer.Latex
         [Serializable]
         public class Playable : PrimerPlayable
         {
-            internal GameObject gameObject;
-            internal LatexTransitionState transition;
-
-            public void Show() => gameObject.Show();
-
-            public void Hide() => gameObject.Hide();
+            internal LatexTransitionState state;
         }
     }
 }

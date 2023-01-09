@@ -17,16 +17,28 @@ namespace Primer.Latex
         }
 
         private readonly GroupState[] groups;
+        private readonly TransformSnapshot snapshot;
+        private readonly GameObject source;
 
-        public LatexTransitionState(Transform transform, IEnumerable<LatexExpression> groups)
+        public Transform transform => source.transform;
+
+        public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
-            this.groups = groups.Select((_, i) => new GroupState(transform, i)).ToArray();
+            source = renderer.gameObject;
+            snapshot = source.GetOrAddComponent<TransformSnapshot>();
+            this.groups = groups.Select((_, i) => new GroupState(renderer.transform, i)).ToArray();
         }
 
-        public LatexTransitionState(Transform transform, IReadOnlyCollection<TransitionType> transitions)
+        public LatexTransitionState(LatexRenderer renderer, IEnumerable<TransitionType> transitions)
         {
-            // EnsureGroupsHaveSameLength(transform.childCount, transitions.Count);
-            groups = transitions.Select((x, i) => new GroupState(transform, i, x)).ToArray();
+            source = renderer.gameObject;
+            snapshot = source.GetOrAddComponent<TransformSnapshot>();
+            groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
+        }
+
+        public void Restore()
+        {
+            snapshot.Restore();
         }
 
         public IEnumerable<GroupState> GroupsToRemoveTransitioningTo(LatexTransitionState other)
