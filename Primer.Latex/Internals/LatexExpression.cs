@@ -61,7 +61,9 @@ namespace Primer.Latex
                 last = start;
             }
 
-            result.Add((last, characters.Length));
+            if (last != characters.Length)
+                result.Add((last, characters.Length));
+
             return result;
         }
         #endregion
