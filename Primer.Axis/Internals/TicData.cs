@@ -1,6 +1,6 @@
 using System;
 
-namespace Primer.Graph
+namespace Primer.Axis
 {
     [Serializable]
     public class TicData

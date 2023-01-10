@@ -1,75 +1,104 @@
 ﻿using System.Collections.Generic;
-using Primer.Animation;
-using Shapes;
+using Primer.Axis;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     [ExecuteInEditMode]
-    public class Graph2 : PrimerBehaviour
+    public class Graph2 : PrimerBehaviour, IAxisConfig
     {
-        [FormerlySerializedAs("ticLabelDistanceVertical")]
-        public float ticLabelDistance = 0.25f;
-        // public float ticLabelDistanceHorizontal = 0.65f;
+        [Header("Prefabs")]
+        [SerializeField]
+        [FormerlySerializedAs("arrowPrefab")]
+        private Transform _arrowPrefab;
+
+        [SerializeField]
+        [FormerlySerializedAs("paddingFraction")]
         [Range(0, 0.5f)]
-        public float paddingFraction = 0.05f;
-        public bool isRightHanded = true;
-        public bool enableZAxis = true;
-        public Transform domain;
+        private float _paddingFraction = 0.05f;
+
+        [SerializeField]
+        [FormerlySerializedAs("primerTextPrefab")]
+        private PrimerText2 _primerTextPrefab;
+
+        [SerializeField]
+        [FormerlySerializedAs("ticLabelDistance")]
+        private float _ticLabelDistance = 0.25f;
+
+        [SerializeField]
+        [FormerlySerializedAs("ticPrefab")]
+        private Tic2 _ticPrefab;
 
         [Header("Axes")]
         public Axis2 _x;
-        Axis2 x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
         public Axis2 _y;
-        Axis2 y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
         public Axis2 _z;
-        Axis2 z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
+        public Transform domain;
+        public bool enableZAxis = true;
+        public bool isRightHanded = true;
 
-        [Header("Prefabs")]
-        public PrimerBehaviour arrowPrefab;
-        public PrimerText2 primerTextPrefab;
-        public Tic2 ticPrefab;
-        public Polyline linePrefab;
+        private bool lastRightHanded = true;
+        private Axis2 x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
+        private Axis2 y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
+        private Axis2 z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
 
-        void Update() {
+        public float ticLabelDistance => _ticLabelDistance;
+        public float paddingFraction => _paddingFraction;
+        public Transform arrowPrefab => _arrowPrefab;
+        public PrimerText2 primerTextPrefab => _primerTextPrefab;
+        public Tic2 ticPrefab => _ticPrefab;
+
+        private void Update()
+        {
             EnsureDomainDimensions();
         }
 
-        void OnEnable() {
+        private void OnEnable()
+        {
             OnValidate();
         }
 
-        void OnValidate() {
+        private void OnValidate()
+        {
             EnsureRightHanded();
             _z.hidden = !enableZAxis;
         }
 
-        public void Regenerate() {
+        public void Regenerate()
+        {
             // we use internal (_) fields because we want them to
             // update their children even if they are hidden
             // as this is when they delete all unused objects
-            if (_x is not null) _x.UpdateChildren();
-            if (_y is not null) _y.UpdateChildren();
-            if (_z is not null) _z.UpdateChildren();
+            if (_x is not null)
+                _x.UpdateChildren();
+
+            if (_y is not null)
+                _y.UpdateChildren();
+
+            if (_z is not null)
+                _z.UpdateChildren();
         }
 
-        public Vector3 DomainToPosition(Vector3 domain) => new Vector3(
+        public Vector3 DomainToPosition(Vector3 domain) => new(
             x ? x.DomainToPosition(domain.x) : 0,
             y ? y.DomainToPosition(domain.y) : 0,
             z ? z.DomainToPosition(domain.z) : 0
         );
 
-        void EnsureDomainDimensions() {
+        private void EnsureDomainDimensions()
+        {
             var scale = new Vector3(
                 _x ? _x.DomainToPosition(1, true) : 1,
                 _y ? _y.DomainToPosition(1, true) : 1,
                 _z ? _z.DomainToPosition(1, true) : 1
             );
 
-            if (isRightHanded) scale.z *= -1;
+            if (isRightHanded)
+                scale.z *= -1;
 
-            if (domain is null || domain.localScale == scale) return;
+            if (domain is null || domain.localScale == scale)
+                return;
 
             var childCount = domain.childCount;
             var children = new List<(Transform, Vector3)>();
@@ -89,10 +118,13 @@ namespace Primer.Graph
             }
         }
 
-        bool lastRightHanded = true;
-        void EnsureRightHanded() {
-            if (z is null) return;
-            if (isRightHanded == lastRightHanded) return;
+        private void EnsureRightHanded()
+        {
+            if (z is null)
+                return;
+
+            if (isRightHanded == lastRightHanded)
+                return;
 
             lastRightHanded = isRightHanded;
 

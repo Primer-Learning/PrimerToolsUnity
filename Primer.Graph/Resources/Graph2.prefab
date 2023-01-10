@@ -48,18 +48,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ticLabelDistance: 0.25
-  paddingFraction: 0.05
-  isRightHanded: 1
-  enableZAxis: 1
-  domain: {fileID: 9170909329295579749}
+  _arrowPrefab: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+  _paddingFraction: 0.05
+  _primerTextPrefab: {fileID: 8603906643652811505, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
+  _ticLabelDistance: 0.25
+  _ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
   _x: {fileID: 8960763701479911132}
   _y: {fileID: 5548746615421559894}
   _z: {fileID: 3564338468142601028}
-  arrowPrefab: {fileID: 4478118126784391353, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
-  primerTextPrefab: {fileID: 8603906643652811505, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
-  ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
-  linePrefab: {fileID: 2912696055847981207, guid: fe11ba990086b4d3e97c43dfc0df729a, type: 3}
+  domain: {fileID: 9170909329295579749}
+  enableZAxis: 1
+  isRightHanded: 1
 --- !u!1 &6847249481812309779
 GameObject:
   m_ObjectHideFlags: 0

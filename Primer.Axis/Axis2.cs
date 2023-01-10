@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
@@ -5,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Primer.Graph
+namespace Primer.Axis
 {
     [ExecuteInEditMode]
     public class Axis2 : ObjectGenerator
@@ -14,10 +15,8 @@ namespace Primer.Graph
         private readonly List<Tic2> tics = new();
         public ArrowPresence arrowPresence = ArrowPresence.Both;
         private PrimerText2 axisLabel;
-        private PrimerBehaviour endArrow;
 
-        // Graph accessors
-        private Graph2 graphCache;
+        private PrimerBehaviour endArrow;
 
         // Configuration values
         public bool hidden;
@@ -45,12 +44,6 @@ namespace Primer.Graph
         [FormerlySerializedAs("thinkness")]
         public float thickness = 1;
         [Min(0)] public float ticStep = 2;
-        private Graph2 graph => graphCache ??= transform.parent?.GetComponent<Graph2>();
-        private PrimerText2 primerTextPrefab => graph.primerTextPrefab;
-        private PrimerBehaviour arrowPrefab => graph.arrowPrefab;
-        private Tic2 ticPrefab => graph.ticPrefab;
-        private float paddingFraction => graph.paddingFraction;
-        private float ticLabelDistance => graph.ticLabelDistance;
 
         // Calculated fields
         private float positionMultiplier => length * (1 - 2 * paddingFraction) / (max - min);
@@ -137,7 +130,7 @@ namespace Primer.Graph
             }
 
             if (!endArrow) {
-                endArrow = Create(arrowPrefab, Quaternion.Euler(0f, 90f, 0f));
+                endArrow = Create(arrowPrefab, Quaternion.Euler(0f, 90f, 0f)).GetPrimer();
                 endArrow.ScaleUpFromZero();
             }
 
@@ -148,7 +141,7 @@ namespace Primer.Graph
             }
 
             if (!originArrow) {
-                originArrow = Create(arrowPrefab, Quaternion.Euler(0f, -90f, 0f));
+                originArrow = Create(arrowPrefab, Quaternion.Euler(0f, -90f, 0f)).GetPrimer();
                 originArrow.ScaleUpFromZero();
             }
         }
@@ -205,7 +198,7 @@ namespace Primer.Graph
         private List<TicData> CalculateTics()
         {
             var calculated = new List<TicData>();
-            var step = (float)System.Math.Round(ticStep, 2);
+            var step = (float)Math.Round(ticStep, 2);
 
             if (step <= 0) {
                 return calculated;
@@ -219,5 +212,32 @@ namespace Primer.Graph
 
             return calculated;
         }
+
+        #region Config
+        private IAxisConfig configCache;
+        private IAxisConfig config {
+            get {
+                if (configCache is not null)
+                    return configCache;
+
+                var sibling = transform.parent.GetComponent<IAxisConfig>();
+
+                if (sibling == null) {
+                    throw new Exception(
+                        $"{nameof(Axis2)} requires a sibling component that extends {nameof(IAxisConfig)}"
+                    );
+                }
+
+                configCache = sibling;
+                return sibling;
+            }
+        }
+
+        private PrimerText2 primerTextPrefab => config.primerTextPrefab;
+        private Transform arrowPrefab => config.arrowPrefab;
+        private Tic2 ticPrefab => config.ticPrefab;
+        private float paddingFraction => config.paddingFraction;
+        private float ticLabelDistance => config.ticLabelDistance;
+        #endregion
     }
 }

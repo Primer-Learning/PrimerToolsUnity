@@ -1,8 +1,7 @@
 using System;
-using Primer.Animation;
 using UnityEngine;
 
-namespace Primer.Graph
+namespace Primer.Axis
 {
     public class Tic2 : PrimerBehaviour
     {

@@ -49,8 +49,8 @@ namespace Primer
         #region Child generation methods
         bool hasGeneratedChildren;
 
-        public T Create<T>(T template, Quaternion rotation) where T : MonoBehaviour => Create(template, null, rotation);
-        public T Create<T>(T template, Vector3? position = null, Quaternion? rotation = null) where T : MonoBehaviour {
+        public T Create<T>(T template, Quaternion rotation) where T : Component => Create(template, null, rotation);
+        public T Create<T>(T template, Vector3? position = null, Quaternion? rotation = null) where T : Component {
             var child = Instantiate(template, transform);
 
             child.gameObject.hideFlags = HideFlags.DontSave;

@@ -1,0 +1,11 @@
+{
+  "name": "Primer.Axis",
+  "rootNamespace": "Primer.Axis",
+  "references": [
+    "GUID:6055be8ebefd69e48b49212b09b47b2f",
+    "GUID:f51ebe6a0ceec4240a699833d6309b23",
+    "ShapesRuntime",
+    "Primer",
+    "Primer.Animation"
+  ]
+}

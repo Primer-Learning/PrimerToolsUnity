@@ -1,6 +1,6 @@
 {
-    "name": "Primer.Graph.Tests",
-    "rootNamespace": "Primer.Graph.Tests",
+    "name": "Primer.Axis.Tests",
+    "rootNamespace": "Primer.Axis.Tests",
     "optionalUnityReferences": [
         "TestAssemblies"
     ],
@@ -9,6 +9,6 @@
     ],
     "references": [
         "Primer",
-        "Primer.Graph"
+        "Primer.Axis"
     ]
 }

@@ -1,4 +1,4 @@
-namespace Primer.Graph
+namespace Primer.Axis
 {
     public enum AxisLabelPosition
     {
