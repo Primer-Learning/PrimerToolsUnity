@@ -56,10 +56,6 @@ namespace Primer.Latex
 
             foreach (var (before, after) in start.GetCommonGroups(end)) {
                 var groupTransform = transforms[before];
-
-                if (after.isAnchor)
-                    Debug.Log("Anchor");
-
                 groupTransform.localScale = Vector3.Lerp(before.scale, after.scale, eased);
                 groupTransform.localPosition = Vector3.Lerp(before.position, after.position + offset, eased);
             }

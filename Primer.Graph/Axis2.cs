@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
@@ -11,55 +10,57 @@ namespace Primer.Graph
     [ExecuteInEditMode]
     public class Axis2 : ObjectGenerator
     {
+        // Internal game object containers
+        private readonly List<Tic2> tics = new();
+        public ArrowPresence arrowPresence = ArrowPresence.Both;
+        private PrimerText2 axisLabel;
+        private PrimerBehaviour endArrow;
+
+        // Graph accessors
+        private Graph2 graphCache;
+
         // Configuration values
         public bool hidden;
-        public ArrowPresence arrowPresence = ArrowPresence.Both;
-        [Min(0.1f)] public float length = 1;
-        public float min;
-        public float max = 10;
-        [FormerlySerializedAs("thinkness")]
-        public float thickness = 1;
 
         [Header("Label")]
         public string label = "Label";
-        public AxisLabelPosition labelPosition = AxisLabelPosition.End;
         public Vector3 labelOffset = Vector3.zero;
+        public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
-        [Header("Tics")]
-        public bool showTics = true;
-        [Min(0)] public float ticStep = 2;
+        // Memory
+        private ArrowPresence lastArrowPresence = ArrowPresence.Neither;
+        [Min(0.1f)] public float length = 1;
+        public List<TicData> manualTics = new();
+        public float max = 10;
         [Tooltip("Ensures no more ticks are rendered.")]
         [Range(1, 100)] public int maxTics = 50;
-        public List<TicData> manualTics = new();
+        public float min;
+        private PrimerBehaviour originArrow;
 
         [Header("Required elements")]
         public Transform rod;
 
-        // Graph accessors
-        Graph2 graphCache;
-        Graph2 graph => graphCache ??= transform.parent?.GetComponent<Graph2>();
-        PrimerText2 primerTextPrefab => graph.primerTextPrefab;
-        PrimerBehaviour arrowPrefab => graph.arrowPrefab;
-        Tic2 ticPrefab => graph.ticPrefab;
-        float paddingFraction => graph.paddingFraction;
-        float ticLabelDistance => graph.ticLabelDistance;
-
-        // Internal game object containers
-        readonly List<Tic2> tics = new();
-        PrimerText2 axisLabel;
-        PrimerBehaviour originArrow;
-        PrimerBehaviour endArrow;
+        [Header("Tics")]
+        public bool showTics = true;
+        [FormerlySerializedAs("thinkness")]
+        public float thickness = 1;
+        [Min(0)] public float ticStep = 2;
+        private Graph2 graph => graphCache ??= transform.parent?.GetComponent<Graph2>();
+        private PrimerText2 primerTextPrefab => graph.primerTextPrefab;
+        private PrimerBehaviour arrowPrefab => graph.arrowPrefab;
+        private Tic2 ticPrefab => graph.ticPrefab;
+        private float paddingFraction => graph.paddingFraction;
+        private float ticLabelDistance => graph.ticLabelDistance;
 
         // Calculated fields
-        float positionMultiplier => length * (1 - 2 * paddingFraction) / (max - min);
-        float offset => -length * paddingFraction + min * positionMultiplier;
+        private float positionMultiplier => length * (1 - 2 * paddingFraction) / (max - min);
+        private float offset => -length * paddingFraction + min * positionMultiplier;
 
-        // Memory
-        ArrowPresence lastArrowPresence = ArrowPresence.Neither;
+        public float DomainToPosition(float domainValue, bool ignoreHidden = false)
+            => !ignoreHidden && hidden ? 0 : domainValue * positionMultiplier;
 
-        public float DomainToPosition(float domainValue, bool ignoreHidden = false) => !ignoreHidden && hidden ? 0 : domainValue * positionMultiplier;
-
-        public override void UpdateChildren() {
+        public override void UpdateChildren()
+        {
             gameObject.SetActive(!hidden);
 
             if (hidden) {
@@ -73,7 +74,8 @@ namespace Primer.Graph
             UpdateTics();
         }
 
-        protected override void OnChildrenRemoved() {
+        protected override void OnChildrenRemoved()
+        {
             tics.Clear();
             axisLabel = null;
             originArrow = null;
@@ -81,12 +83,14 @@ namespace Primer.Graph
             lastArrowPresence = ArrowPresence.Neither;
         }
 
-        void UpdateRod() {
+        private void UpdateRod()
+        {
             rod.localPosition = new Vector3(offset, 0f, 0f);
             rod.localScale = new Vector3(length, thickness, thickness);
         }
 
-        void UpdateLabel() {
+        private void UpdateLabel()
+        {
             if (!axisLabel) {
                 axisLabel = Create(primerTextPrefab);
                 axisLabel.transform.ScaleUpFromZero();
@@ -106,7 +110,8 @@ namespace Primer.Graph
             axisLabel.alignment = TextAlignmentOptions.Midline;
         }
 
-        void UpdateArrowHeads() {
+        private void UpdateArrowHeads()
+        {
             if (arrowPresence != lastArrowPresence) {
                 lastArrowPresence = arrowPresence;
                 RecreateArrowHeads();
@@ -121,7 +126,8 @@ namespace Primer.Graph
             }
         }
 
-        void RecreateArrowHeads() {
+        private void RecreateArrowHeads()
+        {
             if (arrowPresence == ArrowPresence.Neither) {
                 endArrow?.ShrinkAndDispose();
                 endArrow = null;
@@ -147,8 +153,9 @@ namespace Primer.Graph
             }
         }
 
-        internal void UpdateTics() {
-            var mustShowTics = showTics && ticStep > 0;
+        internal void UpdateTics()
+        {
+            var mustShowTics = showTics && (ticStep > 0);
 
             if (!mustShowTics) {
                 foreach (var tic in tics) {
@@ -161,7 +168,7 @@ namespace Primer.Graph
 
             var expectedTics = manualTics.Count != 0 ? manualTics : CalculateTics();
 
-            if (maxTics != 0 && expectedTics.Count() > maxTics) {
+            if ((maxTics != 0) && (expectedTics.Count() > maxTics)) {
                 // TODO: reduce amount of tics in a smart way
                 expectedTics = expectedTics.Take(maxTics).ToList();
             }
@@ -178,7 +185,9 @@ namespace Primer.Graph
 
             foreach (var tic in remove) {
                 tics.Remove(tic);
-                if (tic) tic.ShrinkAndDispose();
+
+                if (tic)
+                    tic.ShrinkAndDispose();
             }
 
             foreach (var data in add) {
@@ -193,9 +202,10 @@ namespace Primer.Graph
             }
         }
 
-        List<TicData> CalculateTics() {
+        private List<TicData> CalculateTics()
+        {
             var calculated = new List<TicData>();
-            var step = (float)Math.Round(ticStep, 2);
+            var step = (float)System.Math.Round(ticStep, 2);
 
             if (step <= 0) {
                 return calculated;

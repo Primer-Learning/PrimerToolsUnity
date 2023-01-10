@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Primer.Math;
 using Primer.Timeline;
 using Shapes;
 using UnityEngine;
@@ -11,16 +12,17 @@ namespace Primer.Graph
     {
         [SerializeReference]
         public ParametricEquation equation = new LinearEquation();
+        private ParametricEquation lastEquation;
+
+        private int lastResolution;
+
+        private Vector3[] points2dCache;
+
+        private List<PolylinePoint> pointsCache;
 
         [Min(1)]
         public int resolution = 100;
-
-        int lastResolution;
-        ParametricEquation lastEquation;
-
-        List<PolylinePoint> pointsCache;
-        ILine ILineBehaviour.Points
-        {
+        ILine ILineBehaviour.Points {
             get {
                 if (resolution != lastResolution || equation != lastEquation) {
                     RecalculatePoints();
@@ -31,10 +33,7 @@ namespace Primer.Graph
                 return new SimpleLine(pointsCache);
             }
         }
-
-        Vector3[] points2dCache;
-        IGrid ISurfaceBehaviour.Grid
-        {
+        IGrid ISurfaceBehaviour.Grid {
             get {
                 if (resolution != lastResolution || equation != lastEquation) {
                     RecalculatePoints2D();
@@ -46,7 +45,8 @@ namespace Primer.Graph
             }
         }
 
-        void RecalculatePoints() {
+        private void RecalculatePoints()
+        {
             // resolution represents the amount of segments
             // points = segments + 1
             var pointsCount = resolution + 1;
@@ -62,7 +62,8 @@ namespace Primer.Graph
             pointsCache = points;
         }
 
-        void RecalculatePoints2D() {
+        private void RecalculatePoints2D()
+        {
             // resolution represents the amount of segments
             // points = segments + 1
             var pointsCount = resolution + 1;

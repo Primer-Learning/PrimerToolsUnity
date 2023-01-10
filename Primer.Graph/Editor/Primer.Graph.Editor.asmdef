@@ -1,17 +1,18 @@
 {
-    "name": "Primer.Graph.Editor",
-    "rootNamespace": "Primer.Graph.Editor",
-    "references": [
-        "GUID:f06555f75b070af458a003d92f9efb00",
-        "GUID:02f771204943f4a40949438e873e3eff",
-        "ShapesRuntime",
-        "Primer",
-        "Primer.Editor",
-        "Primer.Timeline",
-        "Primer.Graph",
-        "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ]
+  "name": "Primer.Graph.Editor",
+  "rootNamespace": "Primer.Graph.Editor",
+  "references": [
+    "GUID:f06555f75b070af458a003d92f9efb00",
+    "GUID:02f771204943f4a40949438e873e3eff",
+    "ShapesRuntime",
+    "Primer",
+    "Primer.Editor",
+    "Primer.Math",
+    "Primer.Animation",
+    "Primer.Timeline",
+    "Primer.Graph"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
 }
