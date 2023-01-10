@@ -31,17 +31,17 @@ namespace Primer.Graph
         private Tic2 _ticPrefab;
 
         [Header("Axes")]
-        public Axis2 _x;
-        public Axis2 _y;
-        public Axis2 _z;
+        public AxisRenderer _x;
+        public AxisRenderer _y;
+        public AxisRenderer _z;
         public Transform domain;
         public bool enableZAxis = true;
         public bool isRightHanded = true;
 
         private bool lastRightHanded = true;
-        private Axis2 x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
-        private Axis2 y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
-        private Axis2 z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
+        private AxisRenderer x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
+        private AxisRenderer y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
+        private AxisRenderer z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
 
         public float ticLabelDistance => _ticLabelDistance;
         public float paddingFraction => _paddingFraction;

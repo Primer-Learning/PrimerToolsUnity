@@ -4,8 +4,8 @@ using UnityEditor;
 
 namespace Primer.Graph.Editor
 {
-    [CustomEditor(typeof(Axis2))]
-    public class AxisEditor : PrimerEditor<Axis2>
+    [CustomEditor(typeof(Axis.AxisRenderer))]
+    public class AxisEditor : PrimerEditor<Axis.AxisRenderer>
     {
         public override void OnInspectorGUI() {
             EditorGUI.BeginChangeCheck();

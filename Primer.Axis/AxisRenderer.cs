@@ -9,43 +9,43 @@ using UnityEngine.Serialization;
 namespace Primer.Axis
 {
     [ExecuteInEditMode]
-    public class Axis2 : ObjectGenerator
+    public class AxisRenderer : ObjectGenerator
     {
         // Internal game object containers
-        private readonly List<Tic2> tics = new();
-        public ArrowPresence arrowPresence = ArrowPresence.Both;
-        private PrimerText2 axisLabel;
-
+        private PrimerText2 labelObject;
+        private PrimerBehaviour originArrow;
         private PrimerBehaviour endArrow;
+        private readonly List<Tic2> tics = new();
 
-        // Configuration values
+        #region Inspectable config
         public bool hidden;
+        public ArrowPresence arrowPresence = ArrowPresence.Both;
+        public float min;
+        public float max = 10;
+        [Min(0.1f)] public float length = 1;
+        [FormerlySerializedAs("thinkness")]
+        public float thickness = 1;
 
         [Header("Label")]
         public string label = "Label";
         public Vector3 labelOffset = Vector3.zero;
         public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
-        // Memory
-        private ArrowPresence lastArrowPresence = ArrowPresence.Neither;
-        [Min(0.1f)] public float length = 1;
-        public List<TicData> manualTics = new();
-        public float max = 10;
-        [Tooltip("Ensures no more ticks are rendered.")]
-        [Range(1, 100)] public int maxTics = 50;
-        public float min;
-        private PrimerBehaviour originArrow;
-
         [Header("Required elements")]
         public Transform rod;
 
         [Header("Tics")]
         public bool showTics = true;
-        [FormerlySerializedAs("thinkness")]
-        public float thickness = 1;
+        [Tooltip("Ensures no more ticks are rendered.")]
         [Min(0)] public float ticStep = 2;
+        [Range(1, 100)] public int maxTics = 50;
+        public List<TicData> manualTics = new();
+        #endregion
 
-        // Calculated fields
+        #region Memory
+        private ArrowPresence lastArrowPresence = ArrowPresence.Neither;
+        #endregion
+
         private float positionMultiplier => length * (1 - 2 * paddingFraction) / (max - min);
         private float offset => -length * paddingFraction + min * positionMultiplier;
 
@@ -70,7 +70,7 @@ namespace Primer.Axis
         protected override void OnChildrenRemoved()
         {
             tics.Clear();
-            axisLabel = null;
+            labelObject = null;
             originArrow = null;
             endArrow = null;
             lastArrowPresence = ArrowPresence.Neither;
@@ -84,9 +84,9 @@ namespace Primer.Axis
 
         private void UpdateLabel()
         {
-            if (!axisLabel) {
-                axisLabel = Create(primerTextPrefab);
-                axisLabel.transform.ScaleUpFromZero();
+            if (!labelObject) {
+                labelObject = Create(primerTextPrefab);
+                labelObject.transform.ScaleUpFromZero();
             }
 
             var labelPos = Vector3.zero;
@@ -98,9 +98,9 @@ namespace Primer.Axis
                 labelPos = new Vector3(length + offset + ticLabelDistance * 1.1f, 0f, 0f);
             }
 
-            axisLabel.transform.localPosition = labelPos + labelOffset;
-            axisLabel.text = label;
-            axisLabel.alignment = TextAlignmentOptions.Midline;
+            labelObject.transform.localPosition = labelPos + labelOffset;
+            labelObject.text = label;
+            labelObject.alignment = TextAlignmentOptions.Midline;
         }
 
         private void UpdateArrowHeads()
@@ -224,7 +224,7 @@ namespace Primer.Axis
 
                 if (sibling == null) {
                     throw new Exception(
-                        $"{nameof(Axis2)} requires a sibling component that extends {nameof(IAxisConfig)}"
+                        $"{nameof(AxisRenderer)} requires a sibling component that extends {nameof(IAxisConfig)}"
                     );
                 }
 
