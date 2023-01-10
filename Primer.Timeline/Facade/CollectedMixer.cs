@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    [Obsolete("Use PrimerMixer instead")]
     public abstract class CollectedMixer<TTrackTarget, TData> : PrimerBoundPlayable<TTrackTarget>
     {
         protected TData originalValue;

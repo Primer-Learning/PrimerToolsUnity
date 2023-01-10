@@ -4,6 +4,7 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    [Obsolete("Use PrimerMixer instead")]
     public abstract class PrimerBoundPlayable<T> : PrimerPlayable
     {
         protected bool isInitialized;

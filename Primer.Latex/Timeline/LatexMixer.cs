@@ -1,26 +1,26 @@
-using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Playables;
 
 namespace Primer.Latex
 {
-    public class LatexMixer : PrimerBoundPlayable<LatexRenderer>
+    internal class LatexMixer : PrimerMixer<LatexRenderer, LatexTransitionState>
     {
         private LatexTransitionState currentState;
         private LatexTransition currentTransition;
+
         public AnimationCurve curve = IPrimerAnimation.cubic;
         private TransformSnapshot snapshot;
+        public LatexTransitionState initialState => trackTarget.state;
 
-        protected override void Start(LatexRenderer trackTarget)
+        protected override void Start()
         {
             snapshot = trackTarget.GetOrAddComponent<TransformSnapshot>();
             trackTarget.gameObject.Hide();
         }
 
-        protected override void Stop(LatexRenderer trackTarget)
+        protected override void Stop()
         {
             trackTarget.gameObject.Show();
             RemoveTransition();
@@ -39,35 +39,45 @@ namespace Primer.Latex
             currentTransition = null;
         }
 
-        protected override void Frame(LatexRenderer trackTarget, Playable playable, FrameData info)
+        protected override IMixerCollector<LatexTransitionState> CreateCollector() =>
+            new MixerCollector<LatexTransformerClip.Playable, LatexTransitionState>(x => x.state);
+
+        protected override void Frame(IMixerCollector<LatexTransitionState> collector)
         {
-            var (weights, behaviours) = CollectInputs<LatexTransformerClip.Playable>(playable);
-            var states = behaviours.Select(x => x.state).ToList();
-            var totalWeight = weights.Sum();
-
-            if (totalWeight == 0) {
-                RunStop();
-                return;
-            }
-
-            RunStart(trackTarget);
-
-            if (states.Count == 1) {
-                if (weights[0] >= 1) {
-                    ApplyState(trackTarget.state, states[0]);
+            if (collector.count == 1) {
+                if (collector.isFull) {
+                    ApplyState(collector[0].input);
                     return;
                 }
 
-                weights.Insert(0, 1 - totalWeight);
-                states.Insert(0, trackTarget.state);
+                collector.AddInitialState(initialState);
             }
 
-            Assert.IsTrue(states.Count == 2, "LatexMixer can't handle more than two states");
-            Transition(trackTarget.state, states[0], states[1], weights[1]);
+            Assert.AreEqual(collector.count, 2, "LatexMixer can't handle more than two states");
+
+            var first = collector[0];
+            var second = collector[1];
+
+            Transition(first.input, second.input, second.weight);
         }
 
-        private void Transition(LatexTransitionState initialState, LatexTransitionState state1,
-            LatexTransitionState state2, float t)
+        private void ApplyState(LatexTransitionState state)
+        {
+            RemoveTransition();
+
+            if (currentState is not null && (currentState != state))
+                RemoveState();
+
+            if (currentState is not null)
+                return;
+
+            snapshot.ApplyTo(state.transform);
+            state.transform.localPosition += initialState.GetOffsetWith(state);
+            currentState = state;
+        }
+
+
+        private void Transition(LatexTransitionState state1, LatexTransitionState state2, float t)
         {
             RemoveState();
 
@@ -81,21 +91,6 @@ namespace Primer.Latex
             }
 
             currentTransition.Apply(t);
-        }
-
-        private void ApplyState(LatexTransitionState initial, LatexTransitionState state)
-        {
-            RemoveTransition();
-
-            if (currentState is not null && (currentState != state))
-                RemoveState();
-
-            if (currentState is not null)
-                return;
-
-            snapshot.ApplyTo(state.transform);
-            state.transform.localPosition += initial.GetOffsetWith(state);
-            currentState = state;
         }
     }
 }
