@@ -65,7 +65,7 @@ namespace Primer.Axis
             // Rod is not a generated object
             children.NextMustBe(rod);
 
-            if (enabled && gameObject.activeSelf) {
+            if (isActiveAndEnabled) {
                 rod.localPosition = new Vector3(offset, 0f, 0f);
                 rod.localScale = new Vector3(length, thickness, thickness);
 
@@ -101,8 +101,6 @@ namespace Primer.Axis
 
 
         #region UpdateArrows()
-        private static readonly Quaternion originArrowRotation = Quaternion.Euler(0f, -90f, 0f);
-        private static readonly Quaternion endArrowRotation = Quaternion.Euler(0f, 90f, 0f);
         private ArrowPresence? lastPresence;
         private Transform originArrow;
         private Transform endArrow;
@@ -136,7 +134,7 @@ namespace Primer.Axis
 
             endArrow = modifier.Next(endArrow)
                 .Called("End Arrow")
-                .Initialize(x => x.rotation = endArrowRotation)
+                .Initialize(x => x.localRotation = Quaternion.Euler(0f, 90f, 0f))
                 .InstantiatedFrom(arrowPrefab);
 
             if (arrowPresence == ArrowPresence.Positive) {
@@ -146,7 +144,7 @@ namespace Primer.Axis
 
             originArrow = modifier.Next(originArrow)
                 .Called("Origin Arrow")
-                .Initialize(x => x.rotation = originArrowRotation)
+                .Initialize(x => x.localRotation = Quaternion.Euler(0f, -90f, 0f))
                 .InstantiatedFrom(arrowPrefab);
         }
         #endregion

@@ -1,63 +1,62 @@
 ﻿using System.Collections.Generic;
 using Primer.Axis;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     [ExecuteInEditMode]
     public class Graph2 : PrimerBehaviour
     {
-        [Header("Axes")]
-        public AxisRenderer _x;
-        public AxisRenderer _y;
-        public AxisRenderer _z;
-        public Transform domain;
+        private bool lastRightHanded = true;
+
+
         public bool enableZAxis = true;
         public bool isRightHanded = true;
+        public Transform domain;
 
-        private bool lastRightHanded = true;
-        private AxisRenderer x => (bool)_x?.enabled ? _x : null;
-        private AxisRenderer y => (bool)_y?.enabled ? _y : null;
-        private AxisRenderer z => (bool)_z?.enabled ? _z : null;
+        [FormerlySerializedAs("_x")]
+        [InlineEditor] public AxisRenderer xAxis;
+        [FormerlySerializedAs("_y")]
+        [InlineEditor] public AxisRenderer yAxis;
+        [FormerlySerializedAs("_z")]
+        [InlineEditor] public AxisRenderer zAxis;
+
+
+        // This warning is show everywhere this properties are used even if we checked for null here
+        // ReSharper disable Unity.NoNullPropagation
+        private AxisRenderer x => (xAxis != null) && xAxis.isActiveAndEnabled ? xAxis : null;
+        private AxisRenderer y => (yAxis != null) && yAxis.isActiveAndEnabled ? yAxis : null;
+        private AxisRenderer z => (zAxis != null) && zAxis.isActiveAndEnabled ? zAxis : null;
 
 
         private void Update() => EnsureDomainDimensions();
 
-        private void OnEnable() => OnValidate();
+        private void OnEnable() => UpdateAxes();
 
-        private void OnValidate()
+        private void OnValidate() => UpdateAxes();
+
+
+        private void UpdateAxes()
         {
             EnsureRightHanded();
-            _z.gameObject.SetActive(enableZAxis);
-        }
-
-        public void Regenerate()
-        {
-            // we use internal (_) fields because we want them to
-            // update their children even if they are hidden
-            // as this is when they delete all unused objects
-            if (_x is not null)
-                _x.UpdateChildren();
-
-            if (_y is not null)
-                _y.UpdateChildren();
-
-            if (_z is not null)
-                _z.UpdateChildren();
+            zAxis.gameObject.SetActive(enableZAxis);
         }
 
         public Vector3 DomainToPosition(Vector3 domain) => new(
-            x ? x.DomainToPosition(domain.x) : 0,
-            y ? y.DomainToPosition(domain.y) : 0,
-            z ? z.DomainToPosition(domain.z) : 0
+            x?.DomainToPosition(domain.x) ?? 0,
+            y?.DomainToPosition(domain.y) ?? 0,
+            z?.DomainToPosition(domain.z) ?? 0
         );
+
 
         private void EnsureDomainDimensions()
         {
             var scale = new Vector3(
-                _x ? _x.DomainToPosition(1) : 1,
-                _y ? _y.DomainToPosition(1) : 1,
-                _z ? _z.DomainToPosition(1) : 1
+                x?.DomainToPosition(1) ?? 1,
+                y?.DomainToPosition(1) ?? 1,
+                z?.DomainToPosition(1) ?? 1
             );
 
             if (isRightHanded)
