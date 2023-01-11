@@ -8,12 +8,12 @@ namespace Primer.Animation
     {
         public async static UniTask ScaleUpFromZero(this Transform transform, Tweener animation = null)
         {
-            await transform.GetOrAddComponent<PrimerBehaviour>().ScaleUpFromZero(animation);
+            await transform.GetPrimer().ScaleUpFromZero(animation);
         }
 
         public async static UniTask ScaleDownToZero(this Transform transform, Tweener animation = null)
         {
-            await transform.GetOrAddComponent<PrimerBehaviour>().ScaleDownToZero(animation);
+            await transform.GetPrimer().ScaleDownToZero(animation);
         }
 
         public async static UniTask ScaleTo(this Transform transform, Vector3 newScale,

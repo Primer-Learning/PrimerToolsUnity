@@ -8,19 +8,19 @@ namespace Primer
     public class PrimerText2 : MonoBehaviour
     {
         [Multiline]
-        public string text = "Primer";
-        public float fontSize = 12;
+        public string text = "";
+        public float fontSize = 2;
         public Color color = Color.white;
         public TextAlignmentOptions alignment = TextAlignmentOptions.Center;
         public Vector3 orientation = Vector3.forward;
 
 
-        TextMeshPro meshCache;
-        TextMeshPro textMeshPro => meshCache ??= GetComponent<TextMeshPro>();
+        private TextMeshPro meshCache;
+        private TextMeshPro textMeshPro => meshCache ??= GetComponent<TextMeshPro>();
 
-        float numericValue = 0;
-        public float AsNumber
-        {
+
+        private float numericValue;
+        public float AsNumber {
             get => numericValue;
             set {
                 numericValue = value;
@@ -30,16 +30,17 @@ namespace Primer
         }
 
 
-        void OnValidate() => UpdateMesh();
+        private void OnValidate() => UpdateMesh();
 
-        void Update()
+        private void Update()
         {
             UpdateMesh();
             transform.LookAt(transform.position + orientation);
         }
 
 
-        void UpdateMesh() {
+        private void UpdateMesh()
+        {
             var mesh = textMeshPro;
             mesh.text = text;
             mesh.color = color;

@@ -1,35 +1,12 @@
 ﻿using System.Collections.Generic;
 using Primer.Axis;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     [ExecuteInEditMode]
-    public class Graph2 : PrimerBehaviour, IAxisConfig
+    public class Graph2 : PrimerBehaviour
     {
-        [Header("Prefabs")]
-        [SerializeField]
-        [FormerlySerializedAs("arrowPrefab")]
-        private Transform _arrowPrefab;
-
-        [SerializeField]
-        [FormerlySerializedAs("paddingFraction")]
-        [Range(0, 0.5f)]
-        private float _paddingFraction = 0.05f;
-
-        [SerializeField]
-        [FormerlySerializedAs("primerTextPrefab")]
-        private PrimerText2 _primerTextPrefab;
-
-        [SerializeField]
-        [FormerlySerializedAs("ticLabelDistance")]
-        private float _ticLabelDistance = 0.25f;
-
-        [SerializeField]
-        [FormerlySerializedAs("ticPrefab")]
-        private Tic2 _ticPrefab;
-
         [Header("Axes")]
         public AxisRenderer _x;
         public AxisRenderer _y;
@@ -39,30 +16,19 @@ namespace Primer.Graph
         public bool isRightHanded = true;
 
         private bool lastRightHanded = true;
-        private AxisRenderer x => _x is not null && !_x.hidden && _x.enabled ? _x : null;
-        private AxisRenderer y => _y is not null && !_y.hidden && _y.enabled ? _y : null;
-        private AxisRenderer z => _z is not null && !_z.hidden && _z.enabled ? _z : null;
+        private AxisRenderer x => (bool)_x?.enabled ? _x : null;
+        private AxisRenderer y => (bool)_y?.enabled ? _y : null;
+        private AxisRenderer z => (bool)_z?.enabled ? _z : null;
 
-        public float ticLabelDistance => _ticLabelDistance;
-        public float paddingFraction => _paddingFraction;
-        public Transform arrowPrefab => _arrowPrefab;
-        public PrimerText2 primerTextPrefab => _primerTextPrefab;
-        public Tic2 ticPrefab => _ticPrefab;
 
-        private void Update()
-        {
-            EnsureDomainDimensions();
-        }
+        private void Update() => EnsureDomainDimensions();
 
-        private void OnEnable()
-        {
-            OnValidate();
-        }
+        private void OnEnable() => OnValidate();
 
         private void OnValidate()
         {
             EnsureRightHanded();
-            _z.hidden = !enableZAxis;
+            _z.gameObject.SetActive(enableZAxis);
         }
 
         public void Regenerate()
@@ -89,9 +55,9 @@ namespace Primer.Graph
         private void EnsureDomainDimensions()
         {
             var scale = new Vector3(
-                _x ? _x.DomainToPosition(1, true) : 1,
-                _y ? _y.DomainToPosition(1, true) : 1,
-                _z ? _z.DomainToPosition(1, true) : 1
+                _x ? _x.DomainToPosition(1) : 1,
+                _y ? _y.DomainToPosition(1) : 1,
+                _z ? _z.DomainToPosition(1) : 1
             );
 
             if (isRightHanded)

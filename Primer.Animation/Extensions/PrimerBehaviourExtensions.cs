@@ -20,6 +20,9 @@ namespace Primer.Animation
 
         public static async void ShrinkAndDispose(this PrimerBehaviour self, Tweener anim = null)
         {
+            if (!self)
+                return;
+
             if (Application.isPlaying)
                 await self.ScaleDownToZero(anim);
 

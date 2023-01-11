@@ -48,11 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _arrowPrefab: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
-  _paddingFraction: 0.05
-  _primerTextPrefab: {fileID: 8603906643652811505, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
-  _ticLabelDistance: 0.25
-  _ticPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
   _x: {fileID: 8960763701479911132}
   _y: {fileID: 5548746615421559894}
   _z: {fileID: 3564338468142601028}

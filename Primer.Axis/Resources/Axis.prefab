@@ -160,17 +160,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hidden: 0
-  arrowPresence: 2
-  length: 1
+  arrowPrefab: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+  tickPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
   min: 0
   max: 10
+  length: 1
+  rod: {fileID: 8141656979287870989}
   thickness: 1
-  label: x
-  labelPosition: 1
+  label: Axis
   labelOffset: {x: 0, y: 0, z: 0}
+  labelPosition: 1
+  arrowPresence: 2
+  paddingFraction: 0.05
   showTics: 1
   ticStep: 2
   maxTics: 5
+  ticLabelDistance: 0.25
   manualTics: []
-  rod: {fileID: 8141656979287870989}

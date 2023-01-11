@@ -18,13 +18,6 @@ namespace Primer.Latex.Editor
         private bool isRunning => processor.state == LatexProcessingState.Processing;
         private bool isCancelled => processor.state == LatexProcessingState.Cancelled;
 
-        /// <summary>Will be true if we are editing a preset.</summary>
-        /// <remarks>
-        ///     This condition was found through exploration... There is no documented way to determine
-        ///     whether we're currently editing a preset. There's likely to be other cases where this is true
-        ///     that we'll want to figure out how to exclude. But we'll handle those as needed.
-        /// </remarks>
-        private bool isTargetAPreset => component.gameObject.scene.handle == 0;
 
         public override bool RequiresConstantRepaint() => true;
 
@@ -69,7 +62,7 @@ namespace Primer.Latex.Editor
 
         private bool HandleIfPreset()
         {
-            if (!isTargetAPreset)
+            if (!component.gameObject.IsPreset())
                 return false;
 
             component.expression = new LatexExpression();
