@@ -48,14 +48,18 @@ namespace Primer
             TPrefab prefab,
             Func<TPrefab, TCached> init,
             string name = null
-        ) where TPrefab : Component where TCached : Component;
+        )
+            where TPrefab : Component
+            where TCached : Component;
 
         public TCached NextIsInstanceOf<TPrefab, TCached>(
             TPrefab prefab,
             ref TCached cache,
             Func<TPrefab, TCached> init,
             string name = null
-        ) where TPrefab : Component where TCached : Component;
+        )
+            where TPrefab : Component
+            where TCached : Component;
 
         public void Apply();
     }

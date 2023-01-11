@@ -15,14 +15,16 @@ namespace Primer
         private readonly Action<Transform> onRemove;
 
 
-        public ChildrenDeclaration(Transform parent, Action<Component> onCreate = null,
+        public ChildrenDeclaration(
+            Transform parent,
+            Action<Component> onCreate = null,
             Action<Transform> onRemove = null)
         {
             DontCallMeOnPrefabException.ThrowIfIsPrefab(parent, nameof(ChildrenDeclaration));
 
             this.parent = parent;
             this.onCreate = onCreate;
-            this.onRemove = onRemove;
+            this.onRemove = onRemove ?? DefaultOnRemove;
 
             ReadChildren();
         }
@@ -73,18 +75,23 @@ namespace Primer
             if (Find(out var found, name, prefab))
                 return Add(found);
 
-            var instance = InstantiationTracker.CreateAndRegister(prefab, parent);
+            var instance = InstantiationTracker.InstantiateAndRegister(prefab, parent);
             Initialize(instance, name, init);
             return Add(instance);
         }
 
-        public TCached NextIsInstanceOf<TPrefab, TCached>(TPrefab prefab, ref TCached cache,
-            Func<TPrefab, TCached> init, string name = null)
+        public TCached NextIsInstanceOf<TPrefab, TCached>(
+            TPrefab prefab,
+            ref TCached cache,
+            Func<TPrefab, TCached> init,
+            string name = null)
             where TPrefab : Component
             where TCached : Component
             => UseCache(cache) ?? (cache = NextIsInstanceOf(prefab, init, name));
 
-        public TCached NextIsInstanceOf<TPrefab, TCached>(TPrefab prefab, Func<TPrefab, TCached> init,
+        public TCached NextIsInstanceOf<TPrefab, TCached>(
+            TPrefab prefab,
+            Func<TPrefab, TCached> init,
             string name = null)
             where TPrefab : Component
             where TCached : Component
@@ -96,11 +103,11 @@ namespace Primer
                     return Add(found);
             }
 
-            var instance = InstantiationTracker.CreateAndRegister(prefab, parent);
-            var save = init(instance);
-
+            var instance = InstantiationTracker.InstantiateAndRegister(prefab, parent);
             Initialize(instance, name);
-            return Add(save);
+
+            var result = init(instance);
+            return Add(result);
         }
         #endregion
 
@@ -159,12 +166,14 @@ namespace Primer
 
 
         #region Internal
+        private static void DefaultOnRemove(Transform x) => x.Dispose();
+
         private T UseCache<T>(T component) where T : Component
             => component == null ? null : Add(component);
 
         private void Initialize<T>(T transform, string name, Action<T> init = null) where T : Component
         {
-            if (init != null)
+            if (init is not null)
                 init(transform);
 
             if (name is not null)
@@ -194,7 +203,7 @@ namespace Primer
         #endregion
 
 
-        #region class InstantiationTracker
+        #region class InstantiationTracker : MonoBehaviour
         [DisallowMultipleComponent]
         internal class InstantiationTracker : MonoBehaviour
         {
@@ -204,7 +213,7 @@ namespace Primer
                 return tracker is not null && (tracker.from == prefab.gameObject.name);
             }
 
-            public static T CreateAndRegister<T>(T prefab, Transform parent, bool worldPositionStays = false)
+            public static T InstantiateAndRegister<T>(T prefab, Transform parent, bool worldPositionStays = false)
                 where T : Component
             {
                 var target = Instantiate(prefab, parent, worldPositionStays);

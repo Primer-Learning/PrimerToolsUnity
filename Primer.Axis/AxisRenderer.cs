@@ -59,14 +59,8 @@ namespace Primer.Axis
 
             var children = new ChildrenDeclaration(
                 transform,
-                onCreate: x => {
-                    Debug.Log($"Created {x.gameObject.name}");
-                    x.GetPrimer().ScaleUpFromZero().Forget();
-                },
-                onRemove: x => {
-                    Debug.Log($"Removed {x.gameObject.name}");
-                    x.GetPrimer().ShrinkAndDispose();
-                }
+                onCreate: x => x.GetPrimer().ScaleUpFromZero().Forget(),
+                onRemove: x => x.GetPrimer().ShrinkAndDispose()
             );
 
             // Rod is not a generated object
@@ -111,8 +105,11 @@ namespace Primer.Axis
 
         public void UpdateArrows(ChildrenDeclaration modifier)
         {
-            if (arrowPresence == ArrowPresence.Neither)
+            if (arrowPresence == ArrowPresence.Neither) {
+                endArrow = null;
+                originArrow = null;
                 return;
+            }
 
             modifier.NextIsInstanceOf(
                 prefab: arrowPrefab,
@@ -123,8 +120,10 @@ namespace Primer.Axis
 
             endArrow.localPosition = new Vector3(length + offset, 0f, 0f);
 
-            if (arrowPresence != ArrowPresence.Both)
+            if (arrowPresence != ArrowPresence.Both) {
+                originArrow = null;
                 return;
+            }
 
             modifier.NextIsInstanceOf(
                 prefab: arrowPrefab,

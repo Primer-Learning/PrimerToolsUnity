@@ -5,6 +5,12 @@ namespace Primer
 {
     public class DontCallMeOnPrefabException : Exception
     {
+        public static void ThrowIfIsPrefab(Component component, string name)
+        {
+            if (component.gameObject.IsPreset())
+                throw new DontCallMeOnPrefabException(name);
+        }
+
         public DontCallMeOnPrefabException(string name)
             : base(
                 $@"
@@ -20,11 +26,5 @@ if (transform.gameObject.IsPreset()) return;
 
                    ".Trim()
             ) {}
-
-        public static void ThrowIfIsPrefab(Component component, string name)
-        {
-            if (component.gameObject.IsPreset())
-                throw new DontCallMeOnPrefabException(name);
-        }
     }
 }
