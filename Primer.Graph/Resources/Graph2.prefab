@@ -51,9 +51,9 @@ MonoBehaviour:
   enableZAxis: 1
   isRightHanded: 1
   domain: {fileID: 9170909329295579749}
-  xAxis: {fileID: 8960763701479911132}
-  yAxis: {fileID: 5548746615421559894}
-  zAxis: {fileID: 3564338468142601028}
+  x: {fileID: 8960763701479911132}
+  y: {fileID: 5548746615421559894}
+  z: {fileID: 3564338468142601028}
 --- !u!1 &6847249481812309779
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_LocalRotation.y
@@ -158,7 +158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -213,6 +213,10 @@ PrefabInstance:
     - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: showTics
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: label.text
+      value: x
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name

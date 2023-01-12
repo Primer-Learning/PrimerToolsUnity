@@ -2,36 +2,43 @@
 using Primer.Axis;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     [ExecuteInEditMode]
     public class Graph2 : PrimerBehaviour
     {
-        private bool lastRightHanded = true;
-
-
+        [Title("Graph controls")]
         public bool enableZAxis = true;
         public bool isRightHanded = true;
         public Transform domain;
 
-        [FormerlySerializedAs("_x")]
-        [InlineEditor] public AxisRenderer xAxis;
-        [FormerlySerializedAs("_y")]
-        [InlineEditor] public AxisRenderer yAxis;
-        [FormerlySerializedAs("_z")]
-        [InlineEditor] public AxisRenderer zAxis;
+        [ShowInInspector]
+        private MultipleAxesController axes = new();
+
+        [Title("Axes references")]
+        [SerializeField]
+        [InlineEditor]
+        [ChildGameObjectsOnly]
+        private AxisRenderer x;
+
+        [SerializeField]
+        [InlineEditor]
+        [ChildGameObjectsOnly]
+        private AxisRenderer y;
+
+        [SerializeField]
+        [InlineEditor]
+        [ChildGameObjectsOnly]
+        private AxisRenderer z;
 
 
-        // This warning is show everywhere this properties are used even if we checked for null here
+        // This warning is show where these properties are used, we checked for != null here
         // ReSharper disable Unity.NoNullPropagation
-        private AxisRenderer x => (xAxis != null) && xAxis.isActiveAndEnabled ? xAxis : null;
-        private AxisRenderer y => (yAxis != null) && yAxis.isActiveAndEnabled ? yAxis : null;
-        private AxisRenderer z => (zAxis != null) && zAxis.isActiveAndEnabled ? zAxis : null;
+        private AxisRenderer enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
+        private AxisRenderer enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
+        private AxisRenderer enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
 
-
-        private void Update() => EnsureDomainDimensions();
 
         private void OnEnable() => UpdateAxes();
 
@@ -40,16 +47,24 @@ namespace Primer.Graph
 
         private void UpdateAxes()
         {
-            EnsureRightHanded();
-            zAxis.gameObject.SetActive(enableZAxis);
+            if (z != null) {
+                z.gameObject.SetActive(enableZAxis);
+
+                if (enableZAxis) {
+                    z.transform.rotation = isRightHanded
+                        ? Quaternion.Euler(0, 90, 0)
+                        : Quaternion.Euler(0, -90, 0);
+                }
+            }
+
+            axes.SetAxes(EnsureDomainDimensions, x, y, z);
         }
 
         public Vector3 DomainToPosition(Vector3 domain) => new(
-            x?.DomainToPosition(domain.x) ?? 0,
-            y?.DomainToPosition(domain.y) ?? 0,
-            z?.DomainToPosition(domain.z) ?? 0
+            enabledXAxis?.DomainToPosition(domain.x) ?? 0,
+            enabledYAxis?.DomainToPosition(domain.y) ?? 0,
+            enabledZAxis?.DomainToPosition(domain.z) ?? 0
         );
-
 
         private void EnsureDomainDimensions()
         {
@@ -81,21 +96,6 @@ namespace Primer.Graph
                 child.parent = domain;
                 child.localPosition = pos;
             }
-        }
-
-        private void EnsureRightHanded()
-        {
-            if (z is null)
-                return;
-
-            if (isRightHanded == lastRightHanded)
-                return;
-
-            lastRightHanded = isRightHanded;
-
-            z.transform.rotation = isRightHanded
-                ? Quaternion.Euler(0, 90, 0)
-                : Quaternion.Euler(0, -90, 0);
         }
     }
 }

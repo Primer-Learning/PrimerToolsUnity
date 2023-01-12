@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Primer
 {
+    /// <summary>
+    /// </summary>
     public class ChildrenDeclaration : IChildrenDeclaration
     {
         private readonly Transform parent;
@@ -26,7 +28,20 @@ namespace Primer
             this.onCreate = onCreate;
             this.onRemove = onRemove ?? DefaultOnRemove;
 
-            ReadChildren();
+            Reset();
+        }
+
+        public void Reset()
+        {
+            after.Clear();
+            remaining.Clear();
+
+            for (int i = 0, childCount = parent.childCount; i < childCount; i++) {
+                var child = parent.GetChild(i);
+
+                if (child != null)
+                    remaining.Add(child);
+            }
         }
 
 
@@ -187,18 +202,6 @@ namespace Primer
         {
             NextIs(target.transform);
             return target;
-        }
-
-        private void ReadChildren()
-        {
-            remaining.Clear();
-
-            for (int i = 0, childCount = parent.childCount; i < childCount; i++) {
-                var child = parent.GetChild(i);
-
-                if (child != null)
-                    remaining.Add(child);
-            }
         }
         #endregion
 
