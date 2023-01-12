@@ -21,7 +21,6 @@ namespace Primer
             if (!gameObject)
                 return;
 
-
             if (!urgent)
                 await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
@@ -38,9 +37,8 @@ namespace Primer
             var array = list.ToArray();
 
             for (var i = array.Length - 1; i >= 0; i--) {
-                if (array[i] != null) {
+                if (array[i] != null)
                     Dispose(array[i].gameObject);
-                }
             }
         }
 
@@ -52,6 +50,7 @@ namespace Primer
 
         public static PrimerBehaviour GetPrimer(this GameObject gameObject)
             => GetOrAddComponent<PrimerBehaviour>(gameObject);
+
 
         #region Visibility
         private const int HIDE_THRESHOLD = -100;

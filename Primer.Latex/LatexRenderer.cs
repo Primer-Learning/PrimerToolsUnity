@@ -89,19 +89,19 @@ namespace Primer.Latex
         public void UpdateChildren()
         {
             var zero = expression.GetCenter();
-            var groupGameObjects = new ChildrenModifier(transform);
+            var groupGameObjects = new ChildrenDeclaration(transform);
 
             foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
                 var chunk = expression.Slice(start, end);
-                var group = groupGameObjects.NextMustBeCalled($"Group (chars {start} to {end - 1})");
-                var children = new ChildrenModifier(group);
+                var group = groupGameObjects.Next($"Group (chars {start} to {end - 1})");
+                var children = new ChildrenDeclaration(group);
                 var center = chunk.GetCenter();
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
                 group.localScale = Vector3.one;
 
                 foreach (var character in chunk) {
-                    var charTransform = children.NextMustBeCalled($"LatexChar {character.position}");
+                    var charTransform = children.Next($"LatexChar {character.position}");
                     charTransform.localPosition = character.position - group.localPosition; //- center + zero;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();

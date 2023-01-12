@@ -57,15 +57,22 @@ namespace Primer.Axis
             if (gameObject.IsPreset())
                 return;
 
-            var children = new ChildrenModifier(transform) {
-                onCreate = x => x.GetPrimer().ScaleUpFromZero().Forget(),
-                onRemove = x => x.GetPrimer().ShrinkAndDispose(),
-            };
+            var children = new ChildrenDeclaration(
+                transform,
+                onCreate: x => {
+                    Debug.Log($"Created {x.gameObject.name}");
+                    x.GetPrimer().ScaleUpFromZero().Forget();
+                },
+                onRemove: x => {
+                    Debug.Log($"Removed {x.gameObject.name}");
+                    x.GetPrimer().ShrinkAndDispose();
+                }
+            );
 
             // Rod is not a generated object
-            children.NextMustBe(rod);
+            children.NextIs(rod);
 
-            if (isActiveAndEnabled) {
+            if (enabled && isActiveAndEnabled) {
                 rod.localPosition = new Vector3(offset, 0f, 0f);
                 rod.localScale = new Vector3(length, thickness, thickness);
 
@@ -81,11 +88,9 @@ namespace Primer.Axis
         #region UpdateLabel()
         private PrimerText2 labelObject;
 
-        public void UpdateLabel(ChildrenModifier modifier)
+        public void UpdateLabel(ChildrenDeclaration modifier)
         {
-            labelObject = modifier.Next(labelObject)
-                .Called("Label")
-                .WithComponent<PrimerText2>();
+            modifier.Next(ref labelObject, "Label");
 
             var position = labelPosition switch {
                 AxisLabelPosition.Along => new Vector3(length / 2 + offset, -2 * ticLabelDistance, 0f),
@@ -101,57 +106,40 @@ namespace Primer.Axis
 
 
         #region UpdateArrows()
-        private ArrowPresence? lastPresence;
         private Transform originArrow;
         private Transform endArrow;
 
-        public void UpdateArrows(ChildrenModifier modifier)
+        public void UpdateArrows(ChildrenDeclaration modifier)
         {
-            FindOrCreateArrows(modifier);
-
-            if (endArrow)
-                endArrow.transform.localPosition = new Vector3(length + offset, 0f, 0f);
-
-            if (originArrow)
-                originArrow.transform.localPosition = new Vector3(offset, 0f, 0f);
-        }
-
-        private void FindOrCreateArrows(ChildrenModifier modifier)
-        {
-            if (arrowPresence == lastPresence) {
-                modifier.NextMustBe(originArrow);
-                modifier.NextMustBe(endArrow);
+            if (arrowPresence == ArrowPresence.Neither)
                 return;
-            }
 
-            lastPresence = arrowPresence;
+            modifier.NextIsInstanceOf(
+                prefab: arrowPrefab,
+                cache: ref endArrow,
+                name: "End Arrow",
+                init: x => x.localRotation = Quaternion.Euler(0f, 90f, 0f)
+            );
 
-            if (arrowPresence == ArrowPresence.Neither) {
-                endArrow = null;
-                originArrow = null;
+            endArrow.localPosition = new Vector3(length + offset, 0f, 0f);
+
+            if (arrowPresence != ArrowPresence.Both)
                 return;
-            }
 
-            endArrow = modifier.Next(endArrow)
-                .Called("End Arrow")
-                .Initialize(x => x.localRotation = Quaternion.Euler(0f, 90f, 0f))
-                .InstantiatedFrom(arrowPrefab);
+            modifier.NextIsInstanceOf(
+                prefab: arrowPrefab,
+                cache: ref originArrow,
+                name: "Origin Arrow",
+                init: x => x.localRotation = Quaternion.Euler(0f, -90f, 0f)
+            );
 
-            if (arrowPresence == ArrowPresence.Positive) {
-                originArrow = null;
-                return;
-            }
-
-            originArrow = modifier.Next(originArrow)
-                .Called("Origin Arrow")
-                .Initialize(x => x.localRotation = Quaternion.Euler(0f, -90f, 0f))
-                .InstantiatedFrom(arrowPrefab);
+            originArrow.localPosition = new Vector3(offset, 0f, 0f);
         }
         #endregion
 
 
         #region UpdateTicks()
-        public void UpdateTicks(ChildrenModifier modifier)
+        public void UpdateTicks(ChildrenDeclaration modifier)
         {
             if (!showTics || ticStep <= 0)
                 return;
@@ -160,20 +148,28 @@ namespace Primer.Axis
                 ? manualTics
                 : CalculateTics();
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if ((maxTics > 0) && (expectedTicks.Count > maxTics)) {
-                // TODO: reduce amount of tics in a smart way
-                expectedTicks = expectedTicks.Take(maxTics).ToList();
-            }
-
-            foreach (var data in expectedTicks) {
-                var tick = modifier.Next()
-                    .Called($"Tick {data.label}")
-                    .InstantiatedFrom(tickPrefab);
-
+            foreach (var data in CropTicksCount(expectedTicks)) {
+                var tick = modifier.NextIsInstanceOf(tickPrefab, $"Tick {data.label}");
                 tick.label = data.label;
                 tick.transform.localPosition = new Vector3(data.value * positionMultiplier, 0, 0);
             }
+        }
+
+        private List<TicData> CropTicksCount(List<TicData> ticks)
+        {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (maxTics <= 0 || ticks.Count <= maxTics)
+                return ticks;
+
+            var picIndexes = ticks.Count / maxTics + 1;
+
+            var copy = ticks
+                .Where((_, i) => i % picIndexes == 0)
+                .Take(maxTics - 1)
+                .ToList();
+
+            copy.Add(ticks.Last());
+            return copy;
         }
 
         private List<TicData> CalculateTics()

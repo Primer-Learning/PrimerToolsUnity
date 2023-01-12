@@ -48,12 +48,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _x: {fileID: 8960763701479911132}
-  _y: {fileID: 5548746615421559894}
-  _z: {fileID: 3564338468142601028}
-  domain: {fileID: 9170909329295579749}
   enableZAxis: 1
   isRightHanded: 1
+  domain: {fileID: 9170909329295579749}
+  xAxis: {fileID: 8960763701479911132}
+  yAxis: {fileID: 5548746615421559894}
+  zAxis: {fileID: 3564338468142601028}
 --- !u!1 &6847249481812309779
 GameObject:
   m_ObjectHideFlags: 0
