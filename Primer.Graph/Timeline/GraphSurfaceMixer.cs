@@ -4,12 +4,15 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
+    // TODO: Replace CollectedMixer with PrimerMixer
+    // Look at LatexMixer for an example
     public class GraphSurfaceMixer : CollectedMixer<MeshFilter, IGrid>
     {
-        readonly Mesh mesh = new();
-        Mesh originalMesh;
+        private readonly Mesh mesh = new();
+        private Mesh originalMesh;
 
-        protected override void Start(MeshFilter meshFilter) {
+        protected override void Start(MeshFilter meshFilter)
+        {
             if (meshFilter != null) {
                 originalMesh = meshFilter.sharedMesh;
                 meshFilter.mesh = mesh;
@@ -20,7 +23,8 @@ namespace Primer.Graph
                 : null;
         }
 
-        protected override void Stop(MeshFilter meshFilter) {
+        protected override void Stop(MeshFilter meshFilter)
+        {
             if (meshFilter != null) {
                 meshFilter.mesh = originalMesh;
             }
@@ -30,7 +34,7 @@ namespace Primer.Graph
         }
 
         protected override IGrid ProcessPlayable(PrimerPlayable playable) =>
-            playable is ISurfaceBehaviour {Grid: {}} behaviour
+            playable is ISurfaceBehaviour { Grid: {} } behaviour
                 ? behaviour.Grid
                 : null;
 
@@ -40,7 +44,8 @@ namespace Primer.Graph
         protected override void Apply(MeshFilter trackTarget, IGrid input) =>
             input.RenderTo(mesh, true);
 
-        protected override IGrid Mix(List<float> weights, List<IGrid> inputs) {
+        protected override IGrid Mix(List<float> weights, List<IGrid> inputs)
+        {
             var grids = IGrid.Resize(inputs.ToArray());
             var result = grids[0];
 

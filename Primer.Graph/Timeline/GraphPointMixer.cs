@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
+    // TODO: Replace CollectedMixer with PrimerMixer
+    // Look at LatexMixer for an example
     public class GraphPointMixer : CollectedMixer<GraphPoint, ILine>
     {
         public Func<bool, PrimerAnimator> getAppearanceAnimator;
