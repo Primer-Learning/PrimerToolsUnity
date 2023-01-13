@@ -30,10 +30,11 @@ namespace Primer.Graph
         {
             EnsurePointsCountMatches(target, input);
 
+            var position = target.GetPositionMultiplier();
             var scale = target.GetScaleNeutralizer();
 
             for (var i = 0; i < input.Points.Length; i++) {
-                points[i].localPosition = input.Points[i];
+                points[i].localPosition = Vector3.Scale(input.Points[i], position);
                 points[i].localScale = scale;
             }
 

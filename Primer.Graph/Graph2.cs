@@ -18,16 +18,19 @@ namespace Primer.Graph
 
         [Title("Axes references")]
         [SerializeField]
+        [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
         private AxisRenderer x;
 
         [SerializeField]
+        [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
         private AxisRenderer y;
 
         [SerializeField]
+        [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
         private AxisRenderer z;
@@ -38,6 +41,12 @@ namespace Primer.Graph
         private AxisRenderer enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
         private AxisRenderer enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
         private AxisRenderer enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
+
+        public Vector3 positionMultiplier => new(
+            enabledXAxis ? 1 : 0,
+            enabledYAxis ? 1 : 0,
+            enabledZAxis ? 1 : 0
+        );
 
 
         private void OnEnable() => UpdateAxes();
@@ -60,11 +69,22 @@ namespace Primer.Graph
             axes.SetAxes(EnsureDomainDimensions, x, y, z);
         }
 
-        public Vector3 DomainToPosition(Vector3 domain) => new(
-            enabledXAxis?.DomainToPosition(domain.x) ?? 0,
-            enabledYAxis?.DomainToPosition(domain.y) ?? 0,
-            enabledZAxis?.DomainToPosition(domain.z) ?? 0
+        public Vector3 DomainToPosition(Vector3 value) => new(
+            enabledXAxis?.DomainToPosition(value.x) ?? 0,
+            enabledYAxis?.DomainToPosition(value.y) ?? 0,
+            enabledZAxis?.DomainToPosition(value.z) ?? 0
         );
+
+        public Vector3 GetScaleNeutralizer(Vector3 originalScale)
+        {
+            var domainScale = domain.localScale;
+
+            return new Vector3(
+                originalScale.x / domainScale.x,
+                originalScale.y / domainScale.y,
+                originalScale.z / domainScale.z
+            );
+        }
 
         private void EnsureDomainDimensions()
         {
