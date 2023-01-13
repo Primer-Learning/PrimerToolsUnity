@@ -7,8 +7,9 @@ namespace Primer.Math
     public class CylinderEquation : ParametricEquation
     {
         public float length = 10;
-        public Vector3 offset = new(3, 0, 3);
         public float radius = 1;
+        [Space]
+        public Vector3 offset = new(3, 0, 3);
 
         public override Vector3 Evaluate(float t, float u) =>
             offset
