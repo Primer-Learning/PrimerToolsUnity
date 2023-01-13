@@ -108,6 +108,10 @@ PrefabInstance:
       propertyPath: showTics
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: label.text
+      value: z
+      objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
       value: Z
@@ -307,6 +311,10 @@ PrefabInstance:
     - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: showTics
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: label.text
+      value: y
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name

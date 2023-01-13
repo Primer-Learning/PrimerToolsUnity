@@ -9,8 +9,13 @@ namespace Primer.Graph
     public class Graph2 : PrimerBehaviour
     {
         [Title("Graph controls")]
+        [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool enableZAxis = true;
+
+        [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
+
+        [OnValueChanged(nameof(EnsureDomainDimensions))]
         public Transform domain;
 
         [ShowInInspector]
@@ -101,20 +106,21 @@ namespace Primer.Graph
                 return;
 
             var childCount = domain.childCount;
-            var children = new List<(Transform, Vector3)>();
+            var children = new List<(Transform child, Vector3 pos, Vector3 scale)>();
 
             for (var i = childCount - 1; i >= 0; i--) {
                 var child = domain.GetChild(i);
-                children.Add((child, child.localPosition));
+                children.Add((child, child.localPosition, child.localScale));
                 child.parent = null;
             }
 
             domain.localScale = scale;
 
             for (var i = childCount - 1; i >= 0; i--) {
-                var (child, pos) = children[i];
+                var (child, pos, prevScale) = children[i];
                 child.parent = domain;
                 child.localPosition = pos;
+                child.localScale = prevScale;
             }
         }
     }
