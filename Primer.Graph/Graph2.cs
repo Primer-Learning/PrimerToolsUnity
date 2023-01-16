@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    [ExecuteInEditMode]
+    [ExecuteAlways]
+    [RequireComponent(typeof(MultipleAxesController))]
     public class Graph2 : PrimerBehaviour
     {
         [Title("Graph controls")]
@@ -18,8 +19,7 @@ namespace Primer.Graph
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public Transform domain;
 
-        [ShowInInspector]
-        private MultipleAxesController axes = new();
+        private MultipleAxesController axes;
 
         [Title("Axes references")]
         [SerializeField]
@@ -71,6 +71,7 @@ namespace Primer.Graph
                 }
             }
 
+            axes ??= GetComponent<MultipleAxesController>();
             axes.SetAxes(EnsureDomainDimensions, x, y, z);
         }
 

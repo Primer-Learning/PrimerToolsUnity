@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685873607332846}
   - component: {fileID: 2390685873607332847}
+  - component: {fileID: 7466920532668496819}
   m_Layer: 0
   m_Name: Graph2
   m_TagString: Untagged
@@ -54,6 +55,29 @@ MonoBehaviour:
   x: {fileID: 1168500524678457913}
   y: {fileID: 2408658000268484787}
   z: {fileID: 6709040623969359777}
+--- !u!114 &7466920532668496819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2390685873607332833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68e48d7d394b4cdd9763085c907e1d22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 1
+  rodThickness: 1
+  arrowPrefab: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+  arrowPresence: 2
+  showTicks: 1
+  showZero: 1
+  ticksPrefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+  tickSteps: 2
+  maxTicks: 50
+  maxDecimals: 2
+  manualTicks: []
 --- !u!1 &6847249481812309779
 GameObject:
   m_ObjectHideFlags: 0
@@ -79,7 +103,7 @@ Transform:
   m_GameObject: {fileID: 6847249481812309779}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.09, y: 0.09, z: -0.09}
+  m_LocalScale: {x: 1, y: 1, z: -1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2390685873607332846}
@@ -92,22 +116,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: rod
-      value: 
-      objectReference: {fileID: 7782635553906779274}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: label
-      value: z
-      objectReference: {fileID: 0}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: hidden
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: showTics
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: label.text
       value: z
@@ -189,11 +197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &7782635553906779274 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8141656979287870989, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-  m_PrefabInstance: {fileID: 2088966744532642439}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7782635553991199872 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
@@ -206,22 +209,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: rod
-      value: 
-      objectReference: {fileID: 2390685874061482258}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: label
-      value: x
-      objectReference: {fileID: 0}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: showTics
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: label.text
-      value: x
-      objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
       value: X
@@ -283,11 +270,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &2390685874061482258 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8141656979287870989, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-  m_PrefabInstance: {fileID: 5895658039900509983}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2390685874144833816 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
@@ -300,18 +282,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: rod
-      value: 
-      objectReference: {fileID: 1186540838307255192}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: label
-      value: y
-      objectReference: {fileID: 0}
-    - target: {fileID: 3281596752345348547, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-      propertyPath: showTics
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: label.text
       value: y
@@ -369,11 +339,6 @@ PrefabInstance:
 --- !u!4 &1186540838256425874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8141656979337668103, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
-  m_PrefabInstance: {fileID: 6956805206470614421}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1186540838307255192 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8141656979287870989, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
   m_PrefabInstance: {fileID: 6956805206470614421}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &2408658000268484787 stripped

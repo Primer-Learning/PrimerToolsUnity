@@ -164,7 +164,7 @@ MonoBehaviour:
     range:
       min: 0
       max: 10
-    length: 1
+    scale: 1
     paddingFraction: 0.05
   rod:
     transform: {fileID: 8141656979287870989}
@@ -178,7 +178,9 @@ MonoBehaviour:
     presence: 2
   ticks:
     showTicks: 1
+    showZero: 0
     prefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
     step: 2
     maxTicks: 50
+    maxDecimals: 2
     manualTicks: []

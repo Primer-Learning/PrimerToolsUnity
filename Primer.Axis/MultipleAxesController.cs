@@ -8,18 +8,27 @@ using UnityEngine;
 
 namespace Primer.Axis
 {
-    [Title("All axes", "Change properties in all axes at once")]
-    [HideLabel]
-    [InlineProperty]
-    [DisableContextMenu]
-    [HideReferenceObjectPicker]
-    public class MultipleAxesController
+    [ExecuteAlways]
+    public class MultipleAxesController : MonoBehaviour
     {
+        [NonSerialized]
         private AxisRenderer[] axes;
+
+        [NonSerialized]
+        private Action lastOnDomainChange;
+
+        [Title("All axes", "Change properties in all axes at once")]
+        [MinValue(0.1f)]
+        [OnValueChanged(nameof(UpdateScale))]
+        public float scale = 1;
+
+        [OnValueChanged(nameof(UpdatePaddingFraction))]
+        public float paddingFraction = 0.1f;
 
         [OnValueChanged(nameof(UpdateRodThickness))]
         public float rodThickness = 1;
 
+        [Title("Arrows")]
         [Required]
         [RequiredIn(PrefabKind.PrefabAsset)]
         [OnValueChanged(nameof(UpdateArrowPrefab))]
@@ -28,8 +37,12 @@ namespace Primer.Axis
         [OnValueChanged(nameof(UpdateArrowPresence))]
         public ArrowPresence arrowPresence = ArrowPresence.Both;
 
+        [Title("Ticks")]
         [OnValueChanged(nameof(UpdateShowTicks))]
         public bool showTicks = true;
+
+        [OnValueChanged(nameof(UpdateShowZero))]
+        public bool showZero = true;
 
         [Required]
         [RequiredIn(PrefabKind.PrefabAsset)]
@@ -60,13 +73,16 @@ namespace Primer.Axis
 
         public void SetAxes(Action onDomainChange, params AxisRenderer[] incoming)
         {
-            if (AreAxesValid(incoming) || !IsSomeAxisNew(onDomainChange))
+            if (!AreAxesValid(incoming) || !IsSomeAxisNew(onDomainChange))
                 return;
 
+            scale = axes[0].domain.scale;
+            paddingFraction = axes[0].domain.paddingFraction;
             rodThickness = axes[0].rod.thickness;
             arrowPrefab = axes[0].arrows.prefab;
             arrowPresence = axes[0].arrows.presence;
             showTicks = axes[0].ticks.showTicks;
+            showZero = axes[0].ticks.showZero;
             ticksPrefab = axes[0].ticks.prefab;
             tickSteps = axes[0].ticks.step;
             maxTicks = axes[0].ticks.maxTicks;
@@ -87,6 +103,8 @@ namespace Primer.Axis
 
         private bool IsSomeAxisNew(Action onDomainChange)
         {
+            lastOnDomainChange = onDomainChange;
+
             var hasNewAxis = false;
 
             for (var i = 0; i < axes.Length; i++) {
@@ -98,41 +116,55 @@ namespace Primer.Axis
         }
 
 
+        private void UpdateScale()
+            => UpdateAxes(scale, x => x.domain, x => x.scale);
+
+        private void UpdatePaddingFraction()
+            => UpdateAxes(paddingFraction, x => x.domain, x => x.paddingFraction);
+
         private void UpdateRodThickness()
-            => Update(rodThickness, x => x.rod, x => x.thickness);
+            => UpdateAxes(rodThickness, x => x.rod, x => x.thickness);
 
         private void UpdateArrowPrefab()
-            => Update(arrowPrefab, x => x.arrows, x => x.prefab);
+            => UpdateAxes(arrowPrefab, x => x.arrows, x => x.prefab);
 
         private void UpdateArrowPresence()
-            => Update(arrowPresence, x => x.arrows, x => x.presence);
+            => UpdateAxes(arrowPresence, x => x.arrows, x => x.presence);
 
         private void UpdateShowTicks()
-            => Update(showTicks, x => x.ticks, x => x.showTicks);
+            => UpdateAxes(showTicks, x => x.ticks, x => x.showTicks);
+
+        private void UpdateShowZero()
+            => UpdateAxes(showZero, x => x.ticks, x => x.showZero);
 
         private void UpdateTicksPrefab()
-            => Update(ticksPrefab, x => x.ticks, x => x.prefab);
+            => UpdateAxes(ticksPrefab, x => x.ticks, x => x.prefab);
 
         private void UpdateTickSteps()
-            => Update(tickSteps, x => x.ticks, x => x.step);
+            => UpdateAxes(tickSteps, x => x.ticks, x => x.step);
 
         private void UpdateMaxTicks()
-            => Update(maxTicks, x => x.ticks, x => x.maxTicks);
+            => UpdateAxes(maxTicks, x => x.ticks, x => x.maxTicks);
 
         private void UpdateMaxDecimals()
-            => Update(maxDecimals, x => x.ticks, x => x.maxDecimals);
+            => UpdateAxes(maxDecimals, x => x.ticks, x => x.maxDecimals);
 
         private void UpdateManualTicks()
-            => Update(manualTicks, x => x.ticks, x => x.manualTicks);
+            => UpdateAxes(manualTicks, x => x.ticks, x => x.manualTicks);
 
 
-        private void Update<TPart, TValue>(
+        private void UpdateAxes<TPart, TValue>(
             TValue value,
             Func<AxisRenderer, TPart> partGetter,
             Expression<Func<TPart, TValue>> fieldExpression)
         {
             if (((MemberExpression)fieldExpression.Body).Member is not FieldInfo field)
                 throw new ArgumentException("The lambda expression should point to a valid Property");
+
+            if (axes is null)
+                throw new Exception($"No axis registered in {nameof(MultipleAxesController)}");
+
+            var hasChanges = false;
 
             for (var i = 0; i < axes.Length; i++) {
                 var axis = axes[i];
@@ -144,7 +176,11 @@ namespace Primer.Axis
 
                 field.SetValue(part, value);
                 axis.OnValidate();
+                hasChanges = true;
             }
+
+            if (hasChanges)
+                lastOnDomainChange();
         }
     }
 }
