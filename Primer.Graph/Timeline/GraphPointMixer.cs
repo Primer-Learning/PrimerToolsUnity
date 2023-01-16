@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
 using Unity.Plastic.Antlr3.Runtime.Misc;
@@ -6,47 +7,39 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    // TODO: Replace CollectedMixer with PrimerMixer
-    // Look at LatexMixer for an example
-    public class GraphPointMixer : CollectedMixer<GraphPoint, ILine>
+    public class GraphPointMixer : PrimerMixer<GraphPoint, ILine>
     {
         public Func<bool, PrimerAnimator> getAppearanceAnimator;
-        private readonly List<Transform> points = new();
         private float fadeModifier;
         private bool isFadeOut;
 
-        protected override void Start(GraphPoint target) {}
+        protected override void Stop()
+            => ChildrenDeclaration.Clear(trackTarget.transform);
 
-        protected override void Stop(GraphPoint target)
+        protected override IMixerCollector<ILine> CreateCollector()
         {
-            points.DisposeAll();
-            points.Clear();
+            return new CollectorWithDirection<PrimerPlayable, ILine>(
+                behaviour =>
+                    behaviour is ILineBehaviour { Points: {} } lineBehaviour
+                        ? lineBehaviour.Points
+                        : null
+            );
         }
 
-        protected override ILine ProcessPlayable(PrimerPlayable behaviour) =>
-            behaviour is ILineBehaviour { Points: {} } lineBehaviour
-                ? lineBehaviour.Points
-                : null;
-
-        protected override void Apply(GraphPoint target, ILine input)
+        protected override void Frame(IMixerCollector<ILine> genericCollector)
         {
-            EnsurePointsCountMatches(target, input);
+            var collector = (CollectorWithDirection<PrimerPlayable, ILine>)genericCollector;
 
-            var position = target.GetPositionMultiplier();
-            var scale = target.GetScaleNeutralizer();
+            var state = collector.count > 1
+                ? Mix(collector.weights, collector.inputs)
+                : collector.isFull
+                    ? collector[0].input
+                    : CutLine(collector[0].input, collector[0].weight, collector.isReverse);
 
-            for (var i = 0; i < input.Points.Length; i++) {
-                points[i].localPosition = Vector3.Scale(input.Points[i], position);
-                points[i].localScale = scale;
-            }
-
-            if (fadeModifier > -1) {
-                var tail = points[isFadeOut ? 0 : points.Count - 1];
-                getAppearanceAnimator(isFadeOut).Evaluate(tail, fadeModifier);
-            }
+            ApplyState(state);
         }
 
-        protected override ILine SingleInput(ILine input, float weight, bool isReverse)
+        protected ILine CutLine(ILine input, float weight, bool isReverse)
         {
             var reduction = input.Segments * weight;
             var newLength = Mathf.CeilToInt(reduction);
@@ -58,7 +51,7 @@ namespace Primer.Graph
             return input.Crop(newLength, isReverse);
         }
 
-        protected override ILine Mix(List<float> weights, List<ILine> inputs)
+        protected ILine Mix(IReadOnlyList<float> weights, IReadOnlyList<ILine> inputs)
         {
             // this tells Apply() we're not scaling any point
             fadeModifier = -1;
@@ -66,30 +59,41 @@ namespace Primer.Graph
             var lines = ILine.Resize(inputs.ToArray());
             var result = lines[0];
 
-            for (var i = 1; i < lines.Length; i++) {
+            for (var i = 1; i < lines.Length; i++)
                 result = ILine.Lerp(result, lines[i], weights[i]);
-            }
 
             return result;
         }
 
-        private void EnsurePointsCountMatches(GraphPoint target, ILine input)
+        private void ApplyState(ILine input)
         {
-            var inputLength = input.Points.Length;
+            var positionMultiplier = trackTarget.GetPositionMultiplier();
+            var scale = trackTarget.GetScaleNeutralizer();
 
-            if (points.Count > inputLength) {
-                points.GetRange(inputLength, points.Count - inputLength).DisposeAll();
-                points.RemoveRange(inputLength, points.Count - inputLength);
+            var children = new ChildrenDeclaration(trackTarget.transform);
+
+            var points = input.Points.Select(
+                    (position, i) => {
+                        var point = children.NextIsInstanceOf(
+                            trackTarget.prefab,
+                            $"Point {i}",
+                            init: x => x.hideFlags = HideFlags.DontSave
+                        );
+
+                        point.localPosition = Vector3.Scale(position, positionMultiplier);
+                        point.localScale = scale;
+                        return point;
+                    }
+                )
+                .ToList();
+
+            children.Apply();
+
+            if (fadeModifier < 0)
                 return;
-            }
 
-            var parent = target.transform;
-
-            for (var i = points.Count; i < inputLength; i++) {
-                var copy = Object.Instantiate(target.prefab, parent, true);
-                copy.hideFlags = HideFlags.DontSave;
-                points.Add(copy);
-            }
+            var tail = isFadeOut ? points.First() : points.Last();
+            getAppearanceAnimator(isFadeOut).Evaluate(tail, fadeModifier);
         }
     }
 }

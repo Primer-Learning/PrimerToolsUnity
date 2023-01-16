@@ -5,6 +5,9 @@ namespace Primer.Timeline
 {
     public interface IMixerCollector<T> : IEnumerable<(float weight, T input)>
     {
+        IReadOnlyList<float> weights { get; }
+        IReadOnlyList<T> inputs { get; }
+
         int count { get; }
         bool isEmpty { get; }
         bool isFull { get; }

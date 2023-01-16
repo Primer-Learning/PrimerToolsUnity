@@ -15,24 +15,27 @@ namespace Primer.Timeline
     public class MixerCollector<TPlayableBehaviour, TData> : IMixerCollector<TData>
         where TPlayableBehaviour : class, IPlayableBehaviour, new()
     {
-        private readonly List<TData> data = new();
         private readonly Func<TPlayableBehaviour, TData> getData;
-        private readonly List<float> weights = new();
         protected float weight;
+
+        private readonly List<float> _weights = new();
+        public IReadOnlyList<float> weights => _weights;
+        private readonly List<TData> _inputs = new();
+        public IReadOnlyList<TData> inputs => _inputs;
 
         public MixerCollector(Func<TPlayableBehaviour, TData> getData) => this.getData = getData;
 
         public bool isEmpty => weight <= 0;
         public bool isFull => weight >= 1;
-        public int count => data.Count;
+        public int count => inputs.Count;
 
-        public (float, TData) this[int i] => (weights[i], data[i]);
+        public (float weight, TData input) this[int i] => (weights[i], inputs[i]);
 
         public void Clear()
         {
             weight = 0;
-            weights.Clear();
-            data.Clear();
+            _weights.Clear();
+            _inputs.Clear();
         }
 
         public virtual void Collect(Playable playable)
@@ -47,8 +50,8 @@ namespace Primer.Timeline
                     continue;
 
                 weight += inputWeight;
-                weights.Add(inputWeight);
-                data.Add(getData(behaviour));
+                _weights.Add(inputWeight);
+                _inputs.Add(getData(behaviour));
             }
         }
 
@@ -57,14 +60,14 @@ namespace Primer.Timeline
             if (isFull)
                 return;
 
-            weights.Insert(0, 1 - weight);
-            data.Insert(0, initial);
+            _weights.Insert(0, 1 - weight);
+            _inputs.Insert(0, initial);
         }
 
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public IEnumerator<(float, TData)> GetEnumerator()
-            => data.Select((input, i) => (weights[i], input)).GetEnumerator();
+            => inputs.Select((input, i) => (weights[i], input)).GetEnumerator();
     }
 }

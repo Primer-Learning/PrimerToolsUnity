@@ -8,6 +8,14 @@ namespace Primer
     /// </summary>
     public class ChildrenDeclaration : IChildrenDeclaration
     {
+        public static void Clear(Transform parent, Action<Transform> onRemove = null)
+        {
+            var remove = onRemove ?? DefaultOnRemove;
+
+            for (int i = 0, childCount = parent.childCount; i < childCount; i++)
+                remove(parent.GetChild(i));
+        }
+
         private readonly Transform parent;
 
         private readonly List<Transform> remaining = new();

@@ -1,48 +1,56 @@
 using System.Collections.Generic;
+using System.Linq;
 using Primer.Timeline;
 using Shapes;
 
 namespace Primer.Graph
 {
-    // TODO: Replace CollectedMixer with PrimerMixer
-    // Look at LatexMixer for an example
-    public class GraphLineMixer : CollectedMixer<Polyline, ILine>
+    public class GraphLineMixer : PrimerMixer<Polyline, ILine>
     {
         private List<PolylinePoint> originalPoints;
 
-        protected override void Start(Polyline line)
+        protected override void Start()
         {
-            originalPoints = line.points;
-
-            originalValue = originalPoints.Count == 0
-                ? null
-                : new SimpleLine(originalPoints);
+            originalPoints = trackTarget.points;
         }
 
-        protected override void Stop(Polyline line)
+        protected override void Stop()
         {
-            if (!line)
+            if (!trackTarget)
                 return;
 
-            line.points = originalPoints;
-            line.meshOutOfDate = true;
+            trackTarget.points = originalPoints;
+            trackTarget.meshOutOfDate = true;
         }
 
-        protected override ILine ProcessPlayable(PrimerPlayable behaviour) =>
-            behaviour is ILineBehaviour { Points: {} } lineBehaviour
-                ? lineBehaviour.Points
-                : null;
 
-        protected override void Apply(Polyline line, ILine input)
+        protected override IMixerCollector<ILine> CreateCollector()
         {
-            line.points = SimpleLine.ToPolyline(input);
-            line.meshOutOfDate = true;
+            return new CollectorWithDirection<PrimerPlayable, ILine>(
+                behaviour =>
+                    behaviour is ILineBehaviour { Points: {} } lineBehaviour
+                        ? lineBehaviour.Points
+                        : null
+            );
         }
 
-        protected override ILine SingleInput(ILine input, float weight, bool isReverse) =>
+        protected override void Frame(IMixerCollector<ILine> genericCollector)
+        {
+            var collector = (CollectorWithDirection<PrimerPlayable, ILine>)genericCollector;
+
+            var state = collector.count > 1
+                ? Mix(collector.weights, collector.inputs)
+                : collector.isFull
+                    ? collector[0].input
+                    : CutLine(collector[0].input, collector[0].weight, collector.isReverse);
+
+            ApplyState(state);
+        }
+
+        protected static ILine CutLine(ILine input, float weight, bool isReverse) =>
             input.SmoothCut(input.Segments * weight, isReverse);
 
-        protected override ILine Mix(List<float> weights, List<ILine> inputs)
+        protected static ILine Mix(IReadOnlyList<float> weights, IReadOnlyList<ILine> inputs)
         {
             var lines = ILine.Resize(inputs.ToArray());
             var result = lines[0];
@@ -52,6 +60,12 @@ namespace Primer.Graph
             }
 
             return result;
+        }
+
+        protected void ApplyState(ILine input)
+        {
+            trackTarget.points = SimpleLine.ToPolyline(input);
+            trackTarget.meshOutOfDate = true;
         }
     }
 }
