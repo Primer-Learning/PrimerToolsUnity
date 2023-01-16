@@ -88,6 +88,9 @@ namespace Primer.Latex
 
         public void UpdateChildren()
         {
+            if (gameObject.IsPreset())
+                return;
+
             var zero = expression.GetCenter();
             var groupGameObjects = new ChildrenDeclaration(transform);
 

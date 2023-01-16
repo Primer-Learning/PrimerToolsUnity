@@ -15,14 +15,10 @@ namespace Primer
             : base(
                 $@"
 
-
 {name} is instantiated over a prefab! Don't generate children on a prefab or {name} won't be able to remove them!
-
 Add this before instantiating {name}:
 
-```
-if (transform.gameObject.IsPreset()) return;
-```
+    if (transform.gameObject.IsPreset()) return;
 
                    ".Trim()
             ) {}
