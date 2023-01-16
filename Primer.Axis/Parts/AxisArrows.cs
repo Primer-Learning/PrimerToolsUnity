@@ -37,7 +37,7 @@ namespace Primer.Axis
                 init: x => x.localRotation = Quaternion.Euler(0f, 90f, 0f)
             );
 
-            endArrow.localPosition = new Vector3(domain.length + domain.offset, 0f, 0f);
+            endArrow.localPosition = new Vector3(domain.rodEnd, 0f, 0f);
 
             if (presence != ArrowPresence.Both) {
                 originArrow = null;
@@ -51,7 +51,7 @@ namespace Primer.Axis
                 init: x => x.localRotation = Quaternion.Euler(0f, -90f, 0f)
             );
 
-            originArrow.localPosition = new Vector3(domain.offset, 0f, 0f);
+            originArrow.localPosition = new Vector3(domain.rodStart, 0f, 0f);
         }
     }
 }

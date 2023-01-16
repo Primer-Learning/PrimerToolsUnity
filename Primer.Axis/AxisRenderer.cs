@@ -28,7 +28,7 @@ namespace Primer.Axis
         internal AxisTicks ticks = new();
 
 
-        public float DomainToPosition(float domainValue) => domainValue * domain.positionMultiplier;
+        public float DomainToPosition(float domainValue) => domainValue * domain.scale;
 
         private void OnEnable() => UpdateChildren();
 

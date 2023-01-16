@@ -16,6 +16,9 @@ namespace Primer.Axis
     {
         public bool showTicks = true;
 
+        [EnableIf("showTicks")]
+        public bool showZero;
+
         [Required]
         [RequiredIn(PrefabKind.PrefabAsset)]
         [EnableIf("showTicks")]
@@ -50,7 +53,7 @@ namespace Primer.Axis
             foreach (var data in CropTicksCount(expectedTicks)) {
                 var tick = modifier.NextIsInstanceOf(prefab, $"Tick {data.label}");
                 tick.label = data.label;
-                tick.transform.localPosition = new Vector3(data.value * domain.positionMultiplier, 0, 0);
+                tick.transform.localPosition = new Vector3(data.value * domain.scale, 0, 0);
             }
         }
 
@@ -79,6 +82,9 @@ namespace Primer.Axis
 
             if (roundedStep <= 0)
                 return calculated;
+
+            if (showZero)
+                calculated.Add(new TicData(0));
 
             for (var i = Mathf.Max(roundedStep, domain.min); i <= domain.max; i += roundedStep)
                 calculated.Add(new TicData(i));

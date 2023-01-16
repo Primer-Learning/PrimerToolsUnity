@@ -1,6 +1,7 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Axis
 {
@@ -18,17 +19,22 @@ namespace Primer.Axis
         [OnValueChanged(nameof(Changed))]
         private MinMax range = new() { min = 0, max = 10 };
 
+        [FormerlySerializedAs("length")]
         [MinValue(0.1f)]
         [OnValueChanged(nameof(Changed))]
-        public float length = 1;
+        public float scale = 1;
 
         [OnValueChanged(nameof(Changed))]
-        public float paddingFraction = 0.05f;
+        public float paddingFraction = 0.1f;
 
         public float min => range.min;
         public float max => range.max;
-        public float positionMultiplier => length * (1 - 2 * paddingFraction) / (range.max - range.min);
-        public float offset => -length * paddingFraction + range.min * positionMultiplier;
+        private float start => range.min * scale;
+        private float end => range.max * scale;
+        public float length => end - start;
+        private float padding => length * paddingFraction;
+        public float rodStart => start - padding;
+        public float rodEnd => end + padding;
 
 
         protected void Changed() => onChange?.Invoke();

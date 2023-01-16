@@ -13,6 +13,8 @@ namespace Primer.Axis
     [Title("Label")]
     internal class AxisLabel
     {
+        public const float X_OFFSET = 0.4f;
+
         private PrimerText2 labelObject;
 
         public string text = "Label";
@@ -24,8 +26,8 @@ namespace Primer.Axis
             modifier.Next(ref labelObject, "Label");
 
             var pos = position switch {
-                AxisLabelPosition.Along => new Vector3(domain.length / 2 + domain.offset, -2 * labelDistance, 0f),
-                AxisLabelPosition.End => new Vector3(domain.length + domain.offset + labelDistance * 1.1f, 0f, 0f),
+                AxisLabelPosition.Along => new Vector3(domain.length / 2, 0f, 0f),
+                AxisLabelPosition.End => new Vector3(domain.rodEnd + X_OFFSET, 0f, 0f),
                 _ => Vector3.zero,
             };
 
