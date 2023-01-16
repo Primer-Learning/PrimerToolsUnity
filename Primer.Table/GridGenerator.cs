@@ -29,6 +29,9 @@ namespace Primer.Table
 
         private void UpdateChildren()
         {
+            if (gameObject.IsPreset())
+                return;
+
             var children = new ChildrenDeclaration(transform);
             var cols = size.x - 1;
             var rows = size.y - 1;
