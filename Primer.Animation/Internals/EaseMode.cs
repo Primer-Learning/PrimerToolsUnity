@@ -1,4 +1,4 @@
-namespace Primer
+namespace Primer.Animation
 {
     public enum EaseMode
     {

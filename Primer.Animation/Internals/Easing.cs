@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Primer
+namespace Primer.Animation
 {
    public static class Easing
     {
