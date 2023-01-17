@@ -18,6 +18,7 @@ namespace Primer.Axis
         private PrimerText2 labelObject;
 
         public string text = "Label";
+        public float fontSize = 2;
         public Vector3 offset = Vector3.zero;
         public AxisLabelPosition position = AxisLabelPosition.End;
 
@@ -32,6 +33,7 @@ namespace Primer.Axis
             };
 
             labelObject.text = text;
+            labelObject.fontSize = fontSize;
             labelObject.alignment = TextAlignmentOptions.Midline;
             labelObject.transform.localPosition = pos + offset;
         }
