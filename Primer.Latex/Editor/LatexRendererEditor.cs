@@ -1,4 +1,5 @@
 using Primer.Editor;
+using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,46 +13,17 @@ namespace Primer.Latex.Editor
             + "you apply the preset to an actual LatexRenderer component."
         );
 
-        private bool internalsVisible;
-
-        private LatexProcessor processor => component.processor;
-        private bool isRunning => processor.state == LatexProcessingState.Processing;
-        private bool isCancelled => processor.state == LatexProcessingState.Cancelled;
-
 
         public override bool RequiresConstantRepaint() => true;
 
         public override void OnInspectorGUI()
         {
             GetStatusBox().Render();
-            PropertyField(nameof(component.latex));
-
-            internalsVisible = EditorGUILayout.Foldout(internalsVisible, "Details");
-
-            if (internalsVisible) {
-                PropertyField(nameof(component.material));
-                PropertyField(nameof(component.gizmos));
-                Space();
-                PropertyField(nameof(component.headers), true);
-                Space();
-                PropertyField(nameof(component.onChange));
-            }
 
             if (HandleIfPreset())
                 return;
 
-            Space();
-
-            if (GUILayout.Button("Open Build Directory"))
-                processor.OpenBuildDir();
-
-            using (new EditorGUI.DisabledScope(!isRunning)) {
-                if (GUILayout.Button("Cancel Rendering Task"))
-                    processor.Cancel();
-            }
-
-            if (GUILayout.Button("Update children"))
-                component.UpdateChildren();
+            base.OnInspectorGUI();
 
             if (!component.expression.isEmpty)
                 RenderGroupDefinition();
@@ -74,16 +46,17 @@ namespace Primer.Latex.Editor
 
         private EditorHelpBox GetStatusBox()
         {
-            if (isCancelled && isRunning)
+            if (component.isCancelled && component.isRunning)
                 return EditorHelpBox.Warning("Cancelling...");
 
-            if (isRunning)
+            if (component.isRunning)
                 return EditorHelpBox.Warning("Rendering LaTeX...");
 
-            if (processor.renderError is not null)
-                return EditorHelpBox.Error(processor.renderError.Message);
+            var error = component.processor.renderError;
 
-            return EditorHelpBox.Info("Ok");
+            return error is null
+                ? EditorHelpBox.Info("Ok")
+                : EditorHelpBox.Error(error.Message);
         }
 
 
