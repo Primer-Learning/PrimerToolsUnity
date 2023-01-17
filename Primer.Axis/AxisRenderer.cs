@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Primer.Axis
 {
     [ExecuteAlways]
-    public class AxisRenderer : MonoBehaviour
+    public class AxisRenderer : GeneratorBehaviour
     {
         [SerializeField]
         internal AxisDomain domain = new();
@@ -30,9 +30,8 @@ namespace Primer.Axis
 
         public float DomainToPosition(float domainValue) => domainValue * domain.scale;
 
-        private void OnEnable() => UpdateChildren();
 
-        internal void OnValidate() => UpdateChildren();
+        new internal void OnValidate() => base.OnValidate();
 
 
         internal bool ListenDomainChange(Action onDomainChange)
@@ -44,28 +43,25 @@ namespace Primer.Axis
             return true;
         }
 
-        public void UpdateChildren()
+
+        protected override ChildrenDeclaration CreateChildrenDeclaration() => new(
+            transform,
+            onCreate: x => x.GetPrimer().ScaleUpFromZero().Forget(),
+            onRemove: x => x.GetPrimer().ShrinkAndDispose()
+        );
+
+        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
         {
-            if (gameObject.IsPreset())
+            // Rod is not a generated object so we keep it as child even if disabled
+            rod.AddTo(declaration);
+
+            if (!isEnabled)
                 return;
 
-            var children = new ChildrenDeclaration(
-                transform,
-                onCreate: x => x.GetPrimer().ScaleUpFromZero().Forget(),
-                onRemove: x => x.GetPrimer().ShrinkAndDispose()
-            );
-
-            // Rod is not a generated object so we keep it as child even if disabled
-            rod.AddTo(children);
-
-            if (enabled && isActiveAndEnabled) {
-                rod.Update(domain);
-                label.Update(children, domain, 0.25f);
-                arrows.Update(children, domain);
-                ticks.Update(children, domain);
-            }
-
-            children.Apply();
+            rod.Update(domain);
+            label.Update(declaration, domain, 0.25f);
+            arrows.Update(declaration, domain);
+            ticks.Update(declaration, domain);
         }
     }
 }

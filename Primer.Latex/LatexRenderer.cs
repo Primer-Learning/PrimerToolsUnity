@@ -13,7 +13,7 @@ namespace Primer.Latex
     [ExecuteAlways]
     [HideMonoScript]
     [AddComponentMenu("Primer / Latex Renderer")]
-    public class LatexRenderer : MonoBehaviour
+    public class LatexRenderer : GeneratorBehaviour
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
         internal LatexExpression expression = new();
@@ -54,14 +54,15 @@ namespace Primer.Latex
         internal bool isCancelled => processor.state == LatexProcessingState.Cancelled;
 
 
-        private async void OnValidate()
+        private new async void OnValidate()
         {
             await Process(config);
 
             // Comment this to disable automatic children update
             if (this)
-                UpdateChildren();
+                base.OnValidate();
         }
+
 
         public async Task Process(LatexInput input)
         {
@@ -70,6 +71,34 @@ namespace Primer.Latex
 
             if (!prevExpression.IsSame(expression))
                 onChange.Invoke(expression);
+        }
+
+        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
+        {
+            var zero = expression.GetCenter();
+
+            foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
+                var chunk = expression.Slice(start, end);
+                var group = declaration.Next($"Group (chars {start} to {end - 1})");
+                var children = new ChildrenDeclaration(group);
+                var center = chunk.GetCenter();
+
+                group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
+                group.localScale = Vector3.one;
+
+                foreach (var character in chunk) {
+                    var charTransform = children.Next($"LatexChar {character.position}");
+                    charTransform.localPosition = character.position - group.localPosition; //- center + zero;
+
+                    var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
+                    meshFilter.sharedMesh = character.symbol.mesh;
+
+                    var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
+                    meshRenderer.material = material;
+                }
+
+                children.Apply();
+            }
         }
 
 
@@ -110,39 +139,7 @@ namespace Primer.Latex
 
         [ResponsiveButtonGroup]
         [Button("Update children")]
-        public void UpdateChildren()
-        {
-            if (gameObject.IsPreset())
-                return;
-
-            var zero = expression.GetCenter();
-            var groupGameObjects = new ChildrenDeclaration(transform);
-
-            foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
-                var chunk = expression.Slice(start, end);
-                var group = groupGameObjects.Next($"Group (chars {start} to {end - 1})");
-                var children = new ChildrenDeclaration(group);
-                var center = chunk.GetCenter();
-
-                group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
-                group.localScale = Vector3.one;
-
-                foreach (var character in chunk) {
-                    var charTransform = children.Next($"LatexChar {character.position}");
-                    charTransform.localPosition = character.position - group.localPosition; //- center + zero;
-
-                    var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
-                    meshFilter.sharedMesh = character.symbol.mesh;
-
-                    var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
-                    meshRenderer.material = material;
-                }
-
-                children.Apply();
-            }
-
-            groupGameObjects.Apply();
-        }
+        private void RunUpdateChildren() => UpdateChildren();
 #endif
     }
 }
