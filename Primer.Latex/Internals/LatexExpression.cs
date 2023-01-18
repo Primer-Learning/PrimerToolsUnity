@@ -16,6 +16,9 @@ namespace Primer.Latex
         public bool isEmpty => characters.Length == 0;
 
 
+        public LatexChar this[int index] => characters[index];
+
+
         public LatexExpression() => characters = Array.Empty<LatexChar>();
 
         public LatexExpression(LatexChar[] chars) => characters = chars;

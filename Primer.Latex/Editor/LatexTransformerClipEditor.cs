@@ -40,15 +40,12 @@ namespace Primer.Latex.Editor
                     trans[i] = (TransitionType)EditorGUILayout.EnumPopup(trans[i], popupSize);
                 }
 
-                var (fromStart, fromEnd) = fromGroups[i];
-
-                LatexCharEditor.ShowGroup(fromRenderer.expression.Slice(fromStart, fromEnd));
+                LatexCharEditor.ShowGroup(fromRenderer.expression, fromGroups[i]);
 
                 if (trans[i] == TransitionType.Remove || toIndex == toGroups.Count)
                     continue;
 
-                var (toStart, toEnd) = toGroups[toIndex];
-                LatexCharEditor.ShowGroup(toRenderer.expression.Slice(toStart, toEnd));
+                LatexCharEditor.ShowGroup(toRenderer.expression, toGroups[toIndex]);
                 toIndex++;
             }
 
@@ -59,9 +56,8 @@ namespace Primer.Latex.Editor
             GUILayout.Label("Following groups won't be used");
 
             for (var i = toIndex; i < toGroups.Count; i++) {
-                var (toStart, toEnd) = toGroups[i];
                 GUILayout.Label($"Clip's group {i}");
-                LatexCharEditor.ShowGroup(toRenderer.expression.Slice(toStart, toEnd));
+                LatexCharEditor.ShowGroup(toRenderer.expression, toGroups[i]);
             }
         }
     }

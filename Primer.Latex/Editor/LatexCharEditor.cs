@@ -42,6 +42,9 @@ namespace Primer.Latex.Editor
             return newTexture;
         }
 
+        public static int ShowGroup(LatexExpression expression, (int start, int end) range)
+            => ShowGroup(expression.Slice(range.start, range.end));
+
         public static int ShowGroup(LatexExpression expression)
         {
             var width = Screen.width;

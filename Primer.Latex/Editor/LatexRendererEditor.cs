@@ -86,7 +86,7 @@ namespace Primer.Latex.Editor
                     }
                 }
 
-                var selected = LatexCharEditor.ShowGroup(component.expression.Slice(start, end));
+                var selected = LatexCharEditor.ShowGroup(component.expression, (start, end));
 
                 if (selected == 0)
                     continue;
