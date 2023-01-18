@@ -41,5 +41,8 @@ namespace Primer
             other.rotation = rotation;
             other.localScale = localScale;
         }
+
+        public override string ToString()
+            => $"pos({position}) rot({rotation}) scale({localScale})";
     }
 }

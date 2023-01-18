@@ -8,8 +8,7 @@ namespace Primer.Latex
         private readonly Transform parent;
         private readonly TransitionType transition;
 
-        public GroupState(Transform parent, int childIndex,
-            TransitionType transition = TransitionType.Transition)
+        public GroupState(Transform parent, int childIndex, TransitionType transition = TransitionType.Replace)
         {
             this.parent = parent;
             this.childIndex = childIndex;
@@ -20,10 +19,11 @@ namespace Primer.Latex
         public Vector3 scale => transform.localScale;
         public Vector3 position => transform.localPosition;
 
-        public bool isStaying => isAnchor || isLerped;
         public bool isAnchor => transition == TransitionType.Anchor;
-        public bool isLerped => transition == TransitionType.Transition;
-        public bool isRemoved => transition == TransitionType.Remove;
-        public bool isReplaced => transition == TransitionType.Replace;
+        private bool isRemoved => transition == TransitionType.Remove;
+        private bool isReplaced => transition == TransitionType.Replace;
+
+        public bool IsAdded(GroupState to) => to.isReplaced || isRemoved;
+        public bool IsRemoved(GroupState to) => to.isReplaced || to.isRemoved;
     }
 }

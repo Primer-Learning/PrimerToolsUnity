@@ -9,10 +9,12 @@ namespace Primer.Latex
     {
         private LatexTransitionState currentState;
         private LatexTransition currentTransition;
+        private TransformSnapshot snapshot;
 
         public AnimationCurve curve = IPrimerAnimation.cubic;
-        private TransformSnapshot snapshot;
+
         public LatexTransitionState initialState => trackTarget.state;
+
 
         protected override void Start()
         {
@@ -23,6 +25,7 @@ namespace Primer.Latex
         protected override void Stop()
         {
             trackTarget.gameObject.Show();
+            snapshot = null;
             RemoveTransition();
             RemoveState();
         }
@@ -38,6 +41,7 @@ namespace Primer.Latex
             currentTransition?.Dispose();
             currentTransition = null;
         }
+
 
         protected override IMixerCollector<LatexTransitionState> CreateCollector() =>
             new MixerCollector<LatexTransformerClip.Playable, LatexTransitionState>(x => x.state);
@@ -57,6 +61,7 @@ namespace Primer.Latex
             Transition(collector[0].input, collector[1].input, collector[1].weight);
         }
 
+
         private void ApplyState(LatexTransitionState state)
         {
             RemoveTransition();
@@ -71,7 +76,6 @@ namespace Primer.Latex
             state.transform.localPosition += initialState.GetOffsetWith(state);
             currentState = state;
         }
-
 
         private void Transition(LatexTransitionState state1, LatexTransitionState state2, float t)
         {

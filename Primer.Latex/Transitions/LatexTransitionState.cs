@@ -7,19 +7,20 @@ namespace Primer.Latex
 {
     internal class LatexTransitionState
     {
-        private static void EnsureGroupsHaveSameLength<TLeft, TRight>(IEnumerable<TLeft> left,
-            IEnumerable<TRight> right)
-            => EnsureGroupsHaveSameLength(left.Count(), right.Count());
+        private static void AssertSameLength<TLeft, TRight>(IEnumerable<TLeft> left, IEnumerable<TRight> right)
+            => AssertSameLength(left.Count(), right.Count());
 
-        private static void EnsureGroupsHaveSameLength(int left, int right)
+        private static void AssertSameLength(int left, int right)
         {
             const string ERROR_MESSAGE = "Can't transition from states with different amount of groups";
             Assert.AreEqual(left, right, ERROR_MESSAGE);
         }
 
+
         private readonly GroupState[] groups;
         private readonly TransformSnapshot snapshot;
         private readonly GameObject source;
+
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
@@ -35,57 +36,60 @@ namespace Primer.Latex
             groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
         }
 
+
         public Transform transform => source.transform;
 
-        public void Restore()
-        {
-            snapshot.Restore();
-        }
+        public void Restore() => snapshot.Restore();
+
 
         public IEnumerable<GroupState> GroupsToAddTransitioningTo(LatexTransitionState other)
-            => other.GroupsToRemoveTransitioningTo(this);
-
-        public IEnumerable<GroupState> GroupsToRemoveTransitioningTo(LatexTransitionState other)
         {
-            EnsureGroupsHaveSameLength(groups, other.groups);
+            AssertSameLength(groups, other.groups);
 
             for (var i = 0; i < groups.Length; i++) {
                 var group = groups[i];
                 var otherGroup = other.groups[i];
 
-                var isReplaced = group.isReplaced || otherGroup.isReplaced;
-                var hasToRemove = group.isRemoved && !otherGroup.isRemoved;
+                if (group.IsAdded(otherGroup))
+                    yield return otherGroup;
+            }
+        }
 
-                if (isReplaced || hasToRemove)
+        public IEnumerable<GroupState> GroupsToRemoveTransitioningTo(LatexTransitionState other)
+        {
+            AssertSameLength(groups, other.groups);
+
+            for (var i = 0; i < groups.Length; i++) {
+                var group = groups[i];
+                var otherGroup = other.groups[i];
+
+                if (group.IsRemoved(otherGroup))
                     yield return group;
             }
         }
 
         public IEnumerable<(GroupState, GroupState)> GetCommonGroups(LatexTransitionState other)
         {
-            EnsureGroupsHaveSameLength(groups, other.groups);
+            AssertSameLength(groups, other.groups);
 
             for (var i = 0; i < groups.Length; i++) {
                 var group = groups[i];
                 var otherGroup = other.groups[i];
 
-                if (group.isStaying && otherGroup.isStaying)
+                if (!group.IsAdded(otherGroup) && !group.IsRemoved(otherGroup))
                     yield return (group, otherGroup);
             }
         }
 
         public Vector3 GetOffsetWith(LatexTransitionState other)
         {
-            EnsureGroupsHaveSameLength(groups, other.groups);
+            AssertSameLength(groups, other.groups);
 
             for (var i = 0; i < groups.Length; i++) {
                 var group = groups[i];
                 var otherGroup = other.groups[i];
 
-                var areShared = group.isStaying && otherGroup.isStaying;
-                var oneIsAnchor = group.isAnchor || otherGroup.isAnchor;
-
-                if (areShared && oneIsAnchor)
+                if (otherGroup.isAnchor)
                     return group.position - otherGroup.position;
             }
 

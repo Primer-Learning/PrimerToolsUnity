@@ -24,7 +24,6 @@ namespace Primer.Latex
             var behaviour = playable.GetBehaviour();
             var renderer = transformTo.Resolve(graph.GetResolver());
 
-            renderer.gameObject.Hide();
             behaviour.state = new LatexTransitionState(renderer, transitions);
 
             return playable;

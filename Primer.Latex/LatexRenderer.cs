@@ -75,7 +75,7 @@ namespace Primer.Latex
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
         {
-            if (expression is null) {
+            if (expression is null || expression.Any(x => x.symbol.mesh is null)) {
                 CancelCurrentUpdate();
                 return;
             }
