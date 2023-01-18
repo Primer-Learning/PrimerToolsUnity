@@ -10,7 +10,7 @@ namespace Primer.Axis
 
         public TicData(float value) {
             this.value = value;
-            label = Presentation.FormatNumberWithDecimals(value);
+            label = value.FormatNumberWithDecimals();
         }
     }
 }

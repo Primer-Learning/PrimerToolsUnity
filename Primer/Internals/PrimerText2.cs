@@ -51,7 +51,7 @@ namespace Primer
             get => numericValue;
             set {
                 numericValue = value;
-                text = Presentation.FormatNumber(value);
+                text = value.FormatNumber();
             }
         }
 
