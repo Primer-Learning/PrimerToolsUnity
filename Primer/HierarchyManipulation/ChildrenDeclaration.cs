@@ -5,7 +5,24 @@ using UnityEngine;
 namespace Primer
 {
     /// <summary>
+    ///    ChildrenDeclaration will ensure provided transform has all the required children and no more.
+    ///    It'll look it's current children for some matching that configuration (in this case only the name)
+    ///
+    ///    Any missing child will be created as new GameObject()
+    ///    - can add components with `Next<PrimerBehaviour>()`
+    ///    - or instance prefabs with `NextIsInstanceOf(prefab)`
+    ///
+    ///    Any extra child will be removed, onRemove callback available on constructor
     /// </summary>
+    ///
+    /// <example>
+    ///     var declaration = new ChildrenDeclaration(transform);
+    ///
+    ///     for (var i = 0; i < 10; i++)
+    ///         declaration.Next($"Child {i}");
+    ///
+    ///     declaration.Apply();
+    /// </example>
     public class ChildrenDeclaration : IChildrenDeclaration
     {
         public static void Clear(Transform parent, Action<Transform> onRemove = null)
@@ -15,6 +32,7 @@ namespace Primer
             for (int i = 0, childCount = parent.childCount; i < childCount; i++)
                 remove(parent.GetChild(i));
         }
+
 
         private readonly Transform parent;
 
