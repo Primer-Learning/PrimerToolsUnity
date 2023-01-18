@@ -20,9 +20,6 @@ namespace Primer.Latex
         public static LatexChar LerpScale(LatexChar a, float t) => a with { scale = Mathf.Lerp(0, a.scale, t) };
 
 
-        public bool isSpriteValid => symbol is not null && symbol.isSpriteValid;
-
-
         public bool IsSameSymbol(LatexChar other) =>
             other is not null && symbol.Equals(other.symbol);
 

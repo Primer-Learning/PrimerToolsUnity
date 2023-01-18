@@ -5,6 +5,7 @@ namespace Primer
 {
     public abstract class GeneratorBehaviour : MonoBehaviour
     {
+        private bool isUpdateCancelled;
         private ChildrenDeclaration declaration;
 
 
@@ -22,17 +23,22 @@ namespace Primer
         }
 
 
+        protected void CancelCurrentUpdate()
+            => isUpdateCancelled = true;
+
         protected void UpdateChildren()
         {
             if (gameObject.IsPreset())
                 return;
 
+            isUpdateCancelled = false;
             declaration ??= CreateChildrenDeclaration();
             declaration.Reset();
 
             UpdateChildren(enabled && isActiveAndEnabled, declaration);
 
-            declaration.Apply();
+            if (!isUpdateCancelled)
+                declaration.Apply();
         }
     }
 }

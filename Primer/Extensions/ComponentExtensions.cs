@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Palmmedia.ReportGenerator.Core.Common;
 using UnityEngine;
 
 namespace Primer
@@ -26,21 +29,7 @@ namespace Primer
 
 #if UNITY_EDITOR
         public static void Log(this Component component, params object[] data)
-        {
-            var type = component.GetType().Name;
-            var gameObject = component.gameObject;
-            var name = gameObject.name;
-            var isPrefab = gameObject.IsPreset() ? " (prefab)" : "";
-
-            var parent = component.transform.parent;
-            var parentName = parent == null ? "" : $"{parent.gameObject.name} > ";
-
-            var parts = new string[data.Length];
-            for (var i = 0; i < data.Length; i++)
-                parts[i] = data[i] == null ? "null" : data[i].ToString();
-
-            Debug.Log($"{type}{isPrefab} [{parentName}{name}] {string.Join(" - ", parts)}\n\n");
-        }
+            => PrimerLogger.Log(component, data);
 #endif
     }
 }

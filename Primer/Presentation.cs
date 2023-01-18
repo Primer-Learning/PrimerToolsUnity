@@ -1,5 +1,6 @@
 namespace Primer
 {
+    // TODO: move methods to FloatExtensions
     public static class Presentation
     {
         public static string FormatNumber(float number)

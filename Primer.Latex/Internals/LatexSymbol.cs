@@ -11,7 +11,8 @@ namespace Primer.Latex
     {
         public readonly VectorUtils.Geometry geometry;
         [NonSerialized] private readonly Sprite sprite;
-        [NonSerialized] private Mesh meshCache;
+        [SerializeField] private Mesh meshCache;
+
         [CanBeNull] public Mesh mesh => meshCache ??= CreateMesh(sprite);
 
 
@@ -72,18 +73,17 @@ namespace Primer.Latex
 
         private static Mesh CreateMesh(Sprite sprite)
         {
-            if (sprite is null) return null;
+            if (sprite == null) return null;
+
+            var normals = new Vector3(0f, 0f, -1f);
+            var tangents = new Vector4(1f, 0f, 0f, -1f);
 
             return new Mesh {
                 vertices = Array.ConvertAll(sprite.vertices, i => (Vector3)i),
                 triangles = Array.ConvertAll(sprite.triangles, i => (int)i),
-                normals =
-                    Enumerable.Repeat(new Vector3(0f, 0f, -1f), sprite.vertices.Length)
-                        .ToArray(),
-                tangents =
-                    Enumerable.Repeat(new Vector4(1f, 0f, 0f, -1f), sprite.vertices.Length)
-                        .ToArray(),
-                uv = sprite.vertices
+                normals = Enumerable.Repeat(normals, sprite.vertices.Length).ToArray(),
+                tangents = Enumerable.Repeat(tangents, sprite.vertices.Length).ToArray(),
+                uv = sprite.vertices,
             };
         }
 

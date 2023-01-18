@@ -13,6 +13,8 @@ namespace Primer.Latex.Editor
             + "you apply the preset to an actual LatexRenderer component."
         );
 
+        internal bool isCancelled => component.processor.state == LatexProcessingState.Cancelled;
+
 
         public override bool RequiresConstantRepaint() => true;
 
@@ -46,7 +48,7 @@ namespace Primer.Latex.Editor
 
         private EditorHelpBox GetStatusBox()
         {
-            if (component.isCancelled && component.isRunning)
+            if (isCancelled && component.isRunning)
                 return EditorHelpBox.Warning("Cancelling...");
 
             if (component.isRunning)

@@ -7,21 +7,19 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
+    [Serializable]
     public class LatexExpression : IEnumerable<LatexChar>
     {
+        [SerializeReference]
         private readonly LatexChar[] characters;
+
+        public bool isEmpty => characters.Length == 0;
+
 
         public LatexExpression() => characters = Array.Empty<LatexChar>();
 
         public LatexExpression(LatexChar[] chars) => characters = chars;
 
-        public bool isEmpty => characters.Length == 0;
-
-        public IEnumerator<LatexChar> GetEnumerator()
-            => ((IEnumerable<LatexChar>)characters).GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
 
         public bool IsSame(LatexExpression other)
             => !ReferenceEquals(null, other) && characters.SequenceEqual(other.characters);
@@ -32,12 +30,19 @@ namespace Primer.Latex
             return VectorUtils.Bounds(allVertices).center;
         }
 
-
         public LatexExpression Slice(int start, int end)
         {
             var chars = characters.Skip(start).Take(end - start).ToArray();
             return new LatexExpression(chars);
         }
+
+
+        public IEnumerator<LatexChar> GetEnumerator()
+            => ((IEnumerable<LatexChar>)characters).GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
+
 
         #region Groups
         public IEnumerable<LatexExpression> Split(List<int> indexes) => Split(CalculateRanges(indexes));

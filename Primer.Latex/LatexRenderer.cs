@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,7 +7,6 @@ using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace Primer.Latex
 {
@@ -16,11 +16,12 @@ namespace Primer.Latex
     public class LatexRenderer : GeneratorBehaviour
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
-        internal LatexExpression expression = new();
+
+        [NonSerialized]
+        internal LatexExpression expression;
 
         [SerializeField]
         [HideInInspector]
-        [FormerlySerializedAs("groupIndexesInternal")]
         internal List<int> groupIndexes = new();
 
         [SerializeField]
@@ -42,16 +43,15 @@ namespace Primer.Latex
         public UnityEvent<LatexExpression> onChange = new();
 
 
+        public LatexInput config => new(latex, headers);
+
+        internal bool isRunning => processor.state == LatexProcessingState.Processing;
+
         private LatexTransitionState stateCache;
         internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
             this,
             expression.Split(groupIndexes)
         );
-
-        public LatexInput config => new(latex, headers);
-
-        internal bool isRunning => processor.state == LatexProcessingState.Processing;
-        internal bool isCancelled => processor.state == LatexProcessingState.Cancelled;
 
 
         private new async void OnValidate()
@@ -69,12 +69,17 @@ namespace Primer.Latex
             var prevExpression = expression;
             expression = await processor.Process(input);
 
-            if (!prevExpression.IsSame(expression))
+            if (prevExpression is null || !prevExpression.IsSame(expression))
                 onChange.Invoke(expression);
         }
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
         {
+            if (expression is null) {
+                CancelCurrentUpdate();
+                return;
+            }
+
             var zero = expression.GetCenter();
 
             foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
