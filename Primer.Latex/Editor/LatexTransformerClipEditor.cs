@@ -1,5 +1,6 @@
 using Primer.Animation;
 using Primer.Editor;
+using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
-            PropertyField(nameof(component.transformTo));
+            base.OnInspectorGUI();
 
             var director = TimelineEditor.inspectedDirector;
             var fromRenderer = director.GetGenericBindingForClip(component) as LatexRenderer;

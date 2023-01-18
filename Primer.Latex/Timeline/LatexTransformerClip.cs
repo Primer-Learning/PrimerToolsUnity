@@ -10,9 +10,13 @@ namespace Primer.Latex
     public class LatexTransformerClip : PlayableAsset, ITimelineClipAsset
     {
         public ExposedReference<LatexRenderer> transformTo;
+
+        [HideInInspector]
         public List<TransitionType> transitions = new();
 
+
         public ClipCaps clipCaps => ClipCaps.Extrapolation | ClipCaps.Blending;
+
 
         public override UnityEngine.Playables.Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
@@ -25,6 +29,7 @@ namespace Primer.Latex
 
             return playable;
         }
+
 
         [Serializable]
         public class Playable : PrimerPlayable
