@@ -24,6 +24,8 @@ namespace Primer
         private readonly Action<Component> onCreate;
         private readonly Action<Transform> onRemove;
 
+        public int count => after.Count;
+
 
         public ChildrenDeclaration(
             Transform parent,

@@ -29,6 +29,7 @@ namespace Primer.Timeline
 
             trackTarget = boundObject;
             collector ??= CreateCollector();
+            collector.Clear();
 
             if (collector is null)
                 throw new Exception($"{GetType().FullName}.{nameof(CreateCollector)}() returns null!");

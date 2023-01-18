@@ -54,11 +54,7 @@ namespace Primer.Latex
             }
 
             Assert.AreEqual(collector.count, 2, "LatexMixer can't handle more than two states");
-
-            var first = collector[0];
-            var second = collector[1];
-
-            Transition(first.input, second.input, second.weight);
+            Transition(collector[0].input, collector[1].input, collector[1].weight);
         }
 
         private void ApplyState(LatexTransitionState state)

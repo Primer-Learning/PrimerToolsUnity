@@ -88,7 +88,7 @@ namespace Primer.Latex
 
                 foreach (var character in chunk) {
                     var charTransform = children.Next($"LatexChar {character.position}");
-                    charTransform.localPosition = character.position - group.localPosition; //- center + zero;
+                    charTransform.localPosition = character.position - group.localPosition;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
                     meshFilter.sharedMesh = character.symbol.mesh;
