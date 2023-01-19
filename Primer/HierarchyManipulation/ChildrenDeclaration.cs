@@ -29,10 +29,16 @@ namespace Primer
         {
             var remove = onRemove ?? DefaultOnRemove;
 
-            for (int i = 0, childCount = parent.childCount; i < childCount; i++)
-                remove(parent.GetChild(i));
+            for (int i = 0, childCount = parent.childCount; i < childCount; i++) {
+                var child = parent.GetChild(i);
+                remove(child);
+
+                if (child != null)
+                    child.parent = null;
+            }
         }
 
+        private bool recreateNextChild;
 
         private readonly Transform parent;
 
@@ -41,8 +47,6 @@ namespace Primer
 
         private readonly Action<Component> onCreate;
         private readonly Action<Transform> onRemove;
-
-        public int count => after.Count;
 
 
         public ChildrenDeclaration(
@@ -184,12 +188,22 @@ namespace Primer
                 needsReorder = true;
             }
         }
+
+        public void ReinitializeNextChild()
+        {
+            recreateNextChild = true;
+        }
         #endregion
 
 
         #region Find from existing children
         private bool Find(out Transform found, string name, Component prefab = null)
         {
+            if (recreateNextChild) {
+                found = null;
+                return false;
+            }
+
             found = remaining.Find(
                 child =>
                     (name is null || child.gameObject.name == name)
@@ -216,7 +230,7 @@ namespace Primer
         private static void DefaultOnRemove(Transform x) => x.Dispose();
 
         private T UseCache<T>(T component) where T : Component
-            => component == null ? null : Add(component);
+            => recreateNextChild || component == null ? null : Add(component);
 
         private void Initialize<T>(T transform, string name, Action<T> init = null) where T : Component
         {
@@ -233,6 +247,7 @@ namespace Primer
         public T Add<T>(T target) where T : Component
         {
             NextIs(target.transform);
+            recreateNextChild = false;
             return target;
         }
         #endregion

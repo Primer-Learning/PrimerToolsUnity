@@ -62,5 +62,9 @@ namespace Primer
             where TCached : Component;
 
         public void Apply();
+
+        // Name intentionally long, please avoid using this as possible
+        public void ReinitializeNextChild();
+
     }
 }
