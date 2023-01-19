@@ -118,6 +118,9 @@ namespace Primer.Latex
 
         private void OnDrawGizmos()
         {
+            if (expression is null)
+                return;
+
             foreach (var character in expression)
                 character.DrawWireGizmos(transform, gizmos);
         }

@@ -27,7 +27,7 @@ namespace Primer.Latex.Editor
 
             base.OnInspectorGUI();
 
-            if (!component.expression.isEmpty)
+            if (component.expression is not null && !component.expression.isEmpty)
                 RenderGroupDefinition();
 
             serializedObject.ApplyModifiedProperties();
