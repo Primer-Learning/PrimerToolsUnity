@@ -15,11 +15,10 @@ namespace Primer.Axis
         private Transform originArrow;
         private Transform endArrow;
 
-        [Required]
-        [RequiredIn(PrefabKind.PrefabAsset)]
-        public Transform prefab;
-
         public ArrowPresence presence = ArrowPresence.Both;
+
+        [RequiredIn(PrefabKind.PrefabAsset)]
+        public PrefabProvider prefab;
 
 
         public void Update(ChildrenDeclaration declaration, AxisDomain domain)
@@ -31,7 +30,7 @@ namespace Primer.Axis
             }
 
             declaration.NextIsInstanceOf(
-                prefab: prefab,
+                prefab,
                 cache: ref endArrow,
                 name: "End Arrow",
                 init: x => x.localRotation = Quaternion.Euler(0f, 90f, 0f)
@@ -45,7 +44,7 @@ namespace Primer.Axis
             }
 
             declaration.NextIsInstanceOf(
-                prefab: prefab,
+                prefab,
                 cache: ref originArrow,
                 name: "Origin Arrow",
                 init: x => x.localRotation = Quaternion.Euler(0f, -90f, 0f)

@@ -28,13 +28,17 @@ namespace Primer
         public static void Clear(Transform parent, Action<Transform> onRemove = null)
         {
             var remove = onRemove ?? DefaultOnRemove;
+            var childCount = parent.childCount;
+            var children = new Transform[childCount];
 
-            for (int i = 0, childCount = parent.childCount; i < childCount; i++) {
-                var child = parent.GetChild(i);
-                remove(child);
+            for (var i = 0; i < childCount; i++)
+                children[i] = parent.GetChild(i);
 
-                if (child != null)
-                    child.parent = null;
+            for (var i = 0; i < childCount; i++) {
+                remove(children[i]);
+
+                if (children[i] != null)
+                    children[i].parent = null;
             }
         }
 

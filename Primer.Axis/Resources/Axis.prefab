@@ -171,16 +171,19 @@ MonoBehaviour:
     thickness: 1
   label:
     text: x
+    fontSize: 2
     offset: {x: 0, y: 0, z: 0}
     position: 1
   arrows:
-    prefab: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
     presence: 2
+    prefab:
+      stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
   ticks:
     showTicks: 1
     showZero: 0
-    prefab: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
     step: 2
     maxTicks: 50
     maxDecimals: 2
     manualTicks: []
+    prefab:
+      stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}

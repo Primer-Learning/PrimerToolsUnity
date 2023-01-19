@@ -141,6 +141,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Label
       objectReference: {fileID: 0}
+    - target: {fileID: 3879151766749067016, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
+      propertyPath: m_text
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

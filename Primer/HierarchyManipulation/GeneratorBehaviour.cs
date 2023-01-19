@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -26,6 +27,10 @@ namespace Primer
         protected void CancelCurrentUpdate()
             => isUpdateCancelled = true;
 
+        [PropertyOrder(100)]
+        [PropertySpace(SpaceBefore = 32)]
+        [Button(ButtonSizes.Medium, Stretch = false, Icon = SdfIconType.ArrowRepeat)]
+        [ContextMenu("PRIMER > Update children")]
         protected void UpdateChildren()
         {
             if (gameObject.IsPreset())

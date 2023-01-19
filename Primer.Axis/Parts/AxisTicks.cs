@@ -19,11 +19,6 @@ namespace Primer.Axis
         [EnableIf("showTicks")]
         public bool showZero;
 
-        [Required]
-        [RequiredIn(PrefabKind.PrefabAsset)]
-        [EnableIf("showTicks")]
-        public AxisTick prefab;
-
         [MinValue(0.1f)]
         [EnableIf("showTicks")]
         [DisableIf("@manualTicks.Count != 0")]
@@ -40,10 +35,14 @@ namespace Primer.Axis
         [EnableIf("showTicks")]
         public List<TicData> manualTicks = new();
 
+        [RequiredIn(PrefabKind.PrefabAsset)]
+        [EnableIf("showTicks")]
+        public PrefabProvider<AxisTick> prefab;
+
 
         public void Update(ChildrenDeclaration modifier, AxisDomain domain)
         {
-            if (!showTicks || step <= 0)
+            if (!showTicks || step <= 0 || prefab.isEmpty)
                 return;
 
             var expectedTicks = manualTicks.Count != 0

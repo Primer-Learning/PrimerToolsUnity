@@ -29,13 +29,13 @@ namespace Primer.Axis
         public float rodThickness = 1;
 
         [Title("Arrows")]
-        [Required]
-        [RequiredIn(PrefabKind.PrefabAsset)]
-        [OnValueChanged(nameof(UpdateArrowPrefab))]
-        public Transform arrowPrefab;
-
         [OnValueChanged(nameof(UpdateArrowPresence))]
         public ArrowPresence arrowPresence = ArrowPresence.Both;
+
+        [InlineProperty]
+        [RequiredIn(PrefabKind.PrefabAsset)]
+        [OnValueChanged(nameof(UpdateArrowPrefab))]
+        public PrefabProvider arrowPrefab;
 
         [Title("Ticks")]
         [OnValueChanged(nameof(UpdateShowTicks))]
@@ -43,12 +43,6 @@ namespace Primer.Axis
 
         [OnValueChanged(nameof(UpdateShowZero))]
         public bool showZero = true;
-
-        [Required]
-        [RequiredIn(PrefabKind.PrefabAsset)]
-        [EnableIf("showTicks")]
-        [OnValueChanged(nameof(UpdateTicksPrefab))]
-        public AxisTick ticksPrefab;
 
         [MinValue(0.1f)]
         [EnableIf("showTicks")]
@@ -69,6 +63,12 @@ namespace Primer.Axis
         [EnableIf("showTicks")]
         [OnValueChanged(nameof(UpdateManualTicks))]
         public List<TicData> manualTicks = new();
+
+        [RequiredIn(PrefabKind.PrefabAsset)]
+        [EnableIf("showTicks")]
+        [OnValueChanged(nameof(UpdateTicksPrefab))]
+        [InlineProperty]
+        public PrefabProvider<AxisTick> ticksPrefab;
 
 
         public void SetAxes(Action onDomainChange, params AxisRenderer[] incoming)
