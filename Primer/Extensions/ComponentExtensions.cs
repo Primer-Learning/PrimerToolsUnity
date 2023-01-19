@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Palmmedia.ReportGenerator.Core.Common;
 using UnityEngine;
 
 namespace Primer
