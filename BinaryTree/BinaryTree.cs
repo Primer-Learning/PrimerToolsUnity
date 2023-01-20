@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Primer;
+using Primer.Animation;
 using TMPro;
 using UnityEngine;
 
@@ -340,9 +343,9 @@ public class BinaryTree : PrimerObject
         if (node != root) {
             node.Label(Resources.Load<PrimerText>("text"));
             node.PlaceLabel();
-            node.label.tmpro.text = labelVal;
+            node.label.text = labelVal;
             node.label.gameObject.SetActive(true);
-            node.label.ScaleUpFromZero();
+            node.label.GetPrimer().ScaleUpFromZero().Forget();
             yield return new WaitForSeconds(delay);
         }
         if (maxLevel != 0) {
@@ -359,7 +362,7 @@ public class BinaryTree : PrimerObject
     }
     IEnumerator hideAllLabels(BTNode node, float delay) {
         if (node != root && node.label != null) {
-            node.label.ScaleDownToZero();
+            node.label.GetPrimer().ScaleDownToZero().Forget();
             yield return new WaitForSeconds(delay);
         }
         if (node.Left != null) {

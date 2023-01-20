@@ -42,7 +42,7 @@ namespace Primer.Table
                     var x = i / cols;
                     var y = j / rows;
                     var pos = placer.Evaluate(x, y);
-                    var child = declaration.Next<PrimerText2>($"Cell {i}-{j}", label => label.fontSize = 2);
+                    var child = declaration.Next<PrimerText>($"Cell {i}-{j}", label => label.fontSize = 2);
 
                     if (displacer is not null)
                         pos = displacer(pos, x, y);

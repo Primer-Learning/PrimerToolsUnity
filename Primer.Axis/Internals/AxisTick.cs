@@ -6,7 +6,7 @@ namespace Primer.Axis
     public class AxisTick : MonoBehaviour
     {
         [HideInInspector]
-        public PrimerText2 text;
+        public PrimerText text;
 
         [ShowInInspector]
         public string label {

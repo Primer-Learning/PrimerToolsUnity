@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Primer;
+using Primer.Animation;
 using UnityEngine;
 
 public class BTNode : PrimerObject
@@ -27,7 +30,7 @@ public class BTNode : PrimerObject
         if (label != null)
         {
             PlaceLabel();
-            label.tmpro.alignment = labelAlign;
+            label.alignment = labelAlign;
         }
     }
 
@@ -48,7 +51,7 @@ public class BTNode : PrimerObject
     {
         label = Instantiate(prefab);
         label.transform.SetParent(transform.parent);
-        label.tmpro.alignment = labelAlign;
+        label.alignment = labelAlign;
         label.gameObject.SetActive(false);
     }
 
@@ -58,14 +61,14 @@ public class BTNode : PrimerObject
         {
             label.transform.localPosition = CalcLabelPos();
             // Debug.Log(label.transform.position);
-            label.tmpro.alignment = labelAlign;
+            label.alignment = labelAlign;
         }
     }
 
     public void UpdateLabel(bool intended = false)
     {
         if (label != null)
-            label.MoveTo(CalcLabelPos(intended));
+            label.transform.MoveTo(CalcLabelPos(intended)).Forget();
     }
 
     private Vector3 CalcLabelPos(bool intended = false)
@@ -162,7 +165,7 @@ public class BTNode : PrimerObject
         if (label != null)
         {
             label.gameObject.SetActive(true);
-            label.ScaleUpFromZero();
+            label.GetPrimer().ScaleUpFromZero();
         }
         try
         {
@@ -187,7 +190,7 @@ public class BTNode : PrimerObject
         }
         if (label != null && label.isActiveAndEnabled)
         {
-            label.ScaleDownToZero();
+            label.GetPrimer().ScaleDownToZero().Forget();
         }
         // This is needed because the BinaryTree hide methods yield on this coroutine
         yield return new WaitForSeconds(delay);

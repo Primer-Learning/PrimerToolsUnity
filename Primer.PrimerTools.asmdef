@@ -5,7 +5,9 @@
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "ShapesRuntime",
         "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5",
-        "GUID:541b6e597e21425c942722d221962ce9"
+        "GUID:541b6e597e21425c942722d221962ce9",
+        "GUID:fa12db3b1380a428aa2ceb49c4ac3684",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
