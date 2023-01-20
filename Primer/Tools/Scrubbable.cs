@@ -3,22 +3,8 @@ using UnityEngine;
 
 namespace Primer
 {
-    public interface IScrubbable
-    {
-        void Prepare();
-        void Cleanup();
-        void Update(float t);
-    }
-
-
-    public interface IBoundScrubbable<out T> : IScrubbable
-    {
-        T target { get; }
-    }
-
-
     [Serializable]
-    public abstract class Scrubbable : StrategyPattern, IBoundScrubbable<Transform>
+    public abstract class Scrubbable
     {
         public Transform target { get; set; }
 
