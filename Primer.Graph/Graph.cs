@@ -7,7 +7,7 @@ namespace Primer.Graph
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph2 : PrimerBehaviour
+    public class Graph : PrimerBehaviour
     {
         [Title("Graph controls")]
         [OnValueChanged(nameof(EnsureDomainDimensions))]

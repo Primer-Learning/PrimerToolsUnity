@@ -8,8 +8,8 @@ namespace Primer.Graph
         [Required]
         public PrefabProvider<Transform> prefab;
 
-        private Graph2 graphCache;
-        private Graph2 graph => graphCache ??= GetComponentInParent<Graph2>();
+        private Graph graphCache;
+        private Graph graph => graphCache ??= GetComponentInParent<Graph>();
 
         public Vector3 GetPositionMultiplier()
             => graph.positionMultiplier;
