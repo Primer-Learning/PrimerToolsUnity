@@ -5,20 +5,25 @@ namespace Primer
 {
     public interface IChildrenDeclaration
     {
+        /// <summary>
+        ///     Updates the target's children list to match
+        /// </summary>
+        public void Apply();
+
+        public void ReinitializeNextChild();
+
+
         public void NextIs(Transform target);
 
         public void NextIs(Component target);
 
-        public Transform Next(
-            string name = null,
-            Action<Transform> init = null
-        );
 
-        public Transform Next(
-            ref Transform cache,
-            string name = null,
-            Action<Transform> init = null
-        );
+        // following methods follow this pattern
+        // method definition
+        public Transform Next(string name = null, Action<Transform> init = null);
+        // then the same method with `ref cache` parameter (refs can't be optional)
+        public Transform Next(ref Transform cache, string name = null, Action<Transform> init = null);
+
 
         public TComponent Next<TComponent>(
             string name = null,
@@ -30,6 +35,7 @@ namespace Primer
             string name = null,
             Action<TComponent> init = null
         ) where TComponent : Component;
+
 
         public TComponent NextIsInstanceOf<TComponent>(
             TComponent prefab,
@@ -43,6 +49,7 @@ namespace Primer
             string name = null,
             Action<TComponent> init = null
         ) where TComponent : Component;
+
 
         public TCached NextIsInstanceOf<TPrefab, TCached>(
             TPrefab prefab,
@@ -60,11 +67,5 @@ namespace Primer
         )
             where TPrefab : Component
             where TCached : Component;
-
-        public void Apply();
-
-        // Name intentionally long, please avoid using this as possible
-        public void ReinitializeNextChild();
-
     }
 }

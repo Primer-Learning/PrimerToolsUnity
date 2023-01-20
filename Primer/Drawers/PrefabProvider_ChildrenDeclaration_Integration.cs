@@ -59,7 +59,7 @@ namespace Primer
 
 
         #region Force reinitialization
-        private static readonly HashSet<string> initialized = new();
+        private static readonly Dictionary<PrefabProvider<Component>, HashSet<string>> initTracker = new();
 
         private static void ForceReinitializationIfRequired<T>(
             string key,
@@ -67,6 +67,14 @@ namespace Primer
             PrefabProvider<T> provider
         ) where T : Component
         {
+            if (provider is not PrefabProvider<Component> baseProvider)
+                throw new Exception("WAT?");
+
+            if (!initTracker.TryGetValue(baseProvider, out var initialized)) {
+                initialized = new HashSet<string>();
+                initTracker.Add(baseProvider, initialized);
+            }
+
             if (provider.hasChanges) {
                 initialized.Clear();
                 provider.hasChanges = false;
