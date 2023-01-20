@@ -16,7 +16,6 @@ namespace Primer.Timeline
         [Required]
         [HideLabel]
         [InlineProperty]
-        [HideReferenceObjectPicker]
         [Title("Animation", "Extend Scrubbable class to add more types")]
         public Scrubbable animation;
 

@@ -1,4 +1,6 @@
 using System;
+using Primer.Animation;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Timeline;
 
@@ -7,9 +9,13 @@ namespace Primer.Timeline
     [Serializable]
     public class ScaleSmoothly : Scrubbable, IPropertyModifier
     {
+        [EnumToggleButtons]
         public enum Direction { ScaleUp, ScaleDown }
-        public Direction direction = Direction.ScaleUp;
+
         private Vector3 originalScale;
+
+        [Space] public Direction direction = Direction.ScaleUp;
+        [Space] public EaseMode ease = EaseMode.Cubic;
 
 
         public override void Prepare() => originalScale = target.localScale;
@@ -29,7 +35,7 @@ namespace Primer.Timeline
                 to = originalScale;
             }
 
-            target.localScale = Vector3.Lerp(from, to, t);
+            target.localScale = Vector3.Lerp(from, to, ease.Apply(t));
         }
 
 
