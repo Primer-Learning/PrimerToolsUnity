@@ -3,10 +3,9 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public abstract class PrimerMixer<TTrackBind, TData> : PrimerPlayable
+    public abstract class PrimerMixer<TTrackBind, TData> : PrimerPlayable<TTrackBind>
     {
         private IMixerCollector<TData> collector;
-        protected TTrackBind trackTarget { get; private set; }
 
 
         protected abstract IMixerCollector<TData> CreateCollector();
@@ -16,18 +15,10 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
+            preventInitialization = true;
             base.ProcessFrame(playable, info, playerData);
+            preventInitialization = false;
 
-            if (playerData is null)
-                return;
-
-            if (playerData is not TTrackBind boundObject) {
-                throw new Exception(
-                    $"Expected track target to be {typeof(TTrackBind).Name} but {playerData?.GetType().Name} found"
-                );
-            }
-
-            trackTarget = boundObject;
             collector ??= CreateCollector();
             collector.Clear();
 
@@ -43,9 +34,7 @@ namespace Primer.Timeline
             }
 
             RunStart();
-
             Frame(collector);
-
             collector.Clear();
         }
     }
