@@ -5,7 +5,7 @@ namespace Primer.Timeline
 {
     public class PrimerPlayable<TTrackBind> : PrimerPlayable
     {
-        protected TTrackBind trackTarget { get; set; }
+        protected virtual TTrackBind trackTarget { get; set; }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {

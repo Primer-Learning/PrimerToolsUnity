@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -9,6 +10,9 @@ namespace Primer.Timeline
         where T : PrimerPlayable, new()
     {
         public virtual ClipCaps clipCaps => ClipCaps.None;
+
+        [Space]
+        [InlineProperty, HideLabel]
         public T template = new();
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)

@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 namespace Primer.Timeline
 {
     [Serializable]
-    public class ScaleSmoothly : Scrubbable<Transform>, IPropertyModifier
+    public class ScaleSmoothly : Scrubbable, IPropertyModifier
     {
         public enum Direction { ScaleUp, ScaleDown }
         public Direction direction = Direction.ScaleUp;

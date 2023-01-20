@@ -1,3 +1,6 @@
+using System;
+using UnityEngine;
+
 namespace Primer
 {
     public interface IScrubbable
@@ -14,9 +17,10 @@ namespace Primer
     }
 
 
-    public abstract class Scrubbable<T> : IBoundScrubbable<T>
+    [Serializable]
+    public abstract class Scrubbable : StrategyPattern, IBoundScrubbable<Transform>
     {
-        public T target { get; set; }
+        public Transform target { get; set; }
 
         public virtual void Prepare() {}
 

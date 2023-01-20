@@ -4,6 +4,9 @@ namespace Primer.Timeline
 {
     public class PrimerPlayable : PlayableBehaviour
     {
+        public bool isFailed = false;
+
+
         private Lifecycle _lifecycle;
         protected Lifecycle lifecycle => _lifecycle ??= new Lifecycle(Start, Stop);
 
@@ -20,9 +23,11 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
+            if (isFailed)
+                throw new FailedClipException();
+
             base.ProcessFrame(playable, info, playerData);
             lifecycle.Initialize();
         }
     }
-
 }

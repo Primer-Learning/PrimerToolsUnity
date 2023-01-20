@@ -1,4 +1,5 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -7,18 +8,37 @@ namespace Primer.Timeline
     [Serializable]
     public class GenericBehaviour : PrimerPlayable<Transform>
     {
-        public bool isFailed = false;
-        public Scrubbable<Transform> animation;
-
         /// <summary>Duration of the clip, not considering any extrapolation.</summary>
-        /// <remarks><tt>playable.GetDuration()</tt> includes the extrapolated time as well, so may be infinity.</remarks>
+        /// <remarks><c>playable.GetDuration()</c> includes the extrapolated time as well, so may be infinity.</remarks>
         public double duration;
 
-        protected override void Start() => animation.Prepare();
-        protected override void Stop() => animation.Cleanup();
+        [SerializeReference]
+        [Required]
+        [HideLabel]
+        [InlineProperty]
+        [HideReferenceObjectPicker]
+        [Title("Animation", "Extend Scrubbable class to add more types")]
+        public Scrubbable animation;
+
+
+        protected override Transform trackTarget {
+            get => animation?.target;
+            set {
+                if (animation is not null)
+                    animation.target = value;
+            }
+        }
+
+
+        protected override void Start() => animation?.Prepare();
+        protected override void Stop() => animation?.Cleanup();
+
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
+            if (animation is null)
+                return;
+
             base.ProcessFrame(playable, info, playerData);
 
             if (isFailed)
@@ -27,6 +47,5 @@ namespace Primer.Timeline
             var t = playable.GetTime() / duration;
             animation.Update((float)t);
         }
-
     }
 }
