@@ -1,9 +1,14 @@
+using Sirenix.OdinInspector;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     public class PrimerPlayable : PlayableBehaviour
     {
+        [DetailedInfoBox(
+            "This is set to true if the clip throws any error",
+            "Used internally to prevent an invalid clip to modify scene game objects"
+        )]
         public bool isFailed = false;
 
 
