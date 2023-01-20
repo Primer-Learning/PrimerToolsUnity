@@ -18,7 +18,7 @@ namespace Primer.Latex
 
         protected override void Start()
         {
-            snapshot = trackTarget.GetOrAddComponent<TransformSnapshot>();
+            snapshot = new TransformSnapshot(trackTarget.transform);
             trackTarget.gameObject.Hide();
         }
 

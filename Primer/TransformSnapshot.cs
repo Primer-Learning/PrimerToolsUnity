@@ -2,35 +2,27 @@ using UnityEngine;
 
 namespace Primer
 {
-    [ExecuteAlways]
-    public class TransformSnapshot : MonoBehaviour
+    public class TransformSnapshot
     {
-        public Vector3 localScale;
-        private Transform parent;
-        public Vector3 position;
-        public Quaternion rotation;
+        private readonly Transform target;
+        private readonly Transform parent;
+
+        public readonly Vector3 position;
+        public readonly Quaternion rotation;
+        public readonly Vector3 localScale;
 
 
-        private void Awake() => hideFlags = HideFlags.DontSave;
-
-        private void OnEnable() => Snapshot();
-
-        private void OnDisable() => Restore();
-
-
-        public void Snapshot()
+        public TransformSnapshot(Transform target)
         {
-            var me = transform;
-            parent = me.parent;
-            position = me.position;
-            rotation = me.rotation;
-            localScale = me.localScale;
+            this.target = target;
+            parent = target.parent;
+            position = target.position;
+            rotation = target.rotation;
+            localScale = target.localScale;
         }
 
-        public void Restore()
-        {
-            ApplyTo(transform);
-        }
+
+        public void Restore() => ApplyTo(target);
 
         public void ApplyTo(Transform other)
         {
@@ -41,6 +33,7 @@ namespace Primer
             other.rotation = rotation;
             other.localScale = localScale;
         }
+
 
         public override string ToString()
             => $"pos({position}) rot({rotation}) scale({localScale})";

@@ -25,14 +25,14 @@ namespace Primer.Latex
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
             source = renderer.gameObject;
-            snapshot = source.GetOrAddComponent<TransformSnapshot>();
+            snapshot = new TransformSnapshot(source.transform);
             this.groups = groups.Select((_, i) => new GroupState(renderer.transform, i)).ToArray();
         }
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<TransitionType> transitions)
         {
             source = renderer.gameObject;
-            snapshot = source.GetOrAddComponent<TransformSnapshot>();
+            snapshot = new TransformSnapshot(source.transform);
             groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
         }
 
