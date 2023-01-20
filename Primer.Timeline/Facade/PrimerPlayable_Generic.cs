@@ -9,9 +9,9 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            preventInitialization = true;
-            base.ProcessFrame(playable, info, playerData);
-            preventInitialization = false;
+            using (lifecycle.PreventInitialization()) {
+                base.ProcessFrame(playable, info, playerData);
+            }
 
             if (playerData is null)
                 return;
@@ -23,7 +23,7 @@ namespace Primer.Timeline
             }
 
             trackTarget = boundObject;
-            RunStart();
+            lifecycle.Initialize();
         }
     }
 }

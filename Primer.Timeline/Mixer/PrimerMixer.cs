@@ -15,9 +15,9 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            preventInitialization = true;
-            base.ProcessFrame(playable, info, playerData);
-            preventInitialization = false;
+            using (lifecycle.PreventInitialization()) {
+                base.ProcessFrame(playable, info, playerData);
+            }
 
             collector ??= CreateCollector();
             collector.Clear();
@@ -28,12 +28,12 @@ namespace Primer.Timeline
             collector.Collect(playable);
 
             if (collector.isEmpty) {
-                RunStop();
+                lifecycle.Reset();
                 trackTarget = default(TTrackBind);
                 return;
             }
 
-            RunStart();
+            lifecycle.Initialize();
             Frame(collector);
             collector.Clear();
         }
