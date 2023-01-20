@@ -10,6 +10,7 @@ namespace Primer.Timeline
     {
         /// <summary>Duration of the clip, not considering any extrapolation.</summary>
         /// <remarks><c>playable.GetDuration()</c> includes the extrapolated time as well, so may be infinity.</remarks>
+        [HideInInspector]
         public double duration;
 
         [SerializeReference]
@@ -20,6 +21,8 @@ namespace Primer.Timeline
         public Scrubbable animation;
 
 
+        public string clipName => animation is null ? "Generic Clip" : animation.GetType().Name;
+
         protected override Transform trackTarget {
             get => animation?.target;
             set {
@@ -27,7 +30,6 @@ namespace Primer.Timeline
                     animation.target = value;
             }
         }
-
 
         protected override void Start() => animation?.Prepare();
         protected override void Stop() => animation?.Cleanup();

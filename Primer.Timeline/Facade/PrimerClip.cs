@@ -12,7 +12,8 @@ namespace Primer.Timeline
         public virtual ClipCaps clipCaps => ClipCaps.None;
 
         [Space]
-        [InlineProperty, HideLabel]
+        [HideLabel]
+        [InlineProperty]
         public T template = new();
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)

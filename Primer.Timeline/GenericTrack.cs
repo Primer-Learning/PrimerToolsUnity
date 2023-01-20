@@ -21,5 +21,16 @@ namespace Primer.Timeline
 
             return playable;
         }
+
+        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        {
+            // Hack to set the display name of the clip to match the IClipNameProvider property
+            foreach (var clip in GetClips()) {
+                if (clip.asset is PrimerClip<GenericBehaviour> asset)
+                    clip.displayName = asset.template.clipName;
+            }
+
+            return base.CreateTrackMixer(graph, go, inputCount);
+        }
     }
 }
