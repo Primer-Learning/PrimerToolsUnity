@@ -34,7 +34,7 @@ namespace Primer
 
 
         #region Something a = children.Next<Something>();
-        /// <summary>Next child is a GameObject with <pre>T</pre> component</summary>
+        /// <summary>Next child is a GameObject with <typeparamref>T</typeparamref> component</summary>
         /// <param name="cache">
         ///    Pass a variable or field to save a reference to the child once created.
         ///    This saves ChildrenDeclaration from having to find the child from the target's children.
@@ -42,15 +42,15 @@ namespace Primer
         /// <param name="name">GameObject's name</param>
         /// <param name="init">Initializer function, will be invoked only when the child is created</param>
         /// <typeparam name="T">The component to add to the child</typeparam>
-        /// <returns>The component of type <pre>T</pre> added to the child</returns>
+        /// <returns>The component of type <typeparamref>T</typeparamref> added to the child</returns>
         public T Next<T>(ref T cache, string name = null, Action<T> init = null) where T : Component
             => UseCache(cache) ?? (cache = Next(name, init));
 
-        /// <summary>Next child is a GameObject with <pre>T</pre> component</summary>
+        /// <summary>Next child is a GameObject with <typeparamref>T</typeparamref> component</summary>
         /// <param name="name">GameObject's name</param>
         /// <param name="init">Initializer function, will be invoked only when the child is created</param>
         /// <typeparam name="T">The component to add to the child</typeparam>
-        /// <returns>The component of type <pre>T</pre> added to the child</returns>
+        /// <returns>The component of type <typeparamref>T</typeparamref> added to the child</returns>
         public T Next<T>(string name = null, Action<T> init = null) where T : Component
         {
             if (Find<T>(out var found, name))

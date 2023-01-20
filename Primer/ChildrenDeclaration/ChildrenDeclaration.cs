@@ -6,6 +6,9 @@ namespace Primer
 {
     /// <summary>
     ///    ChildrenDeclaration will ensure provided transform has all the required children and no more.
+    /// </summary>
+    ///
+    /// <remarks>
     ///    It'll look it's current children for some matching that configuration (in this case only the name)
     ///
     ///    Any missing child will be created as new GameObject()
@@ -13,7 +16,7 @@ namespace Primer
     ///    - or instance prefabs with `NextIsInstanceOf(prefab)`
     ///
     ///    Any extra child will be removed, onRemove callback available on constructor.
-    /// </summary>
+    /// </remarks>
     ///
     /// <example>
     ///     <code>
@@ -47,7 +50,7 @@ namespace Primer
 
         /// <summary>
         ///     Forgets any previous declaration.
-        ///     It leaves this instance of <pre>ChildrenDeclaration</pre> fresh to be used again.
+        ///     It leaves this instance of <c>ChildrenDeclaration</c> fresh to be used again.
         /// </summary>
         public void Reset()
         {
@@ -64,20 +67,20 @@ namespace Primer
 
 
         /// <summary>Next child is the component passed as argument</summary>
-        /// <param name="target">Component to be set as next child of <pre>target</pre></param>
-        public void NextIs(Component target) => NextIs(target.transform);
+        /// <param name="child">Component to be set as next child of <c>target</c></param>
+        public void NextIs(Component child) => NextIs(child.transform);
 
         /// <summary>Next child is the component passed as argument</summary>
-        /// <param name="target">Transform to be set as next child of <pre>target</pre></param>
-        public void NextIs(Transform target)
+        /// <param name="child">Transform to be set as next child of <c>target</c></param>
+        public void NextIs(Transform child)
         {
-            after.Add(target);
-            remaining.Remove(target);
+            after.Add(child);
+            remaining.Remove(child);
         }
 
 
         /// <summary>
-        ///     Forces the next call to <pre>Next()</pre> or <pre>NextIsInstanceOf()</pre>
+        ///     Forces the next call to <c>Next()</c> or <c>NextIsInstanceOf()</c>
         ///     to ignore cache and existing children.
         ///     Thus re-initializing the next child.
         /// </summary>
