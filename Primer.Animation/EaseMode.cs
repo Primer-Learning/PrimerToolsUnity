@@ -1,7 +1,9 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Animation
 {
+    [EnumToggleButtons]
     public enum EaseMode
     {
         Cubic,
@@ -16,33 +18,24 @@ namespace Primer.Animation
         None,
     }
 
-	public static class EasingMethods {
-        public static float Apply(this EaseMode ease, float t) {
-            switch (ease) {
-                case EaseMode.Cubic:
-                    return EaseInAndOutCubic(0, 1, t);
-                case EaseMode.Quadratic:
-                    return EaseInAndOutQuadratic(0, 1, t);
-                case EaseMode.CubicIn:
-                    return EaseInCubic(0, 1, t);
-                case EaseMode.CubicOut:
-                    return EaseOutCubic(0, 1, t);
-                case EaseMode.SmoothStep:
-                    return Mathf.SmoothStep(0, 1, t);
-                case EaseMode.DoubleSmoothStep:
-                    return (Mathf.SmoothStep(0, 1, t) + t) / 2;
-                case EaseMode.SmoothIn:
-                    // Stretch the function and just use first half
-                    return Mathf.SmoothStep(0, 2, t / 2);
-                case EaseMode.SmoothOut:
-                    // Stretch the function and just use second half
-                    // return t;
-                    return Mathf.SmoothStep(0, 2, (t + 1) / 2) - 1;
-                case EaseMode.None:
-                default:
-                    return t;
-            }
-        }
+	public static class EasingMethods
+    {
+        public static float Apply(this EaseMode ease, float t) => ease switch {
+            EaseMode.Cubic => EaseInAndOutCubic(0, 1, t),
+            EaseMode.Quadratic => EaseInAndOutQuadratic(0, 1, t),
+            EaseMode.CubicIn => EaseInCubic(0, 1, t),
+            EaseMode.CubicOut => EaseOutCubic(0, 1, t),
+            EaseMode.SmoothStep => Mathf.SmoothStep(0, 1, t),
+            EaseMode.DoubleSmoothStep => (Mathf.SmoothStep(0, 1, t) + t) / 2,
+
+            // Stretch the function and just use first half
+            EaseMode.SmoothIn => Mathf.SmoothStep(0, 2, t / 2),
+
+            // Stretch the function and just use second half
+            EaseMode.SmoothOut => Mathf.SmoothStep(0, 2, (t + 1) / 2) - 1,
+
+            _ => t,
+        };
 
         private static float EaseInAndOutCubic(float startVal, float endVal, float t) {
             // Scale time relative to half duration
