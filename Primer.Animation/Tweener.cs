@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public record Tweener(float duration = 0.5f, EaseMode ease = EaseMode.Cubic);
+    public record Tweener(float duration = 0.5f, Easing ease = Easing.Cubic);
 
 
     /// <summary>
@@ -22,13 +22,13 @@ namespace Primer.Animation
             var animation = config ?? @default;
             var lerp = GetLerpMethod<T>();
 
-            var tEased = Easing.ApplyNormalizedEasing(t, animation.ease);
+            var tEased = animation.ease.Apply(t);
             var lerped = lerp.Invoke(null, new object[] { a, b, tEased });
 
             return (T)lerped;
         }
 
-        public async static IAsyncEnumerable<T> Tween<T>(this Tweener config, T initial, T target,
+        public static async IAsyncEnumerable<T> Tween<T>(this Tweener config, T initial, T target,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             var startTime = Time.time;
@@ -37,7 +37,7 @@ namespace Primer.Animation
 
             while (!ct.IsCancellationRequested && Time.time < startTime + animation.duration) {
                 var t = (Time.time - startTime) / animation.duration;
-                var tEased = Easing.ApplyNormalizedEasing(t, animation.ease);
+                var tEased = animation.ease.Apply(t);
                 var lerped = lerp.Invoke(null, new object[] {
                     initial, target, tEased
                 });
