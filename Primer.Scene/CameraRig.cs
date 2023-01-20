@@ -4,7 +4,7 @@ namespace Primer.Scene
 {
     [ExecuteAlways]
     [RequireComponent(typeof(Camera))]
-    public class CameraRig2 : MonoBehaviour
+    public class CameraRig : MonoBehaviour
     {
         private Camera cameraCache;
         internal Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;

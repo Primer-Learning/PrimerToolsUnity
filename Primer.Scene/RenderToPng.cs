@@ -55,7 +55,7 @@ namespace Primer.Scene
             return path;
         }
 
-        private void RenderToPNG(string path, int resWidth, int resHeight)
+        internal void RenderToPNG(string path, int resWidth, int resHeight)
         {
             // Set up camera
             var image = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);

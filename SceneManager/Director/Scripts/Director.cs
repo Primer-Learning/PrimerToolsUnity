@@ -139,7 +139,7 @@ public class Director : SceneManager
             rs.screen.clip = clip;
             rs.screen.gameObject.GetComponent<MeshRenderer>().material.SetFloat("_Glossiness", 0);
         }
-        rs.transform.parent = camRig.transform;
+        rs.transform.parent = cameraRenderer.transform;
         rs.transform.localRotation = Quaternion.identity;
         return rs;
     }
@@ -276,7 +276,7 @@ public class Director : SceneManager
                 string fileName = framesSaved.ToString("000000");
                 fileName += ".png";
                 fileName = Path.Combine(path, fileName);
-                camRig.RenderToPNG(fileName, resolutionWidth, resolutionHeight);
+                cameraRenderer.RenderToPNG(fileName, resolutionWidth, resolutionHeight);
                 framesSaved++;
             }
             framesSeen++;

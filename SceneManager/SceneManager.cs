@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Scene;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEditor;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class SceneManager : PrimerObject 
 {
@@ -12,7 +14,8 @@ public class SceneManager : PrimerObject
     
     [Header("Camera default overrides")]
     public Camera cam;
-    public CameraRig camRig;
+    [FormerlySerializedAs("camRig")]
+    public RenderToPng cameraRenderer;
     public bool useEditorVals = false;
 
     // RNG init
@@ -62,9 +65,9 @@ public class SceneManager : PrimerObject
                 cam = Camera.main;
                 // Debug.Log(cam);
             }
-            if (camRig == null) {
+            if (cameraRenderer == null) {
                 // if (camRig == null) {
-                    camRig = cam.gameObject.AddComponent<CameraRig>();
+                    cameraRenderer = cam.gameObject.AddComponent<RenderToPng>();
                 // }
                 // camRig = cam.GetComponent<CameraRig>();
             }
