@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Primer.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 public class CameraRig : PrimerObject

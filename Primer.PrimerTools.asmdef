@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "ShapesRuntime"
+        "ShapesRuntime",
+        "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

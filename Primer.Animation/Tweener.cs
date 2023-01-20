@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public record Tweener(float duration = 0.5f, Easing ease = Easing.Cubic);
+    public record Tweener(float duration = 0.5f, EaseMode ease = EaseMode.Cubic);
 
 
     /// <summary>

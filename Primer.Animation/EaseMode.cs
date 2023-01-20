@@ -2,13 +2,14 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public enum Easing
+    public enum EaseMode
     {
         Cubic,
         Quadratic,
         CubicIn,
         CubicOut,
-        SmoothStep, //Built-in Unity function that's mostly linear but smooths edges
+        /// <summary>Built-in Unity function that's mostly linear but smooths edges</summary>
+        SmoothStep,
         DoubleSmoothStep,
         SmoothIn,
         SmoothOut,
@@ -16,28 +17,28 @@ namespace Primer.Animation
     }
 
 	public static class EasingMethods {
-        public static float Apply(this Easing ease, float t) {
+        public static float Apply(this EaseMode ease, float t) {
             switch (ease) {
-                case Easing.Cubic:
+                case EaseMode.Cubic:
                     return EaseInAndOutCubic(0, 1, t);
-                case Easing.Quadratic:
+                case EaseMode.Quadratic:
                     return EaseInAndOutQuadratic(0, 1, t);
-                case Easing.CubicIn:
+                case EaseMode.CubicIn:
                     return EaseInCubic(0, 1, t);
-                case Easing.CubicOut:
+                case EaseMode.CubicOut:
                     return EaseOutCubic(0, 1, t);
-                case Easing.SmoothStep:
+                case EaseMode.SmoothStep:
                     return Mathf.SmoothStep(0, 1, t);
-                case Easing.DoubleSmoothStep:
+                case EaseMode.DoubleSmoothStep:
                     return (Mathf.SmoothStep(0, 1, t) + t) / 2;
-                case Easing.SmoothIn:
+                case EaseMode.SmoothIn:
                     // Stretch the function and just use first half
                     return Mathf.SmoothStep(0, 2, t / 2);
-                case Easing.SmoothOut:
+                case EaseMode.SmoothOut:
                     // Stretch the function and just use second half
                     // return t;
                     return Mathf.SmoothStep(0, 2, (t + 1) / 2) - 1;
-                case Easing.None:
+                case EaseMode.None:
                 default:
                     return t;
             }

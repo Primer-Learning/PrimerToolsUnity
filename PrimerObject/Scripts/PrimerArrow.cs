@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Primer.Animation;
 using UnityEngine;
 
 public class PrimerArrow : PrimerObject
@@ -101,8 +102,7 @@ public class PrimerArrow : PrimerObject
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             transform.localPosition = Vector3.Lerp(oldPosition, bTo, t);
             transform.localRotation = Quaternion.Slerp(oldRotation, newRotation, t);
             SetLength(Mathf.Lerp(oldLength, newLength, t));

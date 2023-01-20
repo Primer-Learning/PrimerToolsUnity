@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Primer.Animation;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 using Random = System.Random;
 
 public class PrimerBlob : PrimerCharacter
@@ -126,7 +128,7 @@ public class PrimerBlob : PrimerCharacter
                     //Releasing
                     Quaternion goalRot = neckBone.rotation; //Wherever the animator has it
                     float t = (Time.time - releaseStartTime) / releaseDuration;
-                    t = Helpers.ApplyNormalizedEasing(t, EaseMode.Cubic);
+                    EaseMode.Cubic.Apply(t);
                     neckBone.rotation = Quaternion.Slerp(neckOverrideRotation, goalRot, t);
                 }
                 else
@@ -207,7 +209,7 @@ public class PrimerBlob : PrimerCharacter
             goalRot = Quaternion.LookRotation(visualFocus.position - neckBone.position +
                                               lookCorrection);
             float t = (Time.time - overrideStartTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, EaseMode.Cubic);
+            EaseMode.Cubic.Apply(t);
             neckOverrideRotation = Quaternion.Slerp(initialRot, goalRot * baseNeckRot, t);
             yield return null;
         }
@@ -229,7 +231,7 @@ public class PrimerBlob : PrimerCharacter
         while (Time.time < startTime + duration)
         {
             float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, EaseMode.Cubic);
+            t = EaseMode.Cubic.Apply(t);
             float nextVal = Mathf.Lerp(startVal, val, t);
             animator.SetFloat("tiltLeftRight", nextVal);
             yield return null;
@@ -254,7 +256,7 @@ public class PrimerBlob : PrimerCharacter
         while (Time.time < startTime + duration)
         {
             float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, EaseMode.Cubic);
+            t = EaseMode.Cubic.Apply(t);
             float nextVal = Mathf.Lerp(startVal, val, t);
             animator.SetFloat("tiltFrontBack", nextVal);
             yield return null;
@@ -279,7 +281,7 @@ public class PrimerBlob : PrimerCharacter
         while (Time.time < startTime + duration)
         {
             float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, EaseMode.Cubic);
+            t = EaseMode.Cubic.Apply(t);
             float nextVal = Mathf.Lerp(startVal, val, t);
             animator.SetFloat("turnLeftRight", nextVal);
             yield return null;

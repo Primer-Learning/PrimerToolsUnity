@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Animation;
 using UnityEngine;
 
 //Class defining animations or other attributes that may be common to any object in a primer video
@@ -45,8 +46,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             prop.SetValue( this, (TProperty) PrimerLerp(oldVal, newVal, t, typeof(TProperty)) );
             onFrame();
             // Debug.Log(key((TSelf)this));
@@ -196,8 +196,7 @@ public class PrimerObject : MonoBehaviour
 
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             transform.localScale = Vector3.Lerp(initialScale, newScale, t);
             yield return null;
         }
@@ -214,8 +213,7 @@ public class PrimerObject : MonoBehaviour
 
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             trans.localScale = Vector3.Lerp(initialScale, newScale, t);
             yield return null;
         }
@@ -246,8 +244,7 @@ public class PrimerObject : MonoBehaviour
             float startTime = Time.time;
             while (Time.time < startTime + duration)
             {
-                float t = (Time.time - startTime) / duration;
-                t = Helpers.ApplyNormalizedEasing(t, ease);
+                float t = ease.Apply((Time.time - startTime) / duration);
                 transform.localPosition = Vector3.Lerp(initialPos, newPos, t);
                 yield return null;
             }
@@ -259,8 +256,7 @@ public class PrimerObject : MonoBehaviour
             float startTime = Time.time;
             while (Time.time < startTime + duration)
             {
-                float t = (Time.time - startTime) / duration;
-                t = Helpers.ApplyNormalizedEasing(t, ease);
+                float t = ease.Apply((Time.time - startTime) / duration);
                 transform.position = Vector3.Lerp(initialPos, newPos, t);
                 yield return null;
             }
@@ -329,8 +325,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             if (frame == CoordinateFrame.Local) {
                 transform.localRotation = Quaternion.Slerp(initialRot, newQuaternion, t);
             }
@@ -386,8 +381,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             Vector3 nextRotSoFar = Vector3.Lerp(Vector3.zero, eulerRotation, t);
             transform.Rotate(nextRotSoFar - rotSoFar, Space.World);
             rotSoFar = nextRotSoFar;
@@ -537,8 +531,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             l.intensity = Mathf.Lerp(initialIntensity, intensity, t);
             yield return null;
         }
@@ -756,8 +749,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             mat.color = Color.Lerp(initialColor, newColor, t);
             yield return null;
         }
@@ -783,8 +775,7 @@ public class PrimerObject : MonoBehaviour
         float startTime = Time.time;
         while (Time.time < startTime + duration)
         {
-            float t = (Time.time - startTime) / duration;
-            t = Helpers.ApplyNormalizedEasing(t, ease);
+            float t = ease.Apply((Time.time - startTime) / duration);
             mat.mainTextureScale = Vector2.Lerp(initialTiling, newTiling, t);
             yield return null;
         }

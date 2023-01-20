@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Primer.Animation;
 using UnityEngine;
 
 public class PrimerShapesLine : PrimerObject
