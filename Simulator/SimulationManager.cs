@@ -17,7 +17,6 @@ public class SimulationManager : MonoBehaviour
     }
     public List<Simulator> sims = new List<Simulator>();
 
-    public Graph graph = null;
     public GameObject objectToPool;
     public int numToPool = 100; //Override in subclass
     public List<GameObject> pooledObjects;
@@ -100,10 +99,6 @@ public class SimulationManager : MonoBehaviour
     }
 
     // Basic setup
-    public virtual void SetUpGraph(Graph g) {
-        if (graph != null) {Debug.LogWarning("Sim graph already set");}
-        graph = g;
-    }
     public void SetAndSaveSeed(int newSeed) {
         // This is the main one
         // Director.sceneRandom = new System.Random(newSeed);

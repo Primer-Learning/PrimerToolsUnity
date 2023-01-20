@@ -25,7 +25,6 @@ public class SceneManager : PrimerObject
     public PrimerText primerTextPrefab;
     public PrimerText primerCheckPrefab;
     public PrimerText primerXPrefab;
-    public Graph primerGraphPrefab;
     public PrimerObject sunLight;
 
     protected override void Awake() {
@@ -49,7 +48,6 @@ public class SceneManager : PrimerObject
             primerArrowPrefab = Resources.Load("arrowPrefab", typeof(PrimerArrow)) as PrimerArrow;
             primerBracketPrefab = Resources.Load("bracket", typeof(PrimerBracket)) as PrimerBracket;
             primerTextPrefab = Resources.Load("text", typeof(PrimerText)) as PrimerText;
-            primerGraphPrefab = Resources.Load("Graph", typeof(Graph)) as Graph;
             primerCheckPrefab = Resources.Load<PrimerText>("checkmark");
             primerXPrefab = Resources.Load<PrimerText>("x");
             if (sunLight == null) {
