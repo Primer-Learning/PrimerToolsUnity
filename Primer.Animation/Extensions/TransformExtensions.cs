@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -6,17 +7,19 @@ namespace Primer.Animation
 {
     public static class TransformExtensions
     {
-        public async static UniTask ScaleUpFromZero(this Transform transform, Tweener animation = null)
+        [Obsolete("Use transform.GetPrimer().ScaleUpFromZero() instead")]
+        public static async UniTask ScaleUpFromZero(this Transform transform, Tweener animation = null)
         {
             await transform.GetPrimer().ScaleUpFromZero(animation);
         }
 
-        public async static UniTask ScaleDownToZero(this Transform transform, Tweener animation = null)
+        [Obsolete("Use transform.GetPrimer().ScaleDownToZero() instead")]
+        public static async UniTask ScaleDownToZero(this Transform transform, Tweener animation = null)
         {
             await transform.GetPrimer().ScaleDownToZero(animation);
         }
 
-        public async static UniTask ScaleTo(this Transform transform, Vector3 newScale,
+        public static async UniTask ScaleTo(this Transform transform, Vector3 newScale,
             Tweener animation = null, CancellationToken ct = default)
         {
             if (transform == null || transform.localScale == newScale) return;
@@ -32,7 +35,7 @@ namespace Primer.Animation
             }
         }
 
-        public async static UniTask MoveTo(this Transform transform, Vector3 newPosition,
+        public static async UniTask MoveTo(this Transform transform, Vector3 newPosition,
             Tweener animation = null, CancellationToken ct = default)
         {
             if (transform == null || transform.localPosition == newPosition) return;

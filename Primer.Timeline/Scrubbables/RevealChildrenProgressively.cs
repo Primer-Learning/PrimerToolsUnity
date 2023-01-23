@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
+    [Serializable]
     public class RevealChildrenProgressively : Scrubbable
     {
         private Vector3[] originalScales;
