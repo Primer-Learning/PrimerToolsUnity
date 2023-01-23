@@ -6,7 +6,7 @@ namespace Primer
 {
     [ExecuteAlways]
     [RequireComponent(typeof(TextMeshPro))]
-    public class PrimerText : MonoBehaviour
+    public class PrimerText2 : MonoBehaviour
     {
         private TextMeshPro meshCache;
         private TextMeshPro textMeshPro => meshCache ??= GetComponent<TextMeshPro>();

@@ -15,7 +15,7 @@ namespace Primer.Axis
     {
         public const float X_OFFSET = 0.4f;
 
-        private PrimerText labelObject;
+        private PrimerText2 labelObject;
 
         public string text = "Label";
         public float fontSize = 2;
