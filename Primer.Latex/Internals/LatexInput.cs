@@ -37,7 +37,8 @@ namespace Primer.Latex
             @"\usepackage{xcolor}",
             @"\usepackage{microtype}",
             @"\usepackage{pifont}",
-            @"\linespread{1}"
+            @"\linespread{1}",
+            @"\usepackage{concmath-otf}"
         };
     }
 }

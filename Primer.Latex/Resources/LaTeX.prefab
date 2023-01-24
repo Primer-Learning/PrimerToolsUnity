@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6949002310091779321}
-  - component: {fileID: 6949002310091779206}
+  - component: {fileID: 903929774222192340}
   m_Layer: 0
   m_Name: LaTeX
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6949002310091779206
+--- !u!114 &903929774222192340
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,6 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec169d5c2b24498d809c626805dc18dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groupIndexes: 
+  latex: 
+  material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   headers:
   - \documentclass[preview]{standalone}
   - \usepackage[english]{babel}
@@ -65,10 +68,8 @@ MonoBehaviour:
   - \usepackage{microtype}
   - \usepackage{pifont}
   - \linespread{1}
-  latex: 
-  material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - \usepackage{concmath-otf}
   onChange:
     m_PersistentCalls:
       m_Calls: []
-  groupIndexesInternal: 
   gizmos: 0
