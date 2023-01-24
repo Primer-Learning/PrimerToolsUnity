@@ -5,8 +5,6 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    // public class PrepareMethodAttribute : Attribute {}
-
     [ExecuteAlways]
     public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
     {

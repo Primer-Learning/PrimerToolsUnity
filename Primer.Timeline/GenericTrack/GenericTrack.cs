@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -27,7 +26,7 @@ namespace Primer.Timeline.FakeUnityEngine
 
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
-            // Hack to set the display name of the clip to match the IClipNameProvider property
+            // Hack to set the display name of the clip to match the clipName property
             foreach (var clip in GetClips()) {
                 if (clip.asset is PrimerClip<GenericBehaviour> asset)
                     clip.displayName = asset.template.clipName;
