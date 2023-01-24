@@ -1,11 +1,14 @@
-using System.ComponentModel;
 using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Primer.Latex
+// ReSharper disable once CheckNamespace
+// Namespace does not correspond to file location, should be: 'Primer.Timeline'
+// We use FakeUnityEngine namespace because if "UnityEngine" is part of the namespace Unity allow us
+//  to show this track without submenu
+namespace Primer.Latex.FakeUnityEngine
 {
     [TrackClipType(typeof(LatexTransformerClip))]
     [TrackBindingType(typeof(LatexRenderer))]

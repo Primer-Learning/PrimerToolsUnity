@@ -66,7 +66,7 @@ namespace Primer
 
         [SerializeField]
         [EnableIf(nameof(hasIntrinsicPosition))]
-        private Vector3 intrinsicPosition = Vector3.one;
+        private Vector3 intrinsicPosition = Vector3.zero;
 
         public void IntrinsicPositionIsCurrentPosition() => SetIntrinsicPosition(transform.localPosition);
 
@@ -86,14 +86,9 @@ namespace Primer
             if (hasIntrinsicPosition)
                 return intrinsicPosition;
 
-            // We don't have intrinsic scale but the transform's scale is 0...
-            // but we don't save it
-            if (transform.localPosition == Vector3.zero)
-                return Vector3.zero;
-
-            var scale = transform.localPosition;
-            SetIntrinsicPosition(scale);
-            return scale;
+            var position = transform.localPosition;
+            SetIntrinsicPosition(position);
+            return position;
         }
         #endregion;
     }

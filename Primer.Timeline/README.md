@@ -55,6 +55,7 @@ Scrubbables MUST save the state they are going to modify on `Prepare()` and rest
 2. Drag any GameObject to the timeline and create a `GenericTrack`.
 3. Right click on the track and create a `GenericClip`
 4. Click on the clip and select your scrubbable under the "Animation" section
+    ![ScrubbableSelection](Documentation/ScrubbableSelection.png)
 5. In "Animation extrapolation" select if the state should be extended before / after the clip ends.
 6. You can now scrubble the timeline over the clip and see it live in edit mode
 
