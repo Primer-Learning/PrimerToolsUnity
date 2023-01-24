@@ -3,7 +3,7 @@ using Primer.Math;
 using Primer.Timeline;
 using UnityEngine;
 
-namespace Primer.Grid
+namespace Primer.Table
 {
     [Serializable]
     public class CellDisplacerBehaviour : PrimerPlayable

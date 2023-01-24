@@ -1,12 +1,10 @@
-using System.ComponentModel;
 using Primer.Animation;
-using Primer.Table;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Primer.Grid
+namespace Primer.Table
 {
     [TrackClipType(typeof(CellDisplacerClip))]
     [TrackBindingType(typeof(GridGenerator))]

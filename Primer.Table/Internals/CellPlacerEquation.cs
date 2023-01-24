@@ -1,8 +1,9 @@
 using System;
+using Primer.Math;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Math
+namespace Primer.Table
 {
     [Serializable]
     [HideLabel]

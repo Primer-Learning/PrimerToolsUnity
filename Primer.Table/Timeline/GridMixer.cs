@@ -1,10 +1,9 @@
 using System;
 using Primer.Animation;
-using Primer.Table;
 using Primer.Timeline;
 using UnityEngine;
 
-namespace Primer.Grid
+namespace Primer.Table
 {
     internal class GridMixer : PrimerMixer<GridGenerator, CellDisplacerBehaviour>
     {

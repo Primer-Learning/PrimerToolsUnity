@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Primer.Grid
+namespace Primer.Table
 {
     public class CellDisplacerClip : PlayableAsset, ITimelineClipAsset
     {
