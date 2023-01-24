@@ -6,7 +6,6 @@ using UnityEngine.Timeline;
 
 namespace Primer.Graph
 {
-    [DisplayName("Primer / Graph Surface Track")]
     [TrackClipType(typeof(PlottedEquationClip))]
     [TrackClipType(typeof(PlottedDataClip))]
     [TrackBindingType(typeof(MeshFilter))]

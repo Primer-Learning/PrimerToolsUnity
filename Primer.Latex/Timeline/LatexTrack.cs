@@ -7,7 +7,6 @@ using UnityEngine.Timeline;
 
 namespace Primer.Latex
 {
-    [DisplayName("Primer / Latex track")]
     [TrackClipType(typeof(LatexTransformerClip))]
     [TrackBindingType(typeof(LatexRenderer))]
     public class LatexTrack : PrimerTrack

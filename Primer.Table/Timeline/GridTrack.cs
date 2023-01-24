@@ -8,7 +8,6 @@ using UnityEngine.Timeline;
 
 namespace Primer.Grid
 {
-    [DisplayName("Primer / Grid track")]
     [TrackClipType(typeof(CellDisplacerClip))]
     [TrackBindingType(typeof(GridGenerator))]
     public class GridTrack : PrimerTrack

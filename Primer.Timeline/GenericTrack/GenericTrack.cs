@@ -5,7 +5,6 @@ using UnityEngine.Timeline;
 
 namespace Primer.Timeline
 {
-    [DisplayName("Primer / Generic Track")]
     [TrackClipType(typeof(GenericClip))]
     [TrackBindingType(typeof(Transform))]
     internal class GenericTrack : PrimerTrack

@@ -7,7 +7,6 @@ using UnityEngine.Timeline;
 
 namespace Primer.Graph
 {
-    [DisplayName("Primer / Graph Point Track")]
     [TrackClipType(typeof(PlottedEquationClip))]
     [TrackClipType(typeof(PlottedDataClip))]
     [TrackBindingType(typeof(GraphPoint))]
