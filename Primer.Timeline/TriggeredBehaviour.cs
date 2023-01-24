@@ -1,15 +1,14 @@
 using System;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public class PrepareMethodAttribute : Attribute {}
+    // public class PrepareMethodAttribute : Attribute {}
 
     [ExecuteAlways]
-    public abstract class TriggeredAnimation : MonoBehaviour, INotificationReceiver
+    public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
     {
         public void OnNotify(Playable origin, INotification notification, object context)
         {
@@ -20,15 +19,26 @@ namespace Primer.Timeline
             var method = type.GetMethod(trigger.method);
 
             if (method is null)
-                throw new Exception($"No method {trigger.method} in {nameof(TriggeredAnimation)}");
+                throw new Exception($"No method {trigger.method} in {nameof(TriggeredBehaviour)}");
 
             method.Invoke(this, Array.Empty<object>());
         }
 
-        protected static async UniTask Wait(int milliseconds)
+        protected static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
                 await UniTask.Delay(milliseconds);
+        }
+
+        protected static async UniTask Seconds(float seconds)
+        {
+            if (Application.isPlaying)
+                await UniTask.Delay(Mathf.RoundToInt(seconds * 1000));
+        }
+
+        protected static async UniTask Parallel(params UniTask[] processes)
+        {
+            await UniTask.WhenAll(processes);
         }
     }
 }

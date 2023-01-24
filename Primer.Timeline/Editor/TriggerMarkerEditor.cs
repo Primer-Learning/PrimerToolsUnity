@@ -36,8 +36,12 @@ namespace Primer.Timeline.Editor
             var track = marker.parent;
             var bound = director.GetGenericBinding(track);
 
-            if (bound is not TriggeredAnimation animation) {
-                EditorGUILayout.HelpBox($"{nameof(TriggerMarker)} must be in a track bound to a {nameof(TriggeredAnimation)}", MessageType.Error);
+            var animation = bound as TriggeredBehaviour
+                ?? (bound as Component)?.GetComponent<TriggeredBehaviour>()
+                ?? (bound as GameObject)?.GetComponent<TriggeredBehaviour>();
+
+            if (animation is null) {
+                EditorGUILayout.HelpBox($"{nameof(TriggerMarker)} must be in a track bound to a {nameof(TriggeredBehaviour)}", MessageType.Error);
                 return;
             }
 

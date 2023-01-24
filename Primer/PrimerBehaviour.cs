@@ -1,6 +1,7 @@
 using System.Threading;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Internal;
 
 namespace Primer
 {
@@ -21,16 +22,24 @@ namespace Primer
         #region Vector3? intrinsicScale
         [SerializeField]
         [Title("Intrinsic scale")]
+        [InlineButton(nameof(IntrinsicScaleIsCurrentScale), "Set to localScale")]
         private bool hasIntrinsicScale = false;
 
         [SerializeField]
         [EnableIf(nameof(hasIntrinsicScale))]
         private Vector3 intrinsicScale = Vector3.one;
 
+        public void IntrinsicScaleIsCurrentScale() => SetIntrinsicScale(transform.localScale);
+
         public void SetIntrinsicScale(Vector3 value)
         {
             hasIntrinsicScale = true;
             intrinsicScale = value;
+        }
+
+        public void ApplyIntrinsicScale()
+        {
+            transform.localScale = FindIntrinsicScale();
         }
 
         public Vector3 FindIntrinsicScale()
@@ -47,26 +56,29 @@ namespace Primer
             SetIntrinsicScale(scale);
             return scale;
         }
-
-        public void ApplyIntrinsicScale()
-        {
-            transform.localScale = FindIntrinsicScale();
-        }
         #endregion
 
         #region Vector3? intrinsicPosition
         [SerializeField]
         [Title("Intrinsic position")]
+        [InlineButton(nameof(IntrinsicPositionIsCurrentPosition), "Set to localPosition")]
         private bool hasIntrinsicPosition = false;
 
         [SerializeField]
         [EnableIf(nameof(hasIntrinsicPosition))]
         private Vector3 intrinsicPosition = Vector3.one;
 
+        public void IntrinsicPositionIsCurrentPosition() => SetIntrinsicPosition(transform.localPosition);
+
         public void SetIntrinsicPosition(Vector3 value)
         {
             hasIntrinsicPosition = true;
             intrinsicPosition = value;
+        }
+
+        public void ApplyIntrinsicPosition()
+        {
+            transform.localPosition = FindIntrinsicPosition();
         }
 
         public Vector3 FindIntrinsicPosition()
@@ -82,11 +94,6 @@ namespace Primer
             var scale = transform.localPosition;
             SetIntrinsicPosition(scale);
             return scale;
-        }
-
-        public void ApplyIntrinsicPosition()
-        {
-            transform.localPosition = FindIntrinsicPosition();
         }
         #endregion;
     }
