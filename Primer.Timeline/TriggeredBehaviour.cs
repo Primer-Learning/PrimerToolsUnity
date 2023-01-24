@@ -12,14 +12,18 @@ namespace Primer.Timeline
     {
         public void OnNotify(Playable origin, INotification notification, object context)
         {
-            if (notification is not TriggerMarker trigger || trigger.method is null)
+            if (notification is not TriggerMarker trigger)
                 return;
 
-            var type = GetType();
-            var method = type.GetMethod(trigger.method);
+            if (trigger.method is null) {
+                this.Log("Method to trigger is null. Please inspect the marker to ensure a method is selected.");
+                return;
+            }
+
+            var method = GetType().GetMethod(trigger.method);
 
             if (method is null)
-                throw new Exception($"No method {trigger.method} in {nameof(TriggeredBehaviour)}");
+                throw new Exception($"There is no method {trigger.method} in {GetType().FullName}");
 
             method.Invoke(this, Array.Empty<object>());
         }

@@ -10,7 +10,7 @@ namespace Primer.Timeline.Editor
     [CustomEditor(typeof(TriggerMarker))]
     public class TriggerMarkerEditor : UnityEditor.Editor
     {
-        private static string[] ignoreMethods = {
+        private static readonly string[] ignoreMethods = {
             "IsInvoking",
             "CancelInvoke",
             "StopAllCoroutines",
@@ -27,6 +27,7 @@ namespace Primer.Timeline.Editor
         };
 
         private TriggerMarker marker => target as TriggerMarker;
+
 
         public override void OnInspectorGUI()
         {
@@ -51,6 +52,11 @@ namespace Primer.Timeline.Editor
                 .Select(x => x.Name)
                 .ToArray();
 
+            if (methods.Length == 0) {
+                EditorGUILayout.HelpBox($"{nameof(TriggerMarker)} couldn't find any methods without required parameters in {animation.GetType().FullName}", MessageType.Error);
+                return;
+            }
+
             EditorGUI.BeginDisabledGroup(methods.Length == 1);
             var index = Mathf.Clamp(Array.IndexOf(methods, marker.method), 0, methods.Length);
             var labels = methods.Select(x => $"{x}()").ToArray();
@@ -60,10 +66,9 @@ namespace Primer.Timeline.Editor
             marker.method = methods[newIndex];
         }
 
-        private static bool IsValidMethod(MethodInfo method) => (
-            method.GetParameters().Length == 0
+        private static bool IsValidMethod(MethodInfo method) =>
+            method.GetParameters().Count(x => !x.IsOptional) == 0
             && !method.Name.StartsWith("get_")
-            && !ignoreMethods.Contains(method.Name)
-        );
+            && !ignoreMethods.Contains(method.Name);
     }
 }
