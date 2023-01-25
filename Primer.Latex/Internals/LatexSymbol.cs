@@ -13,7 +13,7 @@ namespace Primer.Latex
         [NonSerialized] private readonly Sprite sprite;
         [SerializeField] private Mesh meshCache;
 
-        [CanBeNull] public Mesh mesh => meshCache ??= CreateMesh(sprite);
+        [CanBeNull] public Mesh mesh => meshCache == null ? meshCache = CreateMesh(sprite) : meshCache;
 
 
         /// <summary>

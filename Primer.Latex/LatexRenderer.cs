@@ -71,8 +71,10 @@ namespace Primer.Latex
             try {
                 expression = await processor.Process(input);
 
-                if (prevExpression is null || !prevExpression.IsSame(expression))
+                if (prevExpression is null || !prevExpression.IsSame(expression)) {
+                    UpdateChildren();
                     onChange.Invoke(expression);
+                }
             }
             catch (OperationCanceledException) {
                 Debug.LogWarning($"Removing queued LaTeX execution: {input.code}");

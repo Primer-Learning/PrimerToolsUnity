@@ -7,7 +7,7 @@ namespace Primer
 {
     public class PrimerLogger
     {
-        private const int BREAK_IF_LONGER_THAN = 40;
+        private const int BREAK_IF_LONGER_THAN = 100;
         private static int indentation;
 
         private static string indent => "".PadLeft(indentation * 4, ' ');
