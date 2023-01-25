@@ -98,10 +98,12 @@ namespace Primer.Latex
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
                 group.localScale = Vector3.one;
+                group.localRotation = Quaternion.identity;
 
                 foreach (var character in chunk) {
                     var charTransform = grandChildren.Next($"LatexChar {character.position}");
                     charTransform.localPosition = character.position - group.localPosition;
+                    charTransform.localRotation = Quaternion.identity;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
                     meshFilter.sharedMesh = character.symbol.mesh;
