@@ -1,5 +1,4 @@
 using Primer.Editor;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -95,8 +94,10 @@ namespace Primer.Latex.Editor
                 hasChanges = true;
             }
 
-            if (hasChanges)
+            if (hasChanges) {
+                component.stateCache = null;
                 serializedGroups.SetIntArrayValue(groupIndexes);
+            }
         }
 
         private void GroupsHeader()

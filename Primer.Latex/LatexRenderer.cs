@@ -47,7 +47,7 @@ namespace Primer.Latex
 
         internal bool isRunning => processor.state == LatexProcessingState.Processing;
 
-        private LatexTransitionState stateCache;
+        internal LatexTransitionState stateCache;
         internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
             this,
             expression.Split(groupIndexes)
