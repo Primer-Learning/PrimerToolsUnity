@@ -79,7 +79,7 @@ namespace Primer.Latex
             }
         }
 
-        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
+        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
             if (expression is null || expression.Any(x => x.symbol.mesh is null)) {
                 CancelCurrentUpdate();
@@ -90,15 +90,15 @@ namespace Primer.Latex
 
             foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
                 var chunk = expression.Slice(start, end);
-                var group = declaration.Next($"Group (chars {start} to {end - 1})");
-                var children = new ChildrenDeclaration(group);
+                var group = children.Next($"Group (chars {start} to {end - 1})");
                 var center = chunk.GetCenter();
+                var grandChildren = new ChildrenDeclaration(group);
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
                 group.localScale = Vector3.one;
 
                 foreach (var character in chunk) {
-                    var charTransform = children.Next($"LatexChar {character.position}");
+                    var charTransform = grandChildren.Next($"LatexChar {character.position}");
                     charTransform.localPosition = character.position - group.localPosition;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
@@ -108,7 +108,7 @@ namespace Primer.Latex
                     meshRenderer.material = material;
                 }
 
-                children.Apply();
+                grandChildren.Apply();
             }
         }
 

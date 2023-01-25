@@ -10,7 +10,7 @@ namespace Primer
         private ChildrenDeclaration declaration;
 
 
-        protected abstract void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration);
+        protected abstract void UpdateChildren(bool isEnabled, ChildrenDeclaration children);
 
         protected virtual ChildrenDeclaration CreateChildrenDeclaration() => new(transform);
 

@@ -29,7 +29,7 @@ namespace Primer.Table
         }
 
 
-        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
+        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
             var cols = size.x - 1;
             var rows = size.y - 1;
@@ -42,7 +42,7 @@ namespace Primer.Table
                     var x = i / cols;
                     var y = j / rows;
                     var pos = placer.Evaluate(x, y);
-                    var child = declaration.Next<PrimerText2>($"Cell {i}-{j}", label => label.fontSize = 2);
+                    var child = children.Next<PrimerText2>($"Cell {i}-{j}", label => label.fontSize = 2);
 
                     if (displacer is not null)
                         pos = displacer(pos, x, y);

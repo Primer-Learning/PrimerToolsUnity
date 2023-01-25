@@ -50,18 +50,18 @@ namespace Primer.Axis
             onRemove: x => x.GetPrimer().ShrinkAndDispose()
         );
 
-        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
+        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
             // Rod is not a generated object so we keep it as child even if disabled
-            rod.AddTo(declaration);
+            rod.AddTo(children);
 
             if (!isEnabled)
                 return;
 
             rod.Update(domain);
-            label.Update(declaration, domain, 0.25f);
-            arrows.Update(declaration, domain);
-            ticks.Update(declaration, domain);
+            label.Update(children, domain, 0.25f);
+            arrows.Update(children, domain);
+            ticks.Update(children, domain);
         }
     }
 }
