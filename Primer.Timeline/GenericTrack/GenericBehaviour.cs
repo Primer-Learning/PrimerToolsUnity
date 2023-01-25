@@ -20,6 +20,10 @@ namespace Primer.Timeline
         [Title("Animation", "Extend Scrubbable class to add more types")]
         public Scrubbable animation;
 
+        [SerializeField]
+        [HideInInspector]
+        internal string method;
+
 
         public string clipName => animation is null ? "Generic Clip" : animation.GetType().Name;
 
@@ -45,8 +49,19 @@ namespace Primer.Timeline
             if (isFailed)
                 return;
 
-            var t = playable.GetTime() / duration;
-            animation.Update((float)t);
+            var t = (float)(playable.GetTime() / duration);
+
+            if (method is null || method == "Update") {
+                animation.Update(t);
+                return;
+            }
+
+            var methodInfo = animation.GetType().GetMethod(method);
+
+            if (methodInfo is null)
+                throw new Exception($"No method {method}(float t) found in ${animation.GetType().FullName}");
+
+            methodInfo.Invoke(animation, new object[] { t });
         }
     }
 }

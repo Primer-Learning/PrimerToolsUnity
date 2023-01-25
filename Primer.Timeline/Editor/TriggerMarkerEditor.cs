@@ -1,6 +1,4 @@
-using System;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
@@ -10,24 +8,7 @@ namespace Primer.Timeline.Editor
     [CustomEditor(typeof(TriggerMarker))]
     public class TriggerMarkerEditor : UnityEditor.Editor
     {
-        private static readonly string[] ignoreMethods = {
-            "IsInvoking",
-            "CancelInvoke",
-            "StopAllCoroutines",
-            "GetComponent",
-            "GetComponentInChildren",
-            "GetComponentsInChildren",
-            "GetComponentInParent",
-            "GetComponentsInParent",
-            "GetComponents",
-            "GetInstanceID",
-            "GetHashCode",
-            "ToString",
-            "GetType",
-        };
-
         private TriggerMarker marker => target as TriggerMarker;
-
 
         public override void OnInspectorGUI()
         {
@@ -42,33 +23,15 @@ namespace Primer.Timeline.Editor
                 ?? (bound as GameObject)?.GetComponent<TriggeredBehaviour>();
 
             if (animation is null) {
-                EditorGUILayout.HelpBox($"{nameof(TriggerMarker)} must be in a track bound to a {nameof(TriggeredBehaviour)}", MessageType.Error);
+                EditorGUILayout.HelpBox(
+                    $"{nameof(TriggerMarker)} must be in a track bound to a {nameof(TriggeredBehaviour)}",
+                    MessageType.Error
+                );
+
                 return;
             }
 
-            var methods = animation.GetType()
-                .GetMethods()
-                .Where(IsValidMethod)
-                .Select(x => x.Name)
-                .ToArray();
-
-            if (methods.Length == 0) {
-                EditorGUILayout.HelpBox($"{nameof(TriggerMarker)} couldn't find any methods without required parameters in {animation.GetType().FullName}", MessageType.Error);
-                return;
-            }
-
-            EditorGUI.BeginDisabledGroup(methods.Length == 1);
-            var index = Mathf.Clamp(Array.IndexOf(methods, marker.method), 0, methods.Length);
-            var labels = methods.Select(x => $"{x}()").ToArray();
-            var newIndex = EditorGUILayout.Popup("Method to invoke", index, labels);
-            EditorGUI.EndDisabledGroup();
-
-            marker.method = methods[newIndex];
+            marker.method = MethodSelector.Render(marker.method, MethodSelector.GetMethodsWithNoParams(animation));
         }
-
-        private static bool IsValidMethod(MethodInfo method) =>
-            method.GetParameters().Count(x => !x.IsOptional) == 0
-            && !method.Name.StartsWith("get_")
-            && !ignoreMethods.Contains(method.Name);
     }
 }

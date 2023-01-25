@@ -45,6 +45,9 @@ namespace Primer.Animation
             var timeline = director.GetTimeline();
 
             foreach (var track in timeline.GetRootTracks()) {
+                // TODO: we should recursively check group tracks
+                // https://www.notion.so/primer-learning/Primer-animation-menu-options-don-t-work-for-objects-with-existing-animation-tracks-that-are-in-a-tr-7e911ad990f6434fa7e023a310c22bfb
+
                 if (track is T trackOfType && (director.GetGenericBinding(trackOfType) == boundTo)) {
                     return trackOfType;
                 }
