@@ -30,6 +30,13 @@ namespace Primer.Latex
             RemoveState();
         }
 
+        private static LatexTransitionState ProcessPlayable(LatexTransformerClip.Playable playable)
+        {
+            var state = playable.state;
+            state.transform.gameObject.Hide();
+            return state;
+        }
+
         private void RemoveState()
         {
             currentState?.Restore();
@@ -43,8 +50,8 @@ namespace Primer.Latex
         }
 
 
-        protected override IMixerCollector<LatexTransitionState> CreateCollector() =>
-            new MixerCollector<LatexTransformerClip.Playable, LatexTransitionState>(x => x.state);
+        protected override IMixerCollector<LatexTransitionState> CreateCollector()
+            => new MixerCollector<LatexTransformerClip.Playable, LatexTransitionState>(ProcessPlayable);
 
         protected override void Frame(IMixerCollector<LatexTransitionState> collector)
         {
@@ -68,9 +75,6 @@ namespace Primer.Latex
 
             if (currentState is not null && (currentState != state))
                 RemoveState();
-
-            if (currentState is not null)
-                return;
 
             snapshot.ApplyTo(state.transform);
             state.transform.localPosition += initialState.GetOffsetWith(state);

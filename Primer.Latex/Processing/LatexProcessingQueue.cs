@@ -30,7 +30,7 @@ namespace Primer.Latex
                 if (queue.Equals(config))
                     return queuedTask.Task;
 
-                queuedTask.SetException(new OperationCanceledException("Scheduled execution removed"));
+                queuedTask.SetException(new OperationCanceledException("New LaTeX evaluation requested, clearing queue"));
             }
 
 

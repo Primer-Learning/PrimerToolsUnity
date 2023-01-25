@@ -67,10 +67,16 @@ namespace Primer.Latex
         public async Task Process(LatexInput input)
         {
             var prevExpression = expression;
-            expression = await processor.Process(input);
 
-            if (prevExpression is null || !prevExpression.IsSame(expression))
-                onChange.Invoke(expression);
+            try {
+                expression = await processor.Process(input);
+
+                if (prevExpression is null || !prevExpression.IsSame(expression))
+                    onChange.Invoke(expression);
+            }
+            catch (OperationCanceledException) {
+                Debug.LogWarning($"Removing queued LaTeX execution: {input.code}");
+            }
         }
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration declaration)
