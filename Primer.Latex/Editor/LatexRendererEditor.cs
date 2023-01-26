@@ -95,7 +95,7 @@ namespace Primer.Latex.Editor
             if (hasChanges) {
                 serializedGroups.SetIntArrayValue(groupIndexes);
                 serializedObject.ApplyModifiedProperties();
-                component.GroupsChanged();
+                component.InvalidateCache();
             }
         }
 

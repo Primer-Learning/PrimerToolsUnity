@@ -147,9 +147,17 @@ namespace Primer.Latex
             }
         }
 
-        internal void GroupsChanged()
+        internal void InvalidateCache()
         {
             stateCache = null;
+        }
+
+        private void Update()
+        {
+            if (transform.hasChanged) {
+                InvalidateCache();
+                transform.hasChanged = false;
+            }
         }
 
         [ResponsiveButtonGroup(Order = 1)]
