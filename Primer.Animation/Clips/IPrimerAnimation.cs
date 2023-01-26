@@ -4,6 +4,10 @@ namespace Primer.Animation
 {
     public interface IPrimerAnimation
     {
+        string name { get; }
+        void ApplyTo(AnimationClip clip);
+
+
         public static AnimationCurve cubic = CubicCurve(0, 0, 1, 1);
 
         public static AnimationCurve CubicCurve(float startTime, float startValue, float endTime, float endValue)
@@ -24,8 +28,26 @@ namespace Primer.Animation
             return new AnimationCurve(start, end);
         }
 
-        string name { get; }
+        public static AnimationCurve CubicCurve(AnimationCurve clip)
+            => new(CubicCurve(clip.keys));
 
-        void ApplyTo(AnimationClip clip);
+        public static Keyframe[] CubicCurve(Keyframe[] keys)
+        {
+            var result = new Keyframe[keys.Length];
+            var length = keys.Length;
+
+            for (var i = 0; i < length; i++) {
+                result[i] = new Keyframe(keys[i].time, keys[i].value, 0.0f, 0.0f) {
+                    inWeight = 2f / 3f,
+                    outWeight = 2f / 3f,
+                    weightedMode =
+                        i == 0 ? WeightedMode.Out :
+                        i == length - 1 ? WeightedMode.In :
+                        WeightedMode.Both,
+                };
+            }
+
+            return result;
+        }
     }
 }

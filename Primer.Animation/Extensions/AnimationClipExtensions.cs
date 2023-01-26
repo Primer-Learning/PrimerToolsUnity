@@ -34,6 +34,31 @@ namespace Primer.Animation
             AnimationUtility.SetEditorCurves(clip, bindings.ToArray(), curves.ToArray());
         }
 
+        public static void MakeCubicCurves(this AnimationClip clip)
+        {
+            var bindings = new List<EditorCurveBinding>();
+            var curves = new List<AnimationCurve>();
+
+            foreach (var binding in AnimationUtility.GetCurveBindings(clip)) {
+                var curve = AnimationUtility.GetEditorCurve(clip, binding);
+                curves.Add(IPrimerAnimation.CubicCurve(curve));
+                bindings.Add(binding);
+            }
+
+            AnimationUtility.SetEditorCurves(clip, bindings.ToArray(), curves.ToArray());
+        }
+
+        public static bool IsRecordedAndPristine(this AnimationClip clip)
+        {
+            if (!clip.name.StartsWith("Recorded"))
+                return false;
+
+            return AnimationUtility.GetCurveBindings(clip)
+                .Select(binding => AnimationUtility.GetEditorCurve(clip, binding))
+                .SelectMany(curve => curve.keys)
+                .All(key => key.weightedMode == WeightedMode.None);
+        }
+
         private static void MergeCurves(AnimationCurve target, AnimationCurve source)
         {
             for (var i = 0; i < source.length; i++)
