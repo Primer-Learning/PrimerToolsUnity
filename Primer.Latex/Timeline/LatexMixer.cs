@@ -81,8 +81,7 @@ namespace Primer.Latex
             if (currentState is not null && (currentState != state))
                 RemoveState();
 
-            snapshot.ApplyTo(state.transform);
-            state.transform.localPosition += initialState.GetOffsetWith(state);
+            snapshot.ApplyTo(state.transform, offsetPosition: initialState.GetOffsetWith(state));
             currentState = state;
         }
 
@@ -95,8 +94,7 @@ namespace Primer.Latex
 
             if (currentTransition is null) {
                 currentTransition = new LatexTransition(state1, state2, curve);
-                snapshot.ApplyTo(currentTransition.transform);
-                currentTransition.transform.localPosition += initialState.GetOffsetWith(state1);
+                snapshot.ApplyTo(currentTransition.transform, offsetPosition: initialState.GetOffsetWith(state1));
             }
 
             currentTransition.Apply(t);

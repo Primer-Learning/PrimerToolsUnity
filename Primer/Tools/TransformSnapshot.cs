@@ -24,14 +24,19 @@ namespace Primer
 
         public void Restore() => ApplyTo(target);
 
-        public void ApplyTo(Transform other)
+        public void ApplyTo(Transform other, Vector3? offsetPosition = null)
         {
             if (other.parent != parent)
                 other.parent = parent;
 
-            other.localPosition = position;
             other.localRotation = rotation;
             other.localScale = localScale;
+
+            if (offsetPosition is not null)
+                other.localPosition = position + (rotation * offsetPosition.Value);
+            else
+                other.localPosition = position;
+
         }
 
 
