@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Primer
@@ -27,6 +28,9 @@ namespace Primer
 #if UNITY_EDITOR
         public static void Log(this Component component, params object[] data)
             => PrimerLogger.Log(component, data);
+
+        public static void Error(this Component component, Exception exception)
+            => PrimerLogger.Error(component, exception);
 #endif
     }
 }

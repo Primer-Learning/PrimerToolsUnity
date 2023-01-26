@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -5,7 +7,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public class PrimerLogger
+    public static class PrimerLogger
     {
         private const int BREAK_IF_LONGER_THAN = 100;
         private static int indentation;
@@ -14,11 +16,18 @@ namespace Primer
 
 
         public static void Log(Component component, params object[] data)
-            => Debug.Log($"{ComponentLabel(component)} {Print(data).Trim('[', ']')}\n\n");
+            => Log(ComponentLabel(component), data);
+
+        public static void Log(params object[] data) => Log("", data);
 
         public static void Log(string label, params object[] data)
-            => Debug.Log($"{label} {Print(data).Trim('[', ']')}\n\n");
+            => Debug.Log($"{label} {string.Join(' ', data.Select(Print))}");
 
+        public static void Error(Component component, Exception exception)
+            => Debug.LogError($"{ComponentLabel(component)} {exception.Message}");
+
+        public static void Error(Exception exception)
+            => Debug.LogError(exception);
 
         private static string ComponentLabel(Component component)
         {
@@ -56,25 +65,25 @@ namespace Primer
                 IEnumerable<decimal> x => PrintList(() => x.Select(Print)),
                 IEnumerable<string> x => PrintList(() => x),
                 IEnumerable<object> x => PrintList(() => x.Select(Print)),
+                IEnumerable x => PrintList(() => x.Cast<object>().Select(Print)),
                 _ => target.ToString(),
             };
         }
 
-
-        private static string PrintList(System.Func<IEnumerable<string>> getter)
+        private static string PrintList(Func<IEnumerable<string>> getter)
         {
             var array = getter().ToArray();
             var length = array.Sum(x => x.Length);
 
             if (length < BREAK_IF_LONGER_THAN)
-                return $"[ {string.Join(", ", array)} ]";
+                return $"[({array.Length}) {string.Join(", ", array)} ]";
 
             indentation++;
             var innerIndent = indent;
             var content = string.Join($",\n{innerIndent}", getter().ToArray());
             indentation--;
 
-            return $"[\n{innerIndent}{content}\n{indent}]";
+            return $"[({array.Length})\n{innerIndent}{content}\n{indent}]";
         }
     }
 }
