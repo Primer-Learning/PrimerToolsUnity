@@ -9,7 +9,7 @@ namespace Primer
 
         public readonly Vector3 position;
         public readonly Quaternion rotation;
-        public readonly Vector3 localScale;
+        public readonly Vector3 scale;
 
 
         public TransformSnapshot(Transform target)
@@ -18,7 +18,7 @@ namespace Primer
             parent = target.parent;
             position = target.localPosition;
             rotation = target.localRotation;
-            localScale = target.localScale;
+            scale = target.localScale;
         }
 
 
@@ -31,14 +31,14 @@ namespace Primer
 
             other.localPosition = offsetPosition is null
                 ? position
-                : position + rotation * offsetPosition.Value;
+                : position + rotation * Vector3.Scale(offsetPosition.Value, scale);
 
             other.localRotation = rotation;
-            other.localScale = localScale;
+            other.localScale = scale;
         }
 
 
         public override string ToString()
-            => $"pos({position}) rot({rotation}) scale({localScale})";
+            => $"pos({position}) rot({rotation}) scale({scale})";
     }
 }
