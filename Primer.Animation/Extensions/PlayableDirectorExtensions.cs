@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -42,21 +43,40 @@ namespace Primer.Animation
 
         public static T GetOrCreateTrack<T>(this PlayableDirector director, Object boundTo) where T : TrackAsset, new()
         {
-            var timeline = director.GetTimeline();
+            var found = director.FindTrack(
+                track => track is T trackOfType && (director.GetGenericBinding(trackOfType) == boundTo)
+            );
 
-            foreach (var track in timeline.GetRootTracks()) {
-                // TODO: we should recursively check group tracks
-                // https://www.notion.so/primer-learning/Primer-animation-menu-options-don-t-work-for-objects-with-existing-animation-tracks-that-are-in-a-tr-7e911ad990f6434fa7e023a310c22bfb
-
-                if (track is T trackOfType && (director.GetGenericBinding(trackOfType) == boundTo)) {
-                    return trackOfType;
-                }
-            }
-
-            return director.CreateTrack<T>(boundTo);
+            return found as T ?? director.CreateTrack<T>(boundTo);
         }
 
-        public static TimelineAsset GetTimeline(this PlayableDirector director)
+        public static TrackAsset GetTrackOfClip(this PlayableDirector director, PlayableAsset target)
+        {
+            return director.FindTrack(track => track.GetClips().Any(clip => ReferenceEquals(clip.asset, target)));
+        }
+
+        public static TrackAsset FindTrack(this PlayableDirector director, Predicate<TrackAsset> predicate)
+            => FindTrackRecursively(director.GetTimeline().GetRootTracks(), predicate);
+
+        private static TrackAsset FindTrackRecursively(IEnumerable<TrackAsset> tracks, Predicate<TrackAsset> predicate)
+        {
+            foreach (var track in tracks) {
+                if (predicate(track))
+                    return track;
+
+                if (track is not GroupTrack group)
+                    continue;
+
+                var found = FindTrackRecursively(group.GetChildTracks(), predicate);
+
+                if (found)
+                    return found;
+            }
+
+            return null;
+        }
+
+        private static TimelineAsset GetTimeline(this PlayableDirector director)
         {
             var timeline = director.playableAsset as TimelineAsset;
 
@@ -66,16 +86,5 @@ namespace Primer.Animation
             return timeline;
         }
 
-        public static TrackAsset GetTrackOfClip(this PlayableDirector director, PlayableAsset target)
-        {
-            var timeline = director.GetTimeline();
-
-            foreach (var track in timeline.GetRootTracks()) {
-                if (track.GetClips().Any(clip => ReferenceEquals(clip.asset, target)))
-                    return track;
-            }
-
-            return null;
-        }
     }
 }
