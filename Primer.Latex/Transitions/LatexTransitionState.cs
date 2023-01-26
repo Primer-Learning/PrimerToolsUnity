@@ -12,6 +12,9 @@ namespace Primer.Latex
         private readonly LatexRenderer source;
 
 
+        public Transform transform => source.transform;
+
+
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
             source = renderer;
@@ -25,9 +28,6 @@ namespace Primer.Latex
             snapshot = new TransformSnapshot(source.transform);
             groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
         }
-
-
-        public Transform transform => source.transform;
 
         public void Restore() => snapshot.Restore();
 
