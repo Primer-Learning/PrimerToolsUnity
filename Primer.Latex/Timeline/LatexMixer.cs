@@ -39,7 +39,12 @@ namespace Primer.Latex
 
         private void RemoveState()
         {
-            currentState?.Restore();
+            if (currentState is null)
+                return;
+
+            if (currentState.transform != trackTarget.transform)
+                currentState.Restore();
+
             currentState = null;
         }
 
