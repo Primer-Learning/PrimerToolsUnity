@@ -7,31 +7,21 @@ namespace Primer.Latex
 {
     internal class LatexTransitionState
     {
-        private static void AssertSameLength<TLeft, TRight>(IEnumerable<TLeft> left, IEnumerable<TRight> right)
-            => AssertSameLength(left.Count(), right.Count());
-
-        private static void AssertSameLength(int left, int right)
-        {
-            const string ERROR_MESSAGE = "Can't transition from states with different amount of groups";
-            Assert.AreEqual(left, right, ERROR_MESSAGE);
-        }
-
-
         private readonly GroupState[] groups;
         private readonly TransformSnapshot snapshot;
-        private readonly GameObject source;
+        private readonly LatexRenderer source;
 
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
         {
-            source = renderer.gameObject;
+            source = renderer;
             snapshot = new TransformSnapshot(source.transform);
             this.groups = groups.Select((_, i) => new GroupState(renderer.transform, i)).ToArray();
         }
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<TransitionType> transitions)
         {
-            source = renderer.gameObject;
+            source = renderer;
             snapshot = new TransformSnapshot(source.transform);
             groups = transitions.Select((x, i) => new GroupState(renderer.transform, i, x)).ToArray();
         }
@@ -94,6 +84,19 @@ namespace Primer.Latex
             }
 
             return Vector3.zero;
+        }
+
+        private void AssertSameLength<TLeft, TRight>(IEnumerable<TLeft> left, IEnumerable<TRight> right)
+            => AssertSameLength(left.Count(), right.Count());
+
+        private void AssertSameLength(int left, int right)
+        {
+            try {
+                Assert.AreEqual(left, right, "Can't transition from states with different amount of groups");
+            }
+            catch (AssertionException ex) {
+                source.Error(ex);
+            }
         }
     }
 }

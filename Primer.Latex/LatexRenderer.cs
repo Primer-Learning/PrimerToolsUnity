@@ -47,7 +47,8 @@ namespace Primer.Latex
 
         internal bool isRunning => processor.state == LatexProcessingState.Processing;
 
-        internal LatexTransitionState stateCache;
+        [NonSerialized]
+        private LatexTransitionState stateCache;
         internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
             this,
             expression.Split(groupIndexes)
@@ -124,7 +125,7 @@ namespace Primer.Latex
         [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
         internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
 
-        public List<(int start, int end)> ranges => expression.CalculateRanges(groupIndexes);
+        public List<(int start, int end)> ranges => expression?.CalculateRanges(groupIndexes);
 
         private void OnDrawGizmos()
         {
@@ -144,6 +145,11 @@ namespace Primer.Latex
             if (presets.All(preset => preset.excludedProperties.Contains("material"))) {
                 material = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
             }
+        }
+
+        internal void GroupsChanged()
+        {
+            stateCache = null;
         }
 
         [ResponsiveButtonGroup(Order = 1)]

@@ -28,8 +28,6 @@ namespace Primer.Latex.Editor
 
             if (component.expression is not null && !component.expression.isEmpty)
                 RenderGroupDefinition();
-
-            serializedObject.ApplyModifiedProperties();
         }
 
 
@@ -95,8 +93,9 @@ namespace Primer.Latex.Editor
             }
 
             if (hasChanges) {
-                component.stateCache = null;
                 serializedGroups.SetIntArrayValue(groupIndexes);
+                serializedObject.ApplyModifiedProperties();
+                component.GroupsChanged();
             }
         }
 

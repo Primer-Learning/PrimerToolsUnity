@@ -12,6 +12,8 @@ namespace Primer.Latex.Editor
     {
         private static readonly GUILayoutOption popupSize = GUILayout.MaxWidth(100);
 
+        public override bool RequiresConstantRepaint() => true;
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -27,6 +29,9 @@ namespace Primer.Latex.Editor
             var toGroups = toRenderer.ranges;
             var trans = component.transitions;
             var toIndex = 0;
+
+            if (fromGroups is null || toGroups is null)
+                return;
 
             LatexCharEditor.CharPreviewSize();
 
