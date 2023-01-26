@@ -16,8 +16,8 @@ namespace Primer
         {
             this.target = target;
             parent = target.parent;
-            position = target.position;
-            rotation = target.rotation;
+            position = target.localPosition;
+            rotation = target.localRotation;
             localScale = target.localScale;
         }
 
@@ -29,8 +29,8 @@ namespace Primer
             if (other.parent != parent)
                 other.parent = parent;
 
-            other.position = position;
-            other.rotation = rotation;
+            other.localPosition = position;
+            other.localRotation = rotation;
             other.localScale = localScale;
         }
 
