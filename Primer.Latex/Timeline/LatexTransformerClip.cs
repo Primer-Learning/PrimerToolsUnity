@@ -24,6 +24,12 @@ namespace Primer.Latex
             var behaviour = playable.GetBehaviour();
             var renderer = transformTo.Resolve(graph.GetResolver());
 
+            if (renderer is null) {
+                throw new NullReferenceException(
+                    $"Clip {nameof(LatexTransformerClip)}'s {nameof(transformTo)} property is null"
+                );
+            }
+
             behaviour.state = new LatexTransitionState(renderer, transitions);
 
             return playable;
