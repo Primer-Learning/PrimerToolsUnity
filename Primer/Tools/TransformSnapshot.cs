@@ -29,14 +29,12 @@ namespace Primer
             if (other.parent != parent)
                 other.parent = parent;
 
+            other.localPosition = offsetPosition is null
+                ? position
+                : position + rotation * offsetPosition.Value;
+
             other.localRotation = rotation;
             other.localScale = localScale;
-
-            if (offsetPosition is not null)
-                other.localPosition = position + (rotation * offsetPosition.Value);
-            else
-                other.localPosition = position;
-
         }
 
 
