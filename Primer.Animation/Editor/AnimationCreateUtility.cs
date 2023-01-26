@@ -17,7 +17,7 @@ namespace Primer.Animation.Editor
             var director = TimelineEditor.inspectedDirector;
 
             foreach (var selected in command.GetSelectedElements()) {
-                var animation = new ScaleUpFromZero(selected.transform.localScale, director.time);
+                var animation = new ScaleUpFromZero(selected.GetPrimer().FindIntrinsicScale(), director.time);
                 director.CreateAnimation(selected, animation);
             }
 
@@ -30,7 +30,7 @@ namespace Primer.Animation.Editor
             var director = TimelineEditor.inspectedDirector;
 
             foreach (var selected in command.GetSelectedElements()) {
-                var animation = new ScaleDownToZero(selected.transform.localScale, director.time);
+                var animation = new ScaleDownToZero(selected.GetPrimer().FindIntrinsicScale(), director.time);
                 director.CreateAnimation(selected, animation);
             }
 
