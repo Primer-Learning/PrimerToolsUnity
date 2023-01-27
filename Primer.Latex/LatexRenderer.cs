@@ -65,6 +65,14 @@ namespace Primer.Latex
         }
 
 
+        public Task Process(int input) => Process($"${input}$");
+        public Task Process(float input) => Process($"${input}$");
+        public Task Process(string input)
+        {
+            latex = input;
+            return Process(config);
+        }
+
         public async Task Process(LatexInput input)
         {
             var prevExpression = expression;

@@ -41,6 +41,9 @@ namespace Primer
             transform.localScale = FindIntrinsicScale();
         }
 
+        /// <summary>
+        ///     This is at the same time a getter for intrinsic scale and also finds and sets it if it's not defined
+        /// </summary>
         public Vector3 FindIntrinsicScale()
         {
             if (hasIntrinsicScale)

@@ -23,17 +23,17 @@ namespace Primer
                 UpdateChildren();
         }
 
-
         protected void CancelCurrentUpdate()
             => isUpdateCancelled = true;
 
+
         [PropertyOrder(100)]
-        [PropertySpace(SpaceBefore = 32)]
-        [Button(ButtonSizes.Medium, Stretch = false, Icon = SdfIconType.ArrowRepeat)]
+        [ButtonGroup("Generator group")]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
         [ContextMenu("PRIMER > Update children")]
         protected void UpdateChildren()
         {
-            if (gameObject.IsPreset())
+            if (this == null || gameObject.IsPreset())
                 return;
 
             isUpdateCancelled = false;
@@ -44,6 +44,19 @@ namespace Primer
 
             if (!isUpdateCancelled)
                 declaration.Apply();
+        }
+
+        [PropertyOrder(100)]
+        [ButtonGroup("Generator group")]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
+        [ContextMenu("PRIMER > Regenerate children")]
+        protected void RegenerateChildren()
+        {
+            if (gameObject.IsPreset())
+                return;
+
+            ChildrenDeclaration.Clear(transform);
+            UpdateChildren();
         }
     }
 }

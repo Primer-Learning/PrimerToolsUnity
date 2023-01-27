@@ -1,7 +1,7 @@
-using System;
-using Primer.Math;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Primer.Table
 {
@@ -11,46 +11,59 @@ namespace Primer.Table
         // TODO: Accepts a Vector3 o Func<Vector3> or something that contains a Func<Vector3>
         // public Provider<Vector3> cellSize;
 
-        public Vector2 size = new(3, 3);
+        [FormerlySerializedAs("size")]
+        public Vector3Int length = new(3, 3, 1);
         public Vector3 cellSize = new(1, 1, 0);
 
         [Title("Prefab")]
-        public Transform prefab;
-        public Vector3 scale = Vector3.one;
+        public PrefabProvider prefab;
 
-        internal CellPlacerEquation placer = new();
-        private Func<Vector3, float, float, Vector3> displacer;
-
-
-        public void DisplaceCells(Func<Vector3, float, float, Vector3> newDisplacer)
-        {
-            displacer = newDisplacer;
-            UpdateChildren();
-        }
+        // public UnityEvent<Cell> onCellCreated = new();
 
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
-            var cols = size.x - 1;
-            var rows = size.y - 1;
+            var cols = length.x < 2 ? 1 : length.x - 1;
+            var rows = length.y < 2 ? 1 : length.y - 1;
+            var layers = length.z < 2 ? 1 : length.z - 1;
 
-            placer.start = Vector3.zero;
-            placer.end = new Vector3(cellSize.x * cols, cellSize.y * rows, 0);
+            for (var k = 0; k < length.z; k++) {
+                for (var j = 0; j < length.y; j++) {
+                    for (var i = 0; i < length.x; i++) {
+                        var coordinates = new Vector3Int(i, j, k);
+                        var cellName = $"Cell {coordinates}";
 
-            for (var j = 0; j < size.y; j++) {
-                for (var i = 0; i < size.x; i++) {
-                    var x = i / cols;
-                    var y = j / rows;
-                    var pos = placer.Evaluate(x, y);
-                    var child = children.Next<PrimerText2>($"Cell {i}-{j}", label => label.fontSize = 2);
+                        void Init(Cell cell)
+                        {
+                            cell.coordinates = coordinates;
+                            cell.unitCoordinates = new Vector3(i / cols, j / rows, k / layers);
+                            // onCellCreated.Invoke(cell);
+                        }
 
-                    if (displacer is not null)
-                        pos = displacer(pos, x, y);
+                        var child = prefab is null || prefab.isEmpty
+                            ? children.Next<Cell>(cellName, Init)
+                            : children.NextIsInstanceOf(
+                                provider: prefab,
+                                name: cellName,
+                                init: instance => {
+                                    var cell = instance.gameObject.AddComponent<Cell>();
+                                    Init(cell);
+                                    return cell;
+                                }
+                            );
 
-                    child.text = $"{i + j * size.x}";
-                    child.transform.localPosition = new Vector3(pos.x, -pos.y, pos.z);
+                        var position = Vector3.Scale(coordinates, cellSize);
+                        position.y *= -1;
+                        child.transform.localPosition = position;
+                    }
                 }
             }
+        }
+
+        public class Cell : MonoBehaviour
+        {
+            public Vector3Int coordinates;
+            public Vector3 unitCoordinates;
         }
     }
 }

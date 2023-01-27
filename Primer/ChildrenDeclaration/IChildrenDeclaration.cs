@@ -53,6 +53,7 @@ namespace Primer
 
         public TCached NextIsInstanceOf<TPrefab, TCached>(
             TPrefab prefab,
+            // In this case in particular `init` comes before `name` because it's mandatory
             Func<TPrefab, TCached> init,
             string name = null
         )
@@ -62,6 +63,7 @@ namespace Primer
         public TCached NextIsInstanceOf<TPrefab, TCached>(
             TPrefab prefab,
             ref TCached cache,
+            // In this case in particular `init` comes before `name` because it's mandatory
             Func<TPrefab, TCached> init,
             string name = null
         )
