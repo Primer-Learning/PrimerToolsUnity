@@ -21,7 +21,13 @@ namespace Primer
         #region Vector3? intrinsicScale
         [SerializeField]
         [Title("Intrinsic scale")]
-        [InlineButton(nameof(IntrinsicScaleIsCurrentScale), "Set to localScale")]
+        [InlineButton(nameof(IntrinsicScaleIsCurrentScale), SdfIconType.ArrowDown, "From transform")]
+        [InlineButton(
+            nameof(ApplyIntrinsicScale),
+            SdfIconType.ArrowUp,
+            "To transform",
+            ShowIf = nameof(hasIntrinsicScale)
+        )]
         private bool hasIntrinsicScale = false;
 
         [SerializeField]
@@ -63,7 +69,13 @@ namespace Primer
         #region Vector3? intrinsicPosition
         [SerializeField]
         [Title("Intrinsic position")]
-        [InlineButton(nameof(IntrinsicPositionIsCurrentPosition), "Set to localPosition")]
+        [InlineButton(nameof(IntrinsicPositionIsCurrentPosition), SdfIconType.ArrowDown, "From transform")]
+        [InlineButton(
+            nameof(ApplyIntrinsicPosition),
+            SdfIconType.ArrowUp,
+            "To transform",
+            ShowIf = nameof(hasIntrinsicPosition)
+        )]
         private bool hasIntrinsicPosition = false;
 
         [SerializeField]
