@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -68,16 +69,23 @@ namespace Primer.Latex
         #region Latex processing
         public UniTask Process(int input) => Process($"${input}$");
         public UniTask Process(float input) => Process($"${input}$");
-        public UniTask Process(string input)
-        {
-            latex = input;
-            return Process(config);
-        }
-
+        public UniTask Process(string input) => Process(new LatexInput(input, headers));
         public async UniTask Process(LatexInput input)
         {
+            latex = input.code;
+            headers = input.headers;
             var newExpression = await Evaluate(input);
             ApplyExpression(newExpression);
+        }
+
+        public async UniTask Replace(string input)
+        {
+            var primer = this.GetPrimer();
+            var processing = Evaluate(new LatexInput(input, headers));
+            await primer.ScaleDownToZero();
+            var newExpression = await processing;
+            ApplyExpression(newExpression);
+            await primer.ScaleUpFromZero();
         }
 
 
