@@ -64,7 +64,9 @@ namespace Primer
 
         #region public Vector3 position = value.localPosition ?? Vector3.zero;
         [SerializeReference]
+        [HideInInspector]
         private Vector3 _position;
+        [HideInInspector]
         public bool hasPosition = false;
 
         [ShowInInspector]
@@ -88,8 +90,10 @@ namespace Primer
         #endregion
 
         #region public Quaternion rotation = value.localRotation ?? Quaternion.identity;
+        [HideInInspector]
         [SerializeReference]
         private Quaternion _rotation;
+        [HideInInspector]
         public bool hasRotation = false;
 
         [ShowInInspector]
@@ -114,7 +118,9 @@ namespace Primer
 
         #region public Vector3 scale = value.localScale ?? Vector3.one;
         [SerializeReference]
+        [HideInInspector]
         private Vector3 _scale = Vector3.one;
+        [HideInInspector]
         public bool hasScale = false;
 
         [ShowInInspector]
