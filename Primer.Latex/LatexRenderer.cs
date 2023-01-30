@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -65,30 +65,44 @@ namespace Primer.Latex
         }
 
 
-        public Task Process(int input) => Process($"${input}$");
-        public Task Process(float input) => Process($"${input}$");
-        public Task Process(string input)
+        #region Latex processing
+        public UniTask Process(int input) => Process($"${input}$");
+        public UniTask Process(float input) => Process($"${input}$");
+        public UniTask Process(string input)
         {
             latex = input;
             return Process(config);
         }
 
-        public async Task Process(LatexInput input)
+        public async UniTask Process(LatexInput input)
         {
-            var prevExpression = expression;
+            var newExpression = await Evaluate(input);
+            ApplyExpression(newExpression);
+        }
 
+
+        private async UniTask<LatexExpression> Evaluate(LatexInput input)
+        {
             try {
-                expression = await processor.Process(input);
-
-                if (prevExpression is null || !prevExpression.IsSame(expression)) {
-                    UpdateChildren();
-                    onChange.Invoke(expression);
-                }
+                return await processor.Process(input);
             }
             catch (OperationCanceledException) {
                 Debug.LogWarning($"Removing queued LaTeX execution: {input.code}");
+                return null;
             }
         }
+
+        private bool ApplyExpression(LatexExpression newExpression)
+        {
+            if (newExpression is null || expression is not null && expression.IsSame(newExpression))
+                return false;
+
+            expression = newExpression;
+            UpdateChildren();
+            onChange.Invoke(expression);
+            return true;
+        }
+        #endregion
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {

@@ -17,6 +17,8 @@ namespace Primer.Latex
 
         // Not sure if all latex rendering processes need to share the same instance or not
         // If that ever changes only this line will need to be changed
+        // The difference would be if they share the same queue or not
+        // Cache is internally stored in a static dictionary so it's shared anyway
         public static LatexProcessor GetInstance() => new();
 
 
