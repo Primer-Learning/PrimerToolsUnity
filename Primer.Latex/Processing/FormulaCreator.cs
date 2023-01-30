@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
+    // TODO: Rename to ExpressionCreator
     internal class FormulaCreator : ILatexProcessor
     {
         private readonly LatexToSvg latexToSvg = new();

@@ -9,43 +9,28 @@ namespace Primer.Latex
     [Serializable]
     public sealed class LatexSymbol
     {
-        public readonly VectorUtils.Geometry geometry;
+        [NonSerialized] private readonly VectorUtils.Geometry geometry;
         [NonSerialized] private readonly Sprite sprite;
         [SerializeField] private Mesh meshCache;
+        [SerializeReference] public readonly (Vector2 min, Vector2 max) bounds;
 
         [CanBeNull] public Mesh mesh => meshCache == null ? meshCache = CreateMesh(sprite) : meshCache;
 
 
-        /// <summary>
-        ///     This is expected to happen when a LatexRenderer is
-        ///     (a) initialized from defaults,
-        ///     (b) set via a preset in the editor
-        ///     (c) and occasionally when undoing/redoing.
-        /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         The sprite assets are added as subassets of the scene the LatexRenderer is in, and can be
-        ///         garbage collected any time if there's no LatexRenderer referencing them. This means when
-        ///         redoing/undoing you can arrive in a state where the LatexRenderer is pointing at sprites
-        ///         that have been cleaned up. Fortunately Unity notices when deserializing and the sprites
-        ///         appear as null values in our list.
-        ///     </para>
-        ///     <para>
-        ///         Presets that refer to a Sprite also don't prevent the sprite from being garbage collected
-        ///         (and the preset could be applied to a LatexRenderer in a different scene anyways). So
-        ///         presets often cause this same issue. Finally, when editing a preset directly, we actually
-        ///         set its stored _sprites value to null directly since we need to make sure we never have a
-        ///         mismatch between Latex & Headers text and the stored sprites.
-        ///     </para>
-        ///     <para>
-        ///         I suspect there's a way to handle these situations using hooks into various parts of the
-        ///         editor. But a decently thorough dive into the options had me arrive at the conclusion that
-        ///         the approach here (just recognizing the mismatch and having the inspector rebuild) is the
-        ///         simplest approach. Hopefully as my domain knowledge of the editor improves I'll think of an
-        ///         even cleaner way though.
-        ///     </para>
-        /// </remarks>
-        public bool isSpriteValid => (bool)sprite;
+        internal LatexSymbol(VectorUtils.Geometry geometry)
+        {
+            this.geometry = geometry;
+            sprite = geometry.ConvertToSprite();
+
+            var rect = VectorUtils.Bounds(geometry.TransformVertices());
+            bounds = (rect.min, rect.max);
+        }
+
+        internal LatexSymbol(Mesh mesh, Rect rect)
+        {
+            meshCache = mesh;
+            bounds = (rect.min, rect.max);
+        }
 
 
         public override bool Equals(object other) =>
@@ -55,13 +40,6 @@ namespace Primer.Latex
             geometry.CalculateHashCode();
 
 
-        internal LatexSymbol(VectorUtils.Geometry geometry)
-        {
-            this.geometry = geometry;
-            sprite = geometry.ConvertToSprite();
-        }
-
-
         public void Draw(Transform parent, Material material, Vector3 position, float scale)
         {
             var positionMod = Matrix4x4.Translate(position);
@@ -69,7 +47,6 @@ namespace Primer.Latex
             var matrix = parent.localToWorldMatrix * positionMod * scaleMod;
             Graphics.DrawMesh(mesh, matrix, material, 0);
         }
-
 
         private static Mesh CreateMesh(Sprite sprite)
         {

@@ -18,8 +18,6 @@ namespace Primer.Table
         [Title("Prefab")]
         public PrefabProvider prefab;
 
-        // public UnityEvent<Cell> onCellCreated = new();
-
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
@@ -37,7 +35,6 @@ namespace Primer.Table
                         {
                             cell.coordinates = coordinates;
                             cell.unitCoordinates = new Vector3(i / cols, j / rows, k / layers);
-                            // onCellCreated.Invoke(cell);
                         }
 
                         var child = prefab is null || prefab.isEmpty

@@ -14,6 +14,7 @@ namespace Primer.Latex
         private readonly LatexChar[] characters;
 
         public bool isEmpty => characters.Length == 0;
+        public int count => characters.Length;
 
 
         public LatexChar this[int index] => characters[index];
@@ -29,7 +30,11 @@ namespace Primer.Latex
 
         public Vector3 GetCenter()
         {
-            var allVertices = characters.SelectMany(x => x.symbol.geometry.TransformVertices());
+            var allVertices = characters.SelectMany(x => new [] {
+                x.symbol.bounds.min,
+                x.symbol.bounds.max,
+            });
+
             return VectorUtils.Bounds(allVertices).center;
         }
 

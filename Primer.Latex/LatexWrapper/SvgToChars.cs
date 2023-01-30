@@ -70,7 +70,7 @@ namespace Primer.Latex
         ///     so we need to force another update and hook to it
         ///     we can then use VectorUtils.BuildSprite without throwing
         ///     "Not allowed to override geometry on sprite"
-        /// <remarks>
+        /// </remarks>
         private void ProcessGeometry()
         {
             UnityEventHook.OnUpdate -= ProcessGeometry;

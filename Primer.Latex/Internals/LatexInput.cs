@@ -15,7 +15,16 @@ namespace Primer.Latex
                                                 // ReSharper disable once PossibleUnintendedReferenceComparison
                                                 (headers == other.headers || headers.SequenceEqual(other.headers));
 
-        public override int GetHashCode() => HashCode.Combine(code, headers);
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(code);
+
+            for (var i = 0; i < headers.Count; i++)
+                hash.Add(headers[i]);
+
+            return hash.ToHashCode();
+        }
 
         public static List<string> GetDefaultHeaders() => new() {
             @"\documentclass[preview]{standalone}",

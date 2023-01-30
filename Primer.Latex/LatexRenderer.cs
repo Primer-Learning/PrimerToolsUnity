@@ -190,10 +190,6 @@ namespace Primer.Latex
         [ResponsiveButtonGroup]
         [Button("Cancel Rendering Task")]
         private void Cancel() => processor.Cancel();
-
-        [ResponsiveButtonGroup]
-        [Button("Update children")]
-        private void RunUpdateChildren() => UpdateChildren();
 #endif
     }
 }

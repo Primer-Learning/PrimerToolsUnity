@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using Primer.Animation;
+using Primer.Latex.FakeUnityEngine;
 using Primer.Timeline;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -15,24 +18,37 @@ namespace Primer.Latex
 
         public LatexTransitionState initialState => trackTarget.state;
 
+        private void Log(params object[] args)
+        {
+            var a = new List<object>(args);
+            a.Insert(0, "Mixer");
+            PrimerLogger.Log(trackTarget, a.ToArray());
+        }
+
 
         protected override void Start()
         {
+            if (trackTarget == null)
+                throw new Exception($"{nameof(LatexTrack)}'s needs to be bound to a {nameof(LatexRenderer)}");
+
+            Log("Start");
             snapshot = new TransformSnapshot(trackTarget.transform);
             trackTarget.gameObject.Hide();
         }
 
         protected override void Stop()
         {
+            Log("Stop");
             trackTarget.gameObject.Show();
             snapshot = null;
             RemoveTransition();
             RemoveState();
         }
 
-        private static LatexTransitionState ProcessPlayable(LatexTransformerClip.Playable playable)
+        private LatexTransitionState ProcessPlayable(LatexTransformerClip.Playable playable)
         {
             var state = playable.state;
+            Log("ProcessPlayable", state?.transform?.gameObject?.name);
             state.transform.gameObject.Hide();
             return state;
         }
@@ -42,6 +58,8 @@ namespace Primer.Latex
             if (currentState is null)
                 return;
 
+            Log("RemoveState", currentState.transform.gameObject.name);
+
             if (currentState.transform != trackTarget.transform)
                 currentState.Restore();
 
@@ -50,6 +68,7 @@ namespace Primer.Latex
 
         private void RemoveTransition()
         {
+            Log("RemoveTransition");
             currentTransition?.Dispose();
             currentTransition = null;
         }
@@ -76,6 +95,8 @@ namespace Primer.Latex
 
         private void ApplyState(LatexTransitionState state)
         {
+            Log("ApplyState", state.transform.gameObject.name);
+
             RemoveTransition();
 
             if (currentState is not null && (currentState != state))
@@ -87,6 +108,8 @@ namespace Primer.Latex
 
         private void Transition(LatexTransitionState state1, LatexTransitionState state2, float t)
         {
+            Log("Transition", state1.transform.gameObject.name, state2.transform.gameObject.name);
+
             RemoveState();
 
             if (currentTransition is not null && !currentTransition.Is(state1, state2))
