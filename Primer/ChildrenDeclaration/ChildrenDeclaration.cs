@@ -99,12 +99,8 @@ namespace Primer
         {
             var needsReorder = false;
 
-            foreach (var remove in remaining) {
+            foreach (var remove in remaining)
                 onRemove(remove);
-
-                if (remove != null)
-                    remove.parent = null;
-            }
 
             foreach (var child in after) {
                 var pos = child.localPosition;
