@@ -31,8 +31,8 @@ namespace Primer.Latex
         public Vector3 GetCenter()
         {
             var allVertices = characters.SelectMany(x => new [] {
-                x.symbol.bounds.min,
-                x.symbol.bounds.max,
+                x.bounds.min,
+                x.bounds.max,
             });
 
             return VectorUtils.Bounds(allVertices).center;

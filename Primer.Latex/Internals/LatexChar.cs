@@ -4,33 +4,23 @@ using UnityEngine;
 namespace Primer.Latex
 {
     [Serializable]
-    public sealed record LatexChar(LatexSymbol symbol, Vector3 position, float scale = 1)
+    public sealed record LatexChar(Mesh mesh, Rect bounds, Vector3 position, float scale = 1)
     {
-        public static LatexChar Lerp(LatexChar a, LatexChar b, float t)
+        public static LatexChar Lerp(LatexChar a, LatexChar b, float t) => a with {
+            position = Vector3.Lerp(a.position, b.position, t),
+            scale = Mathf.Lerp(a.scale, b.scale, t),
+        };
+
+        public static LatexChar LerpScale(LatexChar a, float t) => a with {
+            scale = Mathf.Lerp(0, a.scale, t),
+        };
+
+        public void Draw(Transform parent, Material material)
         {
-            if (!a.IsSameSymbol(b))
-                throw new ArgumentException("Can't lerp latex characters for different symbols");
-
-            return a with {
-                position = Vector3.Lerp(a.position, b.position, t),
-                scale = Mathf.Lerp(a.scale, b.scale, t),
-            };
+            var positionMod = Matrix4x4.Translate(position);
+            var scaleMod = Matrix4x4.Scale(Vector3.one * scale);
+            var matrix = parent.localToWorldMatrix * positionMod * scaleMod;
+            Graphics.DrawMesh(mesh, matrix, material, 0);
         }
-
-        public static LatexChar LerpScale(LatexChar a, float t) => a with { scale = Mathf.Lerp(0, a.scale, t) };
-
-
-        public Mesh mesh => symbol.mesh;
-
-        public bool IsSameSymbol(LatexChar other) =>
-            other is not null && symbol.Equals(other.symbol);
-
-        public void Draw(Transform parent, Material material) =>
-            symbol.Draw(parent, material, position, scale);
-
-#if UNITY_EDITOR
-        public void DrawWireGizmos(Transform parent, LatexGizmoMode features = LatexGizmoMode.Nothing) =>
-            symbol.DrawWireGizmos(parent, position, features);
-#endif
     }
 }

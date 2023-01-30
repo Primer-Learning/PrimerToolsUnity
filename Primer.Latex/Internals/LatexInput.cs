@@ -6,7 +6,8 @@ namespace Primer.Latex
 {
     public sealed record LatexInput(string code, List<string> headers)
     {
-        public bool IsEmpty => string.IsNullOrWhiteSpace(code);
+        public int GetDeterministicHashCode()
+            => $"{code}_${string.Join(',', headers)}".GetDeterministicHashCode();
 
         public bool Equals(LatexInput other) => other != null &&
                                                 code == other.code &&

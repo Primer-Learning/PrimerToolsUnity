@@ -15,7 +15,7 @@ namespace Primer.Latex.Editor
 
         private static Texture[] GetPreviewsFor(LatexExpression expression) => (
             from character in expression
-            select character.symbol?.mesh into mesh
+            select character.mesh into mesh
             where mesh is not null
             select AssetPreview.GetAssetPreview(mesh) into texture
             select ResizeAndFlip(texture, charPreviewSize, charPreviewSize)

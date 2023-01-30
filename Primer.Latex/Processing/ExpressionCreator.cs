@@ -1,14 +1,14 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    // TODO: Rename to ExpressionCreator
-    internal class FormulaCreator : ILatexProcessor
+    internal class ExpressionCreator : ILatexProcessor
     {
         private readonly LatexToSvg latexToSvg = new();
-        private readonly SvgToChars svgToChars = new();
+        private readonly SvgToSprites svgToSprites = new();
 
         public LatexProcessingState state { get; private set; } = LatexProcessingState.Initialized;
 
@@ -48,11 +48,15 @@ namespace Primer.Latex
 
             ct.ThrowIfCancellationRequested();
 
-            var renderedSprites = await svgToChars.ConvertToLatexChar(svg, ct);
+            var sprites = await svgToSprites.ConvertToSprites(svg, ct);
 
             ct.ThrowIfCancellationRequested();
 
-            return renderedSprites;
+            var result = sprites.Select(x => x.ToLatexChar()).ToArray();
+
+            ct.ThrowIfCancellationRequested();
+
+            return result;
         }
     }
 }

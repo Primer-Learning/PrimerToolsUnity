@@ -106,7 +106,7 @@ namespace Primer.Latex
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
-            if (expression is null || expression.Any(x => x.symbol.mesh is null)) {
+            if (expression is null || expression.Any(x => x.mesh is null)) {
                 CancelCurrentUpdate();
                 return;
             }
@@ -129,7 +129,7 @@ namespace Primer.Latex
                     charTransform.localRotation = Quaternion.identity;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
-                    meshFilter.sharedMesh = character.symbol.mesh;
+                    meshFilter.sharedMesh = character.mesh;
 
                     var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
                     meshRenderer.material = material;
@@ -141,22 +141,7 @@ namespace Primer.Latex
 
 
 #if UNITY_EDITOR
-        // This needs to be private (or internal) because SpriteDirectRenderer is internal
-        [SerializeField]
-        [FoldoutGroup("Details")]
-        [Tooltip("Which mesh features to visualize. Gizmos are only ever visible in the Unity editor.")]
-        internal LatexGizmoMode gizmos = LatexGizmoMode.Nothing;
-
         public List<(int start, int end)> ranges => expression?.CalculateRanges(groupIndexes);
-
-        private void OnDrawGizmos()
-        {
-            if (expression is null)
-                return;
-
-            foreach (var character in expression)
-                character.DrawWireGizmos(transform, gizmos);
-        }
 
         private void Reset()
         {
@@ -183,12 +168,16 @@ namespace Primer.Latex
         }
 
         [ResponsiveButtonGroup(Order = 1)]
-        [Button("Open Build Directory")]
+        [Button("Open build dir")]
         private void OpenBuildDir() => processor.OpenBuildDir();
 
-        [DisableIf(nameof(isRunning))]
         [ResponsiveButtonGroup]
-        [Button("Cancel Rendering Task")]
+        [Button("Open cache dir")]
+        private void OpenCacheDir() => LatexProcessingCache.OpenCacheDir();
+
+        [EnableIf(nameof(isRunning))]
+        [ResponsiveButtonGroup]
+        [Button("Cancel Rendering")]
         private void Cancel() => processor.Cancel();
 #endif
     }

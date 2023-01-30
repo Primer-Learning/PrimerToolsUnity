@@ -8,7 +8,7 @@ namespace Primer.Latex
     {
         private static CancellableLatexProcessor CreateInnerProcessor()
         {
-            var processor = new FormulaCreator();
+            var processor = new ExpressionCreator();
             var withCache = new LatexProcessingCache(processor);
             var andQueue = new LatexProcessingQueue(withCache);
             var andCancellable = new CancellableLatexProcessor(andQueue);

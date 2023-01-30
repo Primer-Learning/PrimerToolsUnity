@@ -11,24 +11,24 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    internal class SvgToChars
+    internal class SvgToSprites
     {
-        static readonly VectorUtils.TessellationOptions tessellationOptions = new() {
+        private static readonly VectorUtils.TessellationOptions tessellationOptions = new() {
             StepDistance = 100.0f,
             MaxCordDeviation = 0.5f,
             MaxTanAngleDeviation = 0.1f,
-            SamplingStepSize = 0.01f
+            SamplingStepSize = 0.01f,
         };
 
-        record CreateSprites(
+        private record CreateSprites(
             List<VectorUtils.Geometry> Geometry,
-            TaskCompletionSource<LatexChar[]> Result,
+            TaskCompletionSource<SvgSprite[]> Result,
             CancellationToken CancellationToken
         );
 
-        [CanBeNull] CreateSprites waitingToProcess;
+        [CanBeNull] private CreateSprites waitingToProcess;
 
-        public async Task<LatexChar[]> ConvertToLatexChar(string svg, CancellationToken ct)
+        public async Task<SvgSprite[]> ConvertToSprites(string svg, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -42,7 +42,7 @@ namespace Primer.Latex
                 return null;
             }
 
-            var taskCompletionSource = new TaskCompletionSource<LatexChar[]>();
+            var taskCompletionSource = new TaskCompletionSource<SvgSprite[]>();
 
             waitingToProcess = new CreateSprites(
                 VectorUtils.TessellateScene(sceneInfo.Scene, tessellationOptions),
@@ -89,22 +89,27 @@ namespace Primer.Latex
 
             try {
                 ct.ThrowIfCancellationRequested();
-                result.SetResult(ConvertGeometryToChars(allGeometry));
+                result.SetResult(ConvertGeometryToSprites(allGeometry));
             }
             catch (Exception ex) {
                 result.SetException(ex);
             }
         }
 
-        private static LatexChar[] ConvertGeometryToChars(IReadOnlyCollection<VectorUtils.Geometry> allGeometry)
+        private static SvgSprite[] ConvertGeometryToSprites(IReadOnlyCollection<VectorUtils.Geometry> allGeometry)
         {
             var allVertices = allGeometry.SelectMany(geometry => geometry.TransformVertices());
-            var bounds = VectorUtils.Bounds(allVertices);
+            var globalBounds = VectorUtils.Bounds(allVertices);
 
             var chars = allGeometry.Select(geometry => {
-                var symbol = LatexSymbolStorage.FromGeometry(geometry);
-                var position = geometry.CalculatePosition(bounds.center);
-                return new LatexChar(symbol, position);
+                var bounds = VectorUtils.Bounds(geometry.TransformVertices());
+                var position = bounds.center - globalBounds.center;
+
+                // This matches the way flipYAxis would work in BuildSprite if we gave it all of the geometry in the SVG
+                // rather than just one at a time.
+                position.y = -position.y;
+
+                return new SvgSprite(bounds, position, geometry.ConvertToSprite());
             });
 
             return chars.ToArray();
