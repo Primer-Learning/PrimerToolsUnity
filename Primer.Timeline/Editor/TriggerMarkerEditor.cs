@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
@@ -32,6 +33,20 @@ namespace Primer.Timeline.Editor
             }
 
             marker.method = MethodSelector.Render(marker.method, MethodSelector.GetMethodsWithNoParams(animation));
+
+            if (marker.method is null)
+                return;
+
+            // display the method name as a label
+            var regex = new Regex("[A-Z]", RegexOptions.Compiled);
+            var text = regex.Replace(marker.method, " $0").Trim();
+
+            GUILayout.Space(32);
+            GUILayout.Label(text, new GUIStyle {
+                fontSize = 16,
+                normal = { textColor = Color.white },
+                wordWrap = true,
+            });
         }
     }
 }
