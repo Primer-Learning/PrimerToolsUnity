@@ -41,6 +41,10 @@ public static class PrimerColor
     public static Color LightGray = UnityColorFromVector4(blackCoral);
     public static Color White = UnityColorFromVector4(white); 
     public static Color Black = UnityColorFromVector4(black);
+    
+    // Texture base colors
+    static Vector4 woodTextureBase = new Vector4 (209, 142, 49, 255);
+    public static Color WoodTextureBase = UnityColorFromVector4(woodTextureBase);
 
     // Complementary colors
     static Vector4 atomicTangerine = new Vector4(255, 160, 109, 255);
