@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Primer
 {
@@ -8,6 +9,7 @@ namespace Primer
     {
         private bool isUpdateCancelled;
         private ChildrenDeclaration declaration;
+        public readonly UnityEvent afterUpdate = new();
 
 
         protected abstract void UpdateChildren(bool isEnabled, ChildrenDeclaration children);
@@ -42,8 +44,11 @@ namespace Primer
 
             UpdateChildren(enabled && isActiveAndEnabled, declaration);
 
-            if (!isUpdateCancelled)
-                declaration.Apply();
+            if (isUpdateCancelled)
+                return;
+
+            declaration.Apply();
+            afterUpdate.Invoke();
         }
 
         [PropertyOrder(100)]
