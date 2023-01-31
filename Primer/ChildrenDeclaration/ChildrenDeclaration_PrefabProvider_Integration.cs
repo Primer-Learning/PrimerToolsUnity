@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 // This warning is thrown because we didn't document parameters
 // - this ChildrenDeclaration declaration
-// - [CallerFilePath] string callerFile
-// - [CallerLineNumber] int callerLine
 // Those parameters are not meant to be used by the user, but by the compiler
 // ReSharper disable InvalidXmlDocComment
 
@@ -30,15 +26,11 @@ namespace Primer
             PrefabProvider<T> provider,
             ref T cache,
             string name = null,
-            Action<T> init = null,
-            [CallerFilePath] string callerFile = null,
-            [CallerLineNumber] int callerLine = -1)
+            Action<T> init = null)
             where T : Component
         {
             if (provider.value == null)
                 throw new EmptyProviderException();
-
-            ForceReinitializationIfRequired($"{callerFile}:{callerLine}:{name}", declaration, provider);
 
             return declaration.NextIsInstanceOf(
                 prefab: provider.value,
@@ -61,15 +53,11 @@ namespace Primer
             this IChildrenDeclaration declaration,
             PrefabProvider<T> provider,
             string name = null,
-            Action<T> init = null,
-            [CallerFilePath] string callerFile = null,
-            [CallerLineNumber] int callerLine = -1)
+            Action<T> init = null)
             where T : Component
         {
             if (provider.value == null)
                 throw new EmptyProviderException();
-
-            ForceReinitializationIfRequired($"{callerFile}:{callerLine}:{name}", declaration, provider);
 
             return declaration.NextIsInstanceOf(
                 prefab: provider.value,
@@ -103,16 +91,12 @@ namespace Primer
             ref TCached cache,
             // In this case in particular `init` comes before `name` because it's mandatory
             Func<TPrefab, TCached> init,
-            string name = null,
-            [CallerFilePath] string callerFile = null,
-            [CallerLineNumber] int callerLine = -1)
+            string name = null)
             where TPrefab : Component
             where TCached : Component
         {
             if (provider.value == null)
                 throw new EmptyProviderException();
-
-            ForceReinitializationIfRequired($"{callerFile}:{callerLine}:{name}", declaration, provider);
 
             return declaration.NextIsInstanceOf(
                 prefab: provider.value,
@@ -139,16 +123,12 @@ namespace Primer
             PrefabProvider<TPrefab> provider,
             // In this case in particular `init` comes before `name` because it's mandatory
             Func<TPrefab, TCached> init,
-            string name = null,
-            [CallerFilePath] string callerFile = null,
-            [CallerLineNumber] int callerLine = -1)
+            string name = null)
             where TPrefab : Component
             where TCached : Component
         {
             if (provider.value == null)
                 throw new EmptyProviderException();
-
-            ForceReinitializationIfRequired($"{callerFile}:{callerLine}:{name}", declaration, provider);
 
             return declaration.NextIsInstanceOf(
                 prefab: provider.value,
@@ -158,34 +138,6 @@ namespace Primer
                     return init.Invoke(value);
                 }
             );
-        }
-        #endregion
-
-
-        #region Force reinitialization
-        private static readonly Dictionary<IPrefabProvider<Component>, HashSet<string>> initTracker = new();
-
-        private static void ForceReinitializationIfRequired(
-            string key,
-            IChildrenDeclaration declaration,
-            IPrefabProvider<Component> provider
-        )
-        {
-            if (!initTracker.TryGetValue(provider, out var initialized)) {
-                initialized = new HashSet<string>();
-                initTracker.Add(provider, initialized);
-            }
-
-            if (provider.hasChanges) {
-                initialized.Clear();
-                provider.hasChanges = false;
-            }
-
-            if (initialized.Contains(key))
-                return;
-
-            initialized.Add(key);
-            declaration.ReinitializeNextChild();
         }
         #endregion
     }
