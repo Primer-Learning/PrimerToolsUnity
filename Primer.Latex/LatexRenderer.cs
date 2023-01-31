@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -76,16 +75,6 @@ namespace Primer.Latex
             headers = input.headers;
             var newExpression = await Evaluate(input);
             ApplyExpression(newExpression);
-        }
-
-        public async UniTask Replace(string input)
-        {
-            var primer = this.GetPrimer();
-            var processing = Evaluate(new LatexInput(input, headers));
-            await primer.ScaleDownToZero();
-            var newExpression = await processing;
-            ApplyExpression(newExpression);
-            await primer.ScaleUpFromZero();
         }
 
 

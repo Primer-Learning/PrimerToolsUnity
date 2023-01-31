@@ -1,4 +1,3 @@
-using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,7 +16,7 @@ namespace Primer.Table
         public Vector3Int length = new(3, 3, 1);
         public Vector3 cellSize = new(1, 1, 0);
 
-        [Title("Prefab")]
+        [HideLabel, Title("Prefab")]
         public PrefabProvider prefab;
 
 
