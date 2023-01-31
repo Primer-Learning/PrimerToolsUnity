@@ -1,4 +1,5 @@
 using System;
+using Primer.Extensions;
 using UnityEngine;
 
 namespace Primer
@@ -21,18 +22,10 @@ namespace Primer
         public static void Clear(Transform parent, Action<Transform> onRemove = null)
         {
             var remove = onRemove ?? DefaultOnRemove;
-            var childCount = parent.childCount;
-            var children = new Transform[childCount];
+            var children = parent.GetChildren();
 
-            for (var i = 0; i < childCount; i++)
-                children[i] = parent.GetChild(i);
-
-            for (var i = 0; i < childCount; i++) {
+            for (var i = 0; i < children.Length; i++)
                 remove(children[i]);
-
-                if (children[i] != null)
-                    children[i].parent = null;
-            }
         }
     }
 }

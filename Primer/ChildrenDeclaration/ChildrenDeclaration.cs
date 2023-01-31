@@ -30,6 +30,8 @@ namespace Primer
     /// </example>
     public partial class ChildrenDeclaration : IChildrenDeclaration
     {
+        public int count => after.Count;
+
         /// <summary>Start a new child declaration</summary>
         /// <param name="parent">Transform to contain the children</param>
         /// <param name="onCreate">Callback to be invoked whenever a child is created</param>
