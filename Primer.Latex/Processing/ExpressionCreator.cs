@@ -8,7 +8,7 @@ namespace Primer.Latex
     internal class ExpressionCreator : ILatexProcessor
     {
         private readonly LatexToSvg latexToSvg = new();
-        private readonly SvgToSprites svgToSprites = new();
+        private readonly SvgToChars svgToChars = new();
 
         public LatexProcessingState state { get; private set; } = LatexProcessingState.Initialized;
 
@@ -48,15 +48,11 @@ namespace Primer.Latex
 
             ct.ThrowIfCancellationRequested();
 
-            var sprites = await svgToSprites.ConvertToSprites(svg, ct);
+            var chars = await svgToChars.ConvertToSprites(svg, ct);
 
             ct.ThrowIfCancellationRequested();
 
-            var result = sprites.Select(x => x.ToLatexChar()).ToArray();
-
-            ct.ThrowIfCancellationRequested();
-
-            return result;
+            return chars;
         }
     }
 }

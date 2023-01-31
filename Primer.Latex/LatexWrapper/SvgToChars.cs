@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    internal class SvgToSprites
+    internal class SvgToChars
     {
         private static readonly VectorUtils.TessellationOptions tessellationOptions = new() {
             StepDistance = 100.0f,
@@ -22,13 +22,13 @@ namespace Primer.Latex
 
         private record CreateSprites(
             List<VectorUtils.Geometry> Geometry,
-            TaskCompletionSource<SvgSprite[]> Result,
+            TaskCompletionSource<LatexChar[]> Result,
             CancellationToken CancellationToken
         );
 
         [CanBeNull] private CreateSprites waitingToProcess;
 
-        public async Task<SvgSprite[]> ConvertToSprites(string svg, CancellationToken ct)
+        public async Task<LatexChar[]> ConvertToSprites(string svg, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -42,7 +42,7 @@ namespace Primer.Latex
                 return null;
             }
 
-            var taskCompletionSource = new TaskCompletionSource<SvgSprite[]>();
+            var taskCompletionSource = new TaskCompletionSource<LatexChar[]>();
 
             waitingToProcess = new CreateSprites(
                 VectorUtils.TessellateScene(sceneInfo.Scene, tessellationOptions),
@@ -96,23 +96,11 @@ namespace Primer.Latex
             }
         }
 
-        private static SvgSprite[] ConvertGeometryToSprites(IReadOnlyCollection<VectorUtils.Geometry> allGeometry)
+        private static LatexChar[] ConvertGeometryToSprites(IReadOnlyCollection<VectorUtils.Geometry> allGeometry)
         {
             var allVertices = allGeometry.SelectMany(geometry => geometry.TransformVertices());
-            var globalBounds = VectorUtils.Bounds(allVertices);
-
-            var chars = allGeometry.Select(geometry => {
-                var bounds = VectorUtils.Bounds(geometry.TransformVertices());
-                var position = bounds.center - globalBounds.center;
-
-                // This matches the way flipYAxis would work in BuildSprite if we gave it all of the geometry in the SVG
-                // rather than just one at a time.
-                position.y = -position.y;
-
-                return new SvgSprite(bounds, position, geometry.ConvertToSprite());
-            });
-
-            return chars.ToArray();
+            var center = VectorUtils.Bounds(allVertices).center;
+            return allGeometry.Select(geometry => new LatexChar(geometry, center)).ToArray();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
+            LatexProcessingCache.disableCache = GUILayout.Toggle(LatexProcessingCache.disableCache, "Disable cache");
+            Space();
             GetStatusBox().Render();
 
             if (HandleIfPreset())

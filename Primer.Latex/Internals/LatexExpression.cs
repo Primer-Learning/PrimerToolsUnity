@@ -14,10 +14,11 @@ namespace Primer.Latex
         private readonly LatexChar[] characters;
 
         public bool isEmpty => characters.Length == 0;
-        public int count => characters.Length;
+        public Vector2 center => GetBounds().center;
 
 
-        public LatexChar this[int index] => characters[index];
+        // public int count => characters.Length;
+        // public LatexChar this[int index] => characters[index];
 
 
         public LatexExpression() => characters = Array.Empty<LatexChar>();
@@ -28,14 +29,17 @@ namespace Primer.Latex
         public bool IsSame(LatexExpression other)
             => !ReferenceEquals(null, other) && characters.SequenceEqual(other.characters);
 
-        public Vector3 GetCenter()
+        public Rect GetBounds()
         {
-            var allVertices = characters.SelectMany(x => new [] {
-                x.bounds.min,
-                x.bounds.max,
-            });
+            var allVertices = new Vector2[characters.Length * 2];
 
-            return VectorUtils.Bounds(allVertices).center;
+            for (var i = 0; i < characters.Length; i++) {
+                var charBounds = characters[i].bounds;
+                allVertices[i * 2] = charBounds.min;
+                allVertices[i * 2 + 1] = charBounds.max;
+            }
+
+            return VectorUtils.Bounds(allVertices);
         }
 
         public LatexExpression Slice(int start, int end)

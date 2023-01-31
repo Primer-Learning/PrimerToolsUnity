@@ -119,12 +119,12 @@ namespace Primer.Latex
                 return;
             }
 
-            var zero = expression.GetCenter();
+            var zero = expression.center;
 
             foreach (var (start, end) in expression.CalculateRanges(groupIndexes)) {
                 var chunk = expression.Slice(start, end);
                 var group = children.Next($"Group (chars {start} to {end - 1})");
-                var center = chunk.GetCenter();
+                var center = chunk.center;
                 var grandChildren = new ChildrenDeclaration(group);
 
                 group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
@@ -187,6 +187,33 @@ namespace Primer.Latex
         [ResponsiveButtonGroup]
         [Button("Cancel Rendering")]
         private void Cancel() => processor.Cancel();
+
+
+        private void OnDrawGizmos()
+        {
+            if (expression is null)
+                return;
+
+            var rootPosition = transform.position;
+            var zero = expression.center;
+
+            foreach (var (start, end) in ranges) {
+                var chunk = expression.Slice(start, end);
+                var bounds = chunk.GetBounds();
+                var center = chunk.center;
+                var position = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
+
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireCube(rootPosition + position, bounds.size);
+                Handles.Label(rootPosition + position, $"Group {start} to {end - 1}");
+
+                foreach (var character in chunk) {
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireCube(character.position + rootPosition, character.bounds.size);
+                }
+            }
+        }
+
 #endif
     }
 }

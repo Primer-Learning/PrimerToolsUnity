@@ -11,10 +11,15 @@ namespace Primer.Latex
 {
     internal class LatexProcessingCache : ProcessingPipeline
     {
+        public static bool disableCache = false;
+
         public LatexProcessingCache(ILatexProcessor innerProcessor) : base(innerProcessor) {}
 
         public override Task<LatexExpression> Process(LatexInput config, CancellationToken cancellationToken = default)
         {
+            if (disableCache)
+                return processor.Process(config, cancellationToken);
+
             var cached = GetFromCache(config);
 
             if (cached is not null)
@@ -107,7 +112,7 @@ namespace Primer.Latex
         private struct SerializableLatexChar
         {
             public readonly (float x, float y) position;
-            public readonly (float x1, float y1, float x2, float y2) bounds;
+            public readonly (float x, float y, float w, float h) bounds;
             public readonly float scale;
             public readonly SerializableMesh mesh;
 
@@ -115,19 +120,18 @@ namespace Primer.Latex
             {
                 mesh = new SerializableMesh(latexChar.mesh);
                 scale = latexChar.scale;
-                position = (latexChar.position.x, latexChar.position.y );
-
+                position = (latexChar.position.x, latexChar.position.y);
                 bounds = (
-                    latexChar.bounds.xMin,
-                    latexChar.bounds.yMin,
-                    latexChar.bounds.xMax,
-                    latexChar.bounds.yMax
+                    x: latexChar.bounds.xMin,
+                    y: latexChar.bounds.yMin,
+                    w: latexChar.bounds.width,
+                    h: latexChar.bounds.height
                 );
             }
 
             public LatexChar ToLatexChar() => new(
                 mesh.GetMesh(),
-                new Rect(bounds.x1, bounds.y1, bounds.x2, bounds.y2),
+                new Rect(bounds.x, bounds.y, bounds.w, bounds.h),
                 new Vector2(position.x, position.y),
                 scale
             );
