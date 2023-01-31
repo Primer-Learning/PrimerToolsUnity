@@ -20,6 +20,12 @@ namespace Primer.Timeline
         [Title("Animation", "Extend Scrubbable class to add more types")]
         public Scrubbable animation;
 
+        [SerializeReference]
+        [HideLabel]
+        [InlineProperty]
+        [Title("Previous Animation", "If there is a clip before this in the same track, put it here to let them cooperate")]
+        public Scrubbable previousAnimation;
+
         [SerializeField]
         [HideInInspector]
         internal string method;
@@ -35,8 +41,21 @@ namespace Primer.Timeline
             }
         }
 
-        protected override void Start() => animation?.Prepare();
-        protected override void Stop() => animation?.Cleanup();
+        protected override void Start()
+        {
+            if (previousAnimation != null)
+            {
+                previousAnimation.target = trackTarget;
+                previousAnimation.Prepare();
+                previousAnimation.Update(1);
+            }
+            animation?.Prepare();
+        }
+
+        protected override void Stop()
+        {
+            animation?.Cleanup();
+        }
 
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
