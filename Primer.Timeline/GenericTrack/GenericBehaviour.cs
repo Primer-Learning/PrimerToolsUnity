@@ -42,7 +42,6 @@ namespace Primer.Timeline
 
         #region Trigger
         [Space]
-        [SerializeField]
         [SerializeReference]
         [ShowIf("@kind == Kind.Trigger")]
         [ValueDropdown(nameof(GetTriggerableOptions))]
@@ -50,25 +49,15 @@ namespace Primer.Timeline
         internal TriggeredBehaviour triggerable;
 
         [SerializeField]
-        [SerializeReference]
         [MethodOf(nameof(triggerable))]
         [ShowIf("@kind == Kind.Trigger && triggerable != null")]
         [Tooltip("Method to call when the clip is played")]
         internal MethodInvocation triggerMethod;
 
-        private ITriggeredBehaviour[] GetTriggerableOptions()
-        {
-
-
-            if (trackTarget == null) {
-                PrimerLogger.Log("No track target");
-                return Array.Empty<ITriggeredBehaviour>();
-            }
-
-            var list = trackTarget.GetComponents<ITriggeredBehaviour>();
-            PrimerLogger.Log($"Triggerable {list.Length}");
-            return list;
-        }
+        private TriggeredBehaviour[] GetTriggerableOptions()
+            => trackTarget == null
+                ? Array.Empty<TriggeredBehaviour>()
+                : trackTarget.GetComponents<TriggeredBehaviour>();
         #endregion
 
         #region Sequence
@@ -99,7 +88,7 @@ namespace Primer.Timeline
 
         public string clipName => kind switch {
                 Kind.Scrubbable => scrubbable?.GetType().Name,
-                Kind.Trigger => triggerMethod?.ToString(),
+                Kind.Trigger => triggerMethod.ToString(),
                 // Kind.Sequence => sequenceMethod?.ToString(),
                 _ => null,
             }
@@ -142,11 +131,6 @@ namespace Primer.Timeline
                 return;
             }
 
-            if (triggerMethod is null) {
-                Debug.LogWarning("WAT");
-                return;
-            }
-
             var t = Mathf.Clamp01((time - start) / duration);
             scrubbableMethod.Invoke(scrubbable, t);
         }
@@ -155,11 +139,6 @@ namespace Primer.Timeline
         {
             if (triggerable is null) {
                 Debug.LogWarning($"[{this}] no triggerable selected.\nIf no triggerable is available consider adding a {nameof(TriggeredBehaviour)} to the track's target");
-                return;
-            }
-
-            if (triggerMethod is null) {
-                Debug.LogWarning("WAT");
                 return;
             }
 

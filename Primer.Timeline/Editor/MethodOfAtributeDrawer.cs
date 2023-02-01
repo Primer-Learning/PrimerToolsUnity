@@ -13,23 +13,6 @@ namespace Primer.Timeline.Editor
     [UsedImplicitly]
     public class MethodOfAttributeDrawer : OdinAttributeDrawer<MethodOfAttribute>
     {
-        private static readonly string[] ignoreMethods = {
-            "IsInvoking",
-            "CancelInvoke",
-            "StopAllCoroutines",
-            "GetComponent",
-            "GetComponentInChildren",
-            "GetComponentsInChildren",
-            "GetComponentInParent",
-            "GetComponentsInParent",
-            "GetComponents",
-            "GetInstanceID",
-            "GetHashCode",
-            "ToString",
-            "GetType",
-            "Equals",
-        };
-
         private ValueResolver<object> targetResolver;
         private InspectorProperty methodName;
 
@@ -72,11 +55,43 @@ namespace Primer.Timeline.Editor
             EditorGUI.EndDisabledGroup();
         }
 
-        private static MethodInfo[] GetMethodsOf(Type targetType)
-        {
-            return targetType.GetMethods()
+        internal static MethodInfo[] GetMethodsOf(Type targetType)
+            => targetType.GetMethods()
                 .Where(x => !x.Name.StartsWith("get_") && !x.Name.StartsWith("set_") && !ignoreMethods.Contains(x.Name))
                 .ToArray();
-        }
+
+        internal static readonly string[] ignoreMethods = {
+            // MonoBehaviour
+            "BroadcastMessage",
+            "CompareTag",
+            "Invoke",
+            "InvokeRepeating",
+            "OnNotify",
+            "SendMessage",
+            "SendMessageUpwards",
+            "StartCoroutine",
+            "StartCoroutine_Auto",
+            "StopCoroutine",
+            "TryGetComponent",
+
+            // GameObject
+            "IsInvoking",
+            "CancelInvoke",
+            "StopAllCoroutines",
+            "GetComponent",
+            "GetComponentInChildren",
+            "GetComponentsInChildren",
+            "GetComponentInParent",
+            "GetComponentsInParent",
+            "GetComponents",
+            "GetInstanceID",
+
+            // System.Object
+            "GetHashCode",
+            "ToString",
+            "GetType",
+            "Equals",
+        };
+
     }
 }

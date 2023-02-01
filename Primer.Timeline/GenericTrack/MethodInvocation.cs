@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace Primer.Timeline
 {
     [Serializable]
-    internal class MethodInvocation
+    internal struct MethodInvocation
     {
         private static readonly Regex uppercase = new("[A-Z]", RegexOptions.Compiled);
 
@@ -24,6 +24,8 @@ namespace Primer.Timeline
         }
 
         public override string ToString()
-            => uppercase.Replace(methodName, " $0").Trim();
+            => methodName is null
+                ? nameof(MethodInvocation)
+                : uppercase.Replace(methodName, " $0").Trim();
     }
 }

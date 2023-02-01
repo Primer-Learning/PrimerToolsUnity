@@ -6,10 +6,8 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    public interface ITriggeredBehaviour {}
-
     [ExecuteAlways]
-    public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver, ITriggeredBehaviour
+    public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
     {
         public void OnNotify(Playable origin, INotification notification, object context)
         {
