@@ -1,10 +1,10 @@
 using System;
-using Primer.Animation;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Timeline;
 
-namespace Primer.Timeline
+namespace Primer.Animation
 {
     [Serializable]
     public class ScaleSmoothly : Scrubbable, IPropertyModifier
