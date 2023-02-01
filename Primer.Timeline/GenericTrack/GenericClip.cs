@@ -1,33 +1,52 @@
+using System;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Primer.Timeline
 {
-    public class GenericClip : PrimerClip<GenericBehaviour>
+    public class GenericClip : PlayableAsset, ITimelineClipAsset
     {
-        public override ClipCaps clipCaps => ClipCaps.Extrapolation;
+        public ClipCaps clipCaps => ClipCaps.Extrapolation;
 
-        // TODO: Move GenericBehaviour branching logic to here
-        // private ScrubbableShit scrubbable = new();
-        // private TriggerableShit triggerable = new();
-        // // private SequentialShit sequential = new();
-        //
-        // [Space(32)]
-        // [HideLabel]
-        // [EnumToggleButtons]
-        // [OnValueChanged(nameof(OnKindChanged))]
-        // public Kind kind = Kind.Scrubbable;
-        // public enum Kind { Scrubbable, Trigger, Sequence }
-        //
-        // private void OnKindChanged()
-        // {
-        //     template = kind switch {
-        //         Kind.Scrubbable => scrubbable,
-        //         Kind.Trigger => triggerable,
-        //         // Kind.Sequence => sequential,
-        //         // _ => throw new ArgumentOutOfRangeException(),
-        //     };
-        // }
-        //
-        // public void Execute(float time) => template.Execute(time);
+        [Space(32)]
+        [HideLabel]
+        [EnumToggleButtons]
+        public Kind kind = Kind.Scrubbable;
+        public enum Kind { Scrubbable, Trigger, Sequence }
+
+        [SerializeReference]
+        [ShowIf("@kind == Kind.Scrubbable")]
+        [DisableContextMenu]
+        [HideReferenceObjectPicker]
+        [HideLabel]
+        internal ScrubbablePlayable scrubbable = new();
+
+        [SerializeReference]
+        [ShowIf("@kind == Kind.Trigger")]
+        [DisableContextMenu]
+        [HideReferenceObjectPicker]
+        [HideLabel]
+        internal TriggerablePlayable triggerable = new();
+
+        [SerializeReference]
+        [ShowIf("@kind == Kind.Sequence")]
+        [DisableContextMenu]
+        [HideReferenceObjectPicker]
+        [HideLabel]
+        private SequentialPlayable sequential = new();
+
+        public GenericBehaviour template => kind switch {
+            Kind.Scrubbable => scrubbable,
+            Kind.Trigger => triggerable,
+            Kind.Sequence => sequential,
+            _ => throw new ArgumentOutOfRangeException(),
+        };
+
+        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+        {
+            return ScriptPlayable<GenericBehaviour>.Create(graph, template);
+        }
     }
 }

@@ -9,6 +9,8 @@ namespace Primer.Timeline
     [ExecuteAlways]
     public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
     {
+        public virtual void Prepare() {}
+
         public void OnNotify(Playable origin, INotification notification, object context)
         {
             if (notification is not TriggerMarker trigger)

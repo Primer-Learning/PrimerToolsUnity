@@ -14,22 +14,10 @@ namespace Primer.Timeline.FakeUnityEngine
     [TrackBindingType(typeof(Transform))]
     internal class GenericTrack : PrimerTrack
     {
-        // protected override Playable CreatePlayable(PlayableGraph graph, GameObject gameObject, TimelineClip clip) {
-        //     var playable = (ScriptPlayable<GenericBehaviour>)base.CreatePlayable(graph, gameObject, clip);
-        //
-        //     // Only the TimelineClip has the actual duration (not including extrapolation) so we must grab it here.
-        //     var behaviour = playable.GetBehaviour();
-        //
-        //     if (behaviour is not null)
-        //         behaviour.duration = clip.duration;
-        //
-        //     return playable;
-        // }
-
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
             foreach (var clip in GetClips()) {
-                if (clip.asset is not PrimerClip<GenericBehaviour> asset)
+                if (clip.asset is not GenericClip asset)
                     continue;
 
                 // HACK: to set the display name of the clip to match the clipName property
@@ -47,12 +35,14 @@ namespace Primer.Timeline.FakeUnityEngine
         {
             base.OnCreateClip(clip);
 
+            clip.duration = 1;
+
             // clip.postExtrapolationMode = TimelineClip.ClipExtrapolation.Hold;
             //
             // HACK: Property's setter above is internal (why? ask Unity), so we use reflection to set it.
-            const BindingFlags FLAGS = BindingFlags.NonPublic | BindingFlags.Instance;
+            const BindingFlags PRIVATE_INSTANCE = BindingFlags.NonPublic | BindingFlags.Instance;
             clip.GetType()
-                .GetMethod("set_postExtrapolationMode", FLAGS)
+                .GetMethod("set_postExtrapolationMode", PRIVATE_INSTANCE)
                 ?.Invoke(clip, new object[] { TimelineClip.ClipExtrapolation.Hold });
         }
     }
