@@ -1,9 +1,7 @@
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Animation
 {
-    [EnumToggleButtons]
     public enum EaseMode
     {
         Cubic,

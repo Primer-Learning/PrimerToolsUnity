@@ -2,11 +2,11 @@
   "name": "Primer.Timeline.Editor",
   "rootNamespace": "Primer.Timeline.Editor",
   "references": [
-    "Unity.Timeline",
-    "Unity.Timeline.Editor",
+    "GUID:f06555f75b070af458a003d92f9efb00",
+    "GUID:02f771204943f4a40949438e873e3eff",
     "GUID:f51ebe6a0ceec4240a699833d6309b23",
-    "Primer.Timeline",
-    "GUID:fa12db3b1380a428aa2ceb49c4ac3684"
+    "Primer",
+    "Primer.Timeline"
   ],
   "includePlatforms": ["Editor"]
 }
