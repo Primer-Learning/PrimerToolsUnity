@@ -54,7 +54,8 @@ namespace Primer.Timeline
 
         protected override void Stop()
         {
-            animation?.Cleanup();
+            // animation?.Cleanup();
+            animation?.Update(0);
         }
 
 
