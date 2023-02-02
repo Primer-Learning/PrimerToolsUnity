@@ -68,6 +68,8 @@ namespace Primer.Timeline
                 return;
             }
 
+            Prepare();
+
             var t = Mathf.Clamp01((time - start) / duration);
             scrubbableMethod.Invoke(scrubbable, t);
         }

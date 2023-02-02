@@ -19,7 +19,7 @@ namespace Primer.Timeline
             var time = (float)playable.GetTime();
 
             var behaviours = CollectBehaviours(playable)
-                .Where(x => x.start < time)
+                // .Where(x => x.start < time)
                 .GroupBy(x => x.GetType())
                 .ToDictionary(x => x.Key, x => x.ToList());
 
@@ -34,13 +34,10 @@ namespace Primer.Timeline
             for (var i = 0; i < behaviours.Length; i++) {
                 var behaviour = behaviours[i];
 
-                if (behaviour.weight == 0) {
+                if (behaviour.weight == 0)
                     behaviour.Cleanup();
-                    continue;
-                }
-
-                behaviour.Prepare();
-                behaviour.Execute(time);
+                else
+                    behaviour.Execute(time);
             }
         }
 
@@ -52,8 +49,15 @@ namespace Primer.Timeline
             var toExecute = new Queue<TriggerablePlayable>();
 
             for (var i = 0; i < behaviours.Length; i++) {
-                if (alreadyExecuted.Count == 0 || behaviours[i] == alreadyExecuted.Dequeue()) {
-                    toExecute.Enqueue(behaviours[i]);
+                var behaviour = behaviours[i];
+
+                if (behaviour.weight == 0) {
+                    behaviour.Cleanup();
+                    continue;
+                }
+
+                if (alreadyExecuted.Count == 0 || behaviour == alreadyExecuted.Dequeue()) {
+                    toExecute.Enqueue(behaviour);
                     continue;
                 }
 
@@ -69,7 +73,6 @@ namespace Primer.Timeline
                 if (ranTriggers.All(x => x.triggerable != behaviour.triggerable))
                     behaviour.triggerable.Prepare();
 
-                behaviour.Prepare();
                 behaviour.Execute(time);
                 ranTriggers.Add(behaviour);
             }
@@ -94,9 +97,18 @@ namespace Primer.Timeline
             #endregion
 
             foreach (var entry in allSequences.GroupBy(x => x.playableName)) {
-                var behaviours = entry.ToArray();
+                if (entry.Key == SequentialPlayable.NO_SEQUENCE_SELECTED)
+                    continue;
 
-                // All behaviours point to the same sequence
+                var behaviours = entry.Where(x => x.start <= time).ToArray();
+                var stepsToRun = behaviours.Length;
+
+                if (stepsToRun == 0) {
+                    SequentialPlayable.Cleanup(entry.First().sequence);
+                    continue;
+                }
+
+                // All behaviours point to the same method of the same sequence, we pick the first one to represent them all
                 var behaviour = behaviours[0];
                 var sequence = behaviour.sequence;
 
@@ -108,23 +120,23 @@ namespace Primer.Timeline
                     : (0, null);
 
                 // The executed steps match the amount of steps in the track so nothing to do here
-                if (behaviours.Length == lastStepsCount) {
+                if (stepsToRun == lastStepsCount) {
                     steps.Add(sequence, (lastStepsCount, lastEnumerator));
                     continue;
                 }
 
                 // There were some executions but now we have more steps to execute
-                if (behaviours.Length > lastStepsCount) {
+                if (stepsToRun > lastStepsCount) {
                     lastEnumerator ??= behaviour.Initialize();
 
-                    var remaining = behaviours.Length - lastStepsCount;
+                    var remaining = stepsToRun - lastStepsCount;
                     var result = await behaviour.RunSteps(lastEnumerator, remaining, IsExecutionObsolete);
                     var isOver = result != SequentialPlayable.StepExecutionResult.Continue;
 
                     if (isOver && await DisposeEnumerator(lastEnumerator))
                         return;
 
-                    steps[sequence] = (behaviours.Length, isOver ? null : lastEnumerator);
+                    steps[sequence] = (stepsToRun, isOver ? null : lastEnumerator);
                     continue;
                 }
 
@@ -132,7 +144,7 @@ namespace Primer.Timeline
                 if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator))
                     return;
 
-                var enumerator = await behaviour.Execute(behaviours.Length, IsExecutionObsolete);
+                var enumerator = await behaviour.Execute(stepsToRun, IsExecutionObsolete);
                 steps[sequence] = (behaviours.Length, enumerator);
             }
 

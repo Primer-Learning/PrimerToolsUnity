@@ -11,6 +11,7 @@ namespace Primer.Timeline
     internal class SequentialPlayable : GenericBehaviour
     {
         public enum StepExecutionResult { Continue, Abort, Done }
+        public const string NO_SEQUENCE_SELECTED = "No sequence selected";
 
 
         [SerializeReference]
@@ -26,30 +27,30 @@ namespace Primer.Timeline
         static SequentialPlayable() => SetIcon<SequentialPlayable>('≡');
 
         public override string playableName
-            => sequence == null ? "No sequence selected" : sequenceMethod.ToString(sequence);
+            => sequence == null ? NO_SEQUENCE_SELECTED : sequenceMethod.ToString(sequence);
 
 
         #region Sequence management
-        private static HashSet<Sequence> initializationTracker = new();
+        private static HashSet<Sequence> cleannessTracker = new();
 
         public void Prepare() => Prepare(sequence);
         public static void Prepare(Sequence sequence)
         {
-            if (sequence == null || initializationTracker.Contains(sequence))
+            if (sequence == null || !cleannessTracker.Contains(sequence))
                 return;
 
             sequence.Prepare();
-            initializationTracker.Add(sequence);
+            cleannessTracker.Remove(sequence);
         }
 
         public void Cleanup() => Cleanup(sequence);
         public static void Cleanup(Sequence sequence)
         {
-            if (sequence == null || !initializationTracker.Contains(sequence))
+            if (sequence == null || cleannessTracker.Contains(sequence))
                 return;
 
             sequence.Cleanup();
-            initializationTracker.Remove(sequence);
+            cleannessTracker.Add(sequence);
         }
 
         public IAsyncEnumerator<object> Initialize()

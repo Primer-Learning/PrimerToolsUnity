@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -20,31 +21,35 @@ namespace Primer.Timeline
         internal MethodInvocation triggerMethod;
 
 
+        private static Regex removeStep = new(@"^Step(\d+)", RegexOptions.Compiled);
+
         static TriggerablePlayable() => SetIcon<TriggerablePlayable>('╬');
 
         public override string playableName
-            => triggerable == null ? "No triggerable selected" : triggerMethod.ToString();
+            => triggerable == null
+                ? "No triggerable selected"
+                : removeStep.Replace(triggerMethod.ToString(), "$1");
 
 
         #region Triggerable management
-        private static HashSet<Triggerable> initializationTracker = new();
+        private static HashSet<Triggerable> cleannessTracker = new();
 
         public void Prepare()
         {
-            if (triggerable == null || initializationTracker.Contains(triggerable))
+            if (triggerable == null || !cleannessTracker.Contains(triggerable))
                 return;
 
             triggerable.Prepare();
-            initializationTracker.Add(triggerable);
+            cleannessTracker.Remove(triggerable);
         }
 
         public void Cleanup()
         {
-            if (triggerable == null || !initializationTracker.Contains(triggerable))
+            if (triggerable == null || cleannessTracker.Contains(triggerable))
                 return;
 
             triggerable.Cleanup();
-            initializationTracker.Remove(triggerable);
+            cleannessTracker.Add(triggerable);
         }
 
         public void Execute(float time)
@@ -54,6 +59,7 @@ namespace Primer.Timeline
                 return;
             }
 
+            Prepare();
             triggerMethod.Invoke(triggerable);
         }
         #endregion
