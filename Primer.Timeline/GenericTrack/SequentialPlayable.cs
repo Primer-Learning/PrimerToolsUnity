@@ -35,20 +35,23 @@ namespace Primer.Timeline
                 sequence.Cleanup();
         }
 
+
+        private static readonly Dictionary<Transform, (IAsyncEnumerator<object> enumerator, int steps)> executions =
+            new();
+
         public override void Execute(float time)
         {
             // TODO
             throw new NotImplementedException();
 
-            if (sequence is null) {
-                Debug.LogWarning(
-                    $"[{this}] no sequence selected.\nIf no sequence is available consider adding a {nameof(Sequence)} to the track's target"
-                );
-
+            if (!executions.ContainsKey(trackTarget)) {
+                executions.Add(trackTarget, (sequence.Run(), 0));
                 return;
             }
 
-            sequenceMethod.Invoke(sequence);
+            var (enumerator, steps) = executions[trackTarget];
+
+            // if (steps < )
         }
 
         public override string ToString()

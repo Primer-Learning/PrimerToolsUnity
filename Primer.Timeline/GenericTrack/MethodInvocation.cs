@@ -10,18 +10,30 @@ namespace Primer.Timeline
 
         public string methodName;
 
+        public Type expectedReturnType;
 
-        public void Invoke(object target, params object[] parameters)
+
+        public object Invoke(object target, params object[] parameters)
         {
             var method = target.GetType().GetMethod(methodName);
 
             if (method is null) {
                 throw new MethodAccessException(
-                    $"Cannot find method {methodName} on {target.GetType().FullName}"
+                    $"Cannot find method {ToString(target)}"
                 );
             }
 
+            if (expectedReturnType != null && expectedReturnType.IsAssignableFrom(method.ReturnType)) {
+                throw new MethodAccessException(
+                    $"Method {ToString(target)} returns {method.ReturnType}, expected {expectedReturnType}"
+                );
+            }
+
+            if (method.ReturnType != typeof(void))
+                return method.Invoke(target, parameters);
+
             method.Invoke(target, parameters);
+            return null;
         }
 
 
