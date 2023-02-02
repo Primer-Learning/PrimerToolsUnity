@@ -46,7 +46,9 @@ namespace Primer.Timeline
 
         public string ToString(object target)
         {
-            var method = $"{methodName}()";
+            var method = methodName is null
+                ? "(No method selected)"
+                : $"{methodName}()";
 
             return target == null
                 ? method

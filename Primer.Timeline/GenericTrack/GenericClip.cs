@@ -16,6 +16,7 @@ namespace Primer.Timeline
         public Kind kind = Kind.Scrubbable;
         public enum Kind { Scrubbable, Trigger, Sequence }
 
+        [Space]
         [SerializeReference]
         [ShowIf("@kind == Kind.Scrubbable")]
         [DisableContextMenu]
@@ -23,6 +24,7 @@ namespace Primer.Timeline
         [HideLabel]
         internal ScrubbablePlayable scrubbable = new();
 
+        [Space]
         [SerializeReference]
         [ShowIf("@kind == Kind.Trigger")]
         [DisableContextMenu]
@@ -30,6 +32,7 @@ namespace Primer.Timeline
         [HideLabel]
         internal TriggerablePlayable triggerable = new();
 
+        [Space]
         [SerializeReference]
         [ShowIf("@kind == Kind.Sequence")]
         [DisableContextMenu]

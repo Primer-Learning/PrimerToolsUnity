@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -9,7 +10,7 @@ namespace Primer.Timeline
             "This is set to true if the clip throws any error",
             "Used internally to prevent an invalid clip to modify scene game objects"
         )]
-        public bool isFailed = false;
+        internal bool isFailed = false;
 
 
         private Lifecycle _lifecycle;

@@ -8,7 +8,6 @@ namespace Primer.Timeline
     [Serializable]
     internal class SequentialPlayable : GenericBehaviour
     {
-        [Space]
         [SerializeReference]
         [ValueDropdown(nameof(GetSequenceOptions))]
         internal Sequence sequence;
