@@ -22,10 +22,31 @@ namespace Primer.Timeline
         public override string playableName => sequenceMethod.ToString(sequence);
 
 
+        #region Sequence management
+        private static HashSet<Sequence> initializationTracker = new();
+
+        public void Prepare()
+        {
+            if (sequence == null || initializationTracker.Contains(sequence))
+                return;
+
+            sequence.Prepare();
+            initializationTracker.Add(sequence);
+        }
+
+        public void Cleanup()
+        {
+            if (sequence == null || !initializationTracker.Contains(sequence))
+                return;
+
+            sequence.Cleanup();
+            initializationTracker.Remove(sequence);
+        }
         public IAsyncEnumerator<object> Execute()
         {
             return (IAsyncEnumerator<object>)sequenceMethod.Invoke(sequence);
         }
+        #endregion
 
 
         public override string ToString()

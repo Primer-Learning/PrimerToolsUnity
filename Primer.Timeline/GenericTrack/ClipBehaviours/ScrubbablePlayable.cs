@@ -36,14 +36,25 @@ namespace Primer.Timeline
         }
 
 
-        protected override void Start()
+        #region Scrubbable management
+        private bool isInitialized = false;
+
+        public void Prepare()
         {
-            scrubbable?.Prepare();
+            if (isInitialized || scrubbable is null)
+                return;
+
+            scrubbable.Prepare();
+            isInitialized = true;
         }
 
-        protected override void Stop()
+        public void Cleanup()
         {
-            scrubbable?.Cleanup();
+            if (!isInitialized || scrubbable is null)
+                return;
+
+            scrubbable.Cleanup();
+            isInitialized = false;
         }
 
         public void Execute(float time)
@@ -59,6 +70,7 @@ namespace Primer.Timeline
             var t = Mathf.Clamp01((time - start) / duration);
             scrubbableMethod.Invoke(scrubbable, t);
         }
+        #endregion
 
         public override string ToString()
         {

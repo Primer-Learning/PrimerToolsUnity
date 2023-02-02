@@ -33,18 +33,21 @@ namespace Primer.Timeline
             for (var i = 0; i < behaviours.Length; i++) {
                 var behaviour = behaviours[i];
 
-                if (/*behaviour.start <= time && */ behaviour.end >= time)
-                    behaviour.Execute(time);
+                if (behaviour.weight == 0) {
+                    behaviour.Cleanup();
+                    continue;
+                }
+
+                behaviour.Prepare();
+                behaviour.Execute(time);
             }
         }
 
 
-        private readonly List<Triggerable> preparedTriggers = new();
         private readonly List<TriggerablePlayable> ranTriggers = new();
         private void MixTriggerables(TriggerablePlayable[] behaviours, float time, uint iteration)
         {
             var alreadyExecuted = new Queue<TriggerablePlayable>(ranTriggers);
-            // var toPrepare = new List<TriggeredBehaviour>();
             var toExecute = new Queue<TriggerablePlayable>();
 
             for (var i = 0; i < behaviours.Length; i++) {
@@ -65,6 +68,7 @@ namespace Primer.Timeline
                 if (ranTriggers.All(x => x.triggerable != behaviour.triggerable))
                     behaviour.triggerable.Prepare();
 
+                behaviour.Prepare();
                 behaviour.Execute(time);
                 ranTriggers.Add(behaviour);
             }
@@ -149,8 +153,10 @@ namespace Primer.Timeline
             for (var i = 0; i < playable.GetInputCount(); i++) {
                 var inputPlayable = (ScriptPlayable<GenericBehaviour>)playable.GetInput(i);
 
-                if (inputPlayable.GetBehaviour() is {} behaviour)
+                if (inputPlayable.GetBehaviour() is {} behaviour) {
+                    behaviour.weight = playable.GetInputWeight(i);
                     behaviours.Add(behaviour);
+                }
             }
 
             behaviours.Sort(new PlayableTimeComparer());

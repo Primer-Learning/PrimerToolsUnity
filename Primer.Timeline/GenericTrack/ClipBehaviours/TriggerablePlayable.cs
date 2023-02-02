@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -23,6 +24,27 @@ namespace Primer.Timeline
         public override string playableName => triggerMethod.ToString(triggerable);
 
 
+        #region Triggerable management
+        private static HashSet<Triggerable> initializationTracker = new();
+
+        public void Prepare()
+        {
+            if (triggerable == null || initializationTracker.Contains(triggerable))
+                return;
+
+            triggerable.Prepare();
+            initializationTracker.Add(triggerable);
+        }
+
+        public void Cleanup()
+        {
+            if (triggerable == null || !initializationTracker.Contains(triggerable))
+                return;
+
+            triggerable.Cleanup();
+            initializationTracker.Remove(triggerable);
+        }
+
         public void Execute(float time)
         {
             if (triggerable is null) {
@@ -32,6 +54,8 @@ namespace Primer.Timeline
 
             triggerMethod.Invoke(triggerable);
         }
+        #endregion
+
 
         public override string ToString()
         {
