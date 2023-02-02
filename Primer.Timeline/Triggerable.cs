@@ -6,9 +6,8 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
-    // TODO: Rename to Triggerable
     [ExecuteAlways]
-    public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
+    public abstract class Triggerable : MonoBehaviour, INotificationReceiver
     {
         public virtual void Prepare() {}
         public virtual void Cleanup() {}

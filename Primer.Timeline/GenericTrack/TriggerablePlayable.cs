@@ -10,7 +10,7 @@ namespace Primer.Timeline
         [SerializeReference]
         [ValueDropdown(nameof(GetTriggerableOptions))]
         [Tooltip("Components in the track's target that extend TriggeredBehaviour")]
-        internal TriggeredBehaviour triggerable;
+        internal Triggerable triggerable;
 
         [SerializeField]
         [ShowIf(nameof(triggerable))]
@@ -26,7 +26,7 @@ namespace Primer.Timeline
         public void Execute(float time)
         {
             if (triggerable is null) {
-                Debug.LogWarning($"[{this}] no triggerable selected.\nIf no triggerable is available consider adding a {nameof(TriggeredBehaviour)} to the track's target");
+                Debug.LogWarning($"[{this}] no triggerable selected.\nIf no triggerable is available consider adding a {nameof(Triggerable)} to the track's target");
                 return;
             }
 
@@ -42,14 +42,14 @@ namespace Primer.Timeline
         private void OnInspectorInit()
         {
             if (triggerable is null && trackTarget != null)
-                triggerable = trackTarget.GetComponent<TriggeredBehaviour>();
+                triggerable = trackTarget.GetComponent<Triggerable>();
         }
 
-        internal TriggeredBehaviour[] GetTriggerableOptions()
+        internal Triggerable[] GetTriggerableOptions()
         {
             return trackTarget == null
-                ? Array.Empty<TriggeredBehaviour>()
-                : trackTarget.GetComponents<TriggeredBehaviour>();
+                ? Array.Empty<Triggerable>()
+                : trackTarget.GetComponents<Triggerable>();
         }
     }
 }

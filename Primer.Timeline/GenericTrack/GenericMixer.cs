@@ -39,7 +39,7 @@ namespace Primer.Timeline
         }
 
 
-        private readonly List<TriggeredBehaviour> preparedTriggers = new();
+        private readonly List<Triggerable> preparedTriggers = new();
         private readonly List<TriggerablePlayable> ranTriggers = new();
         private void MixTriggerables(TriggerablePlayable[] behaviours, float time, uint iteration)
         {
