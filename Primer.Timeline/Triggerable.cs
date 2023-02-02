@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     [ExecuteAlways]
-    public abstract class Triggerable : MonoBehaviour, INotificationReceiver
+    public abstract class Triggerable : AsyncMonoBehaviour, INotificationReceiver
     {
         public virtual void Prepare() {}
         public virtual void Cleanup() {}
@@ -29,23 +27,6 @@ namespace Primer.Timeline
                 throw new Exception($"There is no method {trigger.method} in {GetType().FullName}");
 
             method.Invoke(this, Array.Empty<object>());
-        }
-
-        protected static async UniTask Milliseconds(int milliseconds)
-        {
-            if (Application.isPlaying)
-                await UniTask.Delay(milliseconds);
-        }
-
-        protected static async UniTask Seconds(float seconds)
-        {
-            if (Application.isPlaying)
-                await UniTask.Delay(Mathf.RoundToInt(seconds * 1000));
-        }
-
-        protected static async UniTask Parallel(params UniTask[] processes)
-        {
-            await UniTask.WhenAll(processes);
         }
     }
 }
