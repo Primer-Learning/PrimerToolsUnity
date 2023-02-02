@@ -454,23 +454,31 @@ public class PrimerBlob : PrimerCharacter
         return accessory;
     }
 
-    public void RandomizeColorAndAccessory(double accessoryChance = 0.7,
+    public void RandomizeColorAndAccessory(System.Random rand, double accessoryChance = 0.7,
         double complementaryChance = 0.5f, List<AccessoryType> options = null)
     {
+        if (rand == null) { rand = SceneManager.sceneRandom2; }
+        
         if (options == null) options = AccessoryOptions;
         SetColor(PrimerColor.BlobColors[
-            SceneManager.sceneRandom2.Next(PrimerColor.BlobColors.Count)]);
+            rand.Next(PrimerColor.BlobColors.Count)]);
 
-        if (SceneManager.sceneRandom2.NextDouble() < accessoryChance)
+        if (rand.NextDouble() < accessoryChance)
         {
             var colorMatch = true;
             AccessoryType aType =
-                AccessoryOptions[SceneManager.sceneRandom2.Next(AccessoryOptions.Count)];
+                AccessoryOptions[rand.Next(AccessoryOptions.Count)];
             if (aType == AccessoryType.beard || aType == AccessoryType.eyePatch)
-                if (SceneManager.sceneRandom2.NextDouble() >= complementaryChance)
+                if (rand.NextDouble() >= complementaryChance)
                     colorMatch = false;
             AddAccessory(aType, colorMatch: colorMatch);
         }
+    }
+
+    public void RandomizeColorAndAccessory(double accessoryChance = 0.7,
+        double complementaryChance = 0.5f, List<AccessoryType> options = null)
+    {
+        RandomizeColorAndAccessory(null, accessoryChance: accessoryChance, complementaryChance: complementaryChance);
     }
     // public void HideBeard() {
     //     if (beard != null) {
