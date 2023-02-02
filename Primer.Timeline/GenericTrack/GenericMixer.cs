@@ -122,9 +122,6 @@ namespace Primer.Timeline
                 var behaviour = behaviours[0];
                 var sequence = behaviour.sequence;
 
-                if (sequence == null)
-                    continue;
-
                 var (lastStepsCount, lastEnumerator) = lastSteps.ContainsKey(sequence)
                     ? lastSteps[sequence]
                     : (0, null);
@@ -151,8 +148,11 @@ namespace Primer.Timeline
                 }
 
                 // At this point we have less steps to execute than before so we need to re-execute the sequence from the start
-                if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator))
+                if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator)) {
                     return;
+                }
+
+                behaviour.Cleanup();
 
                 var enumerator = await behaviour.Execute(stepsToRun, IsExecutionObsolete);
                 steps[sequence] = (behaviours.Length, enumerator);
@@ -165,8 +165,9 @@ namespace Primer.Timeline
 
                 SequentialPlayable.Cleanup(sequence);
 
-                if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator))
+                if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator)) {
                     return;
+                }
             }
 
             lastSteps = steps;
