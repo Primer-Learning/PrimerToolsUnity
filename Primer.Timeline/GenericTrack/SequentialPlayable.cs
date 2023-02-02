@@ -23,36 +23,11 @@ namespace Primer.Timeline
         public override string playableName => sequenceMethod.ToString(sequence);
 
 
-        protected override void Start()
+        public IAsyncEnumerator<object> Execute()
         {
-            if (sequence != null)
-                sequence.Prepare();
+            return (IAsyncEnumerator<object>)sequenceMethod.Invoke(sequence);
         }
 
-        protected override void Stop()
-        {
-            if (sequence != null)
-                sequence.Cleanup();
-        }
-
-
-        private static readonly Dictionary<Transform, (IAsyncEnumerator<object> enumerator, int steps)> executions =
-            new();
-
-        public override void Execute(float time)
-        {
-            // TODO
-            throw new NotImplementedException();
-
-            if (!executions.ContainsKey(trackTarget)) {
-                executions.Add(trackTarget, (sequence.Run(), 0));
-                return;
-            }
-
-            var (enumerator, steps) = executions[trackTarget];
-
-            // if (steps < )
-        }
 
         public override string ToString()
         {

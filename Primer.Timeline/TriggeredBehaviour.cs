@@ -6,10 +6,13 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    // TODO: Rename to Triggerable
     [ExecuteAlways]
     public abstract class TriggeredBehaviour : MonoBehaviour, INotificationReceiver
     {
         public virtual void Prepare() {}
+        public virtual void Cleanup() {}
+
 
         public void OnNotify(Playable origin, INotification notification, object context)
         {

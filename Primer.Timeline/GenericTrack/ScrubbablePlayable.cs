@@ -9,8 +9,6 @@ namespace Primer.Timeline
     [Serializable]
     internal class ScrubbablePlayable : GenericBehaviour
     {
-
-
         [SerializeReference]
         [TypeFilter(nameof(GetScrubbables))]
         [Tooltip("Extend Scrubbable class to add more options")]
@@ -48,7 +46,7 @@ namespace Primer.Timeline
             scrubbable?.Cleanup();
         }
 
-        public override void Execute(float time)
+        public void Execute(float time)
         {
             if (scrubbable is null) {
                 Debug.LogWarning(

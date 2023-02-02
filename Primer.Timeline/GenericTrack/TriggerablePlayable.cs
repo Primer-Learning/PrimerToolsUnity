@@ -23,7 +23,7 @@ namespace Primer.Timeline
         public override string playableName => triggerMethod.ToString(triggerable);
 
 
-        public override void Execute(float time)
+        public void Execute(float time)
         {
             if (triggerable is null) {
                 Debug.LogWarning($"[{this}] no triggerable selected.\nIf no triggerable is available consider adding a {nameof(TriggeredBehaviour)} to the track's target");
