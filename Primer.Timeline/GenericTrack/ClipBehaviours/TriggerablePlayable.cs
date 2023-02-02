@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Primer.Timeline
 {
     [Serializable]
-    internal class TriggerablePlayable : GenericBehaviour
+    internal class TriggerablePlayable : GenericBehaviour, IEquatable<TriggerablePlayable>
     {
         [SerializeReference]
         [ValueDropdown(nameof(GetTriggerableOptions))]
@@ -21,6 +21,7 @@ namespace Primer.Timeline
         internal MethodInvocation triggerMethod;
 
 
+        #region Clip name
         private static Regex removeStep = new(@"^Step(\d+)", RegexOptions.Compiled);
 
         static TriggerablePlayable() => SetIcon<TriggerablePlayable>('╬');
@@ -29,10 +30,12 @@ namespace Primer.Timeline
             => triggerable == null
                 ? "No triggerable selected"
                 : removeStep.Replace(triggerMethod.ToString(), "$1");
+        #endregion
 
 
         #region Triggerable management
         private static HashSet<Triggerable> cleannessTracker = new();
+        private bool isExecuted = false;
 
         public void Prepare()
         {
@@ -45,6 +48,8 @@ namespace Primer.Timeline
 
         public void Cleanup()
         {
+            isExecuted = false;
+
             if (triggerable == null || cleannessTracker.Contains(triggerable))
                 return;
 
@@ -59,8 +64,12 @@ namespace Primer.Timeline
                 return;
             }
 
+            if (isExecuted)
+                return;
+
             Prepare();
             triggerMethod.Invoke(triggerable);
+            isExecuted = true;
         }
         #endregion
 
@@ -83,5 +92,33 @@ namespace Primer.Timeline
                 ? Array.Empty<Triggerable>()
                 : trackTarget.GetComponents<Triggerable>();
         }
+
+
+        public bool Equals(TriggerablePlayable other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Equals(triggerable, other.triggerable) && triggerMethod.Equals(other.triggerMethod);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj.GetType() != GetType())
+                return false;
+
+            return Equals((TriggerablePlayable)obj);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(triggerable, triggerMethod);
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -19,7 +18,6 @@ namespace Primer.Timeline
             var time = (float)playable.GetTime();
 
             var behaviours = CollectBehaviours(playable)
-                // .Where(x => x.start < time)
                 .GroupBy(x => x.GetType())
                 .ToDictionary(x => x.Key, x => x.ToList());
 
@@ -42,39 +40,51 @@ namespace Primer.Timeline
         }
 
 
-        private readonly List<TriggerablePlayable> ranTriggers = new();
-        private void MixTriggerables(TriggerablePlayable[] behaviours, float time, uint iteration)
+
+        private readonly HashSet<TriggerablePlayable> ranTriggers = new();
+        private void MixTriggerables(TriggerablePlayable[] allBehaviours, float time, uint iteration)
         {
-            var alreadyExecuted = new Queue<TriggerablePlayable>(ranTriggers);
+            var behaviours = allBehaviours.Where(x => x.start <= time).ToArray();
+            var toClean = allBehaviours.Select(x => x.triggerable).ToHashSet();
             var toExecute = new Queue<TriggerablePlayable>();
+            var alreadyExecuted = new Queue<TriggerablePlayable>(ranTriggers);
+            var rerunPipeline = false;
 
             for (var i = 0; i < behaviours.Length; i++) {
                 var behaviour = behaviours[i];
 
-                if (behaviour.weight == 0) {
-                    behaviour.Cleanup();
-                    continue;
-                }
-
-                if (alreadyExecuted.Count == 0 || behaviour == alreadyExecuted.Dequeue()) {
+                if (alreadyExecuted.Count == 0) {
                     toExecute.Enqueue(behaviour);
                     continue;
                 }
 
-                foreach (var ran in ranTriggers)
-                    ran.triggerable.Cleanup();
+                if (behaviour.Equals(alreadyExecuted.Dequeue())) {
+                    toClean.Remove(behaviour.triggerable);
+                    continue;
+                }
 
-                ranTriggers.Clear();
-                toExecute = new Queue<TriggerablePlayable>(behaviours);
+                rerunPipeline = true;
                 break;
             }
 
-            foreach (var behaviour in toExecute) {
-                if (ranTriggers.All(x => x.triggerable != behaviour.triggerable))
-                    behaviour.triggerable.Prepare();
+            // We have executions from previous frames that we need to remove, we have to re-run the whole chain
+            if (rerunPipeline || alreadyExecuted.Count > 0) {
 
+                foreach (var ran in ranTriggers)
+                    ran.Cleanup();
+
+                ranTriggers.Clear();
+                toExecute = new Queue<TriggerablePlayable>(behaviours);
+            }
+
+            foreach (var behaviour in toExecute) {
                 behaviour.Execute(time);
                 ranTriggers.Add(behaviour);
+                toClean.Remove(behaviour.triggerable);
+            }
+
+            foreach (var behaviour in toClean.SelectMany(x => allBehaviours.Where(y => y.triggerable == x))) {
+                behaviour.Cleanup();
             }
         }
 
