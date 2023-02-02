@@ -9,17 +9,15 @@ namespace Primer.Timeline
     {
 
         public readonly string sourceProp;
-        public readonly string filterMethod;
-        public Func<object> targetGetter;
 
         public Type returnType { get; init; }
         public Type[] parameters { get; init; }
+        public string[] excludeNames { get; init; }
 
 
-        public MethodOfAttribute(string target = null, string filterMethod = null)
+        public MethodOfAttribute(string target = null)
         {
             sourceProp = target;
-            this.filterMethod = filterMethod;
         }
 
         public MethodInfo[] Filter(MethodInfo[] methods) //, object containerObject = null)
@@ -32,22 +30,12 @@ namespace Primer.Timeline
                     if (parameters is not null && !ParameterTypeMatches(x.GetParameters(), parameters))
                         return false;
 
+                    if (excludeNames is not null && excludeNames.Contains(x.Name))
+                        return false;
+
                     return true;
                 })
                 .ToArray();
-            //
-            // if (containerObject is null || filterMethod is null)
-            //     return filtered;
-            //
-            // var filter = containerObject.GetType().GetMethod(filterMethod);
-            //
-            // if (filter is null) {
-            //     throw new MissingMethodException(
-            //         $"Cannot find method {filterMethod} on {containerObject.GetType().FullName}"
-            //     );
-            // }
-            //
-            // return (MethodInfo[])filter.Invoke(containerObject, new object[] { filtered });
         }
 
         private static bool ParameterTypeMatches(IEnumerable<ParameterInfo> parameters, IEnumerable<Type> types)

@@ -21,7 +21,8 @@ namespace Primer.Timeline
         internal MethodInvocation scrubbableMethod;
 
 
-        public override char icon => '║';
+        static ScrubbablePlayable() => SetIcon<ScrubbablePlayable>('║');
+
         public override string playableName => scrubbable?.GetType().Name;
 
 

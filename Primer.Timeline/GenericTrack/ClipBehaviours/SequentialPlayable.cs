@@ -23,8 +23,10 @@ namespace Primer.Timeline
         internal MethodInvocation sequenceMethod;
 
 
-        public override char icon => '≡';
-        public override string playableName => sequenceMethod.ToString(sequence);
+        static SequentialPlayable() => SetIcon<SequentialPlayable>('≡');
+
+        public override string playableName
+            => sequence == null ? "No sequence selected" : sequenceMethod.ToString(sequence);
 
 
         #region Sequence management

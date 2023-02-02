@@ -10,7 +10,7 @@ namespace Primer.Timeline
 
         public string methodName;
 
-        public Type expectedReturnType;
+        // public Type expectedReturnType;
 
 
         public object Invoke(object target, params object[] parameters)
@@ -23,11 +23,11 @@ namespace Primer.Timeline
                 );
             }
 
-            if (expectedReturnType != null && expectedReturnType.IsAssignableFrom(method.ReturnType)) {
-                throw new MethodAccessException(
-                    $"Method {ToString(target)} returns {method.ReturnType}, expected {expectedReturnType}"
-                );
-            }
+            // if (expectedReturnType != null && expectedReturnType.IsAssignableFrom(method.ReturnType)) {
+            //     throw new MethodAccessException(
+            //         $"Method {ToString(target)} returns {method.ReturnType}, expected {expectedReturnType}"
+            //     );
+            // }
 
             if (method.ReturnType != typeof(void))
                 return method.Invoke(target, parameters);
@@ -46,8 +46,8 @@ namespace Primer.Timeline
 
         public string ToString(object target)
         {
-            var method = methodName is null
-                ? "(No method selected)"
+            var method = string.IsNullOrEmpty(methodName)
+                ? "No method selected"
                 : $"{methodName}()";
 
             return target == null

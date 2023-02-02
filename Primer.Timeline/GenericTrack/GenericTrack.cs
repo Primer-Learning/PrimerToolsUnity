@@ -13,6 +13,8 @@ namespace Primer.Timeline.FakeUnityEngine
     [TrackBindingType(typeof(Transform))]
     internal class GenericTrack : PrimerTrack
     {
+        public float defaultDuration = 1;
+
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
             foreach (var clip in GetClips()) {
@@ -37,7 +39,7 @@ namespace Primer.Timeline.FakeUnityEngine
         {
             base.OnCreateClip(clip);
 
-            clip.duration = 1;
+            clip.duration = defaultDuration;
 
             // clip.postExtrapolationMode = TimelineClip.ClipExtrapolation.Hold;
             //

@@ -100,6 +100,9 @@ namespace Primer.Timeline
                 var behaviour = behaviours[0];
                 var sequence = behaviour.sequence;
 
+                if (sequence == null)
+                    continue;
+
                 var (lastStepsCount, lastEnumerator) = lastSteps.ContainsKey(sequence)
                     ? lastSteps[sequence]
                     : (0, null);

@@ -15,13 +15,15 @@ namespace Primer.Timeline
 
         [SerializeField]
         [ShowIf(nameof(triggerable))]
-        [MethodOf(nameof(triggerable))]
+        [MethodOf(nameof(triggerable), parameters = new Type[] {}, excludeNames = new[] { "Prepare", "Cleanup" })]
         [Tooltip("Method to call when the clip is played")]
         internal MethodInvocation triggerMethod;
 
 
-        public override char icon => '╬';
-        public override string playableName => triggerMethod.ToString(triggerable);
+        static TriggerablePlayable() => SetIcon<TriggerablePlayable>('╬');
+
+        public override string playableName
+            => triggerable == null ? "No triggerable selected" : triggerMethod.ToString();
 
 
         #region Triggerable management
