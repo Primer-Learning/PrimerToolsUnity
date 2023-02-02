@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,6 +10,9 @@ namespace Primer.Timeline
     [Serializable]
     internal class SequentialPlayable : GenericBehaviour
     {
+        public enum StepExecutionResult { Continue, Abort, Done }
+
+
         [SerializeReference]
         [ValueDropdown(nameof(GetSequenceOptions))]
         internal Sequence sequence;
@@ -25,7 +30,8 @@ namespace Primer.Timeline
         #region Sequence management
         private static HashSet<Sequence> initializationTracker = new();
 
-        public void Prepare()
+        public void Prepare() => Prepare(sequence);
+        public static void Prepare(Sequence sequence)
         {
             if (sequence == null || initializationTracker.Contains(sequence))
                 return;
@@ -34,7 +40,8 @@ namespace Primer.Timeline
             initializationTracker.Add(sequence);
         }
 
-        public void Cleanup()
+        public void Cleanup() => Cleanup(sequence);
+        public static void Cleanup(Sequence sequence)
         {
             if (sequence == null || !initializationTracker.Contains(sequence))
                 return;
@@ -42,9 +49,36 @@ namespace Primer.Timeline
             sequence.Cleanup();
             initializationTracker.Remove(sequence);
         }
-        public IAsyncEnumerator<object> Execute()
+
+        public IAsyncEnumerator<object> Initialize()
         {
+            Prepare();
             return (IAsyncEnumerator<object>)sequenceMethod.Invoke(sequence);
+        }
+
+        public async UniTask<IAsyncEnumerator<object>> Execute(int count, Func<bool> shouldAbort)
+        {
+            var enumerator = Initialize();
+            var result = await RunSteps(enumerator, count, shouldAbort);
+
+            if (result == StepExecutionResult.Continue)
+                return enumerator;
+
+            await enumerator.DisposeAsync();
+            return null;
+        }
+
+        public async UniTask<StepExecutionResult> RunSteps(IAsyncEnumerator<object> enumerator, int count, Func<bool> shouldAbort)
+        {
+            for (var i = 0; i < count; i++) {
+                if (!await enumerator.MoveNextAsync())
+                    return StepExecutionResult.Done;
+
+                if (shouldAbort())
+                    return StepExecutionResult.Abort;
+            }
+
+            return StepExecutionResult.Continue;
         }
         #endregion
 
