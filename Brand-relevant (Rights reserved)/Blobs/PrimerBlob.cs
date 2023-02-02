@@ -454,11 +454,21 @@ public class PrimerBlob : PrimerCharacter
         return accessory;
     }
 
+    public void DestoyAccessories()
+    {
+        for (var i = accessories.Count - 1; i == 0; i++)
+        {
+            DestroyImmediate(accessories[i].gameObject);
+        }
+        accessories.Clear();
+    }
+
     public void RandomizeColorAndAccessory(System.Random rand, double accessoryChance = 0.7,
         double complementaryChance = 0.5f, List<AccessoryType> options = null)
     {
-        if (rand == null) { rand = SceneManager.sceneRandom2; }
+        DestoyAccessories();
         
+        if (rand == null) { rand = SceneManager.sceneRandom2; }
         if (options == null) options = AccessoryOptions;
         SetColor(PrimerColor.BlobColors[
             rand.Next(PrimerColor.BlobColors.Count)]);
