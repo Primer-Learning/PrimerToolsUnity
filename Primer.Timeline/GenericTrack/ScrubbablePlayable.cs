@@ -9,6 +9,8 @@ namespace Primer.Timeline
     [Serializable]
     internal class ScrubbablePlayable : GenericBehaviour
     {
+
+
         [SerializeReference]
         [TypeFilter(nameof(GetScrubbables))]
         [Tooltip("Extend Scrubbable class to add more options")]
@@ -21,6 +23,10 @@ namespace Primer.Timeline
         internal MethodInvocation scrubbableMethod;
 
 
+        public override string icon => "║";
+        public override string playableName => scrubbable?.GetType().Name;
+
+
         public override Transform trackTarget {
             get => base.trackTarget;
             internal set {
@@ -31,11 +37,16 @@ namespace Primer.Timeline
             }
         }
 
-        public override string playableName => scrubbable is null ? null : $"║ {scrubbable.GetType().Name}";
 
-        protected override void Start() => scrubbable?.Prepare();
+        protected override void Start()
+        {
+            scrubbable?.Prepare();
+        }
 
-        protected override void Stop() => scrubbable?.Cleanup();
+        protected override void Stop()
+        {
+            scrubbable?.Cleanup();
+        }
 
         public override void Execute(float time)
         {
@@ -53,7 +64,7 @@ namespace Primer.Timeline
 
         public override string ToString()
         {
-            return $"Scrubbable: {scrubbable?.GetType().Name}.{scrubbableMethod}";
+            return $"Scrubbable {icon} {scrubbableMethod.ToString(scrubbable)}";
         }
 
         internal static IEnumerable<Type> GetScrubbables()

@@ -10,7 +10,6 @@ namespace Primer.Timeline
 
         public string methodName;
 
-        public bool isReady => !string.IsNullOrEmpty(methodName);
 
         public void Invoke(object target, params object[] parameters)
         {
@@ -25,9 +24,21 @@ namespace Primer.Timeline
             method.Invoke(target, parameters);
         }
 
+
         public override string ToString()
-            => methodName is null
+        {
+            return methodName is null
                 ? null
                 : uppercase.Replace(methodName, " $0").Trim();
+        }
+
+        public string ToString(object target)
+        {
+            var method = $"{methodName}()";
+
+            return target == null
+                ? method
+                : $"{target.GetType().Name}.{method}";
+        }
     }
 }

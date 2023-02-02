@@ -18,7 +18,10 @@ namespace Primer.Timeline
         [Tooltip("Method to call when the clip is played")]
         internal MethodInvocation triggerMethod;
 
-        public override string playableName => triggerMethod.isReady ? $"╬ {triggerMethod.ToString()}" : null;
+
+        public override string icon => "╬";
+        public override string playableName => triggerMethod.ToString(triggerable);
+
 
         public override void Execute(float time)
         {
@@ -32,7 +35,7 @@ namespace Primer.Timeline
 
         public override string ToString()
         {
-            return $"Trigger: {triggerable?.GetType().Name}.{triggerMethod}";
+            return $"Trigger {icon} {triggerMethod.ToString(triggerable)}";
         }
 
         [OnInspectorInit]

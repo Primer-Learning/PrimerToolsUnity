@@ -18,7 +18,10 @@ namespace Primer.Timeline
         [MethodOf(nameof(sequence), returnType = typeof(IAsyncEnumerator<object>))]
         internal MethodInvocation sequenceMethod;
 
-        public override string playableName => sequenceMethod.isReady ? $"≡ {sequenceMethod.ToString()}" : null;
+
+        public override string icon => "≡";
+        public override string playableName => sequenceMethod.ToString(sequence);
+
 
         protected override void Start()
         {
@@ -50,7 +53,7 @@ namespace Primer.Timeline
 
         public override string ToString()
         {
-            return $"Sequence: {sequence?.GetType().Name}.{sequenceMethod}";
+            return $"Sequence {icon} {sequenceMethod.ToString(sequence)}";
         }
 
         [OnInspectorInit]

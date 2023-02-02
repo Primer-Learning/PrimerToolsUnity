@@ -14,8 +14,18 @@ namespace Primer.Timeline
         public float duration;
         public float end => start + duration;
 
-        public string clipName => playableName ?? "Generic Clip";
-        public virtual string playableName => null;
+        public string clipName {
+            get {
+                var name = playableName;
+                return name == null ? "Generic Clip" : $"{icon} {name}";
+            }
+        }
+
+        // Following members are "abstract" in the sense that they are not implemented here, but are implemented in the derived classes.
+        // we can't use the "abstract" keyword because Unity.Timeline API requires a default constructor in all PlayableBehaviours.
+
+        public virtual string icon { get; }
+        public virtual string playableName { get; }
 
         public virtual void Execute(float time) {}
     }
