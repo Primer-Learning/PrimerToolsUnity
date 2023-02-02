@@ -19,7 +19,7 @@ namespace Primer.Timeline
         internal MethodInvocation triggerMethod;
 
 
-        public override string icon => "╬";
+        public override char icon => '╬';
         public override string playableName => triggerMethod.ToString(triggerable);
 
 

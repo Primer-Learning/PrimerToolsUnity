@@ -19,7 +19,7 @@ namespace Primer.Timeline
         internal MethodInvocation sequenceMethod;
 
 
-        public override string icon => "≡";
+        public override char icon => '≡';
         public override string playableName => sequenceMethod.ToString(sequence);
 
 

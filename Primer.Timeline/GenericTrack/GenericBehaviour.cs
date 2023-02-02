@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Primer.Timeline
@@ -16,17 +17,26 @@ namespace Primer.Timeline
 
         public string clipName {
             get {
+                knownIcons.Add(icon);
                 var name = playableName;
                 return name == null ? "Generic Clip" : $"{icon} {name}";
             }
         }
 
+
         // Following members are "abstract" in the sense that they are not implemented here, but are implemented in the derived classes.
         // we can't use the "abstract" keyword because Unity.Timeline API requires a default constructor in all PlayableBehaviours.
 
-        public virtual string icon { get; }
+        public virtual char icon { get; }
         public virtual string playableName { get; }
 
-        public virtual void Execute(float time) {}
+
+        // Next is icon management. We use a static dictionary to store the icons for each type.
+        private static HashSet<char> knownIcons = new();
+
+        public static bool IsGeneratedClipName(string value)
+        {
+            return value[1] == ' ' && knownIcons.Contains(value[0]);
+        }
     }
 }
