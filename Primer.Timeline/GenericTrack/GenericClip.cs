@@ -8,13 +8,14 @@ namespace Primer.Timeline
 {
     public class GenericClip : PlayableAsset, ITimelineClipAsset
     {
+        public enum Kind { Scrubbable, Trigger, Sequence }
+
         public ClipCaps clipCaps => ClipCaps.Extrapolation;
 
         [Space(32)]
         [HideLabel]
         [EnumToggleButtons]
         public Kind kind = Kind.Scrubbable;
-        public enum Kind { Scrubbable, Trigger, Sequence }
 
         [Space]
         [SerializeReference]
@@ -38,7 +39,7 @@ namespace Primer.Timeline
         [DisableContextMenu]
         [HideReferenceObjectPicker]
         [HideLabel]
-        private SequentialPlayable sequential = new();
+        internal SequentialPlayable sequential = new();
 
         public GenericBehaviour template => kind switch {
             Kind.Scrubbable => scrubbable,
@@ -46,6 +47,23 @@ namespace Primer.Timeline
             Kind.Sequence => sequential,
             _ => throw new ArgumentOutOfRangeException(),
         };
+
+        public Transform trackTarget {
+            get {
+                if (scrubbable.trackTarget == null
+                    || scrubbable.trackTarget != triggerable.trackTarget
+                    || scrubbable.trackTarget != sequential.trackTarget) {
+                    return null;
+                }
+
+                return scrubbable.trackTarget;
+            }
+            set {
+                scrubbable.trackTarget = value;
+                triggerable.trackTarget = value;
+                sequential.trackTarget = value;
+            }
+        }
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

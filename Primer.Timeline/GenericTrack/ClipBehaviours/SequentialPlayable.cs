@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,14 +13,25 @@ namespace Primer.Timeline
         public const string NO_SEQUENCE_SELECTED = "No sequence selected";
 
 
-        [SerializeReference]
+        [SerializeField]
+        [HideInInspector]
+        private ExposedReference<Sequence> _sequence;
+
+        [ShowInInspector]
+        [PropertyOrder(1)]
         [ValueDropdown(nameof(GetSequenceOptions))]
-        internal Sequence sequence;
+        [Tooltip("Components in the track's target that extend Sequence")]
+        internal Sequence sequence {
+            get => referenceResolver.Get(_sequence);
+            set => referenceResolver.Set(_sequence, value);
+        }
 
         [SerializeField]
+        [PropertyOrder(2)]
         [ShowIf(nameof(sequence))]
         [MethodOf(nameof(sequence), returnType = typeof(IAsyncEnumerator<object>))]
         internal MethodInvocation sequenceMethod;
+
 
 
         static SequentialPlayable() => SetIcon<SequentialPlayable>('≡');

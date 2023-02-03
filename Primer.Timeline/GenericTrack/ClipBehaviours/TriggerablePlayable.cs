@@ -9,12 +9,21 @@ namespace Primer.Timeline
     [Serializable]
     internal class TriggerablePlayable : GenericBehaviour, IEquatable<TriggerablePlayable>
     {
-        [SerializeReference]
+        [SerializeField]
+        [HideInInspector]
+        private ExposedReference<Triggerable> _triggerable;
+
+        [ShowInInspector]
+        [PropertyOrder(1)]
         [ValueDropdown(nameof(GetTriggerableOptions))]
-        [Tooltip("Components in the track's target that extend TriggeredBehaviour")]
-        internal Triggerable triggerable;
+        [Tooltip("Components in the track's target that extend Triggerable")]
+        internal Triggerable triggerable {
+            get => referenceResolver.Get(_triggerable);
+            set => referenceResolver.Set(_triggerable, value);
+        }
 
         [SerializeField]
+        [PropertyOrder(2)]
         [ShowIf(nameof(triggerable))]
         [MethodOf(nameof(triggerable), parameters = new Type[] {}, excludeNames = new[] { "Prepare", "Cleanup" })]
         [Tooltip("Method to call when the clip is played")]
@@ -26,10 +35,22 @@ namespace Primer.Timeline
 
         static TriggerablePlayable() => SetIcon<TriggerablePlayable>('╬');
 
-        public override string playableName
-            => triggerable == null
-                ? "No triggerable selected"
-                : removeStep.Replace(triggerMethod.ToString(), "$1");
+        public override string playableName {
+            get {
+                if (triggerable == null)
+                    Debug.Log("No triggerable selected");
+
+                // PrimerLogger.Log(
+                //     "TriggerablePlayable.playableName",
+                //     triggerable,
+                //     triggerMethod,
+                //     (this as IExposedReferenceResolver).resolver
+                // );
+                return triggerable == null
+                    ? "No triggerable selected"
+                    : removeStep.Replace(triggerMethod.ToString(), "$1");
+            }
+        }
         #endregion
 
 
@@ -82,8 +103,10 @@ namespace Primer.Timeline
         [OnInspectorInit]
         private void OnInspectorInit()
         {
-            if (triggerable is null && trackTarget != null)
+            if (triggerable is null && trackTarget != null) {
+                PrimerLogger.Log("Filling", triggerable, trackTarget.GetComponent<Triggerable>());
                 triggerable = trackTarget.GetComponent<Triggerable>();
+            }
         }
 
         internal Triggerable[] GetTriggerableOptions()

@@ -12,21 +12,20 @@ namespace Primer.Timeline.Editor
 
         public override void OnInspectorGUI()
         {
-            if (clip.template is PrimerPlayable<Transform> x && x.trackTarget == null) {
-                FillTrackTarget(x);
-            }
+            if (clip.trackTarget is null)
+                FillTrackTarget();
 
             base.OnInspectorGUI();
         }
 
-        private void FillTrackTarget(PrimerPlayable<Transform> behaviour)
+        private void FillTrackTarget()
         {
             var director = TimelineEditor.inspectedDirector;
             var track = director.GetTrackOfClip(clip);
             var bounds = director.GetGenericBinding(track);
 
             if (bounds is Transform transform)
-                behaviour.trackTarget = transform;
+                clip.trackTarget = transform;
         }
     }
 }
