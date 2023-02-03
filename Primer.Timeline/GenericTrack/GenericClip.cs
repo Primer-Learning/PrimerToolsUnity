@@ -1,5 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -48,6 +49,15 @@ namespace Primer.Timeline
             _ => throw new ArgumentOutOfRangeException(),
         };
 
+        public IExposedPropertyTable resolver {
+            get => scrubbable.resolver;
+            set {
+                scrubbable.resolver = value;
+                triggerable.resolver = value;
+                sequential.resolver = value;
+            }
+        }
+
         public Transform trackTarget {
             get {
                 if (scrubbable.trackTarget == null
@@ -68,6 +78,12 @@ namespace Primer.Timeline
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             return ScriptPlayable<GenericBehaviour>.Create(graph, template);
+        }
+
+        public void Initialize()
+        {
+            triggerable._triggerable.exposedName = GUID.Generate().ToString();
+            sequential._sequence.exposedName = GUID.Generate().ToString();
         }
     }
 }

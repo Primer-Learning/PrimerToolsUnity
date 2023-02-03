@@ -15,15 +15,15 @@ namespace Primer.Timeline
 
         [SerializeField]
         [HideInInspector]
-        private ExposedReference<Sequence> _sequence;
+        internal ExposedReference<Sequence> _sequence;
 
         [ShowInInspector]
         [PropertyOrder(1)]
         [ValueDropdown(nameof(GetSequenceOptions))]
         [Tooltip("Components in the track's target that extend Sequence")]
-        internal Sequence sequence {
-            get => referenceResolver.Get(_sequence);
-            set => referenceResolver.Set(_sequence, value);
+        public Sequence sequence {
+            get => resolver.Get(_sequence);
+            set => resolver.Set(_sequence, value);
         }
 
         [SerializeField]
@@ -33,11 +33,25 @@ namespace Primer.Timeline
         internal MethodInvocation sequenceMethod;
 
 
+        public override Transform trackTarget {
+            get => base.trackTarget;
+            internal set {
+                base.trackTarget = value;
 
+                if (value == null)
+                    sequence = null;
+                else if (sequence is null || sequence.gameObject != value.gameObject)
+                    sequence = value.GetComponent<Sequence>();
+            }
+        }
+
+
+        #region Clip name
         static SequentialPlayable() => SetIcon<SequentialPlayable>('≡');
 
         public override string playableName
             => sequence == null ? NO_SEQUENCE_SELECTED : sequenceMethod.ToString(sequence);
+        #endregion
 
 
         #region Sequence management
@@ -99,13 +113,6 @@ namespace Primer.Timeline
         public override string ToString()
         {
             return $"Sequence {icon} {sequenceMethod.ToString(sequence)}";
-        }
-
-        [OnInspectorInit]
-        private void OnInspectorInit()
-        {
-            if (sequence is null && trackTarget != null)
-                sequence = trackTarget.GetComponent<Sequence>();
         }
 
         private Sequence[] GetSequenceOptions()

@@ -160,18 +160,12 @@ namespace Primer.Timeline
                 steps[sequence] = (behaviours.Length, enumerator);
             }
 
-            void Log(params object [] args) => PrimerLogger.Log("MIXER", args);
-
             // Cleanup the sequences that are no longer in the track
             foreach (var (sequence, (_, lastEnumerator)) in lastSteps) {
-                Log($"Cleaning up sequence: {sequence}");
-
                 if (steps.ContainsKey(sequence)) {
-                    Log("Ah no, it is still in use");
                     continue;
                 }
 
-                Log("Cleaning up");
                 SequentialPlayable.Cleanup(sequence);
 
                 if (lastEnumerator is not null && await DisposeEnumerator(lastEnumerator)) {

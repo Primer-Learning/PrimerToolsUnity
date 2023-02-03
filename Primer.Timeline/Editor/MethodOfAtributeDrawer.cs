@@ -40,8 +40,10 @@ namespace Primer.Timeline.Editor
 
             var target = targetResolver.GetValue();
 
-            if (target is null)
-                throw new Exception($"Source for {nameof(MethodOfAttribute)} is null");
+            if (target is null) {
+                EditorGUILayout.LabelField(label, $"The source property is null");
+                return;
+            }
 
             var methods = Attribute.Filter(GetMethodsOf(target.GetType()));
             var options = methods.Select(x => x.Name).ToArray();

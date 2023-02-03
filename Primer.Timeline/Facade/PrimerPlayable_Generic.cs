@@ -9,28 +9,6 @@ namespace Primer.Timeline
     {
         public virtual TTrackBind trackTarget { get; internal set; }
 
-
-        private ExposedReferencesTable referenceResolverCache;
-        protected ExposedReferencesTable referenceResolver {
-            get {
-
-                if (referenceResolverCache != null) {
-                    return referenceResolverCache;
-                }
-
-                if (trackTarget == null)
-                    return null;
-
-                referenceResolverCache = trackTarget.GetExposedReferencesResolver();
-
-                if (referenceResolverCache == null)
-                    throw new Exception($"No exposed references resolver found");
-
-                return referenceResolverCache;
-            }
-        }
-
-
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             using (lifecycle.PreventInitialization()) {

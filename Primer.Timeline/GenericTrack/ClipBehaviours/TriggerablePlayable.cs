@@ -11,15 +11,15 @@ namespace Primer.Timeline
     {
         [SerializeField]
         [HideInInspector]
-        private ExposedReference<Triggerable> _triggerable;
+        internal ExposedReference<Triggerable> _triggerable;
 
         [ShowInInspector]
         [PropertyOrder(1)]
         [ValueDropdown(nameof(GetTriggerableOptions))]
         [Tooltip("Components in the track's target that extend Triggerable")]
-        internal Triggerable triggerable {
-            get => referenceResolver.Get(_triggerable);
-            set => referenceResolver.Set(_triggerable, value);
+        public Triggerable triggerable {
+            get => resolver.Get(_triggerable);
+            set => resolver.Set(_triggerable, value);
         }
 
         [SerializeField]
@@ -30,27 +30,28 @@ namespace Primer.Timeline
         internal MethodInvocation triggerMethod;
 
 
+        public override Transform trackTarget {
+            get => base.trackTarget;
+            internal set {
+                base.trackTarget = value;
+
+                if (value == null)
+                    triggerable = null;
+                else if (triggerable is null || triggerable.gameObject != value.gameObject)
+                    triggerable = value.GetComponent<Triggerable>();
+            }
+        }
+
+
         #region Clip name
         private static Regex removeStep = new(@"^Step(\d+)", RegexOptions.Compiled);
 
         static TriggerablePlayable() => SetIcon<TriggerablePlayable>('╬');
 
-        public override string playableName {
-            get {
-                if (triggerable == null)
-                    Debug.Log("No triggerable selected");
-
-                // PrimerLogger.Log(
-                //     "TriggerablePlayable.playableName",
-                //     triggerable,
-                //     triggerMethod,
-                //     (this as IExposedReferenceResolver).resolver
-                // );
-                return triggerable == null
-                    ? "No triggerable selected"
-                    : removeStep.Replace(triggerMethod.ToString(), "$1");
-            }
-        }
+        public override string playableName
+            => triggerable == null
+                ? "No triggerable selected"
+                : removeStep.Replace(triggerMethod.ToString(), "$1");
         #endregion
 
 
@@ -98,15 +99,6 @@ namespace Primer.Timeline
         public override string ToString()
         {
             return $"Trigger {icon} {triggerMethod.ToString(triggerable)}";
-        }
-
-        [OnInspectorInit]
-        private void OnInspectorInit()
-        {
-            if (triggerable is null && trackTarget != null) {
-                PrimerLogger.Log("Filling", triggerable, trackTarget.GetComponent<Triggerable>());
-                triggerable = trackTarget.GetComponent<Triggerable>();
-            }
         }
 
         internal Triggerable[] GetTriggerableOptions()

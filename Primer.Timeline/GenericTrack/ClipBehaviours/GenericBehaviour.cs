@@ -23,6 +23,8 @@ namespace Primer.Timeline
         public float duration;
 
         public float end => start + duration;
+
+        internal IExposedPropertyTable resolver { get; set; }
         #endregion
 
 

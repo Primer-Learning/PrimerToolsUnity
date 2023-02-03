@@ -12,20 +12,18 @@ namespace Primer.Timeline.Editor
 
         public override void OnInspectorGUI()
         {
-            if (clip.trackTarget is null)
-                FillTrackTarget();
+            clip.resolver ??= TimelineEditor.inspectedDirector;
+            clip.trackTarget = GetTrackTarget();
 
             base.OnInspectorGUI();
         }
 
-        private void FillTrackTarget()
+        private Transform GetTrackTarget()
         {
             var director = TimelineEditor.inspectedDirector;
             var track = director.GetTrackOfClip(clip);
             var bounds = director.GetGenericBinding(track);
-
-            if (bounds is Transform transform)
-                clip.trackTarget = transform;
+            return bounds as Transform;
         }
     }
 }
