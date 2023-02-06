@@ -1,28 +1,24 @@
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Primer.Timeline
 {
     internal class ScrubbableMixer
     {
-        public void Mix(ScrubbablePlayable[] behaviours, float time, uint iteration)
+        private readonly Queue<ScrubbablePlayable> executed = new();
+
+        public void Mix(ScrubbablePlayable[] allBehaviours, float time, uint iteration)
         {
-            var unused = behaviours.Select(x => x.scrubbable.GetType()).ToHashSet();
+            var validBehaviours = allBehaviours.Where(x => x.scrubbable is not null).ToArray();
+            var toCleanup = validBehaviours.Where(x => x.start > time).ToArray();
+            var toExecute = validBehaviours.Where(x => x.start <= time).ToArray();
 
-            for (var i = 0; i < behaviours.Length; i++) {
-                var behaviour = behaviours[i];
+            // We clean up behaviours after the time cursor from the end to the beginning
+            foreach (var behaviour in toCleanup.Reverse())
+                behaviour.Cleanup();
 
-                if (behaviour.weight != 0) {
-                    behaviour.Execute(time);
-                    unused.Remove(behaviour.scrubbable.GetType());
-                }
-                else if (behaviour.end < time) {
-                    behaviour.Execute(1);
-                    unused.Remove(behaviour.scrubbable.GetType());
-                }
-            }
-
-            foreach (var scrubbable in unused)
-                ScrubbablePlayable.Cleanup(behaviours.First(x => x.scrubbable.GetType() == scrubbable).scrubbable);
+            foreach (var behaviour in toExecute)
+                behaviour.Execute(time);
         }
     }
 }

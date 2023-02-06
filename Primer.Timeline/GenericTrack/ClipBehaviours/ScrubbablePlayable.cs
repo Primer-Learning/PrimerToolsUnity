@@ -38,28 +38,24 @@ namespace Primer.Timeline
 
 
         #region Scrubbable management
-        
-        private static HashSet<Type> cleannessTracker = new();
+        private bool isPrepared = false;
 
-        public void Prepare() => Prepare(scrubbable);
-        
-        public static void Prepare(Scrubbable scrubbable)
+        public void Prepare()
         {
-            if (scrubbable == null || !cleannessTracker.Contains(scrubbable.GetType()))
+            if (scrubbable == null || isPrepared)
                 return;
 
             scrubbable.Prepare();
-            cleannessTracker.Remove(scrubbable.GetType());
+            isPrepared = true;
         }
 
-        public void Cleanup() => Cleanup(scrubbable);
-        public static void Cleanup(Scrubbable scrubbable)
+        public void Cleanup()
         {
-            if (scrubbable == null || cleannessTracker.Contains(scrubbable.GetType()))
+            if (scrubbable == null || !isPrepared)
                 return;
 
             scrubbable.Cleanup();
-            cleannessTracker.Add(scrubbable.GetType());
+            isPrepared = false;
         }
 
         public void Execute(float time)

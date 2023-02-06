@@ -1,4 +1,3 @@
-using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Primer.Timeline
