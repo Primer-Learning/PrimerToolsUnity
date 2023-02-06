@@ -95,6 +95,13 @@ namespace Primer.Timeline
             return null;
         }
 
+        public async UniTask<StepExecutionResult> RunOneStep(IAsyncEnumerator<object> enumerator)
+        {
+            return await enumerator.MoveNextAsync()
+                ? StepExecutionResult.Continue
+                : StepExecutionResult.Done;
+        }
+
         public async UniTask<StepExecutionResult> RunSteps(IAsyncEnumerator<object> enumerator, int count, Func<bool> shouldAbort)
         {
             for (var i = 0; i < count; i++) {
