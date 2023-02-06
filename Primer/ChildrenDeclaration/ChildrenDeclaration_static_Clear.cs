@@ -1,5 +1,4 @@
 using System;
-using Primer.Extensions;
 using UnityEngine;
 
 namespace Primer
