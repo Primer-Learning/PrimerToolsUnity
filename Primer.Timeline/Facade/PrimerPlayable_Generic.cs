@@ -1,11 +1,13 @@
 using System;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     public class PrimerPlayable<TTrackBind> : PrimerPlayable
+        where TTrackBind : Component
     {
-        protected virtual TTrackBind trackTarget { get; set; }
+        public virtual TTrackBind trackTarget { get; internal set; }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {

@@ -1,9 +1,7 @@
-
 using System;
-using Primer.Animation;
 using UnityEngine;
 
-namespace Primer.Timeline
+namespace Primer.Animation
 {
     [Serializable]
     public class RevealChildrenProgressively : Scrubbable

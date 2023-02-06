@@ -11,7 +11,7 @@ namespace Primer.Timeline
         private static readonly CSharpCodeProvider provider = new CSharpCodeProvider();
 
         private static string NameOf(Type type)
-            => provider.GetTypeOutput(new CodeTypeReference(type));
+            => provider.GetTypeOutput(new CodeTypeReference(type)).Split('.').Last();
 
 
         public static string Print(this MethodInfo method)

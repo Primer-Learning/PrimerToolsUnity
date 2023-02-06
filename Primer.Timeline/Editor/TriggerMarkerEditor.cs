@@ -19,13 +19,13 @@ namespace Primer.Timeline.Editor
             var track = marker.parent;
             var bound = director.GetGenericBinding(track);
 
-            var animation = bound as TriggeredBehaviour
-                ?? (bound as Component)?.GetComponent<TriggeredBehaviour>()
-                ?? (bound as GameObject)?.GetComponent<TriggeredBehaviour>();
+            var animation = bound as Triggerable
+                ?? (bound as Component)?.GetComponent<Triggerable>()
+                ?? (bound as GameObject)?.GetComponent<Triggerable>();
 
             if (animation is null) {
                 EditorGUILayout.HelpBox(
-                    $"{nameof(TriggerMarker)} must be in a track bound to a {nameof(TriggeredBehaviour)}",
+                    $"{nameof(TriggerMarker)} must be in a track bound to a {nameof(Triggerable)}",
                     MessageType.Error
                 );
 

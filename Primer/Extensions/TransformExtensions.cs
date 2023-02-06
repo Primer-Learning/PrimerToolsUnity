@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Primer.Extensions
+namespace Primer
 {
     public static class TransformExtensions
     {

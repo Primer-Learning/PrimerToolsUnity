@@ -1,17 +1,9 @@
-using Sirenix.OdinInspector;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     public class PrimerPlayable : PlayableBehaviour
     {
-        [DetailedInfoBox(
-            "This is set to true if the clip throws any error",
-            "Used internally to prevent an invalid clip to modify scene game objects"
-        )]
-        public bool isFailed = false;
-
-
         private Lifecycle _lifecycle;
         protected Lifecycle lifecycle => _lifecycle ??= new Lifecycle(Start, Stop);
 
@@ -28,9 +20,6 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            if (isFailed)
-                throw new FailedClipException();
-
             base.ProcessFrame(playable, info, playerData);
             lifecycle.Initialize();
         }

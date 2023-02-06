@@ -1,9 +1,11 @@
 using System;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     public abstract class PrimerMixer<TTrackBind, TData> : PrimerPlayable<TTrackBind>
+        where TTrackBind : Component
     {
         private IMixerCollector<TData> collector;
 

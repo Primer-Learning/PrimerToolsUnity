@@ -11,23 +11,6 @@ namespace Primer.Timeline.Editor
 {
     public static class MethodSelector
     {
-        private static readonly string[] ignoreMethods = {
-            "IsInvoking",
-            "CancelInvoke",
-            "StopAllCoroutines",
-            "GetComponent",
-            "GetComponentInChildren",
-            "GetComponentsInChildren",
-            "GetComponentInParent",
-            "GetComponentsInParent",
-            "GetComponents",
-            "GetInstanceID",
-            "GetHashCode",
-            "ToString",
-            "GetType",
-            "Equals",
-        };
-
         public static string Render(string currentValue, MethodInfo[] methods, bool hideIfEmpty = false)
         {
             if (methods.Length == 0)
@@ -61,15 +44,11 @@ namespace Primer.Timeline.Editor
             return methods;
         }
 
-        private static IEnumerable<MethodInfo> MethodsWithNoParams<T>(T value)
-        {
-            foreach (var method in GetMethods(value)) {
-                var parameters = method.GetParameters();
-
-                if (parameters.All(param => param.IsOptional))
-                    yield return method;
-            }
-        }
+        private static IEnumerable<MethodInfo> MethodsWithNoParams<T>(T value) =>
+            from method in GetMethods(value)
+            let parameters = method.GetParameters()
+            where parameters.All(param => param.IsOptional)
+            select method;
 
         public static MethodInfo[] GetMethodsWithParamsOfType<T>(T value, params Type[] types)
         {
@@ -86,12 +65,7 @@ namespace Primer.Timeline.Editor
         }
 
         private static IEnumerable<MethodInfo> MethodsWithParamsOfType<T>(T value, params Type[] types)
-        {
-            foreach (var method in GetMethods(value)) {
-                if (ParameterTypeMatches(method.GetParameters(), types))
-                    yield return method;
-            }
-        }
+            => GetMethods(value).Where(method => ParameterTypeMatches(method.GetParameters(), types));
 
         private static bool ParameterTypeMatches(IEnumerable<ParameterInfo> parameters, IEnumerable<Type> types)
         {
@@ -114,10 +88,6 @@ namespace Primer.Timeline.Editor
         }
 
         private static IEnumerable<MethodInfo> GetMethods<T>(T value)
-        {
-            return value.GetType()
-                .GetMethods()
-                .Where(x => !x.Name.StartsWith("get_") && !ignoreMethods.Contains(x.Name));
-        }
+            => MethodOfAttributeDrawer.GetMethodsOf(value.GetType());
     }
 }
