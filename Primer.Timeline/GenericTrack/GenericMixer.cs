@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Jobs.LowLevel.Unsafe;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -10,6 +12,7 @@ namespace Primer.Timeline
     public class GenericMixer : PlayableBehaviour
     {
         private uint currentIteration = 0;
+        private Playable lastPlayable;
 
         private readonly ScrubbableMixer scrubbableMixer = new();
         private readonly TriggerableMixer triggerableMixer = new();
@@ -18,10 +21,19 @@ namespace Primer.Timeline
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
+            lastPlayable = playable;
+
+            var mixers = GetAllGenericMixers(playable.GetGraph());
+            var isLast = mixers.Last() == this;
+
+            if (!isLast)
+                return;
+
             var iteration = ++currentIteration;
             var time = (float)playable.GetTime();
 
-            var behaviours = CollectBehaviours(playable)
+            var behaviours = mixers
+                .SelectMany(mixer => CollectBehaviours(mixer.lastPlayable))
                 .GroupBy(x => x.GetType())
                 .ToDictionary(x => x.Key, x => x.ToList());
 
@@ -61,6 +73,25 @@ namespace Primer.Timeline
 
             behaviours.Sort(new PlayableTimeComparer());
             return behaviours;
+        }
+
+        private List<GenericMixer> GetAllGenericMixers(PlayableGraph graph)
+        {
+            var mixers = new List<GenericMixer>();
+
+            for (var rootIndex = 0; rootIndex < graph.GetRootPlayableCount(); rootIndex++) {
+                var root = graph.GetRootPlayable(rootIndex);
+
+                for (var inputIndex = 0; inputIndex < root.GetInputCount(); inputIndex++) {
+                    var playable = (ScriptPlayable<GenericMixer>)root.GetInput(inputIndex);
+                    var behaviour = playable.GetBehaviour();
+
+                    if (behaviour is not null)
+                        mixers.Add(behaviour);
+                }
+            }
+
+            return  mixers;
         }
     }
 
