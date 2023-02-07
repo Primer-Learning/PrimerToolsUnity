@@ -9,9 +9,5 @@ namespace Primer
         public Transform target { get; set; }
 
         public virtual void Prepare() {}
-
-        public virtual void Cleanup() {}
-
-        public abstract void Update(float t);
     }
 }

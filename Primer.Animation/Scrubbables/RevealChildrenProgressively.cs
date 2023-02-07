@@ -16,15 +16,20 @@ namespace Primer.Animation
             originalScales = SelectChildren((x, i) => x.localScale);
         }
 
-        public override void Cleanup()
+        public void Cleanup()
         {
             ForEachChild((x, i) => x.localScale = originalScales[i]);
             originalScales = null;
         }
 
 
-        public override void Update(float t)
-        {
+        public void Update(float t)
+        {        
+            // Execute(0) is now called instead of Cleanup. So calling this cleanup here for now.
+            if (t == 0)
+            {
+                Cleanup();
+            }
             for (var i = 0; i < target.childCount; i++) {
                 var child = target.GetChild(i);
                 var scalingTime = t * (target.childCount + 1);
