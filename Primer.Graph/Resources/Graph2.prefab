@@ -49,6 +49,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasIntrinsicScale: 0
+  intrinsicScale: {x: 1, y: 1, z: 1}
+  hasIntrinsicPosition: 0
+  intrinsicPosition: {x: 0, y: 0, z: 0}
   enableZAxis: 1
   isRightHanded: 1
   domain: {fileID: 9170909329295579749}
@@ -73,6 +77,12 @@ MonoBehaviour:
   arrowPresence: 2
   arrowPrefab:
     stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+    _position: {x: 0, y: 0, z: 0}
+    hasPosition: 0
+    _rotation: {x: 0, y: 0, z: 0, w: 0}
+    hasRotation: 0
+    _scale: {x: 1, y: 1, z: 1}
+    hasScale: 0
   showTicks: 1
   showZero: 0
   tickSteps: 2
@@ -81,6 +91,12 @@ MonoBehaviour:
   manualTicks: []
   ticksPrefab:
     stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+    _position: {x: 0, y: 0, z: 0}
+    hasPosition: 0
+    _rotation: {x: 0, y: 0, z: 0, w: 0}
+    hasRotation: 0
+    _scale: {x: 1, y: 1, z: 1}
+    hasScale: 0
 --- !u!1 &6847249481812309779
 GameObject:
   m_ObjectHideFlags: 0

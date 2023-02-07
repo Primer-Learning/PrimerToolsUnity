@@ -1,3 +1,4 @@
+using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
@@ -23,7 +24,13 @@ namespace Primer.Timeline.Editor
             var director = TimelineEditor.inspectedDirector;
             var track = director.GetTrackOfClip(clip);
             var bounds = director.GetGenericBinding(track);
-            return bounds as Transform;
+            var transform = bounds as Transform;
+
+            if (transform == null) {
+                GenericTrack.LogNoTrackTargetWarning();
+            }
+
+            return transform;
         }
     }
 }

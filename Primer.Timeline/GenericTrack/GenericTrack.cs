@@ -30,14 +30,16 @@ namespace Primer.Timeline.FakeUnityEngine
                 ? director.GetGenericBinding(this) as Transform
                 : null;
 
+            if (trackTarget == null) {
+                LogNoTrackTargetWarning();
+            }
+
             foreach (var clip in GetClips()) {
                 if (clip.asset is not GenericClip asset)
                     continue;
 
                 asset.resolver ??= graph.GetResolver();
-
-                if (asset.trackTarget is null && trackTarget != null)
-                    asset.trackTarget = trackTarget;
+                asset.trackTarget = trackTarget;
 
                 // HACK: to set the display name of the clip to match the clipName property
                 if (string.IsNullOrWhiteSpace(clip.displayName)
@@ -70,6 +72,11 @@ namespace Primer.Timeline.FakeUnityEngine
             clip.GetType()
                 .GetMethod("set_postExtrapolationMode", PRIVATE_INSTANCE)
                 ?.Invoke(clip, new object[] { TimelineClip.ClipExtrapolation.Hold });
+        }
+
+        internal static void LogNoTrackTargetWarning()
+        {
+            Debug.LogWarning($"{nameof(GenericTrack)} has no target");
         }
     }
 }

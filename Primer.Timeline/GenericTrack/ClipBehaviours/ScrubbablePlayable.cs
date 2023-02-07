@@ -75,6 +75,7 @@ namespace Primer.Timeline
         }
         #endregion
 
+
         public override string ToString()
         {
             return $"Scrubbable {icon} {scrubbableMethod.ToString(scrubbable)}";

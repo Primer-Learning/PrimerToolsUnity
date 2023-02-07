@@ -22,7 +22,6 @@ namespace Primer.Latex
         {
             var a = new List<object>(args);
             a.Insert(0, "Mixer");
-            PrimerLogger.Log(trackTarget, a.ToArray());
         }
 
 

@@ -23,12 +23,6 @@ namespace Primer.Timeline
                 );
             }
 
-            // if (expectedReturnType != null && expectedReturnType.IsAssignableFrom(method.ReturnType)) {
-            //     throw new MethodAccessException(
-            //         $"Method {ToString(target)} returns {method.ReturnType}, expected {expectedReturnType}"
-            //     );
-            // }
-
             if (method.ReturnType != typeof(void))
                 return method.Invoke(target, parameters);
 

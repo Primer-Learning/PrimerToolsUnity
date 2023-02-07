@@ -56,7 +56,7 @@ namespace Primer
                 return intrinsicScale;
 
             // We don't have intrinsic scale but the transform's scale is 0...
-            // but we don't save it
+            // so we don't save it
             if (transform.localScale == Vector3.zero)
                 return Vector3.zero;
 

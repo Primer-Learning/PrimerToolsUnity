@@ -23,8 +23,13 @@ namespace Primer.Timeline
                 await EditModeMix(allBehaviours, time, iteration);
         }
 
-        private async UniTask PlayModeMix(IEnumerable<SequentialPlayable> allBehaviours, float time)
+        private async UniTask PlayModeMix(SequentialPlayable[] allBehaviours, float time)
         {
+            if (time == 0) {
+                foreach (var behaviour in allBehaviours)
+                    behaviour.Cleanup();
+            }
+
             var clips = allBehaviours.Where(x => x.weight > 0);
 
             foreach (var behaviour in clips) {

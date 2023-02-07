@@ -1,0 +1,10 @@
+{
+    "name": "Primer.Timeline.Tests",
+    "rootNamespace": "Primer.Timeline.Tests",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "Primer",
+        "Primer.Timeline",
+        "Primer.Animation"
+    ]
+}
