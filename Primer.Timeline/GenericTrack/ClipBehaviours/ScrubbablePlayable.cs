@@ -54,7 +54,8 @@ namespace Primer.Timeline
             if (scrubbable == null || !isPrepared)
                 return;
 
-            scrubbable.Cleanup();
+            // scrubbable.Cleanup();
+            scrubbable.Update(0);
             isPrepared = false;
         }
 
