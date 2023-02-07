@@ -23,13 +23,13 @@ namespace Primer.Timeline.Tests
             target.localScale = initialScale;
         }
 
-        public override void Update(float t) => Move(t);
-
+        [UsedImplicitly]
         public void Move(float t)
         {
             target.localPosition = Vector3.Lerp(initialPosition, moveTo, t);
         }
 
+        [UsedImplicitly]
         public void Scale(float t)
         {
             target.localScale = Vector3.Lerp(initialScale, moveTo, t);

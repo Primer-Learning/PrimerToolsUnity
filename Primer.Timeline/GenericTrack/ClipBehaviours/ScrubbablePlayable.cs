@@ -55,6 +55,7 @@ namespace Primer.Timeline
                 return;
 
             Execute(0);
+            scrubbable.Cleanup();
             isPrepared = false;
         }
 
