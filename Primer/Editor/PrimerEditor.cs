@@ -1,9 +1,9 @@
-using Sirenix.OdinInspector.Editor;
+using UnityEditor;
 using UnityEngine;
 
 namespace Primer.Editor
 {
-    public class PrimerEditor<T> : OdinEditor where T : class
+    public class PrimerEditor<T> : UnityEditor.Editor where T : class
     {
         protected T component => target as T;
 
@@ -11,7 +11,9 @@ namespace Primer.Editor
 
         protected void Space() => GUILayout.Space(spacingPixels);
 
-        protected void PropertyField(string propertyName)
-            => Tree.GetPropertyAtPath(propertyName).Draw();
+        protected void PropertyField(string name, bool includeChildren = false)
+        {
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(name), includeChildren);
+        }
     }
 }
