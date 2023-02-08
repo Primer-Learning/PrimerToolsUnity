@@ -26,7 +26,6 @@ namespace Primer
     ///     void Update() => Debug.Log(strategy.GetSomeNumber());
     /// }
     /// </example>
-    [Obsolete("Odin inspector implements this by default, this class isn't needed anymore")]
     public class StrategyPattern
     {
     }
