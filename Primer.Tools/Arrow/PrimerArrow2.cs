@@ -1,9 +1,9 @@
-using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Tools
 {
+    [ExecuteAlways]
     public class PrimerArrow2 : MonoBehaviour
     {
         private float shaftLength;
@@ -20,15 +20,14 @@ namespace Primer.Tools
         [ChildGameObjectsOnly]
         public Transform tail;
 
-        public Color color = Color.white;
-
         [Title("Positioning")]
         [InlineButton(nameof(SwapStartEnd))]
         public bool globalPositioning = false;
-
         public Vector3 start = Vector3.zero;
         public Vector3 end = Vector3.one;
         public Vector2 buffer = Vector2.zero;
+        public Transform startTracker;
+        public Transform endTracker;
 
         [Title("Fine tuning")]
         public float thickness = 1f;
@@ -45,14 +44,55 @@ namespace Primer.Tools
         private float realArrowLength => arrowLength * thickness;
 
 
-        #region Unity events
         public void OnValidate() => Recalculate();
-        #endregion
+
+        public void Update()
+        {
+            var hasChanges = false;
+
+            if (startTracker != null && startTracker.position != start) {
+                start = startTracker.position;
+                hasChanges = true;
+            }
+
+            if (endTracker != null && endTracker.position != end) {
+                end = endTracker.position;
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+                Recalculate();
+        }
 
 
         public void SwapStartEnd()
         {
             (start, end) = (end, start);
+            Recalculate();
+        }
+
+        public void Follow(GameObject from, GameObject to)
+            => Follow(from.transform, to.transform);
+
+        public void Follow(Transform from, Transform to)
+        {
+            SetFromTo(from.position, to.position, true);
+            startTracker = from;
+            endTracker = to;
+        }
+
+        public void SetFromTo(Vector3 from, Vector3 to, bool global)
+        {
+            globalPositioning = global;
+            SetFromTo(from, to);
+        }
+
+        public void SetFromTo(Vector3 from, Vector3 to)
+        {
+            startTracker = null;
+            endTracker = null;
+            start = from;
+            end = to;
             Recalculate();
         }
 
@@ -87,17 +127,13 @@ namespace Primer.Tools
 
         private void CalculatePosition()
         {
-            var diff = end - start;
             var arrow = transform;
+            arrow.rotation = Quaternion.FromToRotation(Vector3.right, end - start);
 
-            if (globalPositioning) {
+            if (globalPositioning)
                 arrow.position = start;
-                arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
-            }
-            else {
+            else
                 arrow.localPosition = start;
-                arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
-            }
         }
 
         private void CalculateChildrenPosition()
@@ -112,174 +148,45 @@ namespace Primer.Tools
             tail.localPosition = new Vector3(buffer.x + realArrowLength, 0, 0);
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            // Gizmos.DrawCube();
-            throw new NotImplementedException();
-        }
-
-        // public void SetFromTo(Vector3 from, Vector3 to, float endBuffer = 0f, float startBuffer = 0f,
-        //     bool globalPositioning = false)
-        // {
-        //     var totalLength = (from - to).magnitude;
-        //
-        //     if (startBuffer + endBuffer >= totalLength) {
-        //         NoLength();
-        //         return;
-        //     }
-        //
-        //     var startBufferFac = startBuffer / totalLength;
-        //     var endBufferFac = endBuffer / totalLength;
-        //
-        //     var start = Vector3.Lerp(from, to, startBufferFac);
-        //     var end = Vector3.Lerp(to, from, endBufferFac);
-        //
-        //     if (globalPositioning)
-        //         transform.position = start;
-        //     else
-        //         transform.localPosition = end;
-        //
-        //     length = totalLength - endBuffer - startBuffer;
-        //
-        //     // //Assume we're looking at the local xy plane. This thing is flat.
-        //     // float rads = Mathf.Atan2((start - end).y, (start - end).x);
-        //     // transform.localRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
-        // }
-
         private void NoLength()
         {
             primer.FindIntrinsicScale();
             transform.localScale = Vector3.zero;
         }
 
-
-        //     [Header ("Controls")]
-        //     [SerializeField] Vector3 headPosition;
-        //     [SerializeField] float headBuffer;
-        //     [SerializeField] Vector3 tailPosition = new Vector3(1, 1, 0);
-        //     [SerializeField] float tailBuffer;
+        // public void AnimateFromTo(Vector3 from, Vector3 to, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float endBuffer = 0f, float startBuffer = 0f)
+        // {
+        //     StartCoroutine(animateFromTo(from, to, duration, ease, endBuffer, startBuffer));
+        // }
+        // private IEnumerator animateFromTo(Vector3 from, Vector3 to, float duration, EaseMode ease, float endBuffer = 0f, float startBuffer = 0f)
+        // {
+        //     Vector3 oldPosition = transform.localPosition;
+        //     Quaternion oldRotation = transform.localRotation;
+        //     float oldLength = currentLength;
         //
-        //     [Header ("Object and transform references")]
-        //     [SerializeField] PrimerObject shaftRoot = null;
-        //     [SerializeField] Transform shaft = null;
-        //     [SerializeField] Transform head = null;
-        //     float currentLength;
-        //     public Color Color {
-        //         get {
-        //             return head.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color;
-        //             // Assume head and shaft are the same color
-        //         }
-        //         set {
-        //             head.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color = value;
-        //             shaft.GetComponentsInChildren<MeshRenderer>()[0].materials[0].color = value;
-        //         }
-        //     }
+        //     //HandleBuffer
+        //     float newLength = (from - to).magnitude;
+        //     float startBufferFac = startBuffer / newLength;
+        //     float endBufferFac = endBuffer / newLength;
+        //     Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
+        //     Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
+        //     newLength -= startBuffer + endBuffer;
         //
+        //     //get new rotation
+        //     float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
+        //     Quaternion newRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
         //
-        //     void OnValidate() {
-        //         if ( (tailPosition - headPosition).magnitude > 0 ) {
-        //             SetFromTo(tailPosition, headPosition, endBuffer: headBuffer, startBuffer: tailBuffer);
-        //         }
-        //     }
-        //
-        //     public void SetWidth(float width)
+        //     float startTime = Time.time;
+        //     while (Time.time < startTime + duration)
         //     {
-        //         transform.localScale = Vector3.one * width;
+        //         float t = ease.Apply((Time.time - startTime) / duration);
+        //         transform.localPosition = Vector3.Lerp(oldPosition, bTo, t);
+        //         transform.localRotation = Quaternion.Slerp(oldRotation, newRotation, t);
+        //         SetLength(Mathf.Lerp(oldLength, newLength, t));
+        //         yield return null;
         //     }
-        //
-        //     public void SetLength(float length)
-        //     {
-        //         shaftRoot.transform.localPosition = new Vector3(
-        //             length / transform.localScale.x,
-        //             shaftRoot.transform.localPosition.y,
-        //             shaftRoot.transform.localPosition.z
-        //         );
-        //         shaft.localScale = new Vector3(
-        //             length / transform.localScale.x - 0.1f, //Leave a little room for the head to come to a point
-        //             shaftRoot.transform.localScale.y,
-        //             shaftRoot.transform.localScale.z
-        //         );
-        //         head.localPosition = new Vector3(
-        //             -length / transform.localScale.x,
-        //             shaftRoot.transform.localPosition.y,
-        //             shaftRoot.transform.localPosition.z
-        //         );
-        //         currentLength = length;
-        //     }
-        //
-        //     public void SetFromTo(Vector3 from, Vector3 to, float endBuffer = 0f, float startBuffer = 0f)
-        //     {
-        //         //HandleBuffer
-        //         float length = (from - to).magnitude;
-        //         float startBufferFac = startBuffer / length;
-        //         float endBufferFac = endBuffer / length;
-        //         Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
-        //         Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
-        //         length -= endBuffer + startBuffer;
-        //
-        //         //Move object
-        //         transform.localPosition = bTo;
-        //         SetLength(length);
-        //         //Assume we're looking at the local xy plane. This thing is flat.
-        //         float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
-        //         transform.localRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
-        //     }
-        //
-        //     public void AnimateFromTo(Vector3 from, Vector3 to, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float endBuffer = 0f, float startBuffer = 0f)
-        //     {
-        //         StartCoroutine(animateFromTo(from, to, duration, ease, endBuffer, startBuffer));
-        //     }
-        //     private IEnumerator animateFromTo(Vector3 from, Vector3 to, float duration, EaseMode ease, float endBuffer = 0f, float startBuffer = 0f)
-        //     {
-        //         Vector3 oldPosition = transform.localPosition;
-        //         Quaternion oldRotation = transform.localRotation;
-        //         float oldLength = currentLength;
-        //
-        //         //HandleBuffer
-        //         float newLength = (from - to).magnitude;
-        //         float startBufferFac = startBuffer / newLength;
-        //         float endBufferFac = endBuffer / newLength;
-        //         Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
-        //         Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
-        //         newLength -= startBuffer + endBuffer;
-        //
-        //         //get new rotation
-        //         float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
-        //         Quaternion newRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
-        //
-        //         float startTime = Time.time;
-        //         while (Time.time < startTime + duration)
-        //         {
-        //             float t = ease.Apply((Time.time - startTime) / duration);
-        //             transform.localPosition = Vector3.Lerp(oldPosition, bTo, t);
-        //             transform.localRotation = Quaternion.Slerp(oldRotation, newRotation, t);
-        //             SetLength(Mathf.Lerp(oldLength, newLength, t));
-        //             yield return null;
-        //         }
-        //         SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
-        //     }
-        //
-        //     public override void ScaleUpFromZero(float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float delay = 0)
-        //     {
-        //         //Appear from the shaft, even though the point is our center here
-        //         shaftRoot.ScaleUpFromZero(duration: duration, ease: ease, delay: delay);
-        //     }
-        //
-        //     public override void SetIntrinsicScale(Vector3 scale)
-        //     {
-        //         Debug.LogWarning("Arrows are animated by scaling a child object, setting current scale instead of intrinsic scale.");
-        //         transform.localScale = scale;
-        //     }
-        //     public override void SetIntrinsicScale(float scale)
-        //     {
-        //         SetIntrinsicScale(Vector3.one * scale);
-        //     }
-        //
-        //     public override void SetColor(Color c)
-        //     {
-        //         Debug.LogWarning("Arrow color has been moved to a property. Just set PrimerArrow.Color normally.");
-        //         Color = c;
-        //     }
+        //     SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
+        // }
 
     }
 }
