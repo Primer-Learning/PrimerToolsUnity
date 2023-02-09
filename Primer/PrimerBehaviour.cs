@@ -17,6 +17,11 @@ namespace Primer
             lifetimeCancellation.Cancel();
         }
 
+        public void CancelOnDestroy(CancellationTokenSource tokenSource)
+        {
+            lifetime.Register(tokenSource.Cancel);
+        }
+
 
         #region Vector3? intrinsicScale
         [SerializeField]

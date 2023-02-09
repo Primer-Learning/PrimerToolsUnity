@@ -144,11 +144,11 @@ namespace Primer.Tools
             shaftLength = length - realArrowLength * 2;
 
             if (shaftLength <= 0) {
-                NoLength();
+                ScaleDownToZero();
                 return;
             }
 
-            primer.ApplyIntrinsicScale();
+            ScaleUpFromZero();
 
             CalculatePosition();
             CalculateChildrenPosition();
@@ -177,10 +177,11 @@ namespace Primer.Tools
             tail.localPosition = new Vector3(buffer.x + realArrowLength, 0, 0);
         }
 
-        private void NoLength()
+
+        [Button("Look at camera")]
+        public void LookAtCamera()
         {
-            primer.FindIntrinsicScale();
-            transform.localScale = Vector3.zero;
+            transform.LookAt(Camera.main.transform);
         }
 
         // public void AnimateFromTo(Vector3 from, Vector3 to, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float endBuffer = 0f, float startBuffer = 0f)
@@ -217,5 +218,26 @@ namespace Primer.Tools
         //     SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
         // }
 
+        #region Scale up / down
+        private bool isScaledDown = false;
+
+        public void ScaleDownToZero()
+        {
+            if (isScaledDown)
+                return;
+
+            isScaledDown = true;
+            this.GetPrimer().ScaleDownToZero().Forget();
+        }
+
+        public void ScaleUpFromZero()
+        {
+            if (!isScaledDown)
+                return;
+
+            isScaledDown = false;
+            this.GetPrimer().ScaleUpFromZero().Forget();
+        }
+        #endregion
     }
 }
