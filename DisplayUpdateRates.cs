@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 // Adapted from Unity's FixedUpdate documentation
@@ -9,9 +9,12 @@ public class DisplayUpdateRates : MonoBehaviour
 {
     private float updateCount = 0;
     private float fixedUpdateCount = 0;
+    [ShowInInspector, ReadOnly]
     private float updateUpdateCountPerSecond;
+    [ShowInInspector, ReadOnly]
     private float updateFixedUpdateCountPerSecond;
     private float lastRealTime;
+    [ShowInInspector, ReadOnly]
     private float deltaRealTime;
 
     void Awake()
