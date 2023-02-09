@@ -1,5 +1,9 @@
+using System.ComponentModel;
+using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Component = UnityEngine.Component;
 
 namespace Primer.Tools
 {
@@ -22,15 +26,35 @@ namespace Primer.Tools
 
         [Title("Positioning")]
         [InlineButton(nameof(SwapStartEnd))]
+        [DisableIf(nameof(startTracker))]
+        [Tooltip("Start and end positions are in global space if true. Start Tracker and End Tracker set this to true.")]
         public bool globalPositioning = false;
+
+        [DisableIf(nameof(startTracker))]
+        [Tooltip("Point where the arrow starts. Start Tracker overrides this value.")]
         public Vector3 start = Vector3.zero;
+
+        [DisableIf(nameof(endTracker))]
+        [Tooltip("Point where the arrow ends. End Tracker overrides this value.")]
         public Vector3 end = Vector3.one;
-        public Vector2 buffer = Vector2.zero;
+
+        [Title("Follow")]
+        [InlineButton("@startTracker = null", SdfIconType.X, "")]
+        [Tooltip("Start of the arrow follow this transform.")]
         public Transform startTracker;
+
+        [InlineButton("@endTracker = null", SdfIconType.X, "")]
+        [Tooltip("End of the arrow follow this transform.")]
         public Transform endTracker;
 
         [Title("Fine tuning")]
+        [Tooltip("Leave empty space between start and end points and the arrow itself")]
+        public Vector2 buffer = Vector2.zero;
         public float thickness = 1f;
+
+        [Title("Constants")]
+        [Tooltip("This is the distance for the arrow heads before the shaft starts. " +
+            "This only needs to be changed if the arrow mesh changes.")]
         public float arrowLength = 0.18f;
 
         [ShowInInspector]
@@ -40,7 +64,6 @@ namespace Primer.Tools
             set => SetLength(value);
         }
 
-        private PrimerBehaviour primer => this.GetPrimer();
         private float realArrowLength => arrowLength * thickness;
 
 
@@ -60,25 +83,31 @@ namespace Primer.Tools
                 hasChanges = true;
             }
 
-            if (hasChanges)
+            if (hasChanges) {
+                globalPositioning = true;
                 Recalculate();
+            }
         }
-
 
         public void SwapStartEnd()
         {
             (start, end) = (end, start);
+            (startTracker, endTracker) = (endTracker, startTracker);
             Recalculate();
         }
 
         public void Follow(GameObject from, GameObject to)
             => Follow(from.transform, to.transform);
 
-        public void Follow(Transform from, Transform to)
+        public void Follow(Component from, Component to)
         {
-            SetFromTo(from.position, to.position, true);
-            startTracker = from;
-            endTracker = to;
+            var fromTransform = from.transform;
+            var toTransform = to.transform;
+
+            SetFromTo(fromTransform.position, toTransform.position, true);
+
+            startTracker = fromTransform;
+            endTracker = toTransform;
         }
 
         public void SetFromTo(Vector3 from, Vector3 to, bool global)
