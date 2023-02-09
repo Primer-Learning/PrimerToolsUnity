@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -28,18 +29,20 @@ namespace Primer.Animation
             return (T)lerped;
         }
 
-        public static async IAsyncEnumerable<T> Tween<T>(this Tweener config, T initial, T target,
-            [EnumeratorCancellation] CancellationToken ct = default)
+        public static async IAsyncEnumerable<T> Tween<T>(
+            this Tweener config, T initial, T target,
+            [EnumeratorCancellation] CancellationToken ct = default,
+            [CanBeNull] Func<T, T, float, T> customLerp = null)
         {
             var startTime = Time.time;
             var animation = config ?? @default;
-            var lerp = GetLerpMethod<T>();
+            var lerp = customLerp is null ? GetLerpMethod<T>() : customLerp.Method;
 
             while (!ct.IsCancellationRequested && Time.time < startTime + animation.duration) {
                 var t = (Time.time - startTime) / animation.duration;
                 var tEased = animation.ease.Apply(t);
                 var lerped = lerp.Invoke(null, new object[] {
-                    initial, target, tEased
+                    initial, target, tEased,
                 });
 
                 yield return (T)lerped;

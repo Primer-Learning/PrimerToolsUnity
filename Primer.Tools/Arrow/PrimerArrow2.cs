@@ -1,4 +1,6 @@
+using System;
 using System.ComponentModel;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -136,7 +138,7 @@ namespace Primer.Tools
             Recalculate();
         }
 
-        private void Recalculate()
+        public void Recalculate()
         {
             if (shaft == null || head == null || tail == null || gameObject.IsPreset())
                 return;
@@ -184,39 +186,40 @@ namespace Primer.Tools
             transform.LookAt(Camera.main.transform);
         }
 
-        // public void AnimateFromTo(Vector3 from, Vector3 to, float duration = 0.5f, EaseMode ease = EaseMode.Cubic, float endBuffer = 0f, float startBuffer = 0f)
-        // {
-        //     StartCoroutine(animateFromTo(from, to, duration, ease, endBuffer, startBuffer));
-        // }
-        // private IEnumerator animateFromTo(Vector3 from, Vector3 to, float duration, EaseMode ease, float endBuffer = 0f, float startBuffer = 0f)
-        // {
-        //     Vector3 oldPosition = transform.localPosition;
-        //     Quaternion oldRotation = transform.localRotation;
-        //     float oldLength = currentLength;
-        //
-        //     //HandleBuffer
-        //     float newLength = (from - to).magnitude;
-        //     float startBufferFac = startBuffer / newLength;
-        //     float endBufferFac = endBuffer / newLength;
-        //     Vector3 bFrom = Vector3.Lerp(from, to, startBufferFac);
-        //     Vector3 bTo = Vector3.Lerp(to, from, endBufferFac);
-        //     newLength -= startBuffer + endBuffer;
-        //
-        //     //get new rotation
-        //     float rads = Mathf.Atan2((bFrom - bTo).y, (bFrom - bTo).x);
-        //     Quaternion newRotation = Quaternion.Euler(0, 0, rads * Mathf.Rad2Deg);
-        //
-        //     float startTime = Time.time;
-        //     while (Time.time < startTime + duration)
-        //     {
-        //         float t = ease.Apply((Time.time - startTime) / duration);
-        //         transform.localPosition = Vector3.Lerp(oldPosition, bTo, t);
-        //         transform.localRotation = Quaternion.Slerp(oldRotation, newRotation, t);
-        //         SetLength(Mathf.Lerp(oldLength, newLength, t));
-        //         yield return null;
-        //     }
-        //     SetFromTo(bFrom, bTo); //Don't include buffer, since 'to' has already been altered
-        // }
+
+        // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
+        public async UniTask Animate(Vector3 tailTo, Vector3 headTo, Tweener animation = null, CancellationToken ct = default)
+        {
+            if (start == tailTo || end == headTo) return;
+
+            if (!Application.isPlaying) {
+                start = tailTo;
+                end = headTo;
+                Recalculate();
+                return;
+            }
+
+            var from = (start, end);
+            var to = (tailTo, headTo);
+
+            await foreach (var (tailLerped, headLerped) in animation.Tween(from, to, ct, LerpVector3Pair)) {
+                if (ct.IsCancellationRequested) return;
+                start = tailLerped;
+                end = headLerped;
+                Recalculate();
+            }
+
+            return;
+
+            static (Vector3, Vector3) LerpVector3Pair((Vector3, Vector3) a, (Vector3, Vector3) b, float t)
+            {
+                return (
+                    Vector3.Lerp(a.Item1, b.Item1, t),
+                    Vector3.Lerp(a.Item2, b.Item2, t)
+                );
+            }
+        }
+
 
         #region Scale up / down
         private bool isScaledDown = false;
