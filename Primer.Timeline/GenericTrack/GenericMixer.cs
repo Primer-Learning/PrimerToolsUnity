@@ -18,6 +18,8 @@ namespace Primer.Timeline
         private readonly TriggerableMixer triggerableMixer = new();
         private readonly SequentialMixer sequentialMixer = new();
 
+        public bool isMuted;
+
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -88,9 +90,10 @@ namespace Primer.Timeline
                         var playable = (ScriptPlayable<GenericMixer>)root.GetInput(inputIndex);
                         var behaviour = playable.GetBehaviour();
 
-                        if (behaviour is not null)
+                        if (behaviour is not null && behaviour.isMuted == false)
                             mixers.Add(behaviour);
                     }
+                    // TODO: prevent error throw when the Playable can't be casted to ScriptPlayable<GenericMixer>
                     catch {}
                 }
             }

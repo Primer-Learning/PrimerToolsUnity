@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -53,7 +52,9 @@ namespace Primer.Timeline.FakeUnityEngine
                 asset.template.duration = (float)clip.duration;
             }
 
-            return ScriptPlayable<GenericMixer>.Create(graph, inputCount);
+            var mixer = ScriptPlayable<GenericMixer>.Create(graph, inputCount);
+            mixer.GetBehaviour().isMuted = muted;
+            return mixer;
         }
 
         protected override void OnCreateClip(TimelineClip clip)
