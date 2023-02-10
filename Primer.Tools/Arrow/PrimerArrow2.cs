@@ -207,12 +207,14 @@ namespace Primer.Tools
             endArrowLength = endPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
+            var scale = this.GetPrimer().FindIntrinsicScale();
+
             if (shaftLength <= 0) {
-                ScaleDownToZero().Forget();
+                transform.localScale = Vector3.zero;
                 return;
             }
 
-            ScaleUpFromZero().Forget();
+            transform.localScale = scale;
 
             CalculatePosition();
             CalculateChildrenPosition();
@@ -270,29 +272,6 @@ namespace Primer.Tools
             (start, end) = (end, start);
             (startTracker, endTracker) = (endTracker, startTracker);
             Recalculate();
-        }
-        #endregion
-
-
-        #region Scale up / down
-        private bool isScaledDown = false;
-
-        public async UniTask ScaleDownToZero()
-        {
-            if (isScaledDown)
-                return;
-
-            isScaledDown = true;
-            await this.GetPrimer().ScaleDownToZero();
-        }
-
-        public async UniTask ScaleUpFromZero()
-        {
-            if (!isScaledDown)
-                return;
-
-            isScaledDown = false;
-            await this.GetPrimer().ScaleUpFromZero();
         }
         #endregion
     }
