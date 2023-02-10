@@ -1,5 +1,3 @@
-using System;
-using System.ComponentModel;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
@@ -98,6 +96,13 @@ namespace Primer.Tools
             }
         }
 
+        public void SetStartAndEnd(Vector3 start, Vector3? end = null)
+        {
+            this.start = start;
+            this.end = end ?? start;
+            Recalculate();
+        }
+
         public void SwapStartEnd()
         {
             (start, end) = (end, start);
@@ -153,11 +158,11 @@ namespace Primer.Tools
             shaftLength = length - realArrowLength * 2;
 
             if (shaftLength <= 0) {
-                ScaleDownToZero();
+                ScaleDownToZero().Forget();
                 return;
             }
 
-            ScaleUpFromZero();
+            ScaleUpFromZero().Forget();
 
             CalculatePosition();
             CalculateChildrenPosition();
@@ -201,24 +206,31 @@ namespace Primer.Tools
 
 
         // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
-        public async UniTask Animate(Vector3 tailTo, Vector3 headTo, Tweener animation = null, CancellationToken ct = default)
+        public async UniTask Animate(
+            Vector3? from = null,
+            Vector3? to = null,
+            Tweener animation = null,
+            CancellationToken ct = default)
         {
-            if (start == tailTo || end == headTo) return;
+            var tailTo = from ?? this.start;
+            var headTo = to ?? this.end;
+
+            if (this.start == tailTo && this.end == headTo) return;
 
             if (!Application.isPlaying) {
-                start = tailTo;
-                end = headTo;
+                this.start = tailTo;
+                this.end = headTo;
                 Recalculate();
                 return;
             }
 
-            var from = (start, end);
-            var to = (tailTo, headTo);
+            var tailAnim = (this.start, this.end);
+            var headAnim = (tailTo, headTo);
 
-            await foreach (var (tailLerped, headLerped) in animation.Tween(from, to, ct, LerpVector3Pair)) {
+            await foreach (var (tailLerped, headLerped) in animation.Tween(tailAnim, headAnim, ct, LerpVector3Pair)) {
                 if (ct.IsCancellationRequested) return;
-                start = tailLerped;
-                end = headLerped;
+                this.start = tailLerped;
+                this.end = headLerped;
                 Recalculate();
             }
 
@@ -237,22 +249,22 @@ namespace Primer.Tools
         #region Scale up / down
         private bool isScaledDown = false;
 
-        public void ScaleDownToZero()
+        public async UniTask ScaleDownToZero()
         {
             if (isScaledDown)
                 return;
 
             isScaledDown = true;
-            this.GetPrimer().ScaleDownToZero().Forget();
+            await this.GetPrimer().ScaleDownToZero();
         }
 
-        public void ScaleUpFromZero()
+        public async UniTask ScaleUpFromZero()
         {
             if (!isScaledDown)
                 return;
 
             isScaledDown = false;
-            this.GetPrimer().ScaleUpFromZero().Forget();
+            await this.GetPrimer().ScaleUpFromZero();
         }
         #endregion
     }
