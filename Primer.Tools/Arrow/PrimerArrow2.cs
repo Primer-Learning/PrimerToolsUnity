@@ -14,16 +14,11 @@ namespace Primer.Tools
     {
         private float shaftLength;
 
-        [Required]
-        [ChildGameObjectsOnly]
+        [Required, ChildGameObjectsOnly]
         public Transform shaft;
-
-        [Required]
-        [ChildGameObjectsOnly]
+        [Required, ChildGameObjectsOnly]
         public Transform head;
-
-        [Required]
-        [ChildGameObjectsOnly]
+        [Required, ChildGameObjectsOnly]
         public Transform tail;
 
         [Title("Positioning")]
@@ -50,8 +45,9 @@ namespace Primer.Tools
         public Transform endTracker;
 
         [Title("Fine tuning")]
-        [Tooltip("Leave empty space between start and end points and the arrow itself")]
-        public Vector2 buffer = Vector2.zero;
+        public float startSpace = 0;
+        public float endSpace = 0;
+        public float axisRotation = 0;
         public float thickness = 1f;
 
         [Title("Constants")]
@@ -62,9 +58,10 @@ namespace Primer.Tools
         [ShowInInspector]
         [MinValue(0)]
         public float length {
-            get => (end - start).magnitude - buffer.x - buffer.y;
+            get => (end - start).magnitude - startSpace - endSpace;
             set => SetLength(value);
         }
+
 
         private float realArrowLength => arrowLength * thickness;
 
@@ -169,17 +166,23 @@ namespace Primer.Tools
 
         private void CalculateChildrenPosition()
         {
-            shaft.localPosition = new Vector3(buffer.x + realArrowLength, 0, 0);
+            var childRotation = Quaternion.Euler(axisRotation, 0, 0);
+
+            shaft.localPosition = new Vector3(startSpace + realArrowLength, 0, 0);
             shaft.localScale = new Vector3(shaftLength, thickness, thickness);
+            shaft.localRotation = childRotation;
 
             head.localScale = head.GetPrimer().FindIntrinsicScale() * thickness;
-            head.localPosition = new Vector3(shaftLength + buffer.x + realArrowLength, 0, 0);
+            head.localPosition = new Vector3(shaftLength + startSpace + realArrowLength, 0, 0);
+            head.localRotation = childRotation;
 
             tail.localScale = tail.GetPrimer().FindIntrinsicScale() * thickness;
-            tail.localPosition = new Vector3(buffer.x + realArrowLength, 0, 0);
+            tail.localPosition = new Vector3(startSpace + realArrowLength, 0, 0);
+            tail.localRotation = childRotation;
         }
 
 
+        [PropertySpace]
         [Button("Look at camera")]
         public void LookAtCamera()
         {
