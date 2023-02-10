@@ -11,6 +11,8 @@ namespace Primer.Tools
     public class PrimerArrow2 : MonoBehaviour
     {
         private float shaftLength;
+        private float startArrowLength;
+        private float endArrowLength;
 
         [Required, ChildGameObjectsOnly]
         public Transform shaft;
@@ -20,8 +22,7 @@ namespace Primer.Tools
         public Transform tail;
 
         [Title("Positioning")]
-        [InlineButton(nameof(SwapStartEnd))]
-        [DisableIf(nameof(startTracker))]
+        [DisableIf("@startTracker != null || endTracker != null")]
         [Tooltip("Start and end positions are in global space if true. Start Tracker and End Tracker set this to true.")]
         public bool globalPositioning = false;
 
@@ -32,7 +33,8 @@ namespace Primer.Tools
         [Tooltip("Point where the arrow starts. Start Tracker overrides this value.")]
         public Vector3 start = Vector3.zero;
 
-        [Space, LabelText("Space")]
+        [Space]
+        [LabelText("Space")]
         public float startSpace = 0;
 
         [LabelText("Follow")]
@@ -40,18 +42,25 @@ namespace Primer.Tools
         [Tooltip("Start of the arrow follow this transform.")]
         public Transform startTracker;
 
+        [LabelText("Pointer")]
+        public bool startPointer = false;
+
         [HideLabel, Title("End", titleAlignment: TitleAlignments.Centered)]
         [DisableIf(nameof(endTracker))]
         [Tooltip("Point where the arrow ends. End Tracker overrides this value.")]
         public Vector3 end = Vector3.one;
 
-        [Space, LabelText("Space")]
+        [Space]
+        [LabelText("Space")]
         public float endSpace = 0;
 
         [LabelText("Follow")]
         [InlineButton("@endTracker = null", SdfIconType.X, "")]
         [Tooltip("End of the arrow follow this transform.")]
         public Transform endTracker;
+
+        [LabelText("Pointer")]
+        public bool endPointer = true;
 
         [Space(16)]
         [Title("Fine tuning")]
@@ -74,6 +83,7 @@ namespace Primer.Tools
         private float realArrowLength => arrowLength * thickness;
 
 
+        #region Unity events
         public void OnValidate() => Recalculate();
 
         public void Update()
@@ -95,20 +105,8 @@ namespace Primer.Tools
                 Recalculate();
             }
         }
+        #endregion
 
-        public void SetStartAndEnd(Vector3 start, Vector3? end = null)
-        {
-            this.start = start;
-            this.end = end ?? start;
-            Recalculate();
-        }
-
-        public void SwapStartEnd()
-        {
-            (start, end) = (end, start);
-            (startTracker, endTracker) = (endTracker, startTracker);
-            Recalculate();
-        }
 
         public void Follow(GameObject from, GameObject to)
             => Follow(from.transform, to.transform);
@@ -139,10 +137,17 @@ namespace Primer.Tools
             Recalculate();
         }
 
+        public void SetStartAndEnd(Vector3 start, Vector3? end = null)
+        {
+            this.start = start;
+            this.end = end ?? start;
+            Recalculate();
+        }
+
         private void SetLength(float value)
         {
             // If the length is too small, just prevent the change
-            if (value < realArrowLength * 2)
+            if (value < (startPointer ? realArrowLength : 0) + (endPointer ? realArrowLength : 0))
                 return;
 
             var diff = end - start;
@@ -150,12 +155,57 @@ namespace Primer.Tools
             Recalculate();
         }
 
+
+        // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
+        public async UniTask Animate(
+            Vector3? from = null,
+            Vector3? to = null,
+            Tweener animation = null,
+            CancellationToken ct = default)
+        {
+            var tailTo = from ?? start;
+            var headTo = to ?? end;
+
+            if (start == tailTo && end == headTo) return;
+
+            if (!Application.isPlaying) {
+                start = tailTo;
+                end = headTo;
+                Recalculate();
+                return;
+            }
+
+            var tailAnim = (start, end);
+            var headAnim = (tailTo, headTo);
+
+            await foreach (var (tailLerped, headLerped) in animation.Tween(tailAnim, headAnim, ct, LerpVector3Pair)) {
+                if (ct.IsCancellationRequested) return;
+                start = tailLerped;
+                end = headLerped;
+                Recalculate();
+            }
+
+            return;
+
+            static (Vector3, Vector3) LerpVector3Pair((Vector3, Vector3) a, (Vector3, Vector3) b, float t)
+            {
+                return (
+                    Vector3.Lerp(a.Item1, b.Item1, t),
+                    Vector3.Lerp(a.Item2, b.Item2, t)
+                );
+            }
+        }
+
+
+        #region void Recalculate()
         public void Recalculate()
         {
             if (shaft == null || head == null || tail == null || gameObject.IsPreset())
                 return;
 
-            shaftLength = length - realArrowLength * 2;
+            startArrowLength = startPointer ? realArrowLength : 0;
+            endArrowLength = endPointer ? realArrowLength : 0;
+            shaftLength = length - startArrowLength - endArrowLength;
 
             if (shaftLength <= 0) {
                 ScaleDownToZero().Forget();
@@ -183,67 +233,43 @@ namespace Primer.Tools
         {
             var childRotation = Quaternion.Euler(axisRotation, 0, 0);
 
-            shaft.localPosition = new Vector3(startSpace + realArrowLength, 0, 0);
+            shaft.localPosition = new Vector3(startSpace + startArrowLength, 0, 0);
             shaft.localScale = new Vector3(shaftLength, thickness, thickness);
             shaft.localRotation = childRotation;
 
-            head.localScale = head.GetPrimer().FindIntrinsicScale() * thickness;
-            head.localPosition = new Vector3(shaftLength + startSpace + realArrowLength, 0, 0);
-            head.localRotation = childRotation;
-
-            tail.localScale = tail.GetPrimer().FindIntrinsicScale() * thickness;
-            tail.localPosition = new Vector3(startSpace + realArrowLength, 0, 0);
-            tail.localRotation = childRotation;
+            CalculatePointer(childRotation, tail, startPointer, startSpace + startArrowLength);
+            CalculatePointer(childRotation, head, endPointer, (start - end).magnitude - endSpace - endArrowLength);
         }
 
-
-        [PropertySpace]
-        [Button("Look at camera")]
-        public void LookAtCamera()
+        private void CalculatePointer(Quaternion childRotation, Transform transform, bool show, float x)
         {
-            transform.LookAt(Camera.main.transform);
-        }
+            var primer = transform.GetPrimer();
 
-
-        // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
-        public async UniTask Animate(
-            Vector3? from = null,
-            Vector3? to = null,
-            Tweener animation = null,
-            CancellationToken ct = default)
-        {
-            var tailTo = from ?? this.start;
-            var headTo = to ?? this.end;
-
-            if (this.start == tailTo && this.end == headTo) return;
-
-            if (!Application.isPlaying) {
-                this.start = tailTo;
-                this.end = headTo;
-                Recalculate();
+            if (!show) {
+                primer.ScaleDownToZero().Forget();
                 return;
             }
 
-            var tailAnim = (this.start, this.end);
-            var headAnim = (tailTo, headTo);
-
-            await foreach (var (tailLerped, headLerped) in animation.Tween(tailAnim, headAnim, ct, LerpVector3Pair)) {
-                if (ct.IsCancellationRequested) return;
-                this.start = tailLerped;
-                this.end = headLerped;
-                Recalculate();
-            }
-
-            return;
-
-            static (Vector3, Vector3) LerpVector3Pair((Vector3, Vector3) a, (Vector3, Vector3) b, float t)
-            {
-                return (
-                    Vector3.Lerp(a.Item1, b.Item1, t),
-                    Vector3.Lerp(a.Item2, b.Item2, t)
-                );
-            }
+            primer.ScaleUpFromZero().Forget();
+            transform.localScale = primer.FindIntrinsicScale() * thickness;
+            transform.localPosition = new Vector3(x, 0, 0);
+            transform.localRotation = childRotation;
         }
+        #endregion
+
+
+        #region Inspector panel
+        [OnInspectorGUI] private void Space() => GUILayout.Space(16);
+
+        [ButtonGroup]
+        [Button(ButtonSizes.Large, Icon = SdfIconType.Recycle)]
+        public void SwapStartEnd()
+        {
+            (start, end) = (end, start);
+            (startTracker, endTracker) = (endTracker, startTracker);
+            Recalculate();
+        }
+        #endregion
 
 
         #region Scale up / down
