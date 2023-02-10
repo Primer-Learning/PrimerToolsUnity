@@ -31,7 +31,7 @@ namespace Primer.Axis
         public float DomainToPosition(float domainValue) => domainValue * domain.scale;
 
 
-        new internal void OnValidate() => base.OnValidate();
+        internal new void OnValidate() => base.OnValidate();
 
 
         internal bool ListenDomainChange(Action onDomainChange)
