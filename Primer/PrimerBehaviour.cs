@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,7 +15,11 @@ namespace Primer
 
         private void OnDestroy()
         {
-            lifetimeCancellation.Cancel();
+            try {
+                lifetimeCancellation.Cancel();
+            } catch (ObjectDisposedException) {
+                // ignored
+            }
         }
 
         public void CancelOnDestroy(CancellationTokenSource tokenSource)

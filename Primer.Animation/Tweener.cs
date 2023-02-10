@@ -34,6 +34,11 @@ namespace Primer.Animation
             [EnumeratorCancellation] CancellationToken ct = default,
             [CanBeNull] Func<T, T, float, T> customLerp = null)
         {
+            if (!Application.isPlaying) {
+                yield return target;
+                yield break;
+            }
+
             var startTime = Time.time;
             var animation = config ?? @default;
             var lerp = customLerp is null ? GetLerpMethod<T>() : customLerp.Method;
@@ -59,7 +64,7 @@ namespace Primer.Animation
 
             if (lerp == null) {
                 throw new ArgumentException(
-                    $"AnimationConfig.tween() couldn't find static .Lerp() in {typeof(T).FullName}");
+                    $"Tweener.Tween() couldn't find static .Lerp() in {typeof(T).FullName}");
             }
 
             return lerp;
