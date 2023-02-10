@@ -27,33 +27,38 @@ namespace Primer.Tools
         [Tooltip("Start and end positions are in global space if true. Start Tracker and End Tracker set this to true.")]
         public bool globalPositioning = false;
 
+        // [HorizontalGroup("range", LabelWidth = 70)]
+
+        [HideLabel, Title("Start", titleAlignment: TitleAlignments.Centered)]
         [DisableIf(nameof(startTracker))]
         [Tooltip("Point where the arrow starts. Start Tracker overrides this value.")]
         public Vector3 start = Vector3.zero;
 
-        [DisableIf(nameof(endTracker))]
-        [Tooltip("Point where the arrow ends. End Tracker overrides this value.")]
-        public Vector3 end = Vector3.one;
+        [Space, LabelText("Space")]
+        public float startSpace = 0;
 
-        [Title("Follow")]
+        [LabelText("Follow")]
         [InlineButton("@startTracker = null", SdfIconType.X, "")]
         [Tooltip("Start of the arrow follow this transform.")]
         public Transform startTracker;
 
+        [HideLabel, Title("End", titleAlignment: TitleAlignments.Centered)]
+        [DisableIf(nameof(endTracker))]
+        [Tooltip("Point where the arrow ends. End Tracker overrides this value.")]
+        public Vector3 end = Vector3.one;
+
+        [Space, LabelText("Space")]
+        public float endSpace = 0;
+
+        [LabelText("Follow")]
         [InlineButton("@endTracker = null", SdfIconType.X, "")]
         [Tooltip("End of the arrow follow this transform.")]
         public Transform endTracker;
 
+        [Space(16)]
         [Title("Fine tuning")]
-        public float startSpace = 0;
-        public float endSpace = 0;
-        public float axisRotation = 0;
         public float thickness = 1f;
-
-        [Title("Constants")]
-        [Tooltip("This is the distance for the arrow heads before the shaft starts. " +
-            "This only needs to be changed if the arrow mesh changes.")]
-        public float arrowLength = 0.18f;
+        public float axisRotation = 0;
 
         [ShowInInspector]
         [MinValue(0)]
@@ -61,6 +66,11 @@ namespace Primer.Tools
             get => (end - start).magnitude - startSpace - endSpace;
             set => SetLength(value);
         }
+
+        [Title("Constants")]
+        [Tooltip("This is the distance for the arrow heads before the shaft starts. " +
+            "This only needs to be changed if the arrow mesh changes.")]
+        public float arrowLength = 0.18f;
 
 
         private float realArrowLength => arrowLength * thickness;
