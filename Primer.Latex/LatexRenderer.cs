@@ -158,6 +158,7 @@ namespace Primer.Latex
 
                 foreach (var character in chunk) {
                     var charTransform = grandChildren.Next($"LatexChar {character.position}");
+                    charTransform.localScale = Vector3.one;
                     charTransform.localPosition = character.position - group.localPosition;
                     charTransform.localRotation = Quaternion.identity;
 

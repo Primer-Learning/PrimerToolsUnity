@@ -23,6 +23,8 @@ namespace Primer
 
         private void Initialize<T>(T transform, string name, Action<T> init = null) where T : Component
         {
+            transform.transform.parent = parent;
+
             if (init is not null)
                 init(transform);
 
