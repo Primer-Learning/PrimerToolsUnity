@@ -207,14 +207,10 @@ namespace Primer.Tools
             endArrowLength = endPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
-            var scale = this.GetPrimer().FindIntrinsicScale();
+            var scale = this.GetPrimer().ApplyIntrinsicScale(hide: shaftLength <= 0);
 
-            if (shaftLength <= 0) {
-                transform.localScale = Vector3.zero;
+            if (scale == Vector3.zero)
                 return;
-            }
-
-            transform.localScale = scale;
 
             CalculatePosition();
             CalculateChildrenPosition();
@@ -247,14 +243,11 @@ namespace Primer.Tools
 
         private void CalculatePointer(Quaternion childRotation, Transform transform, bool show, float x)
         {
-            var scale = transform.GetPrimer().FindIntrinsicScale();
+            var scale = transform.GetPrimer().ApplyIntrinsicScale(multiplier: thickness, hide: !show);
 
-            if (!show) {
-                transform.localScale = Vector3.zero;
+            if (scale == Vector3.zero)
                 return;
-            }
 
-            transform.localScale = scale * thickness;
             transform.localPosition = new Vector3(x, 0, 0);
             transform.localRotation = childRotation;
         }
