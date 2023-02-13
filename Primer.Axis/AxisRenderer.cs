@@ -63,5 +63,18 @@ namespace Primer.Axis
             arrows.Update(children, domain);
             ticks.Update(children, domain);
         }
+
+        [PropertyOrder(100)]
+        [ButtonGroup("Generator group")]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
+        [ContextMenu("PRIMER > Regenerate children")]
+        protected override void RegenerateChildren()
+        {
+            if (gameObject.IsPreset())
+                return;
+
+            ChildrenDeclaration.Clear(transform, skip: new []{ rod.transform });
+            UpdateChildren();
+        }
     }
 }

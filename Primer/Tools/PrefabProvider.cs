@@ -159,7 +159,7 @@ namespace Primer
                 transform.localScale = _scale;
 
             if (hasRotation)
-                transform.rotation = _rotation;
+                transform.localRotation = _rotation;
 
             if (hasPosition)
                 transform.localPosition = _position;

@@ -22,8 +22,8 @@ namespace Primer.Axis
         [OnValueChanged(nameof(UpdateScale))]
         public float scale = 1;
 
-        [OnValueChanged(nameof(UpdatePaddingFraction))]
-        public float paddingFraction = 0.1f;
+        [OnValueChanged(nameof(UpdatePadding))]
+        private Vector2 padding = Vector2.zero;
 
         [OnValueChanged(nameof(UpdateRodThickness))]
         public float rodThickness = 1;
@@ -61,6 +61,10 @@ namespace Primer.Axis
         public int maxDecimals = 2;
 
         [EnableIf("showTicks")]
+        [OnValueChanged(nameof(UpdateTickOffset))]
+        public float offset = 2;
+
+        [EnableIf("showTicks")]
         [OnValueChanged(nameof(UpdateManualTicks))]
         public List<TicData> manualTicks = new();
 
@@ -77,7 +81,7 @@ namespace Primer.Axis
                 return;
 
             scale = axes[0].domain.scale;
-            paddingFraction = axes[0].domain.paddingFraction;
+            padding = axes[0].domain.padding;
             rodThickness = axes[0].rod.thickness;
             arrowPrefab = axes[0].arrows.prefab;
             arrowPresence = axes[0].arrows.presence;
@@ -87,6 +91,7 @@ namespace Primer.Axis
             tickSteps = axes[0].ticks.step;
             maxTicks = axes[0].ticks.maxTicks;
             maxDecimals = axes[0].ticks.maxDecimals;
+            offset = axes[0].ticks.offset;
             manualTicks = axes[0].ticks.manualTicks.ToArray().ToList();
 
             onDomainChange?.Invoke();
@@ -116,41 +121,19 @@ namespace Primer.Axis
         }
 
 
-        private void UpdateScale()
-            => UpdateAxes(scale, x => x.domain, x => x.scale);
-
-        private void UpdatePaddingFraction()
-            => UpdateAxes(paddingFraction, x => x.domain, x => x.paddingFraction);
-
-        private void UpdateRodThickness()
-            => UpdateAxes(rodThickness, x => x.rod, x => x.thickness);
-
-        private void UpdateArrowPrefab()
-            => UpdateAxes(arrowPrefab, x => x.arrows, x => x.prefab);
-
-        private void UpdateArrowPresence()
-            => UpdateAxes(arrowPresence, x => x.arrows, x => x.presence);
-
-        private void UpdateShowTicks()
-            => UpdateAxes(showTicks, x => x.ticks, x => x.showTicks);
-
-        private void UpdateShowZero()
-            => UpdateAxes(showZero, x => x.ticks, x => x.showZero);
-
-        private void UpdateTicksPrefab()
-            => UpdateAxes(ticksPrefab, x => x.ticks, x => x.prefab);
-
-        private void UpdateTickSteps()
-            => UpdateAxes(tickSteps, x => x.ticks, x => x.step);
-
-        private void UpdateMaxTicks()
-            => UpdateAxes(maxTicks, x => x.ticks, x => x.maxTicks);
-
-        private void UpdateMaxDecimals()
-            => UpdateAxes(maxDecimals, x => x.ticks, x => x.maxDecimals);
-
-        private void UpdateManualTicks()
-            => UpdateAxes(manualTicks, x => x.ticks, x => x.manualTicks);
+        private void UpdateScale() => UpdateAxes(scale, x => x.domain, x => x.scale);
+        private void UpdatePadding() => UpdateAxes(padding, x => x.domain, x => x.padding);
+        private void UpdateRodThickness() => UpdateAxes(rodThickness, x => x.rod, x => x.thickness);
+        private void UpdateArrowPrefab() => UpdateAxes(arrowPrefab, x => x.arrows, x => x.prefab);
+        private void UpdateArrowPresence() => UpdateAxes(arrowPresence, x => x.arrows, x => x.presence);
+        private void UpdateShowTicks() => UpdateAxes(showTicks, x => x.ticks, x => x.showTicks);
+        private void UpdateShowZero() => UpdateAxes(showZero, x => x.ticks, x => x.showZero);
+        private void UpdateTicksPrefab() => UpdateAxes(ticksPrefab, x => x.ticks, x => x.prefab);
+        private void UpdateTickSteps() => UpdateAxes(tickSteps, x => x.ticks, x => x.step);
+        private void UpdateMaxTicks() => UpdateAxes(maxTicks, x => x.ticks, x => x.maxTicks);
+        private void UpdateMaxDecimals() => UpdateAxes(maxDecimals, x => x.ticks, x => x.maxDecimals);
+        private void UpdateTickOffset() => UpdateAxes(offset, x => x.ticks, x => x.offset);
+        private void UpdateManualTicks() => UpdateAxes(manualTicks, x => x.ticks, x => x.manualTicks);
 
 
         private void UpdateAxes<TPart, TValue>(

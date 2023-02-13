@@ -25,16 +25,15 @@ namespace Primer.Axis
         public float scale = 1;
 
         [OnValueChanged(nameof(Changed))]
-        public float paddingFraction = 0.1f;
+        public Vector2 padding = Vector2.zero;
 
         public float min => range.min;
         public float max => range.max;
         private float start => range.min * scale;
         private float end => range.max * scale;
         public float length => end - start;
-        private float padding => length * paddingFraction;
-        public float rodStart => start - padding;
-        public float rodEnd => end + padding;
+        public float rodStart => start - padding.x;
+        public float rodEnd => end + padding.y;
 
 
         protected void Changed() => onChange?.Invoke();

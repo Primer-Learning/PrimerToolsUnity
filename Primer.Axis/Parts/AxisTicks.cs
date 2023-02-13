@@ -33,6 +33,9 @@ namespace Primer.Axis
         public int maxDecimals = 2;
 
         [EnableIf("showTicks")]
+        public float offset = 0;
+
+        [EnableIf("showTicks")]
         public List<TicData> manualTicks = new();
 
         [RequiredIn(PrefabKind.PrefabAsset)]
@@ -52,7 +55,7 @@ namespace Primer.Axis
             foreach (var data in CropTicksCount(expectedTicks)) {
                 var tick = modifier.NextIsInstanceOf(prefab, $"Tick {data.label}");
                 tick.label = data.label;
-                tick.transform.localPosition = new Vector3(data.value * domain.scale, 0, 0);
+                tick.transform.localPosition = new Vector3(data.value * domain.scale, offset, 0);
             }
         }
 

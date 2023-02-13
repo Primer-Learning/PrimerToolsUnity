@@ -20,6 +20,7 @@ namespace Primer.Axis
         public string text = "Label";
         public float fontSize = 2;
         public Vector3 offset = Vector3.zero;
+        public Quaternion rotate = Quaternion.identity;
         public AxisLabelPosition position = AxisLabelPosition.End;
 
         public void Update(ChildrenDeclaration modifier, AxisDomain domain, float labelDistance)
@@ -35,7 +36,15 @@ namespace Primer.Axis
             labelObject.text = text;
             labelObject.fontSize = fontSize;
             labelObject.alignment = TextAlignmentOptions.Midline;
-            labelObject.transform.localPosition = pos + offset;
+
+            var transform = labelObject.transform;
+            transform.localPosition = pos + offset;
+
+            if (rotate == Quaternion.identity)
+                return;
+
+            transform.localRotation = rotate;
+            labelObject.forceOrientation = false;
         }
     }
 }

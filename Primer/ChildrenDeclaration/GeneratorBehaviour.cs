@@ -55,7 +55,7 @@ namespace Primer
         [ButtonGroup("Generator group")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
         [ContextMenu("PRIMER > Regenerate children")]
-        protected void RegenerateChildren()
+        protected virtual void RegenerateChildren()
         {
             if (gameObject.IsPreset())
                 return;
