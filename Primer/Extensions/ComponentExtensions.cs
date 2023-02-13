@@ -20,6 +20,7 @@ namespace Primer
                 : component.gameObject.AddComponent<T>();
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public static PrimerBehaviour GetPrimer(this Component component)
         {
             return GetOrAddComponent<PrimerBehaviour>(component);

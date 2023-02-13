@@ -238,19 +238,22 @@ namespace Primer.Tools
             shaft.localRotation = childRotation;
 
             var edge = (end - start).magnitude / 2;
-            CalculatePointer(childRotation, tail, startPointer, -(edge - startSpace - startArrowLength));
-            CalculatePointer(childRotation, head, endPointer, edge - endSpace - endArrowLength);
+
+            tail.gameObject.SetActive(startPointer);
+            head.gameObject.SetActive(endPointer);
+
+            if (startPointer)
+                CalculatePointer(tail, childRotation, -(edge - startSpace - startArrowLength));
+
+            if (endPointer)
+                CalculatePointer(head, childRotation, edge - endSpace - endArrowLength);
         }
 
-        private void CalculatePointer(Quaternion childRotation, Transform transform, bool show, float x)
+        private void CalculatePointer(Transform pointer, Quaternion childRotation, float x)
         {
-            var scale = transform.GetPrimer().ApplyIntrinsicScale(multiplier: thickness, hide: !show);
-
-            if (scale == Vector3.zero)
-                return;
-
-            transform.localPosition = new Vector3(x, 0, 0);
-            transform.localRotation = childRotation;
+            pointer.GetPrimer().ApplyIntrinsicScale(multiplier: thickness);
+            pointer.localPosition = new Vector3(x, 0, 0);
+            pointer.localRotation = childRotation;
         }
         #endregion
 

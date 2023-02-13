@@ -143,7 +143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -160,6 +160,10 @@ PrefabInstance:
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8603906643652811505, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
+      propertyPath: forceOrientation
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
