@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEditor.Presets;
@@ -55,11 +57,44 @@ namespace Primer.Latex
         );
 
 
+        #region Color
+        [SerializeField]
+        private Color _color = Color.white;
+
+        public Color color {
+            get => _color;
+            set {
+                _color = value;
+
+                foreach (var mesh in GetComponentsInChildren<MeshRenderer>())
+                    mesh.SetColor(value);
+            }
+        }
+
+        public async UniTask TweenColor(Color newColor, Tweener animation = null, CancellationToken ct = default)
+        {
+            if (color == newColor)
+                return;
+
+            var children = GetComponentsInChildren<MeshRenderer>();
+
+            await foreach (var lerpedColor in animation.Tween(color, newColor, ct)) {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                color = lerpedColor;
+
+                foreach(var child in children)
+                    child.SetColor(lerpedColor);
+            }
+        }
+        #endregion
+
+
         private new async void OnValidate()
         {
             await Process(config);
 
-            // Comment this to disable automatic children update
             if (this)
                 base.OnValidate();
         }
@@ -101,6 +136,7 @@ namespace Primer.Latex
         }
         #endregion
 
+
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
             if (expression is null || expression.Any(x => x.mesh is null)) {
@@ -130,6 +166,7 @@ namespace Primer.Latex
 
                     var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
                     meshRenderer.material = material;
+                    meshRenderer.SetColor(color);
                 }
 
                 grandChildren.Apply();

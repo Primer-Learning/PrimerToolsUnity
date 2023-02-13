@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -7,11 +8,11 @@ namespace Primer.Animation
 {
     public static class MeshRendererExtensions
     {
-        private static readonly Dictionary<MeshRenderer, Material> stored = new();
+        private static readonly Dictionary<WeakReference<MeshRenderer>, Material> memory = new();
 
         public static Color GetColor(this MeshRenderer renderer)
         {
-            return stored.TryGetValue(renderer, out var material)
+            return memory.TryGetValue(new WeakReference<MeshRenderer>(renderer), out var material)
                 ? material.color
                 : renderer.sharedMaterial.color;
         }
@@ -39,9 +40,11 @@ namespace Primer.Animation
 
         private static Material Get(MeshRenderer renderer)
         {
-            if (!stored.TryGetValue(renderer, out var material)) {
+            var weak = new WeakReference<MeshRenderer>(renderer);
+
+            if (!memory.TryGetValue(weak, out var material)) {
                 material = new Material(renderer.sharedMaterial);
-                stored.Add(renderer, material);
+                memory.Add(weak, material);
             }
 
             renderer.material = material;
