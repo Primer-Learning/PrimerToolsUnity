@@ -1,3 +1,4 @@
+using System;
 using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -17,6 +18,28 @@ namespace Primer.Timeline.Editor
             clip.trackTarget = GetTrackTarget();
 
             base.OnInspectorGUI();
+
+            ShowCodeEditorLink();
+        }
+
+        private void ShowCodeEditorLink()
+        {
+            MonoBehaviour script = clip.template switch {
+                ScrubbablePlayable a => null,
+                TriggerablePlayable b => b.triggerable,
+                SequentialPlayable c => c.sequence,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            if (script != null) {
+                EditorGUI.BeginDisabledGroup(true);
+
+                // It can be a MonoBehaviour or a ScriptableObject
+                var monoScript = MonoScript.FromMonoBehaviour(script);
+                EditorGUILayout.ObjectField("Open editor", monoScript, typeof(MonoBehaviour), false);
+
+                EditorGUI.EndDisabledGroup();
+            }
         }
 
         private Transform GetTrackTarget()
