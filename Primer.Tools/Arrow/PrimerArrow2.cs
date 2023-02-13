@@ -247,15 +247,14 @@ namespace Primer.Tools
 
         private void CalculatePointer(Quaternion childRotation, Transform transform, bool show, float x)
         {
-            var primer = transform.GetPrimer();
+            var scale = transform.GetPrimer().FindIntrinsicScale();
 
             if (!show) {
-                primer.ScaleDownToZero().Forget();
+                transform.localScale = Vector3.zero;
                 return;
             }
 
-            primer.ScaleUpFromZero().Forget();
-            transform.localScale = primer.FindIntrinsicScale() * thickness;
+            transform.localScale = scale * thickness;
             transform.localPosition = new Vector3(x, 0, 0);
             transform.localRotation = childRotation;
         }
