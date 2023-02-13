@@ -60,6 +60,9 @@ namespace Primer.Timeline
 
         public static bool IsGeneratedClipName(string value)
         {
+            if (value.Length < 2)
+                return false;
+
             if (value is nameof(GenericClip) or DEFAULT_CLIP_NAME)
                 return true;
 
