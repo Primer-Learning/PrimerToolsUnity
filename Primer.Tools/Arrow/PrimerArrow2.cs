@@ -223,22 +223,23 @@ namespace Primer.Tools
             arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
 
             if (globalPositioning)
-                arrow.position = (diff / 2) + start;
+                arrow.position = diff / 2 + start;
             else
-                arrow.localPosition = (diff / 2) + start;
+                arrow.localPosition = diff / 2 + start;
         }
 
         private void CalculateChildrenPosition()
         {
-            const float EDGE = 0.5f;
             var childRotation = Quaternion.Euler(axisRotation, 0, 0);
+            var shaftMiddle = (startSpace + startArrowLength) / 2 - (endSpace + endArrowLength) / 2;
 
-            shaft.localPosition = new Vector3((startArrowLength + -endArrowLength) * EDGE, 0, 0);
+            shaft.localPosition = new Vector3(shaftMiddle, 0, 0);
             shaft.localScale = new Vector3(shaftLength, thickness, thickness);
             shaft.localRotation = childRotation;
 
-            CalculatePointer(childRotation, tail, startPointer, -(length * EDGE) + startArrowLength);
-            CalculatePointer(childRotation, head, endPointer, length * EDGE - endArrowLength);
+            var edge = (end - start).magnitude / 2;
+            CalculatePointer(childRotation, tail, startPointer, -(edge - startSpace - startArrowLength));
+            CalculatePointer(childRotation, head, endPointer, edge - endSpace - endArrowLength);
         }
 
         private void CalculatePointer(Quaternion childRotation, Transform transform, bool show, float x)
