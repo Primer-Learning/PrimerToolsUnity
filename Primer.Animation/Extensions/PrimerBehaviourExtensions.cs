@@ -25,6 +25,11 @@ namespace Primer.Animation
             if (self.transform.localScale == target)
                 return;
 
+            if (!Application.isPlaying) {
+                self.transform.localScale = target;
+                return;
+            }
+
             self.transform.localScale = Vector3.zero;
             var ct = CreateCancellationToken(self);
             await self.transform.ScaleTo(target, anim, ct);
@@ -35,6 +40,11 @@ namespace Primer.Animation
         {
             if (self.transform.localPosition == target)
                 return;
+
+            if (!Application.isPlaying) {
+                self.transform.localPosition = target;
+                return;
+            }
 
             self.FindIntrinsicPosition();
             var ct = CreateCancellationToken(self);
