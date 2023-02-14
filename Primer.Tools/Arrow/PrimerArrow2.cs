@@ -108,6 +108,7 @@ namespace Primer.Tools
         #endregion
 
 
+        #region Setters
         public void Follow(GameObject from, GameObject to)
             => Follow(from.transform, to.transform);
 
@@ -154,7 +155,20 @@ namespace Primer.Tools
             end += (value - diff.magnitude) * Vector3.Normalize(diff);
             Recalculate();
         }
+        #endregion
 
+
+        #region Animations
+        public UniTask GrowFromStart(Vector3 from, Vector3 to, Tweener animation = null, CancellationToken ct = default)
+        {
+            SetStartAndEnd(from, from);
+            return Animate(from, to, animation, ct);
+        }
+
+        public UniTask ShrinkToEnd(Tweener animation = null, CancellationToken ct = default)
+        {
+            return Animate(end, end, animation, ct);
+        }
 
         // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
         public async UniTask Animate(
@@ -195,6 +209,7 @@ namespace Primer.Tools
                 );
             }
         }
+        #endregion
 
 
         #region void Recalculate()
@@ -207,12 +222,14 @@ namespace Primer.Tools
             endArrowLength = endPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
+            var scale = this.GetPrimer().FindIntrinsicScale();
+
             if (shaftLength <= 0) {
-                gameObject.SetActive(false);
+                transform.localScale = Vector3.zero;
                 return;
             }
 
-            gameObject.SetActive(true);
+            transform.localScale = scale;
             CalculatePosition();
             CalculateChildrenPosition();
         }
@@ -222,9 +239,13 @@ namespace Primer.Tools
             var arrow = transform;
             var diff = end - start;
 
-            arrow.localScale = globalPositioning && arrow.parent is not null
-                ? arrow.parent.lossyScale.InvertScale()
-                : Vector3.one;
+            if (globalPositioning) {
+                var parentScale = arrow.parent is null ? Vector3.zero : arrow.parent.lossyScale;
+                arrow.localScale = parentScale == Vector3.zero ? Vector3.one : parentScale.InvertScale();
+            }
+            else {
+                arrow.localScale = Vector3.one;
+            }
 
             arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
             arrow.SetPosition(diff / 2 + start, globalPositioning);
