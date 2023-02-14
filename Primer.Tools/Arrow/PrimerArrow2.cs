@@ -222,6 +222,10 @@ namespace Primer.Tools
             var arrow = transform;
             var diff = end - start;
 
+            arrow.localScale = globalPositioning && arrow.parent is not null
+                ? arrow.parent.lossyScale.InvertScale()
+                : Vector3.one;
+
             arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
             arrow.SetPosition(diff / 2 + start, globalPositioning);
         }
