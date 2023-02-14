@@ -27,16 +27,36 @@ namespace Primer.Axis
         [OnValueChanged(nameof(Changed))]
         public Vector2 padding = Vector2.zero;
 
-        public float min => range.min;
-        public float max => range.max;
         private float start => range.min * scale;
         private float end => range.max * scale;
         public float length => end - start;
         public float rodStart => start - padding.x;
         public float rodEnd => end + padding.y;
 
+        public float min {
+            get => range.min;
+            set {
+                if (value == range.min)
+                    return;
 
-        protected void Changed() => onChange?.Invoke();
+                range.min = value;
+                Changed();
+            }
+        }
+
+        public float max {
+            get => range.max;
+            set {
+                if (value == range.max)
+                    return;
+
+                range.max = value;
+                Changed();
+            }
+        }
+
+
+        public void Changed() => onChange?.Invoke();
 
 
         [Serializable]

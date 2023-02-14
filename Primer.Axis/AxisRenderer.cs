@@ -28,6 +28,17 @@ namespace Primer.Axis
         internal AxisTicks ticks = new();
 
 
+        public float min {
+            get => domain.min;
+            set => domain.min = value;
+        }
+
+        public float max {
+            get => domain.max;
+            set => domain.max = value;
+        }
+
+
         public float DomainToPosition(float domainValue) => domainValue * domain.scale;
 
 
