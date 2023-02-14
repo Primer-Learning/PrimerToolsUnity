@@ -26,8 +26,16 @@ namespace Primer.Tools.Editor
 
             EditorGUI.BeginChangeCheck();
 
-            var start = Handles.PositionHandle(arrow.start + modifier, Quaternion.identity);
-            var end = Handles.PositionHandle(arrow.end + modifier, Quaternion.identity);
+            var start = arrow.start + modifier;
+            var end = arrow.end + modifier;
+
+            if (arrow.startTracker is null) {
+                start = Handles.PositionHandle(start, Quaternion.identity);
+            }
+
+            if (arrow.endTracker is null) {
+                end = Handles.PositionHandle(end, Quaternion.identity);
+            }
 
             if (!EditorGUI.EndChangeCheck())
                 return;

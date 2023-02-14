@@ -52,11 +52,9 @@ namespace Primer
             intrinsicScale = value;
         }
 
-        public Vector3 ApplyIntrinsicScale(float multiplier = 1, bool hide = false)
+        public Vector3 ApplyIntrinsicScale()
         {
-            return transform.localScale = hide
-                ? Vector3.zero
-                : FindIntrinsicScale() * multiplier;
+            return transform.localScale = FindIntrinsicScale();
         }
 
         /// <summary>

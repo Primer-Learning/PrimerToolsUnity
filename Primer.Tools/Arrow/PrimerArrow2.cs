@@ -207,11 +207,12 @@ namespace Primer.Tools
             endArrowLength = endPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
-            var scale = this.GetPrimer().ApplyIntrinsicScale(hide: shaftLength <= 0);
-
-            if (scale == Vector3.zero)
+            if (shaftLength <= 0) {
+                gameObject.SetActive(false);
                 return;
+            }
 
+            gameObject.SetActive(true);
             CalculatePosition();
             CalculateChildrenPosition();
         }
@@ -220,12 +221,9 @@ namespace Primer.Tools
         {
             var arrow = transform;
             var diff = end - start;
-            arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
 
-            if (globalPositioning)
-                arrow.position = diff / 2 + start;
-            else
-                arrow.localPosition = diff / 2 + start;
+            arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
+            arrow.SetPosition(diff / 2 + start, globalPositioning);
         }
 
         private void CalculateChildrenPosition()
@@ -251,7 +249,7 @@ namespace Primer.Tools
 
         private void CalculatePointer(Transform pointer, Quaternion childRotation, float x)
         {
-            pointer.GetPrimer().ApplyIntrinsicScale(multiplier: thickness);
+            pointer.localScale = pointer.GetPrimer().FindIntrinsicScale() * thickness;
             pointer.localPosition = new Vector3(x, 0, 0);
             pointer.localRotation = childRotation;
         }

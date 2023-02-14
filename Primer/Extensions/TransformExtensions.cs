@@ -21,5 +21,15 @@ namespace Primer
 
             return children;
         }
+
+        public static void SetPosition(this Transform transform, Vector3 newPosition, bool global = false)
+        {
+            if (global) {
+                transform.position = newPosition;
+            }
+            else {
+                transform.localPosition = newPosition;
+            }
+        }
     }
 }
