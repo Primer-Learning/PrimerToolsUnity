@@ -1,5 +1,6 @@
 using System.Collections;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using UnityEngine;
 
 // Adapted from Unity's FixedUpdate documentation
@@ -7,6 +8,8 @@ using UnityEngine;
 
 public class DisplayUpdateRates : MonoBehaviour
 {
+    public bool showInGameView = false;
+    
     private float updateCount = 0;
     private float fixedUpdateCount = 0;
     [ShowInInspector, ReadOnly]
@@ -41,11 +44,17 @@ public class DisplayUpdateRates : MonoBehaviour
     // Show the number of calls to both messages.
     void OnGUI()
     {
-        GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
-        fontSize.fontSize = 24;
-        GUI.Label(new Rect(100, 50, 500, 100), "Updates per game second: " + updateUpdateCountPerSecond.ToString(), fontSize);
-        GUI.Label(new Rect(100, 100, 500, 100), "FixedUpdates per game second: " + updateFixedUpdateCountPerSecond.ToString(), fontSize);
-        GUI.Label(new Rect(100, 150, 500, 100), "Game seconds per real second: " + (1 / deltaRealTime).ToString(), fontSize);
+        if (showInGameView)
+        {
+            GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
+            fontSize.fontSize = 24;
+            GUI.Label(new Rect(100, 50, 500, 100), "Updates per game second: " + updateUpdateCountPerSecond.ToString(),
+                fontSize);
+            GUI.Label(new Rect(100, 100, 500, 100),
+                "FixedUpdates per game second: " + updateFixedUpdateCountPerSecond.ToString(), fontSize);
+            GUI.Label(new Rect(100, 150, 500, 100), "Game seconds per real second: " + (1 / deltaRealTime).ToString(),
+                fontSize);
+        }
     }
 
     // Update both CountsPerSecond values every second.
