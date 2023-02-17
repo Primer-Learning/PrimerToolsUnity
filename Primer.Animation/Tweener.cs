@@ -60,6 +60,9 @@ namespace Primer.Animation
 
         private static MethodInfo GetLerpMethod<T>()
         {
+            if (typeof(T) == typeof(float))
+                return typeof(Mathf).GetMethod("Lerp");
+
             var lerp = typeof(T).GetMethod("Lerp");
 
             if (lerp == null) {
