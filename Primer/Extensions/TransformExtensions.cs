@@ -31,5 +31,15 @@ namespace Primer
                 transform.localPosition = newPosition;
             }
         }
+
+        public static void CopyTo(this Transform source, Transform target, bool copyParent = true)
+        {
+            if (copyParent)
+                target.parent = source.parent;
+
+            target.localPosition = source.localPosition;
+            target.localRotation = source.localRotation;
+            target.localScale = source.localScale;
+        }
     }
 }

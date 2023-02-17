@@ -115,5 +115,13 @@ namespace Primer
             return position;
         }
         #endregion;
+
+        public void CopyTo(PrimerBehaviour other)
+        {
+            other.hasIntrinsicScale = hasIntrinsicScale;
+            other.intrinsicScale = intrinsicScale;
+            other.hasIntrinsicPosition = hasIntrinsicPosition;
+            other.intrinsicPosition = intrinsicPosition;
+        }
     }
 }
