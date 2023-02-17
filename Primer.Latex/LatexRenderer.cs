@@ -45,7 +45,10 @@ namespace Primer.Latex
         public UnityEvent<LatexExpression> onChange = new();
 
 
-        public LatexInput config => new(latex, headers);
+        public LatexInput config {
+            get => new(latex, headers);
+            set => Process(value).Forget();
+        }
 
         internal bool isRunning => processor.state == LatexProcessingState.Processing;
 
