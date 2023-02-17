@@ -40,7 +40,7 @@ namespace Primer.Tools
         [LabelText("Follow")]
         [InlineButton("@startTracker = null", SdfIconType.X, "")]
         [Tooltip("Start of the arrow follow this transform.")]
-        public Transform startTracker;
+        public Transform startTracker = null;
 
         [LabelText("Pointer")]
         public bool startPointer = false;
@@ -57,7 +57,7 @@ namespace Primer.Tools
         [LabelText("Follow")]
         [InlineButton("@endTracker = null", SdfIconType.X, "")]
         [Tooltip("End of the arrow follow this transform.")]
-        public Transform endTracker;
+        public Transform endTracker = null;
 
         [LabelText("Pointer")]
         public bool endPointer = true;
@@ -167,6 +167,8 @@ namespace Primer.Tools
 
         public UniTask ShrinkToEnd(Tweener animation = null, CancellationToken ct = default)
         {
+            startTracker = null;
+            endTracker = null;
             return Animate(end, end, animation, ct);
         }
 
@@ -177,8 +179,10 @@ namespace Primer.Tools
             Tweener animation = null,
             CancellationToken ct = default)
         {
-            var tailTo = from ?? start;
-            var headTo = to ?? end;
+            var initialStart = start;
+            var initialEnd = end;
+            var tailTo = from ?? initialEnd;
+            var headTo = to ?? initialEnd;
 
             if (start == tailTo && end == headTo) return;
 
@@ -189,25 +193,33 @@ namespace Primer.Tools
                 return;
             }
 
-            var tailAnim = (start, end);
-            var headAnim = (tailTo, headTo);
-
-            await foreach (var (tailLerped, headLerped) in animation.Tween(tailAnim, headAnim, ct, LerpVector3Pair)) {
+            await foreach (var t in animation.Tween(0, 1f, ct)) {
                 if (ct.IsCancellationRequested) return;
-                start = tailLerped;
-                end = headLerped;
+
+                var updatedStart = startTracker == null ? initialStart : startTracker.position;
+                 var updatedEnd = endTracker == null ? initialEnd : endTracker.position;
+
+                start = Vector3.Lerp(updatedStart, from.HasValue ? from.Value : updatedStart, t);
+                end = Vector3.Lerp(updatedEnd, to.HasValue ? to.Value : updatedEnd, t);
+
                 Recalculate();
             }
+        }
 
-            return;
+        private Vector3 GetStart(Vector3? overrideValue = null)
+        {
+            if (startTracker is not null)
+                return startTracker.position;
 
-            static (Vector3, Vector3) LerpVector3Pair((Vector3, Vector3) a, (Vector3, Vector3) b, float t)
-            {
-                return (
-                    Vector3.Lerp(a.Item1, b.Item1, t),
-                    Vector3.Lerp(a.Item2, b.Item2, t)
-                );
-            }
+            return overrideValue.HasValue ? overrideValue.Value : start;
+        }
+
+        private Vector3 GetEnd(Vector3? overrideValue = null)
+        {
+            if (endTracker is not null)
+                return endTracker.position;
+
+            return overrideValue.HasValue ? overrideValue.Value : end;
         }
         #endregion
 
