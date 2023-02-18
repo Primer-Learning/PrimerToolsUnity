@@ -55,26 +55,20 @@ namespace Primer.Timeline
 
 
         #region Sequence management
-        private static HashSet<Sequence> cleannessTracker = new();
+        private static PlayableTracker<Sequence> tracker = new();
 
         public void Prepare() => Prepare(sequence);
         public static void Prepare(Sequence sequence)
         {
-            if (sequence == null || !cleannessTracker.Contains(sequence))
-                return;
-
-            sequence.Prepare();
-            cleannessTracker.Remove(sequence);
+            if (!tracker.IsPrepared(sequence))
+                sequence.Prepare();
         }
 
         public void Cleanup() => Cleanup(sequence);
         public static void Cleanup(Sequence sequence)
         {
-            if (sequence == null || cleannessTracker.Contains(sequence))
-                return;
-
-            sequence.Cleanup();
-            cleannessTracker.Add(sequence);
+            if (!tracker.IsClean(sequence))
+                sequence.Cleanup();
         }
 
         public IAsyncEnumerator<object> Initialize()

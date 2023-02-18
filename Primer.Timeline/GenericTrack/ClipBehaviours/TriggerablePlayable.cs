@@ -56,27 +56,21 @@ namespace Primer.Timeline
 
 
         #region Triggerable management
-        private static HashSet<Triggerable> cleannessTracker = new();
+        private static PlayableTracker<Triggerable> tracker = new();
         private bool isExecuted = false;
 
         public void Prepare()
         {
-            if (triggerable == null || !cleannessTracker.Contains(triggerable))
-                return;
-
-            triggerable.Prepare();
-            cleannessTracker.Remove(triggerable);
+            if (!tracker.IsPrepared(triggerable))
+                triggerable.Prepare();
         }
 
         public void Cleanup()
         {
             isExecuted = false;
 
-            if (triggerable == null || cleannessTracker.Contains(triggerable))
-                return;
-
-            triggerable.Cleanup();
-            cleannessTracker.Add(triggerable);
+            if (!tracker.IsClean(triggerable))
+                triggerable.Cleanup();
         }
 
         public void Execute(float time)
