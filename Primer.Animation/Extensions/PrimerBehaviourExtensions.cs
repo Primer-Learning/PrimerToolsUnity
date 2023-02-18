@@ -52,7 +52,7 @@ namespace Primer.Animation
             ClearToken(self);
         }
 
-        public static async void ShrinkAndDispose(this PrimerBehaviour self, Tweener anim = null)
+        public static async UniTask ShrinkAndDispose(this PrimerBehaviour self, Tweener anim = null)
         {
             if (!self)
                 return;
