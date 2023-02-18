@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CSharp;
 
-namespace Primer.Timeline
+namespace Primer.Timeline.Editor
 {
     public static class MethodInfoExtensions
     {
