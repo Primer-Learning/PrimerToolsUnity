@@ -40,6 +40,9 @@ namespace Primer.Animation
 
         private static Material Get(MeshRenderer renderer)
         {
+            if (renderer.sharedMaterial == null)
+                throw new InvalidOperationException("MeshRenderer doesn't have a material");
+
             var weak = new WeakReference<MeshRenderer>(renderer);
 
             if (!memory.TryGetValue(weak, out var material)) {
