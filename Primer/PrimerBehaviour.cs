@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -13,18 +14,14 @@ namespace Primer
         public CancellationToken lifetime => lifetimeCancellation.Token;
 
 
-        private void OnDestroy()
+        public void Awake()
         {
-            try {
-                lifetimeCancellation.Cancel();
-            } catch (ObjectDisposedException) {
-                // ignored
-            }
+            lifetimeCancellation.RegisterRaiseCancelOnDestroy(this);
         }
 
         public void CancelOnDestroy(CancellationTokenSource tokenSource)
         {
-            lifetime.Register(tokenSource.Cancel);
+            lifetime.Register(tokenSource.TryCancel);
         }
 
 
