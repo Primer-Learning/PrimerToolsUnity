@@ -40,7 +40,9 @@ namespace Primer.Timeline
         }
 
         public static TrackAsset FindTrack(this PlayableDirector director, Predicate<TrackAsset> predicate)
-            => FindTrackRecursively(director.GetTimeline().GetRootTracks(), predicate);
+        {
+            return FindTrackRecursively(director.GetTimeline().GetRootTracks(), predicate);
+        }
 
         private static TrackAsset FindTrackRecursively(IEnumerable<TrackAsset> tracks, Predicate<TrackAsset> predicate)
         {
@@ -58,6 +60,25 @@ namespace Primer.Timeline
             }
 
             return null;
+        }
+
+        public static List<TrackAsset> GetAllTracks(this PlayableDirector director)
+        {
+            return GetAllTracksRecursively(director.GetTimeline().GetRootTracks());
+        }
+
+        public static List<TrackAsset> GetAllTracksRecursively(IEnumerable<TrackAsset> tracks)
+        {
+            var result = new List<TrackAsset>();
+
+            foreach (var track in tracks) {
+                if (track is GroupTrack group)
+                    result.AddRange(GetAllTracksRecursively(group.GetChildTracks()));
+                else
+                    result.Add(track);
+            }
+
+            return result;
         }
 
         private static TimelineAsset GetTimeline(this PlayableDirector director)
