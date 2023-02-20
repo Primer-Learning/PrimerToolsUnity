@@ -8,7 +8,14 @@ namespace Primer.Timeline.Editor
 {
     public static class AnimationClipExtensions
     {
-        public static void ModifyKeyFrames(this AnimationClip clip, Func<Keyframe, Keyframe> modifier)
+            public static IEnumerable<Keyframe[]> IterateAllKeyframes(this AnimationClip clip)
+        {
+            return AnimationUtility.GetCurveBindings(clip)
+                .Select(binding => AnimationUtility.GetEditorCurve(clip, binding))
+                .Select(curve => curve.keys);
+        }
+
+        public static void ModifyKeyframes(this AnimationClip clip, Func<Keyframe, Keyframe> modifier)
         {
             var bindings = new List<EditorCurveBinding>();
             var curves = new List<AnimationCurve>();
@@ -19,12 +26,7 @@ namespace Primer.Timeline.Editor
                 bindings.Add(binding);
             }
 
-            try {
-                AnimationUtility.SetEditorCurves(clip, bindings.ToArray(), curves.ToArray());
-            }
-            catch (Exception e) {
-                // ignore
-            }
+            AnimationUtility.SetEditorCurves(clip, bindings.ToArray(), curves.ToArray());
         }
     }
 }
