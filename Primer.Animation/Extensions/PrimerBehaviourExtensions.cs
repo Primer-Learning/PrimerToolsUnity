@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -17,10 +18,10 @@ namespace Primer.Animation
             await self.transform.ScaleTo(Vector3.zero, anim, ct);
             ClearToken(self);
         }
-
-        public static async UniTask ScaleUpFromZero(this PrimerBehaviour self, Tweener anim = null)
+        
+        public static async UniTask ScaleTo(this PrimerBehaviour self, Vector3 newScale, Tweener anim = null)
         {
-            var target = self.FindIntrinsicScale();
+            var target = newScale;
 
             if (self.transform.localScale == target)
                 return;
@@ -30,10 +31,23 @@ namespace Primer.Animation
                 return;
             }
 
-            self.transform.localScale = Vector3.zero;
             var ct = CreateCancellationToken(self);
             await self.transform.ScaleTo(target, anim, ct);
             ClearToken(self);
+        }
+        
+        /// <summary>
+        /// A convenience method for setting the scale to zero, then scaling up to the intrinsic scale.
+        /// Useful when spawning new objects.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="anim"></param>
+        public static async UniTask ScaleUpFromZero(this PrimerBehaviour self, Tweener anim = null)
+        {
+            var target = self.FindIntrinsicScale();
+            self.transform.localScale = Vector3.zero;
+
+            await ScaleTo(self, target, anim: anim);
         }
 
         public static async UniTask MoveTo(this PrimerBehaviour self, Vector3 target, Tweener anim = null)
