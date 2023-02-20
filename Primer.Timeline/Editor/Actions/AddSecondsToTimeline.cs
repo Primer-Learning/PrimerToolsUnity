@@ -16,18 +16,23 @@ namespace Primer.Timeline.Editor
         public override bool Execute(ActionContext context)
         {
             var time = (float)TimelineEditor.inspectedDirector.time;
+            var timeline = TimelineEditor.inspectedAsset;
 
-            var value = EditorInputDialog.Show(
+            // if (timeline.HasSomeClipAt(time)) {
+            //     throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
+            // }
+
+            var value = EditTimelineDialog.Show(
                 "Add time",
-                $"How many frames to add after {time}s?",
+                $"How many seconds to add after {time}s?",
                 DEFAULT_ADD_SECONDS
             );
 
             if (!value.HasValue)
                 return false;
 
-            Undo.RecordObject(TimelineEditor.inspectedAsset, "Add time");
-            TimelineEditor.inspectedAsset.AddTime(time, value.Value, true);
+            Undo.RecordObject(timeline, "Add time");
+            timeline.AddTime(time, value.Value, true);
             return true;
         }
     }

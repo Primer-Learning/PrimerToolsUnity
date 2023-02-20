@@ -10,13 +10,11 @@ namespace Primer.Timeline.Editor
     {
         public static void AddTime(this TimelineAsset timeline, float time, float seconds, bool preserveClips = false)
         {
-            var allTracks = timeline.GetAllTracks();
-
-            if (preserveClips && allTracks.SelectMany(track => track.GetClips()).Any(clip => clip.start < time && clip.end > time)) {
+            if (preserveClips && timeline.HasSomeClipAt(time)) {
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
             }
 
-            foreach (var track in allTracks) {
+            foreach (var track in timeline.GetAllTracks()) {
                 if (track is AnimationTrack animTrack && animTrack.infiniteClip != null) {
                     animTrack.infiniteClip.ModifyKeyframes(
                         keyframe => {
@@ -29,19 +27,26 @@ namespace Primer.Timeline.Editor
                 }
 
                 foreach (var clip in track.GetClips()) {
-                    if (clip.start > time)
+                    if ((float)clip.start >= time)
                         clip.start += seconds;
-                    else if (clip.end > time)
+                    else if ((float)clip.end > time)
                         clip.duration += seconds;
                 }
             }
+        }
+
+        public static bool HasSomeClipAt(this TimelineAsset timeline, float time)
+        {
+            return timeline.GetAllTracks()
+                .SelectMany(track => track.GetClips())
+                .Any(clip => (float)clip.start < time && (float)clip.end > time);
         }
 
 
         public static void RemoveTime(this TimelineAsset timeline, float time, float seconds, bool preserveClips = false)
         {
             var totalTimeToRemove = preserveClips
-                ? Mathf.Min(seconds, GetMaxRemovableTime(timeline, time))
+                ? Mathf.Min(seconds, timeline.GetMaxRemovableTimeAt(time))
                 : seconds;
 
             if (preserveClips && totalTimeToRemove != seconds) {
@@ -83,7 +88,7 @@ namespace Primer.Timeline.Editor
             }
         }
 
-        private static float GetMaxRemovableTime(TimelineAsset timeline, float time)
+        public static float GetMaxRemovableTimeAt(this TimelineAsset timeline, float time)
         {
             var max = float.MaxValue;
 

@@ -4,30 +4,28 @@ using UnityEngine;
 
 namespace Primer.Timeline.Editor
 {
-    public class EditorInputDialog : EditorWindow
+    public class EditTimelineDialog : EditorWindow
     {
-        public static string Show(string title, string description, string value, string okText = "OK", string cancelText = "Cancel")
+        public static string Show(string title, string description, string value)
         {
-            var window = CreateInstance<EditorInputDialog>();
+            var window = CreateInstance<EditTimelineDialog>();
             window.titleContent = new GUIContent(title);
             window.description = description;
             window.value = value;
-            window.okButton = okText;
-            window.cancelButton = cancelText;
             window.onOkButton += () => value = window.value;
             window.ShowModal();
             return value;
         }
 
-        public static int? Show(string title, string description, int? value, string okText = "OK", string cancelText = "Cancel")
+        public static int? Show(string title, string description, int? value)
         {
-            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null, okText, cancelText);
+            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null);
             return int.TryParse(input, out var result) ? result : null;
         }
 
-        public static float? Show(string title, string description, float? value, string okText = "OK", string cancelText = "Cancel")
+        public static float? Show(string title, string description, float? value)
         {
-            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null, okText, cancelText);
+            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null);
             return float.TryParse(input, out var result) ? result : null;
         }
 
@@ -35,8 +33,6 @@ namespace Primer.Timeline.Editor
         #region internals
         private string description;
         private string value;
-        private string okButton;
-        private string cancelButton;
         private bool initializedPosition = false;
         private bool shouldClose = false;
         private Action onOkButton;
@@ -81,14 +77,14 @@ namespace Primer.Timeline.Editor
             var buttonsRect = EditorGUILayout.GetControlRect();
             buttonsRect.width /= 2;
 
-            if (GUI.Button(buttonsRect, okButton)) {
+            if (GUI.Button(buttonsRect, "Ok")) {
                 onOkButton?.Invoke();
                 shouldClose = true;
             }
 
             buttonsRect.x += buttonsRect.width;
 
-            if (GUI.Button(buttonsRect, cancelButton)) {
+            if (GUI.Button(buttonsRect, "Cancel")) {
                 value = null;
                 shouldClose = true;
             }

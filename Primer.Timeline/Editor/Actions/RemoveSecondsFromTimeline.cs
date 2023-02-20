@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEditor.Timeline.Actions;
+using UnityEngine;
 
 namespace Primer.Timeline.Editor
 {
@@ -16,18 +17,19 @@ namespace Primer.Timeline.Editor
         public override bool Execute(ActionContext context)
         {
             var time = (float)TimelineEditor.inspectedDirector.time;
+            var timeline = TimelineEditor.inspectedAsset;
 
-            var value = EditorInputDialog.Show(
+            var value = EditTimelineDialog.Show(
                 "Remove time",
-                $"How many frames to remove from {time}s?",
-                DEFAULT_REMOVE_SECONDS
+                $"How many seconds to remove from {time}s?",
+                Mathf.Min(DEFAULT_REMOVE_SECONDS, timeline.GetMaxRemovableTimeAt(time))
             );
 
             if (!value.HasValue)
                 return false;
 
-            Undo.RecordObject(TimelineEditor.inspectedAsset, "Remove time");
-            TimelineEditor.inspectedAsset.RemoveTime(time, value.Value, true);
+            Undo.RecordObject(timeline, "Remove time");
+            timeline.RemoveTime(time, value.Value, true);
             return true;
         }
     }
