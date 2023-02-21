@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Timeline;
+using Object = UnityEngine.Object;
 
 namespace Primer.Timeline.Editor
 {
@@ -13,24 +16,32 @@ namespace Primer.Timeline.Editor
             if (preserveClips && timeline.HasSomeClipAt(time))
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
 
-            foreach (var track in timeline.GetAllTracks()) {
-                if (track is AnimationTrack animTrack && animTrack.infiniteClip != null) {
-                    animTrack.infiniteClip.ModifyKeyframes(
-                        keyframe => {
-                            if (keyframe.time >= time)
-                                keyframe.time += seconds;
+            var undoMessage = $"Add {seconds}s at {time}s";
+            var tracks = timeline.GetAllTracks();
+            var clips = tracks.SelectMany(x => x.GetClips()).ToList();
+            var anim = tracks.OfType<AnimationTrack>()
+                .Where(x => x.infiniteClip != null)
+                .Select(x => x.infiniteClip)
+                .ToList();
 
-                            return keyframe;
-                        }
-                    );
-                }
+            UndoExtensions.RegisterClips(clips, undoMessage);
 
-                foreach (var clip in track.GetClips()) {
-                    if ((float)clip.start >= time)
-                        clip.start += seconds;
-                    else if ((float)clip.end > time)
-                        clip.duration += seconds;
-                }
+            foreach (var clip in clips) {
+                if ((float)clip.start >= time)
+                    clip.start += seconds;
+                else if ((float)clip.end > time)
+                    clip.duration += seconds;
+            }
+
+            Undo.RecordObjects(anim.Cast<Object>().ToArray(), undoMessage);
+
+            foreach (var clip in anim) {
+                clip.ModifyKeyframes(keyframe => {
+                    if (keyframe.time >= time)
+                        keyframe.time += seconds;
+
+                    return keyframe;
+                });
             }
         }
 
@@ -54,36 +65,44 @@ namespace Primer.Timeline.Editor
                 );
             }
 
-            foreach (var track in timeline.GetAllTracks()) {
-                if (track is AnimationTrack animTrack && animTrack.infiniteClip != null) {
-                    animTrack.infiniteClip.ModifyKeyframes(
-                        keyframe => {
-                            if (keyframe.time > time)
-                                keyframe.time -= Mathf.Min(totalTimeToRemove, keyframe.time - time);
+            var undoMessage = $"Remove {seconds}s at {time}s";
+            var tracks = timeline.GetAllTracks();
+            var clips = tracks.SelectMany(x => x.GetClips()).ToList();
+            var anim = tracks.OfType<AnimationTrack>()
+                .Where(x => x.infiniteClip != null)
+                .Select(x => x.infiniteClip)
+                .ToList();
 
-                            return keyframe;
-                        }
-                    );
+            UndoExtensions.RegisterClips(clips, undoMessage);
+
+            foreach (var clip in clips) {
+                var toRemove = totalTimeToRemove;
+
+                if (clip.start > time) {
+                    var moveBack = Mathf.Min((float)(clip.start - time), toRemove);
+                    clip.start -= moveBack;
+                    toRemove -= moveBack;
                 }
 
-                foreach (var clip in track.GetClips()) {
-                    var toRemove = totalTimeToRemove;
+                if (preserveClips)
+                    continue;
 
-                    if (clip.start > time) {
-                        var moveBack = Mathf.Min((float)(clip.start - time), toRemove);
-                        clip.start -= moveBack;
-                        toRemove -= moveBack;
-                    }
+                if (clip.end > time)
+                    clip.duration -= Mathf.Min((float)(clip.duration - (time - clip.start)), toRemove);
 
-                    if (preserveClips)
-                        continue;
+                if (clip.duration == 0)
+                    clip.GetParentTrack().DeleteClip(clip);
+            }
 
-                    if (clip.end > time)
-                        clip.duration -= Mathf.Min((float)(clip.duration - (time - clip.start)), toRemove);
+            Undo.RecordObjects(anim.Cast<Object>().ToArray(), undoMessage);
 
-                    if (clip.duration == 0)
-                        track.DeleteClip(clip);
-                }
+            foreach (var clip in anim) {
+                clip.ModifyKeyframes(keyframe => {
+                    if (keyframe.time > time)
+                        keyframe.time -= Mathf.Min(totalTimeToRemove, keyframe.time - time);
+
+                    return keyframe;
+                });
             }
         }
 

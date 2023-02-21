@@ -29,9 +29,7 @@ namespace Primer.Timeline.Editor
             if (value is null)
                 return false;
 
-            UndoExtensions.RegisterCompleteTimeline(timeline, $"Remove {value.seconds}s at {time}s");
             timeline.RemoveTime(time, value.seconds, value.preserveClips);
-
             return true;
         }
     }

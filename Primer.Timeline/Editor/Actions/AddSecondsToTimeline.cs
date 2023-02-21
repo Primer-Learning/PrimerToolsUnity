@@ -1,6 +1,5 @@
 using System;
 using JetBrains.Annotations;
-using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEditor.Timeline.Actions;
 
@@ -31,9 +30,7 @@ namespace Primer.Timeline.Editor
             if (value.preserveClips && timeline.HasSomeClipAt(time))
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
 
-            UndoExtensions.RegisterCompleteTimeline(timeline, $"Add {value.seconds}s at {time}s");
             timeline.AddTime(time, value.seconds, value.preserveClips);
-
             return true;
         }
     }
