@@ -43,5 +43,12 @@ namespace Primer.Timeline
         {
             await UniTask.WhenAll(processes);
         }
+        protected static async UniTask Series(params UniTask[] processes)
+        {
+            foreach (var process in processes)
+            {
+                await process;
+            }
+        }
     }
 }
