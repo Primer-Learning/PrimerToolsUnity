@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.Timeline;
@@ -18,21 +19,21 @@ namespace Primer.Timeline.Editor
             var time = (float)TimelineEditor.inspectedDirector.time;
             var timeline = TimelineEditor.inspectedAsset;
 
-            // if (timeline.HasSomeClipAt(time)) {
-            //     throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
-            // }
-
             var value = EditTimelineDialog.Show(
                 "Add time",
                 $"How many seconds to add after {time}s?",
                 DEFAULT_ADD_SECONDS
             );
 
-            if (!value.HasValue)
+            if (value is null)
                 return false;
 
-            Undo.RecordObject(timeline, "Add time");
-            timeline.AddTime(time, value.Value, true);
+            if (value.preserveClips && timeline.HasSomeClipAt(time))
+                throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
+
+            UndoExtensions.RegisterCompleteTimeline(timeline, $"Add {value.seconds}s at {time}s");
+            timeline.AddTime(time, value.seconds, value.preserveClips);
+
             return true;
         }
     }

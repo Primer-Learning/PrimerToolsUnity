@@ -18,18 +18,20 @@ namespace Primer.Timeline.Editor
         {
             var time = (float)TimelineEditor.inspectedDirector.time;
             var timeline = TimelineEditor.inspectedAsset;
+            var defaultValue = Mathf.Min(DEFAULT_REMOVE_SECONDS, timeline.GetMaxRemovableTimeAt(time));
 
             var value = EditTimelineDialog.Show(
                 "Remove time",
                 $"How many seconds to remove from {time}s?",
-                Mathf.Min(DEFAULT_REMOVE_SECONDS, timeline.GetMaxRemovableTimeAt(time))
+                defaultValue
             );
 
-            if (!value.HasValue)
+            if (value is null)
                 return false;
 
-            Undo.RecordObject(timeline, "Remove time");
-            timeline.RemoveTime(time, value.Value, true);
+            UndoExtensions.RegisterCompleteTimeline(timeline, $"Remove {value.seconds}s at {time}s");
+            timeline.RemoveTime(time, value.seconds, value.preserveClips);
+
             return true;
         }
     }

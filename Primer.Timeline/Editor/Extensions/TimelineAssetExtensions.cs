@@ -10,9 +10,8 @@ namespace Primer.Timeline.Editor
     {
         public static void AddTime(this TimelineAsset timeline, float time, float seconds, bool preserveClips = false)
         {
-            if (preserveClips && timeline.HasSomeClipAt(time)) {
+            if (preserveClips && timeline.HasSomeClipAt(time))
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
-            }
 
             foreach (var track in timeline.GetAllTracks()) {
                 if (track is AnimationTrack animTrack && animTrack.infiniteClip != null) {

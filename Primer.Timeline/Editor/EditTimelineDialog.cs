@@ -6,36 +6,52 @@ namespace Primer.Timeline.Editor
 {
     public class EditTimelineDialog : EditorWindow
     {
-        public static string Show(string title, string description, string value)
+        public record TimelineEditValues(float seconds, bool preserveClips = true);
+
+        public static TimelineEditValues Show(string title, string description, float value)
+        {
+            return Show(title, description, new TimelineEditValues(value));
+        }
+
+        private static TimelineEditValues Show(string title, string description, TimelineEditValues input)
         {
             var window = CreateInstance<EditTimelineDialog>();
             window.titleContent = new GUIContent(title);
             window.description = description;
-            window.value = value;
-            window.onOkButton += () => value = window.value;
+
+            window.seconds = input.seconds;
+            window.preserveClips = input.preserveClips;
+
+            var output = null as TimelineEditValues;
+            window.onComplete += values => output = values;
+
             window.ShowModal();
-            return value;
-        }
-
-        public static int? Show(string title, string description, int? value)
-        {
-            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null);
-            return int.TryParse(input, out var result) ? result : null;
-        }
-
-        public static float? Show(string title, string description, float? value)
-        {
-            var input = Show(title, description, value.HasValue ? value.Value.ToString() : null);
-            return float.TryParse(input, out var result) ? result : null;
+            return output;
         }
 
 
         #region internals
-        private string description;
-        private string value;
-        private bool initializedPosition = false;
-        private bool shouldClose = false;
-        private Action onOkButton;
+        public string description;
+        private TimelineEditValues values;
+        private Action<TimelineEditValues> onComplete;
+
+        private float seconds;
+        private bool preserveClips = true;
+
+        private bool initializedPosition;
+        private bool shouldClose;
+
+        private void Cancel()
+        {
+            onComplete?.Invoke(null);
+            shouldClose = true;
+        }
+
+        private void Submit()
+        {
+            onComplete?.Invoke(new TimelineEditValues(seconds, preserveClips));
+            shouldClose = true;
+        }
 
         private void OnGUI()
         {
@@ -43,17 +59,10 @@ namespace Primer.Timeline.Editor
             var @event = Event.current;
 
             if (@event.type == EventType.KeyDown) {
-                switch (@event.keyCode) {
-                    case KeyCode.Escape:
-                        shouldClose = true;
-                        break;
-
-                    case KeyCode.Return:
-                    case KeyCode.KeypadEnter:
-                        onOkButton?.Invoke();
-                        shouldClose = true;
-                        break;
-                }
+                if (@event.keyCode is KeyCode.Escape)
+                    Cancel();
+                else if (@event.keyCode is KeyCode.Return or KeyCode.KeypadEnter)
+                    Submit();
             }
 
             if (shouldClose) {
@@ -68,26 +77,25 @@ namespace Primer.Timeline.Editor
             EditorGUILayout.LabelField(description);
 
             EditorGUILayout.Space(8);
-            GUI.SetNextControlName("inText");
-            value = EditorGUILayout.TextField("", value);
-            GUI.FocusControl("inText");
+            GUI.SetNextControlName("valueInput");
+            seconds = EditorGUILayout.FloatField("Seconds", seconds);
+            GUI.FocusControl("valueInput");
+
+            EditorGUILayout.Space(8);
+            preserveClips = EditorGUILayout.Toggle("Preserve clips", preserveClips);
             EditorGUILayout.Space(12);
 
             // Draw OK / Cancel buttons
             var buttonsRect = EditorGUILayout.GetControlRect();
             buttonsRect.width /= 2;
 
-            if (GUI.Button(buttonsRect, "Ok")) {
-                onOkButton?.Invoke();
-                shouldClose = true;
-            }
+            if (GUI.Button(buttonsRect, "Ok"))
+                Submit();
 
             buttonsRect.x += buttonsRect.width;
 
-            if (GUI.Button(buttonsRect, "Cancel")) {
-                value = null;
-                shouldClose = true;
-            }
+            if (GUI.Button(buttonsRect, "Cancel"))
+                Cancel();
 
             EditorGUILayout.Space(8);
             EditorGUILayout.EndVertical();
