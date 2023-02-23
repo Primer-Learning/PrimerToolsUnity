@@ -24,9 +24,9 @@ namespace Primer.Timeline
         public Transform prevParent = null;
         public Transform newParent = null;
 
-        private Vector3 originalLocalPosition;
-        private Quaternion originalLocalRotation;
-        private Vector3 originalLocalScale;
+        public  Vector3 originalLocalPosition;
+        public Quaternion originalLocalRotation;
+        public Vector3 originalLocalScale;
 
         public override void Cleanup()
         {
