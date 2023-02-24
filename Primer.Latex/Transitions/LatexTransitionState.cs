@@ -13,6 +13,7 @@ namespace Primer.Latex
 
 
         public Transform transform => source.transform;
+        public GameObject gameObject => source.gameObject;
 
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)
