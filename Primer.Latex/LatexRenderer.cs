@@ -103,6 +103,25 @@ namespace Primer.Latex
                 base.OnValidate();
         }
 
+        internal LatexTransition CreateTransition(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions)
+        {
+            var currentState = state;
+            var targetState = new LatexTransitionState(transitionTo, transitions);
+            return new LatexTransition(currentState, targetState, IPrimerAnimation.cubic);
+        }
+
+        public async UniTask<IDisposable> TransitionTo(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions,
+            Tweener anim = null, CancellationToken ct = default)
+        {
+            var transition = CreateTransition(transitionTo, transitions);
+
+            await foreach (var t in anim.Tween(0, 1f, ct)) {
+                transition.Apply(t);
+            }
+
+            return transition;
+        }
+
 
         #region Latex processing
         public UniTask Process(int input) => Process($"${input}$");
