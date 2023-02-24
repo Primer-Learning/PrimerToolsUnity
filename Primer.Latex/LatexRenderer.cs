@@ -25,7 +25,7 @@ namespace Primer.Latex
 
         [SerializeField]
         [HideInInspector]
-        internal List<int> groupIndexes = new();
+        public List<int> groupIndexes = new();
 
         [SerializeField]
         [PropertyOrder(2)]
