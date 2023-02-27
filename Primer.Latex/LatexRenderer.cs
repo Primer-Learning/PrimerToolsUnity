@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -25,7 +24,7 @@ namespace Primer.Latex
 
         [SerializeField]
         [HideInInspector]
-        public List<int> groupIndexes = new();
+        internal List<int> groupIndexes = new();
 
         [SerializeField]
         [PropertyOrder(2)]
@@ -160,6 +159,28 @@ namespace Primer.Latex
         #endregion
 
 
+        #region Group indexes
+        public void SetGroupIndexes(params int[] indexes)
+        {
+            groupIndexes = indexes.ToList();
+            InvalidateCache();
+        }
+
+        public void SetGroupLengths(params int[] lengths)
+        {
+            groupIndexes.Clear();
+
+            lengths.Aggregate(0, (acc, x) => {
+                var sum = acc + x;
+                groupIndexes.Add(sum);
+                return sum;
+            });
+
+            InvalidateCache();
+        }
+        #endregion
+
+
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
             if (expression is null || expression.Any(x => x.mesh is null)) {
@@ -263,7 +284,6 @@ namespace Primer.Latex
                 }
             }
         }
-
 #endif
     }
 }
