@@ -32,12 +32,15 @@ namespace Primer
             }
         }
 
-        public static void CopyTo(this Transform source, Transform target, bool copyParent = true)
+        public static void CopyTo(this Transform source, Transform target, bool copyParent = true, Vector3? offsetPosition = null)
         {
             if (copyParent)
                 target.parent = source.parent;
 
-            target.localPosition = source.localPosition;
+            target.localPosition = offsetPosition is null
+                ? source.localPosition
+                : source.localPosition + source.localRotation * Vector3.Scale(offsetPosition.Value, source.localScale);
+
             target.localRotation = source.localRotation;
             target.localScale = source.localScale;
         }
