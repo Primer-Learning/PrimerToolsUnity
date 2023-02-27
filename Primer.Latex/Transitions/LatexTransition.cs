@@ -9,9 +9,8 @@ namespace Primer.Latex
     {
         private static int instances;
 
-        private readonly GameObject gameObject;
+        private readonly GameObject container;
         private readonly AnimationCurve curve;
-        private readonly TransformSnapshot endStateSnapshot;
 
         private readonly LatexTransitionState start;
         private readonly LatexTransitionState end;
@@ -21,10 +20,8 @@ namespace Primer.Latex
         private readonly List<(Transform, GroupState)> remove = new();
         private readonly List<(Transform, GroupState from, GroupState to)> transition = new();
 
-        private enum State { Ready, Transitioning, Ended }
-        private State state;
 
-        public Transform transform => gameObject.transform;
+        public Transform transform => container.transform;
 
 
         public LatexTransition(LatexTransitionState from, LatexTransitionState to, AnimationCurve curve)
@@ -33,55 +30,22 @@ namespace Primer.Latex
             offset = from.GetOffsetWith(to);
             start = from;
             end = to;
-            endStateSnapshot = new TransformSnapshot(end.transform);
 
-            gameObject = CreateTransitionGameObject();
-            state = State.Ready;
-        }
+            container = new GameObject($"LatexTransition {instances++}") {
+                hideFlags = HideFlags.DontSave,
+            };
 
-        public void Dispose()
-        {
-            gameObject.Dispose(urgent: false);
-            endStateSnapshot?.Restore();
-            end.gameObject.SetActive(false);
-            start.gameObject.SetActive(true);
-        }
-
-        public bool Is(LatexTransitionState from, LatexTransitionState to)
-        {
-            return start == from && end == to;
+            CreateTransforms();
         }
 
 
-        private void StartTransition()
-        {
-            state = State.Transitioning;
-            start.gameObject.SetActive(false);
-            gameObject.SetActive(true);
-            end.gameObject.SetActive(false);
-        }
+        public void Dispose() => container.Dispose(urgent: true);
 
-        private void EndTransition()
-        {
-            state = State.Ended;
-            start.transform.CopyTo(end.transform);
-            start.gameObject.SetActive(false);
-            gameObject.SetActive(false);
-            end.gameObject.SetActive(true);
-        }
+        public bool Is(LatexTransitionState from, LatexTransitionState to) => (start == from) && (end == to);
+
 
         public void Apply(float t)
         {
-            if (t >= 1) {
-                if (state is not State.Ended)
-                    EndTransition();
-
-                return;
-            }
-
-            if (state is State.Ready or State.Ended)
-                StartTransition();
-
             var eased = curve.Evaluate(t);
             var easeOut = 1 - Mathf.Clamp(t * 2, 0, 1);
             var easeIn = Mathf.Clamp(t * 2 - 1, 0, 1);
@@ -98,20 +62,10 @@ namespace Primer.Latex
             }
         }
 
-        private GameObject CreateTransitionGameObject()
+        private void CreateTransforms()
         {
-            var go = new GameObject($"LatexTransition {instances++}") {
-                hideFlags = HideFlags.DontSave,
-            };
+            var parent = container.transform;
 
-            go.SetActive(false);
-            start.transform.CopyTo(go.transform);
-            CreateGroups(go.transform);
-            return go;
-        }
-
-        private void CreateGroups(Transform parent)
-        {
             foreach (var (before, after) in start.GetCommonGroups(end)) {
                 var groupTransform = Object.Instantiate(before.transform, parent);
                 groupTransform.localPosition += offset;

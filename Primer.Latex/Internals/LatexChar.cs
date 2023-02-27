@@ -21,9 +21,6 @@ namespace Primer.Latex
         public Vector3 position { get; init; }
         public float scale { get; init; }
 
-        // public Rect bounds => new Rect(mesh.bounds.min, mesh.bounds.size);
-
-
 
         internal LatexChar(VectorUtils.Geometry geometry, Vector2 offset)
         {

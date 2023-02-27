@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public class TransformSnapshot
+    public readonly struct TransformSnapshot
     {
         private readonly Transform target;
         private readonly Transform parent;

@@ -11,9 +11,7 @@ namespace Primer.Latex
         private readonly TransformSnapshot snapshot;
         private readonly LatexRenderer source;
 
-
         public Transform transform => source.transform;
-        public GameObject gameObject => source.gameObject;
 
 
         public LatexTransitionState(LatexRenderer renderer, IEnumerable<LatexExpression> groups)

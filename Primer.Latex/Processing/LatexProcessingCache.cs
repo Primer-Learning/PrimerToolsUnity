@@ -141,7 +141,12 @@ namespace Primer.Latex
 #if UNITY_EDITOR
         public static void OpenCacheDir()
         {
-            System.Diagnostics.Process.Start($"{cacheDir}{Path.DirectorySeparatorChar}");;
+            System.Diagnostics.Process.Start($"{cacheDir}{Path.DirectorySeparatorChar}");
+        }
+
+        public static void ClearCache()
+        {
+            new DirectoryInfo(cacheDir).Delete(true);
         }
 #endif
     }

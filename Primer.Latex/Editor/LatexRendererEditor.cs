@@ -1,6 +1,8 @@
+using Cysharp.Threading.Tasks;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Primer.Latex.Editor
 {
@@ -19,7 +21,8 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
-            LatexProcessingCache.disableCache = GUILayout.Toggle(LatexProcessingCache.disableCache, "Disable cache");
+            CacheManagement();
+
             Space();
             GetStatusBox().Render();
 
@@ -30,6 +33,25 @@ namespace Primer.Latex.Editor
 
             if (component.expression is not null && !component.expression.isEmpty)
                 RenderGroupDefinition();
+        }
+
+        private void CacheManagement()
+        {
+            using var scope = new GUILayout.HorizontalScope();
+
+            if (GUILayout.Button("Clear cache")) {
+                LatexProcessingCache.ClearCache();
+                component.Process(component.config).Forget();
+            }
+
+            if (GUILayout.Button("Open cache dir")) {
+                LatexProcessingCache.OpenCacheDir();
+            }
+
+            LatexProcessingCache.disableCache = GUILayout.Toggle(
+                LatexProcessingCache.disableCache,
+                "Disable cache"
+            );
         }
 
 
