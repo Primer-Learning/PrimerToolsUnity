@@ -12,10 +12,10 @@ using UnityEngine.Events;
 
 namespace Primer.Latex
 {
+    [Obsolete("Use LatexComponent instead.")]
     [ExecuteAlways]
     [HideMonoScript]
-    [AddComponentMenu("Primer / Latex Renderer")]
-    public class LatexRenderer : GeneratorBehaviour
+    public class DeprecatedLatexRenderer : GeneratorBehaviour
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
 
@@ -52,12 +52,12 @@ namespace Primer.Latex
 
         internal bool isRunning => processor.state == LatexProcessingState.Processing;
 
-        [NonSerialized]
-        private LatexTransitionState stateCache;
-        internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
-            this,
-            expression.Split(groupIndexes)
-        );
+        // [NonSerialized]
+        // private LatexTransitionState stateCache;
+        // internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
+        //     this,
+        //     expression.Split(groupIndexes)
+        // );
 
 
         #region Color
@@ -102,24 +102,24 @@ namespace Primer.Latex
                 base.OnValidate();
         }
 
-        internal LatexTransition CreateTransition(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions)
-        {
-            var currentState = state;
-            var targetState = new LatexTransitionState(transitionTo, transitions);
-            return new LatexTransition(currentState, targetState, IPrimerAnimation.cubic);
-        }
-
-        public async UniTask<IDisposable> TransitionTo(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions,
-            Tweener anim = null, CancellationToken ct = default)
-        {
-            var transition = CreateTransition(transitionTo, transitions);
-
-            await foreach (var t in anim.Tween(0, 1f, ct)) {
-                transition.Apply(t);
-            }
-
-            return transition;
-        }
+        // internal LatexTransition CreateTransition(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions)
+        // {
+        //     var currentState = state;
+        //     var targetState = new LatexTransitionState(transitionTo, transitions);
+        //     return new LatexTransition(currentState, targetState, IPrimerAnimation.cubic);
+        // }
+        //
+        // public async UniTask<IDisposable> TransitionTo(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions,
+        //     Tweener anim = null, CancellationToken ct = default)
+        // {
+        //     var transition = CreateTransition(transitionTo, transitions);
+        //
+        //     await foreach (var t in anim.Tween(0, 1f, ct)) {
+        //         transition.Apply(t);
+        //     }
+        //
+        //     return transition;
+        // }
 
 
         #region Latex processing
@@ -235,7 +235,7 @@ namespace Primer.Latex
 
         internal void InvalidateCache()
         {
-            stateCache = null;
+            // stateCache = null;
         }
 
         private void Update()

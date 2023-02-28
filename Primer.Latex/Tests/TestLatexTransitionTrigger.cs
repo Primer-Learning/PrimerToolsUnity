@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Primer.Animation;
 using Primer.Timeline;
@@ -7,26 +6,19 @@ namespace Primer.Latex
 {
     public class TestLatexTransitionTrigger : Triggerable
     {
-        public LatexRenderer transitionTo;
+        public LatexComponent transitionTo;
 
-        private LatexRenderer target;
-        private IDisposable transition;
-
-        public override void Cleanup()
-        {
-            base.Cleanup();
-            transition?.Dispose();
-        }
+        private LatexComponent target;
 
         public override void Prepare()
         {
             base.Prepare();
-            target = GetComponent<LatexRenderer>();
+            target = GetComponent<LatexComponent>();
         }
 
         public async Task Transition()
         {
-            transition = await target.TransitionTo(
+            await target.TransitionTo(
                 transitionTo,
                 new [] {
                     TransitionType.Transition,

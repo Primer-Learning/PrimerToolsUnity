@@ -1,89 +1,182 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Primer.Latex
 {
-    internal class LatexTransition : IDisposable
+    public class LatexTransition : IDisposable
     {
         private static int instances;
 
-        private readonly GameObject container;
-        private readonly AnimationCurve curve;
-
-        private readonly LatexTransitionState start;
-        private readonly LatexTransitionState end;
+        private readonly GameObject gameObject;
+        private readonly EaseMode ease;
         private readonly Vector3 offset;
 
-        private readonly List<(Transform, GroupState)> add = new();
-        private readonly List<(Transform, GroupState)> remove = new();
-        private readonly List<(Transform, GroupState from, GroupState to)> transition = new();
+        private readonly LatexComponent start;
+        private readonly LatexComponent end;
+        private readonly TransitionType[] transitions;
+
+        private readonly List<(Transform, Transform)> add = new();
+        private readonly List<(Transform, Transform)> remove = new();
+        private readonly List<(Transform, Transform from, Transform to)> transition = new();
+
+        public Transform transform => gameObject.transform;
 
 
-        public Transform transform => container.transform;
-
-
-        public LatexTransition(LatexTransitionState from, LatexTransitionState to, AnimationCurve curve)
+        public LatexTransition(LatexComponent from, LatexComponent to, IEnumerable<TransitionType> transitions,
+            EaseMode ease = EaseMode.Cubic)
         {
-            this.curve = curve;
-            offset = from.GetOffsetWith(to);
+            if (from == null)
+                throw new ArgumentNullException(nameof(from));
+
+            if (to == null)
+                throw new ArgumentNullException(nameof(to));
+
+            this.ease = ease;
+            this.transitions = transitions.Validate();
             start = from;
             end = to;
+            offset = GetOffset();
+            gameObject = CreateGameObject();
+        }
 
-            container = new GameObject($"LatexTransition {instances++}") {
-                hideFlags = HideFlags.DontSave,
-            };
-
-            CreateTransforms();
+        public void Dispose()
+        {
+            gameObject.Dispose(urgent: true);
         }
 
 
-        public void Dispose() => container.Dispose(urgent: true);
-
-        public bool Is(LatexTransitionState from, LatexTransitionState to) => (start == from) && (end == to);
-
+        public async UniTask Run(Tweener anim = null, CancellationToken ct = default)
+        {
+            await foreach (var t in anim.Tween(0, 1f, ct)) {
+                Apply(t);
+            }
+        }
 
         public void Apply(float t)
         {
-            var eased = curve.Evaluate(t);
+            var eased = ease.Apply(t);
             var easeOut = 1 - Mathf.Clamp(t * 2, 0, 1);
             var easeIn = Mathf.Clamp(t * 2 - 1, 0, 1);
 
             foreach (var (groupTransform, group) in remove)
-                groupTransform.localScale = group.scale * easeOut;
+                groupTransform.localScale = group.localScale * easeOut;
 
             foreach (var (groupTransform, group) in add)
-                groupTransform.localScale = group.scale * easeIn;
+                groupTransform.localScale = group.localScale * easeIn;
 
             foreach (var (groupTransform, before, after) in transition) {
-                groupTransform.localScale = Vector3.Lerp(before.scale, after.scale, eased);
-                groupTransform.localPosition = Vector3.Lerp(before.position, after.position + offset, eased);
+                groupTransform.localScale = Vector3.Lerp(before.localScale, after.localScale, eased);
+                groupTransform.localPosition = Vector3.Lerp(before.localPosition, after.localPosition + offset, eased);
             }
         }
 
-        private void CreateTransforms()
+        private IEnumerable<Transform> GroupsToAdd()
         {
-            var parent = container.transform;
+            var endCursor = 0;
+            var endGroups = end.transform.GetChildren();
 
-            foreach (var (before, after) in start.GetCommonGroups(end)) {
-                var groupTransform = Object.Instantiate(before.transform, parent);
+            for (var i = 0; i < transitions.Length; i++) {
+                if (transitions[i] is TransitionType.Add or TransitionType.Replace)
+                    yield return endGroups[endCursor];
+
+                if (transitions[i] is not TransitionType.Remove)
+                    endCursor++;
+            }
+        }
+
+        private IEnumerable<Transform> GroupsToRemove()
+        {
+            var startCursor = 0;
+            var startGroups = start.transform.GetChildren();
+
+            for (var i = 0; i < transitions.Length; i++) {
+                if (transitions[i] is TransitionType.Remove or TransitionType.Replace)
+                    yield return startGroups[startCursor];
+
+                if (transitions[i] is not TransitionType.Add)
+                    startCursor++;
+            }
+        }
+
+        private IEnumerable<(Transform, Transform)> GetCommonGroups()
+        {
+            var startCursor = 0;
+            var endCursor = 0;
+            var startGroups = start.transform.GetChildren();
+            var endGroups = end.transform.GetChildren();
+
+            for (var i = 0; i < transitions.Length; i++) {
+                if (transitions[i] is not TransitionType.Add and not TransitionType.Remove and not TransitionType.Replace)
+                    yield return (startGroups[startCursor], endGroups[endCursor]);
+
+                if (transitions[i] is not TransitionType.Add)
+                    startCursor++;
+
+                if (transitions[i] is not TransitionType.Remove)
+                    endCursor++;
+            }
+        }
+
+        public Vector3 GetOffset() => GetOffsetWith(start, end, transitions);
+        public static Vector3 GetOffsetWith(LatexComponent from, LatexComponent to, params TransitionType[] transitions)
+        {
+            var startCursor = 0;
+            var endCursor = 0;
+
+            for (var i = 0; i < transitions.Length; i++) {
+                if (transitions[i] is TransitionType.Anchor) {
+                    var startGroup = from.transform.GetChild(startCursor);
+                    var endGroup = to.transform.GetChild(endCursor);
+                    return startGroup.localPosition - endGroup.localPosition;
+                }
+
+                if (transitions[i] is not TransitionType.Add)
+                    startCursor++;
+
+                if (transitions[i] is not TransitionType.Remove)
+                    endCursor++;
+            }
+
+            return Vector3.zero;
+        }
+
+        #region Initialization
+        private GameObject CreateGameObject()
+        {
+            var container = new GameObject($"LatexTransition {instances++}") {
+                hideFlags = HideFlags.DontSave,
+            };
+
+            CreateTransforms(container.transform);
+            return container;
+        }
+
+        private void CreateTransforms(Transform parent)
+        {
+            foreach (var (before, after) in GetCommonGroups()) {
+                var groupTransform = Object.Instantiate(before, parent);
                 groupTransform.localPosition += offset;
                 transition.Add((groupTransform, before, after));
             }
 
-            foreach (var group in start.GroupsToRemoveTransitioningTo(end)) {
-                var groupTransform = Object.Instantiate(group.transform, parent);
+            foreach (var group in GroupsToRemove()) {
+                var groupTransform = Object.Instantiate(group, parent);
                 groupTransform.localScale = Vector3.zero;
                 remove.Add((groupTransform, group));
             }
 
-            foreach (var group in start.GroupsToAddTransitioningTo(end)) {
-                var groupTransform = Object.Instantiate(group.transform, parent);
+            foreach (var group in GroupsToAdd()) {
+                var groupTransform = Object.Instantiate(group, parent);
                 groupTransform.localPosition += offset;
                 groupTransform.localScale = Vector3.zero;
                 add.Add((groupTransform, group));
             }
         }
+        #endregion
     }
 }

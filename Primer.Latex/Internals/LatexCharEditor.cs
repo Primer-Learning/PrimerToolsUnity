@@ -7,7 +7,7 @@ namespace Primer.Latex
 {
     public static class LatexCharEditor
     {
-        private static int charPreviewSize = 50;
+        private static int charPreviewSize = 32;
 
         public static void CharPreviewSize()
         {
@@ -49,7 +49,7 @@ namespace Primer.Latex
         public static int ShowGroup(LatexExpression expression)
         {
             var width = Screen.width;
-            var cols = width / (charPreviewSize + 10);
+            var cols = width / (charPreviewSize + 20);
 
             var textures = GetPreviewsFor(expression);
             return GUILayout.SelectionGrid(0, textures, cols);

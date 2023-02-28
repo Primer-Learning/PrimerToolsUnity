@@ -1,13 +1,14 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Primer.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Primer.Latex.Editor
 {
-    [CustomEditor(typeof(LatexRenderer))]
-    public class LatexRendererEditor : PrimerEditor<LatexRenderer>
+    [Obsolete("Use LatexComponent instead.")]
+    [CustomEditor(typeof(DeprecatedLatexRenderer))]
+    public class DeprecatedLatexRendererEditor : PrimerEditor<DeprecatedLatexRenderer>
     {
         public static readonly EditorHelpBox targetIsPresetWarning = EditorHelpBox.Warning(
             "You are editing a preset and the LaTeX will not be built until "

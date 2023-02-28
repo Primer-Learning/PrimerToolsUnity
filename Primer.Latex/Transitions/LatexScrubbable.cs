@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Primer.Animation;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -14,13 +13,13 @@ namespace Primer.Latex
         #region Inspector
         [SerializeReference]
         [HideInInspector]
-        private LatexRenderer _from;
+        private LatexComponent _from;
 
         [ShowInInspector]
-        public LatexRenderer from {
+        public LatexComponent from {
             get => _from;
             set {
-                _from = value;
+                _from = value == null ? null : value;
                 transition = null;
                 UpdateGroupsLength();
             }
@@ -28,13 +27,13 @@ namespace Primer.Latex
 
         [SerializeReference]
         [HideInInspector]
-        private LatexRenderer _to;
+        private LatexComponent _to;
 
         [ShowInInspector]
-        public LatexRenderer to {
+        public LatexComponent to {
             get => _to;
             set {
-                _to = value;
+                _to = value == null ? null : value;
                 transition = null;
                 UpdateGroupsLength();
             }
@@ -67,7 +66,7 @@ namespace Primer.Latex
             if (_transition is not null)
                 return _transition;
 
-            _transition = new LatexTransition(fromState, toState, IPrimerAnimation.cubic);
+            _transition = new LatexTransition(from, to, groups);
             from.transform.CopyTo(_transition.transform);
             return _transition;
         }
@@ -83,19 +82,22 @@ namespace Primer.Latex
 
         private enum State { Unset, Initial, Transitioning, Ended }
         private State state = State.Unset;
-
-        private LatexTransitionState fromState => from.state;
-        private LatexTransitionState toState => new(to, groups);
-
+        private bool isValid => from != null && to != null;
 
         public override void Cleanup()
         {
+            if (from == null)
+                return;
+
             base.Cleanup();
             SetInitialState();
         }
 
         public override void Prepare()
         {
+            if (!isValid)
+                return;
+
             base.Prepare();
             EnsureTransitionExists();
         }
@@ -103,6 +105,9 @@ namespace Primer.Latex
         [UsedImplicitly]
         public void Update(float time)
         {
+            if (!isValid)
+                return;
+
             switch (time) {
                 case <= 0:
                     SetInitialState();
@@ -125,7 +130,9 @@ namespace Primer.Latex
             state = State.Initial;
             transition = null;
             from.gameObject.SetActive(true);
-            to.gameObject.SetActive(false);
+
+            if (to != null)
+                to.gameObject.SetActive(false);
         }
 
         private void SetEndState()
@@ -133,12 +140,14 @@ namespace Primer.Latex
             if (state == State.Ended)
                 return;
 
+            var offset = transition.GetOffset();
+
             state = State.Ended;
             transition = null;
             from.gameObject.SetActive(false);
             to.gameObject.SetActive(true);
 
-            from.transform.CopyTo(toState.transform, offsetPosition: fromState.GetOffsetWith(toState));
+            from.transform.CopyTo(to.transform, offsetPosition: offset);
         }
 
         private void SetTransitionState(float time)
@@ -157,7 +166,7 @@ namespace Primer.Latex
             if (from == null || to == null)
                 return;
 
-            var length = Mathf.Max(from.ranges.Count, to.ranges.Count);
+            var length = Mathf.Max(from.groupsCount, to.groupsCount);
             groups.SetLength(length);
         }
 
