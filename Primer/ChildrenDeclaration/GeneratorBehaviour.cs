@@ -17,9 +17,9 @@ namespace Primer
         protected virtual ChildrenDeclaration CreateChildrenDeclaration() => new(transform);
 
 
-        protected void OnEnable() => UpdateChildren();
+        protected virtual void OnEnable() => UpdateChildren();
 
-        protected void OnValidate()
+        protected virtual void OnValidate()
         {
             if (!EditorApplication.isPlaying)
                 UpdateChildren();
