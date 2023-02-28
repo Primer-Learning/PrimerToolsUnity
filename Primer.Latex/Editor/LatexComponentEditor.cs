@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
+using UnityEngine;
 
 namespace Primer.Latex.Editor
 {
@@ -19,6 +21,8 @@ namespace Primer.Latex.Editor
             }
 
             base.OnInspectorGUI();
+
+            CacheManagement();
         }
 
         private void ShowPresetWarning()
@@ -28,5 +32,37 @@ namespace Primer.Latex.Editor
 
             EditorGUILayout.HelpBox(message, MessageType.Warning);
         }
+
+        private void CacheManagement()
+        {
+            using var scope = new GUILayout.HorizontalScope();
+
+            if (GUILayout.Button("Clear cache")) {
+                LatexProcessingCache.ClearCache();
+                component.Process(component.config).Forget();
+            }
+
+            if (GUILayout.Button("Open cache dir")) {
+                LatexProcessingCache.OpenCacheDir();
+            }
+
+            LatexProcessingCache.disableCache = GUILayout.Toggle(
+                LatexProcessingCache.disableCache,
+                "Disable cache"
+            );
+        }
+
+        // private void ChildrenManagement()
+        // {
+        //     using var scope = new GUILayout.HorizontalScope();
+        //
+        //     if (GUILayout.Button("Update children")) {
+        //         component.UpdateChildren();
+        //     }
+        //
+        //     if (GUILayout.Button("Rebuild children")) {
+        //         component.Process(component.config).Forget();
+        //     }
+        // }
     }
 }

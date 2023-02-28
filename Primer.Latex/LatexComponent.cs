@@ -166,6 +166,27 @@ namespace Primer.Latex
                 renderer.material = defaultMaterial;
             }
         }
+
+        [Title("Controls")]
+        // [ButtonGroup("Children group")]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
+        [ContextMenu("PRIMER > Update children")]
+        internal void UpdateChildren()
+        {
+            renderer.UpdateChildren();
+        }
+
+        // [ButtonGroup("Children group")]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
+        [ContextMenu("PRIMER > Regenerate children")]
+        protected virtual void RegenerateChildren()
+        {
+            if (gameObject.IsPreset())
+                return;
+
+            ChildrenDeclaration.Clear(transform);
+            UpdateChildren();
+        }
         #endregion
     }
 }
