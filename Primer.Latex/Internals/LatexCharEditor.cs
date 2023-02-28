@@ -2,7 +2,8 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Primer.Latex.Editor
+#if UNITY_EDITOR
+namespace Primer.Latex
 {
     public static class LatexCharEditor
     {
@@ -55,3 +56,4 @@ namespace Primer.Latex.Editor
         }
     }
 }
+#endif
