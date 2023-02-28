@@ -37,7 +37,7 @@ namespace Primer.Latex
                 throw new ArgumentNullException(nameof(to));
 
             this.ease = ease;
-            this.transitions = transitions.Validate();
+            this.transitions = transitions.Validate(from, to);
             start = from;
             end = to;
             offset = GetOffset();
@@ -49,13 +49,6 @@ namespace Primer.Latex
             gameObject.Dispose(urgent: true);
         }
 
-
-        public async UniTask Run(Tweener anim = null, CancellationToken ct = default)
-        {
-            await foreach (var t in anim.Tween(0, 1f, ct)) {
-                Apply(t);
-            }
-        }
 
         public void Apply(float t)
         {

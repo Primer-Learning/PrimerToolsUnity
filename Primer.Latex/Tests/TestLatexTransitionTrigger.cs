@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Timeline;
 
@@ -9,32 +9,31 @@ namespace Primer.Latex
         public LatexComponent transitionTo;
 
         private LatexComponent target;
+        private LatexScrubbable scrubbable;
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            scrubbable?.Dispose();
+            scrubbable = null;
+        }
 
         public override void Prepare()
         {
             base.Prepare();
             target = GetComponent<LatexComponent>();
+
+            scrubbable = target.CreateTransition(
+                transitionTo,
+                TransitionType.Remove,
+                TransitionType.Anchor,
+                TransitionType.Replace
+            );
         }
 
-        public async Task Transition()
+        public async UniTask Transition()
         {
-            await target.TransitionTo(
-                transitionTo,
-                new [] {
-                    TransitionType.Transition,
-                    TransitionType.Replace,
-                    TransitionType.Anchor,
-                    TransitionType.Transition,
-                    TransitionType.Replace,
-                    TransitionType.Transition,
-                    TransitionType.Replace,
-                    TransitionType.Transition,
-                    TransitionType.Transition,
-                    TransitionType.Transition,
-                    TransitionType.Replace,
-                },
-                new Tweener(2f)
-            );
+            await scrubbable.Play();
         }
     }
 }

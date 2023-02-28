@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using JetBrains.Annotations;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
@@ -91,15 +91,21 @@ namespace Primer.Latex
 
         // Transitions
 
-        public LatexTransition CreateTransition(LatexComponent transitionTo, IEnumerable<TransitionType> transitions)
+        public LatexScrubbable CreateTransition(LatexComponent transitionTo, params TransitionType[] transitions)
         {
-            return new LatexTransition(this, transitionTo, transitions);
+            return new LatexScrubbable {
+                from = this,
+                to = transitionTo,
+                groups = transitions,
+            };
         }
 
-        public UniTask TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions, Tweener anim = null,
+        public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions, Tweener anim = null,
             CancellationToken ct = default)
         {
-            return CreateTransition(to, transitions).Run(anim, ct);
+            var scrubbable = CreateTransition(to, transitions.ToArray());
+            await scrubbable.Play(anim, ct);
+            return scrubbable;
         }
 
 

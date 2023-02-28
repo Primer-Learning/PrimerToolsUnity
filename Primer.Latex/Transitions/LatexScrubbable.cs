@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -44,10 +48,10 @@ namespace Primer.Latex
         private List<TransitionType> _groups = new();
 
         [ShowInInspector]
-        public List<TransitionType> groups {
+        public IEnumerable<TransitionType> groups {
             get => _groups;
             set {
-                _groups = value ?? new List<TransitionType>();
+                _groups = value?.ToList() ?? new List<TransitionType>();
                 transition = null;
                 UpdateGroupsLength();
             }
@@ -67,7 +71,12 @@ namespace Primer.Latex
                 return _transition;
 
             _transition = new LatexTransition(from, to, groups);
+
+            state = State.Transitioning;
+            from.gameObject.SetActive(false);
+            to.gameObject.SetActive(false);
             from.transform.CopyTo(_transition.transform);
+
             return _transition;
         }
 
@@ -121,6 +130,18 @@ namespace Primer.Latex
             }
         }
 
+        public async UniTask Play(Tweener anim = null, CancellationToken ct = default)
+        {
+            if (!Application.isPlaying) {
+                SetEndState();
+                return;
+            }
+            
+            await foreach (var t in anim.Tween(0, 1f, ct)) {
+                Update(t);
+            }
+        }
+
 
         private void SetInitialState()
         {
@@ -152,12 +173,6 @@ namespace Primer.Latex
 
         private void SetTransitionState(float time)
         {
-            if (state != State.Transitioning) {
-                state = State.Transitioning;
-                from.gameObject.SetActive(false);
-                to.gameObject.SetActive(false);
-            }
-
             transition.Apply(time);
         }
 
@@ -167,11 +182,12 @@ namespace Primer.Latex
                 return;
 
             var length = Mathf.Max(from.groupsCount, to.groupsCount);
-            groups.SetLength(length);
+            _groups.SetLength(length);
         }
 
         public void Dispose()
         {
+            Cleanup();
             _transition?.Dispose();
         }
     }
