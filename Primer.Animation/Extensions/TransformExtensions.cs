@@ -19,6 +19,13 @@ namespace Primer.Animation
             await transform.GetPrimer().ScaleDownToZero(animation);
         }
 
+        // Convenience overload method for scaling to multiples of Vector3.one
+        public static async UniTask ScaleTo(this Transform transform, float newScale,
+            Tweener animation = null, CancellationToken ct = default)
+        {
+            await transform.ScaleTo(newScale * Vector3.one, animation: animation, ct: ct);
+        }
+
         public static async UniTask ScaleTo(this Transform transform, Vector3 newScale,
             Tweener animation = null, CancellationToken ct = default)
         {
