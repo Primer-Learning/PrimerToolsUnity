@@ -52,13 +52,6 @@ namespace Primer.Latex
 
         internal bool isRunning => processor.state == LatexProcessingState.Processing;
 
-        // [NonSerialized]
-        // private LatexTransitionState stateCache;
-        // internal LatexTransitionState state => stateCache ??= new LatexTransitionState(
-        //     this,
-        //     expression.Split(groupIndexes)
-        // );
-
 
         #region Color
         [SerializeField]
@@ -101,25 +94,6 @@ namespace Primer.Latex
             if (this)
                 base.OnValidate();
         }
-
-        // internal LatexTransition CreateTransition(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions)
-        // {
-        //     var currentState = state;
-        //     var targetState = new LatexTransitionState(transitionTo, transitions);
-        //     return new LatexTransition(currentState, targetState, IPrimerAnimation.cubic);
-        // }
-        //
-        // public async UniTask<IDisposable> TransitionTo(LatexRenderer transitionTo, IEnumerable<TransitionType> transitions,
-        //     Tweener anim = null, CancellationToken ct = default)
-        // {
-        //     var transition = CreateTransition(transitionTo, transitions);
-        //
-        //     await foreach (var t in anim.Tween(0, 1f, ct)) {
-        //         transition.Apply(t);
-        //     }
-        //
-        //     return transition;
-        // }
 
 
         #region Latex processing

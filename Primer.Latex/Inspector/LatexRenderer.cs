@@ -75,7 +75,9 @@ namespace Primer.Latex
 
         public void UpdateChildren()
         {
-            if (expression is null || expression.Any(x => x.mesh is null))
+            var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
+
+            if (isExpressionInvalid || transform.gameObject.IsPreset())
                 return;
 
             var children = new ChildrenDeclaration(transform);

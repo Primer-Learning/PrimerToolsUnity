@@ -22,6 +22,11 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
+            if (GUILayout.Button("Convert to LatexComponent")) {
+                ConvertToLatexComponent();
+                return;
+            }
+
             CacheManagement();
 
             Space();
@@ -34,6 +39,17 @@ namespace Primer.Latex.Editor
 
             if (component.expression is not null && !component.expression.isEmpty)
                 RenderGroupDefinition();
+        }
+
+        private void ConvertToLatexComponent()
+        {
+            var go = component.gameObject;
+            var newComponent = go.GetOrAddComponent<LatexComponent>();
+            newComponent.color = component.color;
+            newComponent.material = component.material;
+            newComponent.config = component.config;
+            newComponent.SetGroupIndexes(component.groupIndexes.ToArray());
+            DestroyImmediate(component);
         }
 
         private void CacheManagement()
