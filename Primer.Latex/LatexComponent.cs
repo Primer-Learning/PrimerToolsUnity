@@ -48,14 +48,7 @@ namespace Primer.Latex
 
         public async UniTask Process(LatexInput input)
         {
-            if (isEnabled) {
-                await integration.Process(input);
-                return;
-            }
-
-            OnEnable();
             await integration.Process(input);
-            OnDisable();
         }
 
         // Groups
@@ -109,49 +102,59 @@ namespace Primer.Latex
         }
 
 
-        #region Internals
-        internal bool isEnabled = false;
-
-        internal void OnEnable()
+        #region Unity events
+        private void Reset()
         {
-            if (isEnabled)
-                return;
+            ConnectParts();
+            PatchMaterial();
+        }
 
-            isEnabled = true;
+        // ConnectParts is critical for the component to function.
+        // it's idempotent so it can be called several times without issue.
+        // but if it's not called, the component will not function.
+        private void Awake() => ConnectParts();
+        private void OnEnable() => ConnectParts();
+        private void OnDrawGizmos() => renderer.DrawGizmos();
+        #endregion
+
+
+        #region Internals
+        internal bool isInitialized = false;
+
+        public void ConnectParts()
+        {
+            if (isInitialized)
+                DisconnectParts();
+
+            isInitialized = true;
             groups.onChange += EmitOnChange;
             integration.onChange += EmitOnChange;
 
-            groups.expression = integration.expression;
+            groups.getExpression = () => integration.expression;
             renderer.transform = transform;
             renderer.latexGroups = groups;
 
             integration.Refresh();
         }
 
-        internal void OnDisable()
+        private void DisconnectParts()
         {
-            if (!isEnabled)
+            if (!isInitialized)
                 return;
 
-            isEnabled = false;
+            isInitialized = false;
             groups.onChange -= EmitOnChange;
             integration.onChange -= EmitOnChange;
         }
 
-        private void OnDrawGizmos()
-        {
-            renderer.DrawGizmos();
-        }
-
         private void EmitOnChange()
         {
-            groups.expression = integration.expression;
             renderer.UpdateChildren();
             onChange?.Invoke(expression);
         }
 
         internal static Material defaultMaterial;
-        private void Reset()
+        private void PatchMaterial()
         {
             defaultMaterial ??= AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 
@@ -163,7 +166,6 @@ namespace Primer.Latex
                 renderer.material = defaultMaterial;
             }
         }
-
         #endregion
     }
 }

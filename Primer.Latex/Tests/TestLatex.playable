@@ -25,7 +25,7 @@ MonoBehaviour:
     m_Start: 1
     m_ClipIn: 0
     m_Asset: {fileID: 6359639589694568720}
-    m_Duration: 2
+    m_Duration: 1
     m_TimeScale: 1
     m_ParentTrack: {fileID: -8838086179186489079}
     m_EaseInDuration: 0
@@ -475,7 +475,7 @@ MonoBehaviour:
       data:
         weight: 0
         start: 1
-        duration: 2
+        duration: 1
         _triggerable:
           exposedName: 854c2d8dcd567410a98fa516f0880618
           defaultValue: {fileID: 0}

@@ -22,10 +22,10 @@ namespace Primer.Latex
         public Action onChange;
 
         [NonSerialized]
-        public LatexExpression expression;
+        internal Func<LatexExpression> getExpression;
+        public LatexExpression expression => getExpression?.Invoke();
 
         public List<(int start, int end)> ranges => expression?.CalculateRanges(indexes) ?? new List<(int, int)>();
-        // public IEnumerable<LatexExpression> parts => expression?.Split(indexes);
 
         public void SetGroupIndexes(params int[] values)
         {
