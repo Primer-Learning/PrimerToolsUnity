@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Primer.Animation;
 using Primer.Latex.FakeUnityEngine;
 using Primer.Timeline;
@@ -11,7 +12,7 @@ namespace Primer.Latex
     {
         private LatexTransitionState currentState;
         private LatexTransition currentTransition;
-        private TransformSnapshot? snapshot;
+        private TransformSnapshot snapshot;
 
         public AnimationCurve curve = IPrimerAnimation.cubic;
 
@@ -86,7 +87,7 @@ namespace Primer.Latex
             if (currentState is not null && (currentState != state))
                 RemoveState();
 
-            snapshot?.ApplyTo(state.transform, offsetPosition: initialState.GetOffsetWith(state));
+            snapshot.ApplyTo(state.transform, offsetPosition: initialState.GetOffsetWith(state));
             currentState = state;
         }
 
@@ -99,7 +100,7 @@ namespace Primer.Latex
 
             if (currentTransition is null) {
                 currentTransition = new LatexTransition(state1, state2, curve);
-                snapshot?.ApplyTo(currentTransition.transform, offsetPosition: initialState.GetOffsetWith(state1));
+                snapshot.ApplyTo(currentTransition.transform, offsetPosition: initialState.GetOffsetWith(state1));
             }
 
             currentTransition.Apply(t);
