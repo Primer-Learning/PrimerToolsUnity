@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6949002310091779321}
   - component: {fileID: 903929774222192340}
+  - component: {fileID: -6092298845959530769}
   m_Layer: 0
   m_Name: LaTeX
   m_TagString: Untagged
@@ -39,7 +40,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6949002310091779323}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ec169d5c2b24498d809c626805dc18dd, type: 3}
   m_Name: 
@@ -72,4 +73,63 @@ MonoBehaviour:
   onChange:
     m_PersistentCalls:
       m_Calls: []
-  gizmos: 0
+  _color: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &-6092298845959530769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6949002310091779323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8219815f9854ee5b55ea8f92992bb95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  integration:
+    rid: 5481954517474869302
+  groups:
+    rid: 5481954517474869303
+  renderer:
+    rid: 5481954517474869304
+  onChange:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 5481954517474869302
+      type: {class: LatexCliIntegration, ns: Primer.Latex, asm: Primer.Latex}
+      data:
+        _latex: 
+        _headers:
+        - \documentclass[preview]{standalone}
+        - \usepackage[english]{babel}
+        - \usepackage[utf8]{inputenc}
+        - \usepackage[T1]{fontenc}
+        - \usepackage{amsmath}
+        - \usepackage{amssymb}
+        - \usepackage{dsfont}
+        - \usepackage{setspace}
+        - \usepackage{tipa}
+        - \usepackage{relsize}
+        - \usepackage{textcomp}
+        - \usepackage{mathrsfs}
+        - \usepackage{calligra}
+        - \usepackage{wasysym}
+        - \usepackage{ragged2e}
+        - \usepackage{physics}
+        - \usepackage{xcolor}
+        - \usepackage{microtype}
+        - \usepackage{pifont}
+        - \linespread{1}
+        - \usepackage{concmath-otf}
+    - rid: 5481954517474869303
+      type: {class: LatexGroups, ns: Primer.Latex, asm: Primer.Latex}
+      data:
+        indexes: 
+    - rid: 5481954517474869304
+      type: {class: LatexRenderer, ns: Primer.Latex, asm: Primer.Latex}
+      data:
+        _color: {r: 1, g: 1, b: 1, a: 1}
+        _material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
