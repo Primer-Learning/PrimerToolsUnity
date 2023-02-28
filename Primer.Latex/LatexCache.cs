@@ -6,10 +6,14 @@ namespace Primer.Latex
     public static class LatexCache
     {
         public static void Disable()
-            => LatexProcessingCache.disableCache = true;
+        {
+            LatexProcessingCache.disableCache = true;
+        }
 
         public static void Enable()
-            => LatexProcessingCache.disableCache = false;
+        {
+            LatexProcessingCache.disableCache = false;
+        }
 
         public static async UniTask Preload(params string[] inputs)
         {

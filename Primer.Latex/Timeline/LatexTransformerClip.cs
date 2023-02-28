@@ -14,7 +14,6 @@ namespace Primer.Latex
         [HideInInspector]
         public List<TransitionType> transitions = new();
 
-
         public ClipCaps clipCaps => ClipCaps.Extrapolation | ClipCaps.Blending;
 
 

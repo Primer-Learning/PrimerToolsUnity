@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Primer.Latex
 {
-    abstract internal class ProcessingPipeline : ILatexProcessor
+    internal abstract class ProcessingPipeline : ILatexProcessor
     {
         protected readonly ILatexProcessor processor;
 

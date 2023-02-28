@@ -49,13 +49,13 @@ namespace Primer.Latex
             get => _groups;
             set {
                 _groups = value ?? new List<TransitionType>();
-                UpdateGroupsLength();
                 transition = null;
+                UpdateGroupsLength();
             }
         }
         #endregion
 
-        #region Internal (non-serialized) state
+        #region private LatexTransition transition { get; set; }
         private LatexTransition _transition;
         private LatexTransition transition {
             get => EnsureTransitionExists();

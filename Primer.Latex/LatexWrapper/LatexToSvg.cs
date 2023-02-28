@@ -10,11 +10,11 @@ namespace Primer.Latex
         private static readonly string[] xelatexArguments = {
             "-no-pdf",
             "-interaction=batchmode",
-            "-halt-on-error"
+            "-halt-on-error",
         };
 
         private static readonly string[] dvisvgmArguments = {
-            "--no-fonts=1"
+            "--no-fonts=1",
         };
 
         readonly object executionLock = new();
@@ -43,6 +43,7 @@ namespace Primer.Latex
             var outputPath = dir.GetChildPath("output.svg");
 
             ct.ThrowIfCancellationRequested();
+
             File.WriteAllText(sourcePath, @$"
                 {string.Join(Environment.NewLine, config.headers)}
                 \begin{{document}}
@@ -58,7 +59,7 @@ namespace Primer.Latex
             return File.ReadAllText(outputPath);
         }
 
-        private void ExecuteXelatex(TempDir tmpDir, string sourcePath, CancellationToken ct)
+        private static void ExecuteXelatex(TempDir tmpDir, string sourcePath, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -74,7 +75,7 @@ namespace Primer.Latex
             }
         }
 
-        private void ExecuteDvisvgm(TempDir workingDirectory, string outputPath, CancellationToken ct)
+        private static void ExecuteDvisvgm(TempDir workingDirectory, string outputPath, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -89,12 +90,12 @@ namespace Primer.Latex
             }
         }
 
-        private static void DumpStandardOutputs(TempDir workingDirectory, CliProgram.ExecutionResult result, string name)
+        private static void DumpStandardOutputs(TempDir workingDir, CliProgram.ExecutionResult result, string name)
         {
-            var stdout = workingDirectory.GetChildPath($"{name}.stdout");
+            var stdout = workingDir.GetChildPath($"{name}.stdout");
             File.WriteAllText(stdout, result.stdout);
 
-            var stderr = workingDirectory.GetChildPath($"{name}.stderr");
+            var stderr = workingDir.GetChildPath($"{name}.stderr");
             File.WriteAllText(stderr, result.stderr);
         }
     }

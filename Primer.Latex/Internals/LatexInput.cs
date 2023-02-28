@@ -7,14 +7,19 @@ namespace Primer.Latex
     public sealed record LatexInput(string code, List<string> headers)
     {
         public int GetDeterministicHashCode()
-            => $"{code}_${string.Join(',', headers)}".GetDeterministicHashCode();
+        {
+            return $"{code}_${string.Join(',', headers)}".GetDeterministicHashCode();
+        }
 
-        public bool Equals(LatexInput other) => other != null &&
-                                                code == other.code &&
-                                                // We compare them with == because we want to know if both of them are null
-                                                // or both o them are the same object, in both cases we don't compare their content
-                                                // ReSharper disable once PossibleUnintendedReferenceComparison
-                                                (headers == other.headers || headers.SequenceEqual(other.headers));
+        public bool Equals(LatexInput other)
+        {
+            return other != null
+                && code == other.code
+                // We compare them with == because we want to know if both of them are null
+                // or both o them are the same object, in both cases we don't compare their content
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                && (headers == other.headers || headers.SequenceEqual(other.headers));
+        }
 
         public override int GetHashCode()
         {

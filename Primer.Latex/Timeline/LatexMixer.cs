@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Primer.Animation;
 using Primer.Latex.FakeUnityEngine;
 using Primer.Timeline;
@@ -36,7 +35,7 @@ namespace Primer.Latex
             RemoveState();
         }
 
-        private LatexTransitionState ProcessPlayable(LatexTransformerClip.Playable playable)
+        private static LatexTransitionState ProcessPlayable(LatexTransformerClip.Playable playable)
         {
             var state = playable.state;
             state.transform.gameObject.Hide();

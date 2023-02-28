@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    static internal class VectorUtilsGeometryExtensions
+    internal static class VectorUtilsGeometryExtensions
     {
         public const float SVG_PIXELS_PER_UNIT = 10f;
 
