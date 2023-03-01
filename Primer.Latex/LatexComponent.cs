@@ -139,11 +139,6 @@ namespace Primer.Latex
         //     integration.onChange -= EmitOnChange;
         // }
 
-        private void Log(params object[] args)
-        {
-            PrimerLogger.Log(transform.gameObject.name, args);
-        }
-
         private void EmitOnChange()
         {
             renderer.UpdateChildren();
@@ -164,8 +159,7 @@ namespace Primer.Latex
             }
         }
 
-        [Title("Controls")]
-        // [ButtonGroup("Children group")]
+        [ButtonGroup("Children group")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
         [ContextMenu("PRIMER > Update children")]
         internal void UpdateChildren()
@@ -173,7 +167,7 @@ namespace Primer.Latex
             renderer.UpdateChildren();
         }
 
-        // [ButtonGroup("Children group")]
+        [ButtonGroup("Children group")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
         [ContextMenu("PRIMER > Regenerate children")]
         protected virtual void RegenerateChildren()
