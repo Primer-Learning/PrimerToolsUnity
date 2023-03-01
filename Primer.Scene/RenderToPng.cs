@@ -14,6 +14,7 @@ namespace Primer.Scene
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
+        public int frameRate = 60;
         internal int framesSaved = 0;
 
         internal static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
@@ -34,6 +35,7 @@ namespace Primer.Scene
 
         private void Start()
         {
+            Time.captureFramerate = 60;
             destinationDirectory = GetContainerDirectory();
         }
 
