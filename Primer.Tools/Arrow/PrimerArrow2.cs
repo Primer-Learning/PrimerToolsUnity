@@ -14,12 +14,12 @@ namespace Primer.Tools
         private float startArrowLength;
         private float endArrowLength;
 
-        [Required, ChildGameObjectsOnly]
-        public Transform shaft;
-        [Required, ChildGameObjectsOnly]
-        public Transform head;
-        [Required, ChildGameObjectsOnly]
-        public Transform tail;
+        [SerializeField, PrefabChild]
+        private Transform shaft;
+        [SerializeField, PrefabChild]
+        private Transform head;
+        [SerializeField, PrefabChild]
+        private Transform tail;
 
         [Title("Positioning")]
         [DisableIf("@startTracker != null || endTracker != null")]
