@@ -81,6 +81,17 @@ namespace Primer.Latex
             return renderer.TweenColor(newColor, anim, ct);
         }
 
+        public void SetColorInGroups(Color groupColor, params int[] groupIndexes)
+        {
+            renderer.SetColorInGroups(groupColor, groupIndexes);
+        }
+
+        public UniTask TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes, Tweener anim = null,
+            CancellationToken ct = default)
+        {
+            return renderer.TweenColorInGroups(groupColor, groupIndexes, anim, ct);
+        }
+
         // Transitions
 
         public LatexScrubbable CreateTransition(LatexComponent transitionTo, params TransitionType[] transitions)

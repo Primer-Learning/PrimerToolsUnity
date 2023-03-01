@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
-using UnityEditor.Presets;
 using UnityEngine;
 
 namespace Primer.Latex
@@ -54,6 +53,34 @@ namespace Primer.Latex
         private LatexExpression expression => latexGroups?.expression;
         private MeshRenderer[] meshRenderers => transform.GetComponentsInChildren<MeshRenderer>();
 
+
+        public void SetColorInGroups(Color groupColor, params int[] groupIndexes)
+        {
+            var children = groupIndexes
+                .Select(index => transform.GetChild(index))
+                .SelectMany(group => group.GetComponentsInChildren<MeshRenderer>());
+
+            foreach (var child in children)
+                child.SetColor(groupColor);
+        }
+
+        public async UniTask TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes, Tweener animation = null, CancellationToken ct = default)
+        {
+            var children = groupIndexes
+                .Select(index => transform.GetChild(index))
+                .SelectMany(group => group.GetComponentsInChildren<MeshRenderer>())
+                .ToArray();
+
+            await foreach (var lerpedColor in animation.Tween(color, groupColor, ct)) {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                color = lerpedColor;
+
+                foreach(var child in children)
+                    child.SetColor(lerpedColor);
+            }
+        }
 
         public async UniTask TweenColor(Color newColor, Tweener animation = null, CancellationToken ct = default)
         {
