@@ -11,15 +11,13 @@ namespace Primer.Scene
         private Camera cameraCache;
         internal Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
 
-
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         internal int framesSaved = 0;
 
-
-        internal static string defaultOutDir => Directory.GetCurrentDirectory();
-
+        internal static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
+        private string destinationDirectory;
 
         private void Update()
         {
@@ -29,15 +27,18 @@ namespace Primer.Scene
             }
 
             framesSaved++;
-
-            var dirname = GetContainerDirectory();
-            var path = Path.Combine(dirname, $"{framesSaved:000000}.png");
+            var path = Path.Combine(destinationDirectory, $"{framesSaved:000000}.png");
 
             RenderToPNG(path, resolutionWidth, resolutionHeight);
         }
 
+        private void Start()
+        {
+            destinationDirectory = GetContainerDirectory();
+        }
 
-        private readonly List<string> createdDirs = new();
+
+        // private readonly List<string> createdDirs = new();
         private string GetContainerDirectory()
         {
             var outDir = string.IsNullOrWhiteSpace(frameOutDir)
@@ -45,14 +46,21 @@ namespace Primer.Scene
                 : frameOutDir;
 
             var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
-            var path = Path.Combine(outDir, "png", dirname);
+            var scenePath = Path.Combine(outDir, "png", dirname);
 
-            if (!createdDirs.Contains(path)) {
-                Directory.CreateDirectory(path);
-                createdDirs.Add(path);
+            // Make a folder specifically for this take
+            var takeCount = 0;
+            var takesString = "take 1";
+            var takePath = Path.Combine(scenePath, takesString);
+            // Increment the folder number until one doesn't exist, 
+            while (Directory.Exists(takePath)) {
+                takeCount++;
+                takesString = $"take {takeCount + 1}";
+                takePath = Path.Combine(scenePath, takesString);
             }
+            Directory.CreateDirectory(takePath);
 
-            return path;
+            return takePath;
         }
 
         internal void RenderToPNG(string path, int resWidth, int resHeight)
