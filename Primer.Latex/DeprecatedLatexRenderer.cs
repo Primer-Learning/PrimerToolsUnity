@@ -157,7 +157,10 @@ namespace Primer.Latex
 
         protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
         {
-            if (expression is null || expression.Any(x => x.mesh is null)) {
+            var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
+            var isObsolete = !enabled && GetComponent<LatexComponent>()?.enabled == true;
+
+            if (isExpressionInvalid || isObsolete) {
                 CancelCurrentUpdate();
                 return;
             }

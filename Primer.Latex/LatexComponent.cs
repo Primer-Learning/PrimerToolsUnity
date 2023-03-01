@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -119,32 +118,30 @@ namespace Primer.Latex
 
 
         #region Internals
-        internal bool isInitialized = false;
-
         public void ConnectParts()
         {
-            if (isInitialized)
-                DisconnectParts();
-
-            isInitialized = true;
-            groups.onChange += EmitOnChange;
-            integration.onChange += EmitOnChange;
-
             groups.getExpression = () => integration.expression;
             renderer.transform = transform;
             renderer.latexGroups = groups;
 
+            if (groups.onChange != null && integration.onChange != null)
+                return;
+
+            groups.onChange += EmitOnChange;
+            integration.onChange += EmitOnChange;
+
             integration.Refresh();
         }
 
-        private void DisconnectParts()
-        {
-            if (!isInitialized)
-                return;
+        // private void DisconnectParts()
+        // {
+        //     groups.onChange -= EmitOnChange;
+        //     integration.onChange -= EmitOnChange;
+        // }
 
-            isInitialized = false;
-            groups.onChange -= EmitOnChange;
-            integration.onChange -= EmitOnChange;
+        private void Log(params object[] args)
+        {
+            PrimerLogger.Log(transform.gameObject.name, args);
         }
 
         private void EmitOnChange()
