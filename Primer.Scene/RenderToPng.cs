@@ -15,6 +15,7 @@ namespace Primer.Scene
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         public int frameRate = 60;
+        public int maxFrames = 0;
         internal int framesSaved = 0;
 
         internal static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
@@ -31,11 +32,15 @@ namespace Primer.Scene
             var path = Path.Combine(destinationDirectory, $"{framesSaved:000000}.png");
 
             RenderToPNG(path, resolutionWidth, resolutionHeight);
+            if (maxFrames > 0 && framesSaved >= maxFrames)
+            {
+                UnityEditor.EditorApplication.ExitPlaymode();
+            }
         }
 
         private void Start()
         {
-            Time.captureFramerate = 60;
+            Time.captureFramerate = frameRate;
             destinationDirectory = GetContainerDirectory();
         }
 
