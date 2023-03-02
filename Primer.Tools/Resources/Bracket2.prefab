@@ -542,22 +542,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef9bd0af15f114a9ab460660fa93bfc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scaler: {fileID: 0}
   leftTip: {fileID: 5988512013839784344}
   leftBar: {fileID: 7411166658595784750}
-  leftCenter: {fileID: 4343474462309398913}
-  rightCenter: {fileID: 1082246025138073104}
   rightBar: {fileID: 6358706490595045722}
   rightTip: {fileID: 3430032377415060528}
-  anchor:
+  anchorPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}
     _value: {x: 0, y: 0, z: 0}
-  left:
+  leftPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}
     _value: {x: -1, y: 0, z: 1}
-  right:
+  rightPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}
     _value: {x: 1, y: 0, z: 1}

@@ -11,10 +11,6 @@ namespace Primer.Tools
         [SerializeField, PrefabChild]
         private Transform leftBar;
         [SerializeField, PrefabChild]
-        private Transform leftCenter;
-        [SerializeField, PrefabChild]
-        private Transform rightCenter;
-        [SerializeField, PrefabChild]
         private Transform rightBar;
         [SerializeField, PrefabChild]
         private Transform rightTip;
@@ -49,9 +45,11 @@ namespace Primer.Tools
             }
         }
 
+        // This method is marked as performance intensive because it logs a warning 🤦
+        // ReSharper disable Unity.PerformanceAnalysis
         [Title("Controls", horizontalLine: false)]
         [Button("Refresh")]
-        private void Refresh()
+        public void Refresh()
         {
             var self = transform;
             var parent = self.parent;
@@ -70,16 +68,18 @@ namespace Primer.Tools
             var forward = Vector3.Cross(upwards, mouth);
             var center = Vector3.Project(toLeft, forward);
 
-            var leftLength = (toLeft - center).magnitude;
-            var rightLength = (toRight - center).magnitude;
+            var leftTipSize = leftBar.localPosition.x;
+            var rightTipSize = rightBar.localPosition.x;
+            var leftLength = (toLeft - center).magnitude - Mathf.Abs(leftTipSize * 2);
+            var rightLength = (toRight - center).magnitude - Mathf.Abs(rightTipSize * 2);
 
-            if (leftLength < 0.01f || rightLength < 0.01f) {
+            if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude) {
                 Debug.LogWarning("Refusing to render a broken-looking bracket");
                 return;
             }
 
-            leftBar.localScale = new Vector3(leftLength - Mathf.Abs(leftBar.localPosition.x * 2), 1, 1);
-            rightBar.localScale = new Vector3(rightLength - Mathf.Abs(rightBar.localPosition.x * 2), 1, 1);
+            leftBar.localScale = new Vector3(leftLength, 1, 1);
+            rightBar.localScale = new Vector3(rightLength, 1, 1);
 
             self.rotation = Quaternion.LookRotation(forward,  upwards);
             self.localScale = new Vector3(1, 1, center.magnitude);
@@ -87,13 +87,6 @@ namespace Primer.Tools
             self.position = anchorPoint.GetWorldPosition(parent);
             leftTip.position = leftPoint.GetWorldPosition(parent);
             rightTip.position = rightPoint.GetWorldPosition(parent);
-        }
-
-
-        private void SetBarLength(Transform bar, float length)
-        {
-            var scale = bar.localScale;
-            bar.localScale = new Vector3(length, scale.y, scale.z);
         }
     }
 }

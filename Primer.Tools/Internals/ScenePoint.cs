@@ -73,11 +73,6 @@ namespace Primer.Tools
 
         public bool isTracking => _follow != null;
 
-        public bool isLocalPosition {
-            get => !isWorldPosition;
-            set => isWorldPosition = !value;
-        }
-
 
         public bool CheckTrackedObject(bool emitOnChange = true)
         {
@@ -123,20 +118,6 @@ namespace Primer.Tools
 
         // Statics
 
-        public static void Listen(Action listener, params ScenePoint[] points)
-        {
-            for (var i = 0; i < points.Length; i++) {
-                points[i].onChange = listener;
-            }
-        }
-
-        public static void StopListening(params ScenePoint[] points)
-        {
-            for (var i = 0; i < points.Length; i++) {
-                points[i].onChange = null;
-            }
-        }
-
         public static bool CheckTrackedObject(params ScenePoint[] points)
         {
             var hasChanges = false;
@@ -149,29 +130,6 @@ namespace Primer.Tools
             return hasChanges;
         }
 
-        public static Vector3[] GetRelativeValues(Transform parent, params ScenePoint[] points)
-        {
-            var worldPositions = 0;
-
-            for (var i = 0; i < points.Length; i++) {
-                if (points[i].isWorldPosition)
-                    worldPositions++;
-                else
-                    worldPositions--;
-            }
-
-            var useWorldPosition = worldPositions > 0;
-            var values = new Vector3[points.Length];
-
-            for (var i = 0; i < points.Length; i++) {
-                values[i] = useWorldPosition
-                    ? points[i].GetWorldPosition(parent)
-                    : points[i].GetLocalPosition(parent);
-            }
-
-            return values;
-        }
-
         // Operators
 
         public static implicit operator Vector3(ScenePoint point)
@@ -182,11 +140,6 @@ namespace Primer.Tools
         public static implicit operator ScenePoint(Vector3 value)
         {
             return new ScenePoint { value = value };
-        }
-
-        public static Vector3 operator -(ScenePoint a, ScenePoint b)
-        {
-            return a.value - b.value;
         }
     }
 }
