@@ -141,5 +141,21 @@ namespace Primer.Tools
         {
             return new ScenePoint { value = value };
         }
+
+#if UNITY_EDITOR
+        public bool DrawHandle(Transform parent)
+        {
+            var current = GetWorldPosition(parent);
+            var newValue = UnityEditor.Handles.PositionHandle(current, Quaternion.identity);
+
+            if (newValue == current)
+                return false;
+
+            StopTracking();
+            _isWorldPosition = true;
+            _value = newValue;
+            return true;
+        }
+#endif
     }
 }
