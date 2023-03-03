@@ -5,6 +5,7 @@ using UnityEngine;
 namespace Primer.Tools
 {
     [Serializable]
+    [HideLabel]
     [InlineProperty]
     public class ScenePoint
     {

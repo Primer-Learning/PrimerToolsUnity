@@ -15,17 +15,22 @@ namespace Primer.Tools
         [SerializeField, PrefabChild]
         private Transform rightTip;
 
-        [HideLabel, Title("Anchor")]
+        [Title("Anchor")]
         public ScenePoint anchorPoint = Vector3.zero;
 
-        [HideLabel, Title("Left")]
+        [Title("Left")]
         public ScenePoint leftPoint = new Vector3(-1, 0, 1);
 
-        [HideLabel, Title("Right")]
+        [Title("Right")]
         public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
         private void OnEnable()
         {
+            // TODO: Scheduler doesn't work
+            // var scheduler = new Scheduler(Refresh);
+            // anchorPoint.onChange = scheduler.Schedule;
+            // leftPoint.onChange = scheduler.Schedule;
+            // rightPoint.onChange = scheduler.Schedule;
             anchorPoint.onChange = Refresh;
             leftPoint.onChange = Refresh;
             rightPoint.onChange = Refresh;
@@ -51,6 +56,9 @@ namespace Primer.Tools
         [Button("Refresh")]
         public void Refresh()
         {
+            if (leftTip == null || leftBar == null || rightBar == null || rightTip == null || gameObject.IsPreset())
+                return;
+
             var self = transform;
             var parent = self.parent;
 

@@ -20,30 +20,18 @@ namespace Primer.Tools.Editor
         protected virtual void OnSceneGUI()
         {
             var arrow = (PrimerArrow2)target;
-            var modifier = arrow.globalPositioning
-                ? Vector3.zero
-                : arrow.transform.parent?.position ?? Vector3.zero;
+            var parent = arrow.transform.parent;
 
             EditorGUI.BeginChangeCheck();
 
-            var start = arrow.start + modifier;
-            var end = arrow.end + modifier;
-
-            if (arrow.startTracker is null) {
-                start = Handles.PositionHandle(start, Quaternion.identity);
-            }
-
-            if (arrow.endTracker is null) {
-                end = Handles.PositionHandle(end, Quaternion.identity);
-            }
+            arrow.startPoint.DrawHandle(parent);
+            arrow.endPoint.DrawHandle(parent);
 
             if (!EditorGUI.EndChangeCheck())
                 return;
 
             Undo.RecordObject(arrow, "Change start / end");
-            arrow.start = start - modifier;
-            arrow.end = end - modifier;
-            arrow.OnValidate();
+            arrow.Recalculate();
         }
     }
 }

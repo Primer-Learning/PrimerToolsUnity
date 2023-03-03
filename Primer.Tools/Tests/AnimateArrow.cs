@@ -21,10 +21,10 @@ namespace Primer.Tools.Tests
             arrow = GetComponent<PrimerArrow2>();
 
             if (startInitial is not null)
-                arrow.start = startInitial.Value;
+                arrow.startPoint.value = startInitial.Value;
 
             if (endInitial is not null)
-                arrow.end = endInitial.Value;
+                arrow.endPoint.value = endInitial.Value;
 
             arrow.Recalculate();
         }
