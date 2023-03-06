@@ -1,15 +1,48 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Primer
 {
     [Serializable]
-    public class RuntimeList<T> : ScriptableObject, IList<T>
+    public abstract class RuntimeList<T> : ScriptableObject, IList<T>
     {
         public List<T> items = new();
+        private FileStorage<List<T>> file;
 
+        /// <summary>
+        /// Use this method only to call .CreateStorage(), C# will do the rest
+        /// </summary>
+        protected abstract void Initialize();
+
+        protected void CreateStorage([CallerFilePath] string scriptPath = null)
+        {
+            file ??= FileStorage<List<T>>.CreateForScript(scriptPath, "bin", new List<T>());
+        }
+
+        protected virtual void OnEnable() => ReadFromDisk();
+        protected virtual void OnDisable() => WriteToDisk();
+
+        protected void ReadFromDisk()
+        {
+            if (file is null)
+                Initialize();
+
+            items = file!.Read();
+        }
+
+        protected void WriteToDisk()
+        {
+            if (file is null)
+                Initialize();
+
+            file!.Write(items);
+        }
+
+
+        #region IList implementation
         public int Count => items.Count;
         public bool IsReadOnly => false;
 
@@ -30,5 +63,6 @@ namespace Primer
 
         public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        #endregion
     }
 }
