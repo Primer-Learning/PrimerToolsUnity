@@ -40,7 +40,7 @@ namespace Primer.Timeline
                 await UniTask.Delay(Mathf.RoundToInt(seconds * 1000));
         }
 
-        protected static async UniTask Parallel(params UniTask[] processes)
+        public static async UniTask Parallel(params UniTask[] processes)
         {
             await UniTask.WhenAll(processes);
         }
