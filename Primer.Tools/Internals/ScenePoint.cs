@@ -7,7 +7,7 @@ namespace Primer.Tools
     [Serializable]
     [HideLabel]
     [InlineProperty]
-    public class ScenePoint
+    public struct ScenePoint
     {
         #region bool isWorldPosition;
         [SerializeField, HideInInspector]
