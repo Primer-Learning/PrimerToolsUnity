@@ -544,8 +544,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftTip: {fileID: 5988512013839784344}
   leftBar: {fileID: 7411166658595784750}
+  leftCenter: {fileID: 4343474462309398913}
+  rightCenter: {fileID: 1082246025138073104}
   rightBar: {fileID: 6358706490595045722}
   rightTip: {fileID: 3430032377415060528}
+  _width: 1
   anchorPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}

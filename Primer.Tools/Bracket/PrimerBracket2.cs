@@ -11,9 +11,33 @@ namespace Primer.Tools
         [SerializeField, PrefabChild]
         private Transform leftBar;
         [SerializeField, PrefabChild]
+        private Transform leftCenter;
+        [SerializeField, PrefabChild]
+        private Transform rightCenter;
+        [SerializeField, PrefabChild]
         private Transform rightBar;
         [SerializeField, PrefabChild]
         private Transform rightTip;
+
+        #region public float width;
+        [SerializeField, HideInInspector]
+        private float _width = 1f;
+
+        [ShowInInspector]
+        [PropertyOrder(-1)]
+        [PropertyRange(0.01f, 10f)]
+        public float width {
+            get => _width;
+            set {
+                _width = value;
+                Refresh();
+            }
+        }
+        #endregion
+
+        [Title("Details")]
+        [PropertyOrder(-1)]
+        public float tipWidth = 0.39f;
 
         [Title("Anchor")]
         public ScenePoint anchorPoint = Vector3.zero;
@@ -24,13 +48,25 @@ namespace Primer.Tools
         [Title("Right")]
         public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
+        public Vector3 anchor {
+            get => anchorPoint.value;
+            set => anchorPoint.value = value;
+        }
+
+        public Vector3 left {
+            get => leftPoint.value;
+            set => leftPoint.value = value;
+        }
+
+        public Vector3 right {
+            get => rightPoint.value;
+            set => rightPoint.value = value;
+        }
+
+
+        #region Unity events
         private void OnEnable()
         {
-            // TODO: Scheduler doesn't work
-            // var scheduler = new Scheduler(Refresh);
-            // anchorPoint.onChange = scheduler.Schedule;
-            // leftPoint.onChange = scheduler.Schedule;
-            // rightPoint.onChange = scheduler.Schedule;
             anchorPoint.onChange = Refresh;
             leftPoint.onChange = Refresh;
             rightPoint.onChange = Refresh;
@@ -43,12 +79,19 @@ namespace Primer.Tools
             rightPoint.onChange = null;
         }
 
+        private void OnValidate()
+        {
+            Refresh();
+        }
+
         private void Update()
         {
             if (ScenePoint.CheckTrackedObject(anchorPoint, leftPoint, rightPoint)) {
                 Refresh();
             }
         }
+        #endregion
+
 
         // This method is marked as performance intensive because it logs a warning 🤦
         // ReSharper disable Unity.PerformanceAnalysis
@@ -62,24 +105,22 @@ namespace Primer.Tools
             var self = transform;
             var parent = self.parent;
 
-            var anchor = anchorPoint.GetLocalPosition(parent);
-            var left = leftPoint.GetLocalPosition(parent);
-            var right = rightPoint.GetLocalPosition(parent);
+            var anchorLocal = anchorPoint.GetLocalPosition(parent);
+            var leftLocal = leftPoint.GetLocalPosition(parent);
+            var rightLocal = rightPoint.GetLocalPosition(parent);
 
             // mouth is the open side of the bracket
-            var mouth = left - right;
-            var toLeft = left - anchor;
-            var toRight = right - anchor;
+            var mouth = leftLocal - rightLocal;
+            var toLeft = leftLocal - anchorLocal;
+            var toRight = rightLocal - anchorLocal;
 
             // Cross returns a vector that is orthogonal (perpendicular) to both input parameters
             var upwards = Vector3.Cross(toLeft, toRight);
             var forward = Vector3.Cross(upwards, mouth);
             var center = Vector3.Project(toLeft, forward);
 
-            var leftTipSize = leftBar.localPosition.x;
-            var rightTipSize = rightBar.localPosition.x;
-            var leftLength = (toLeft - center).magnitude - Mathf.Abs(leftTipSize * 2);
-            var rightLength = (toRight - center).magnitude - Mathf.Abs(rightTipSize * 2);
+            var leftLength = BarLength(toLeft, center);
+            var rightLength = BarLength(toRight, center);
 
             if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude) {
                 Debug.LogWarning("Refusing to render a broken-looking bracket");
@@ -90,11 +131,20 @@ namespace Primer.Tools
             rightBar.localScale = new Vector3(rightLength, 1, 1);
 
             self.rotation = Quaternion.LookRotation(forward,  upwards);
-            self.localScale = new Vector3(1, 1, center.magnitude);
+            var stemToLine = center.magnitude;
+            self.localScale = new Vector3(width, width, stemToLine);
 
             self.position = anchorPoint.GetWorldPosition(parent);
             leftTip.position = leftPoint.GetWorldPosition(parent);
             rightTip.position = rightPoint.GetWorldPosition(parent);
+        }
+
+        private float BarLength(Vector3 toSide, Vector3 center)
+        {
+            var diff = toSide - center;
+            var distance = diff.magnitude;
+            var tipsWidth = tipWidth * width * 2;
+            return (distance - tipsWidth) / width;
         }
     }
 }
