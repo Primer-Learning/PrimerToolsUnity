@@ -16,7 +16,7 @@ namespace Primer.Latex
     [DisableContextMenu]
     [HideReferenceObjectPicker]
     [Title("Rendering")]
-    internal class LatexRenderer
+    internal class LatexRenderer : IMeshRendererController
     {
         [SerializeField]
         [HideInInspector]
@@ -27,9 +27,7 @@ namespace Primer.Latex
             get => _color;
             set {
                 _color = value;
-
-                foreach (var mesh in meshRenderers)
-                    mesh.SetColor(value);
+                this.SetColor(value);
             }
         }
 
@@ -37,12 +35,10 @@ namespace Primer.Latex
         private Material _material;
 
         public Material material {
-            get => _material ??= LatexComponent.defaultMaterial;
+            get => _material ??= IMeshRendererController.defaultMaterial;
             set {
                 _material = value;
-
-                foreach (var mesh in meshRenderers)
-                    mesh.material = value;
+                this.SetMaterial(value);
             }
         }
 
@@ -51,7 +47,8 @@ namespace Primer.Latex
         [NonSerialized] internal LatexGroups latexGroups;
 
         private LatexExpression expression => latexGroups?.expression;
-        private MeshRenderer[] meshRenderers => transform.GetComponentsInChildren<MeshRenderer>();
+
+        MeshRenderer[] IMeshRendererController.meshRenderers => transform.GetComponentsInChildren<MeshRenderer>();
 
 
         public void SetColorInGroups(Color groupColor, params int[] groupIndexes)
@@ -72,24 +69,6 @@ namespace Primer.Latex
                 .ToArray();
 
             await foreach (var lerpedColor in animation.Tween(color, groupColor, ct)) {
-                if (ct.IsCancellationRequested)
-                    return;
-
-                color = lerpedColor;
-
-                foreach(var child in children)
-                    child.SetColor(lerpedColor);
-            }
-        }
-
-        public async UniTask TweenColor(Color newColor, Tweener animation = null, CancellationToken ct = default)
-        {
-            if (color == newColor)
-                return;
-
-            var children = meshRenderers;
-
-            await foreach (var lerpedColor in animation.Tween(color, newColor, ct)) {
                 if (ct.IsCancellationRequested)
                     return;
 

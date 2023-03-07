@@ -156,6 +156,144 @@ MonoBehaviour:
     m_Recordable: 0
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: "\u2261 TestBracketSequence.Run()"
+  - m_Version: 1
+    m_Start: 2.3
+    m_ClipIn: 0
+    m_Asset: {fileID: 1389019048975219563}
+    m_Duration: 1
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -8163291683991813681}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: "\u2261 TestBracketSequence.Run()"
+  - m_Version: 1
+    m_Start: 3.3
+    m_ClipIn: 0
+    m_Asset: {fileID: -1217074105560439647}
+    m_Duration: 1
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -8163291683991813681}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: Infinity
     m_PreExtrapolationTime: 0
     m_DisplayName: "\u2261 TestBracketSequence.Run()"
@@ -218,6 +356,62 @@ MonoBehaviour:
           defaultValue: {fileID: 0}
         sequenceMethod:
           methodName: Run
+--- !u!114 &-1217074105560439647
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d75f479224a4bd48cc44c29195bc4f, type: 3}
+  m_Name: GenericClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  kind: 2
+  scrubbable:
+    rid: 6955339208335294467
+  triggerable:
+    rid: 6955339208335294468
+  sequential:
+    rid: 6955339208335294469
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6955339208335294467
+      type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0.3
+        duration: 1
+        scrubbable:
+          rid: -2
+        scrubbableMethod:
+          methodName: 
+    - rid: 6955339208335294468
+      type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0
+        duration: 0
+        _triggerable:
+          exposedName: 3b5d7b6940b4c4dccaf042b696bca262
+          defaultValue: {fileID: 0}
+        triggerMethod:
+          methodName: 
+    - rid: 6955339208335294469
+      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 3.3
+        duration: 1
+        _sequence:
+          exposedName: 2579dcfb9983245e0972214179b3b13f
+          defaultValue: {fileID: 0}
+        sequenceMethod:
+          methodName: Run
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,6 +433,62 @@ MonoBehaviour:
     m_ScenePreview: 1
   m_DurationMode: 0
   m_MarkerTrack: {fileID: 0}
+--- !u!114 &1389019048975219563
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d75f479224a4bd48cc44c29195bc4f, type: 3}
+  m_Name: GenericClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  kind: 2
+  scrubbable:
+    rid: 6955339208335294467
+  triggerable:
+    rid: 6955339208335294468
+  sequential:
+    rid: 6955339208335294469
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6955339208335294467
+      type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0.3
+        duration: 1
+        scrubbable:
+          rid: -2
+        scrubbableMethod:
+          methodName: 
+    - rid: 6955339208335294468
+      type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0
+        duration: 0
+        _triggerable:
+          exposedName: 9a27230c08685455897f3ee8f34ccb6f
+          defaultValue: {fileID: 0}
+        triggerMethod:
+          methodName: 
+    - rid: 6955339208335294469
+      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 2.3
+        duration: 1
+        _sequence:
+          exposedName: 3073fd46d7d5b4c978ee31ab9a34ab60
+          defaultValue: {fileID: 0}
+        sequenceMethod:
+          methodName: Run
 --- !u!114 &4887293878168114275
 MonoBehaviour:
   m_ObjectHideFlags: 1

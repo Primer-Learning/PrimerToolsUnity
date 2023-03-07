@@ -13,7 +13,7 @@ namespace Primer.Latex
 {
     [ExecuteAlways]
     [AddComponentMenu("Primer / LaTeX")]
-    public class LatexComponent : MonoBehaviour
+    public class LatexComponent : MonoBehaviour, IMeshRendererController
     {
         [SerializeReference] private LatexCliIntegration integration = new();
         [SerializeReference] private LatexGroups groups = new();
@@ -21,6 +21,8 @@ namespace Primer.Latex
 
         [Title("Events")]
         public UnityEvent<LatexExpression> onChange = new();
+
+        MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
 
         // Processing
 
@@ -74,11 +76,6 @@ namespace Primer.Latex
         public Material material {
             get => renderer.material;
             set => renderer.material = value;
-        }
-
-        public UniTask TweenColor(Color newColor, Tweener anim = null, CancellationToken ct = default)
-        {
-            return renderer.TweenColor(newColor, anim, ct);
         }
 
         public void SetColorInGroups(Color groupColor, params int[] groupIndexes)
@@ -156,17 +153,14 @@ namespace Primer.Latex
             onChange?.Invoke(expression);
         }
 
-        internal static Material defaultMaterial;
         private void PatchMaterial()
         {
-            defaultMaterial ??= AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
-
             // A default preset will automatically get applied when we're reset.
             // If we unconditionally set material here, we'll blow away the value it set.
             var presets = Preset.GetDefaultPresetsForObject(this);
 
             if (renderer.material is null || presets.All(preset => preset.excludedProperties.Contains("material"))) {
-                renderer.material = defaultMaterial;
+                renderer.material = IMeshRendererController.defaultMaterial;
             }
         }
 

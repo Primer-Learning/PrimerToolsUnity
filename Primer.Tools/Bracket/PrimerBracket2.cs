@@ -1,11 +1,15 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Tools
 {
     [ExecuteAlways]
-    public class PrimerBracket2 : MonoBehaviour
+    public class PrimerBracket2 : MonoBehaviour, IMeshRendererController
     {
+        #region Children objects
         [SerializeField, PrefabChild]
         private Transform leftTip;
         [SerializeField, PrefabChild]
@@ -18,6 +22,7 @@ namespace Primer.Tools
         private Transform rightBar;
         [SerializeField, PrefabChild]
         private Transform rightTip;
+        #endregion
 
         #region public float width;
         [SerializeField, HideInInspector]
@@ -35,33 +40,71 @@ namespace Primer.Tools
         }
         #endregion
 
+        #region public Color color;
+        [SerializeField, HideInInspector]
+        private Color _color = Color.white;
+
+        [ShowInInspector]
+        [PropertyOrder(-1)]
+        public Color color {
+            get => _color;
+            set {
+                _color = value;
+                this.SetColor(value);
+            }
+        }
+        #endregion
+
+        #region public Material material;
+        [SerializeField, HideInInspector]
+        private Material _material;
+
+        [ShowInInspector]
+        [PropertyOrder(-1)]
+        public Material material {
+            get => _material ??= IMeshRendererController.defaultMaterial;
+            set {
+                _material = value;
+                this.SetMaterial(value);
+            }
+        }
+        #endregion
+
         [Title("Details")]
         [PropertyOrder(-1)]
         public float tipWidth = 0.39f;
 
+        #region public Vector3 anchor;
         [Title("Anchor")]
         public ScenePoint anchorPoint = Vector3.zero;
-
-        [Title("Left")]
-        public ScenePoint leftPoint = new Vector3(-1, 0, 1);
-
-        [Title("Right")]
-        public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
         public Vector3 anchor {
             get => anchorPoint.value;
             set => anchorPoint.value = value;
         }
+        #endregion
+
+        #region public Vector3 left;
+        [Title("Left")]
+        public ScenePoint leftPoint = new Vector3(-1, 0, 1);
 
         public Vector3 left {
             get => leftPoint.value;
             set => leftPoint.value = value;
         }
+        #endregion
+
+        #region public Vector3 right;
+        [Title("Right")]
+        public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
         public Vector3 right {
             get => rightPoint.value;
             set => rightPoint.value = value;
         }
+        #endregion
+
+        MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
 
 
         #region Unity events
@@ -92,6 +135,53 @@ namespace Primer.Tools
         }
         #endregion
 
+
+        public void SetPoints(Vector3? anchor = null, Vector3? left = null, Vector3? right = null, bool? isGlobal = null)
+        {
+            if (anchor.HasValue) this.anchor = anchor.Value;
+            if (left.HasValue) this.left = left.Value;
+            if (right.HasValue) this.right = right.Value;
+
+            if (!isGlobal.HasValue)
+                return;
+
+            anchorPoint.isWorldPosition = isGlobal.Value;
+            leftPoint.isWorldPosition = isGlobal.Value;
+            rightPoint.isWorldPosition = isGlobal.Value;
+        }
+
+        public async UniTask Animate(Vector3? anchor = null, Vector3? left = null, Vector3? right = null,
+            Tweener animation = null, CancellationToken ct = default)
+        {
+            var anchorStart = this.anchor;
+            var leftStart = this.left;
+            var rightStart = this.right;
+            var anchorEnd = anchor ?? anchorStart;
+            var leftEnd = left ?? leftStart;
+            var rightEnd = right ?? rightStart;
+
+            if (this.anchor == anchorEnd && this.left == leftEnd && this.right == rightEnd)
+                return;
+
+            if (!Application.isPlaying) {
+                this.anchor = anchorEnd;
+                this.left = leftEnd;
+                this.right = rightEnd;
+                return;
+            }
+
+            await foreach (var t in animation.Tween(0, 1f, ct)) {
+                if (ct.IsCancellationRequested) return;
+
+                var updatedAnchor = anchorPoint.isTracking ? anchorPoint.value : anchorStart;
+                var updatedLeft = leftPoint.isTracking ? leftPoint.value : leftStart;
+                var updatedRight = rightPoint.isTracking ? rightPoint.value : rightStart;
+
+                anchorPoint.value = Vector3.Lerp(updatedAnchor, anchor ?? updatedAnchor, t);
+                leftPoint.value = Vector3.Lerp(updatedLeft, left ?? updatedLeft, t);
+                rightPoint.value = Vector3.Lerp(updatedRight, right ?? updatedRight, t);
+            }
+        }
 
         // This method is marked as performance intensive because it logs a warning 🤦
         // ReSharper disable Unity.PerformanceAnalysis
@@ -131,8 +221,7 @@ namespace Primer.Tools
             rightBar.localScale = new Vector3(rightLength, 1, 1);
 
             self.rotation = Quaternion.LookRotation(forward,  upwards);
-            var stemToLine = center.magnitude;
-            self.localScale = new Vector3(width, width, stemToLine);
+            self.localScale = new Vector3(width, width, center.magnitude);
 
             self.position = anchorPoint.GetWorldPosition(parent);
             leftTip.position = leftPoint.GetWorldPosition(parent);

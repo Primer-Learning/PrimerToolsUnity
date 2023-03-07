@@ -150,7 +150,8 @@ namespace Primer.Tools
             var tailTo = from ?? initialEnd;
             var headTo = to ?? initialEnd;
 
-            if (start == tailTo && end == headTo) return;
+            if (start == tailTo && end == headTo)
+                return;
 
             if (!Application.isPlaying) {
                 startPoint.value = tailTo;
