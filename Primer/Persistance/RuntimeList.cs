@@ -9,9 +9,9 @@ namespace Primer
     [Serializable]
     public abstract class RuntimeList<T> : ScriptableObject, IList<T>
     {
+        [HideInInspector]
         public List<T> items = new();
         private JsonStorage<List<T>> file;
-        // private BinaryStorage<List<T>> fileIn;
 
         /// <summary>
         /// Use this method only to call .CreateStorage(), C# will do the rest
@@ -21,28 +21,55 @@ namespace Primer
         protected void CreateStorage([CallerFilePath] string scriptPath = null)
         {
             file ??= JsonStorage<List<T>>.CreateForScript(scriptPath, new List<T>());
-            // fileIn ??= BinaryStorage<List<T>>.CreateForScript(scriptPath, new List<T>());
         }
 
         protected virtual void OnEnable() => ReadFromDisk();
         protected virtual void OnDisable() => WriteToDisk();
 
-        protected void ReadFromDisk()
+
+        #region I/O
+        private void EnsureInitialized()
         {
             if (file is null)
                 Initialize();
+        }
 
-            items = file!.Read();
+        protected void ReadFromDisk()
+        {
+            EnsureInitialized();
+            items = file.Read();
         }
 
         protected void WriteToDisk()
         {
-            if (file is null)
-                Initialize();
-
-            if (items.Count > 0)
-                file!.Write(items);
+            EnsureInitialized();
+            file.Write(items);
         }
+
+        public void Backup(uint index = 0)
+        {
+            EnsureInitialized();
+            file.BackupFile(index).Write(items);
+        }
+
+        public void RestoreBackup(uint index = 0)
+        {
+            EnsureInitialized();
+            var backup = file.BackupFile(index);
+
+            if (!backup.Exists()) {
+                Debug.LogError($"File {backup.path} does not exist, cannot restore backup");
+                return;
+            }
+
+            items = backup.Read();
+        }
+
+        public void OpenDirectory()
+        {
+            file.OpenFolder();
+        }
+        #endregion
 
 
         #region IList implementation

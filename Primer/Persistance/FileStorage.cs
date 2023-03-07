@@ -7,9 +7,9 @@ namespace Primer
 {
     public abstract class FileStorage<T>
     {
-        private readonly T initialValue;
-        private readonly string filename;
-        private readonly string directory;
+        protected readonly T initialValue;
+        protected readonly string filename;
+        protected readonly string directory;
 
         public string path => Path.Combine(directory, filename);
 
@@ -23,12 +23,17 @@ namespace Primer
         protected abstract void Serialize(FileStream stream, T data);
         protected abstract T Deserialize(FileStream stream);
 
+        public bool Exists()
+        {
+            return File.Exists(path);
+        }
+
         public T Read()
         {
-            if (!File.Exists(path))
+            if (!Exists())
                 return initialValue;
 
-            PrimerLogger.Log("Read", path);
+            // PrimerLogger.Log("Read", path);
 
             try {
                 using var stream = File.Open(path, FileMode.Open);
@@ -45,7 +50,7 @@ namespace Primer
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
-            PrimerLogger.Log("Write", path);
+            // PrimerLogger.Log("Write", path);
 
             using var stream = File.Open(path, FileMode.Create);
             Serialize(stream, data);

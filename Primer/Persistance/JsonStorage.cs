@@ -53,6 +53,11 @@ namespace Primer
                 : JsonUtility.FromJson<T>(json);
         }
 
+        public JsonStorage<T> BackupFile(uint index = 0)
+        {
+            return new JsonStorage<T>(directory, $"{filename}.backup{index}", initialValue);
+        }
+
         [UsedImplicitly]
         private class JsonList<TList>
         {
