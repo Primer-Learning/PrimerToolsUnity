@@ -10,7 +10,8 @@ namespace Primer
     public abstract class RuntimeList<T> : ScriptableObject, IList<T>
     {
         public List<T> items = new();
-        private FileStorage<List<T>> file;
+        private JsonStorage<List<T>> file;
+        // private BinaryStorage<List<T>> fileIn;
 
         /// <summary>
         /// Use this method only to call .CreateStorage(), C# will do the rest
@@ -19,7 +20,8 @@ namespace Primer
 
         protected void CreateStorage([CallerFilePath] string scriptPath = null)
         {
-            file ??= FileStorage<List<T>>.CreateForScript(scriptPath, "bin", new List<T>());
+            file ??= JsonStorage<List<T>>.CreateForScript(scriptPath, new List<T>());
+            // fileIn ??= BinaryStorage<List<T>>.CreateForScript(scriptPath, new List<T>());
         }
 
         protected virtual void OnEnable() => ReadFromDisk();
@@ -38,7 +40,8 @@ namespace Primer
             if (file is null)
                 Initialize();
 
-            file!.Write(items);
+            if (items.Count > 0)
+                file!.Write(items);
         }
 
 
