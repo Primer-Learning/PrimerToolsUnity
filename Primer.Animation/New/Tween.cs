@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -49,6 +54,31 @@ namespace Primer.Animation
                 t = Mathf.Clamp01(PrimerMath.Remap(0, 1, -delay / duration, 1, t));
 
             lerp(easeMethod.Evaluate(t));
+        }
+
+        public async UniTask Play(CancellationToken ct = default)
+        {
+            if (!Application.isPlaying) {
+                Evaluate(1);
+                return;
+            }
+
+            var startTime = Time.time;
+            var delayAndDuration = totalDuration;
+
+            Evaluate(0);
+
+            while (!ct.IsCancellationRequested && Time.time < startTime + delayAndDuration) {
+                var t = (Time.time - startTime) / delayAndDuration;
+
+                Evaluate(t);
+                await UniTask.DelayFrame(1, cancellationToken: ct);
+
+                if (!ct.IsCancellationRequested)
+                    return;
+            }
+
+            Evaluate(1);
         }
 
         public static implicit operator Tween(Action<float> value)

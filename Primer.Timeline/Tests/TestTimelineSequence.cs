@@ -22,10 +22,14 @@ namespace Primer.Timeline.Tests
             primer.ApplyIntrinsicPosition();
         }
 
-        public override async IAsyncEnumerator<object> Run()
+        public override async IAsyncEnumerator<Tween> Run()
         {
+            await new Tween(
+                t => {}
+            ).Play();
+
             this.Log("ScaleUpFromZero");
-            await primer.ScaleUpFromZero();
+            await primer.ScaleUpFromZero().Play();
             this.Log($"Now wait {seconds} seconds");
             await Seconds(seconds);
             this.Log("MyCustomNamedTrigger done");
@@ -35,7 +39,7 @@ namespace Primer.Timeline.Tests
             var pos = transform.position;
 
             this.Log("Move UP!");
-            await primer.MoveTo(new Vector3(pos.x, pos.y + 1, pos.z));
+            await primer.MoveTo(new Vector3(pos.x, pos.y + 1, pos.z)).Play();
             this.Log("Movement complete");
 
             yield return null;
