@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Primer.Animation;
 
 namespace Primer.Timeline
 {
@@ -8,6 +9,12 @@ namespace Primer.Timeline
 
         public virtual void Cleanup() {}
 
-        public abstract IAsyncEnumerator<object> Run();
+        public abstract IAsyncEnumerator<Tween> Run();
+
+
+        protected static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Merge(tweenList);
+        }
     }
 }
