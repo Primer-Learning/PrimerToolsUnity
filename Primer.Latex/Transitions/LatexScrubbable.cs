@@ -130,17 +130,17 @@ namespace Primer.Latex
             }
         }
 
-        public async UniTask Play(Tweener anim = null, CancellationToken ct = default)
-        {
-            if (!Application.isPlaying) {
-                SetEndState();
-                return;
-            }
-            
-            await foreach (var t in anim.Tween(0, 1f, ct)) {
-                Update(t);
-            }
-        }
+        // public async UniTask Play(Tweener anim = null, CancellationToken ct = default)
+        // {
+        //     if (!Application.isPlaying) {
+        //         SetEndState();
+        //         return;
+        //     }
+        //
+        //     await foreach (var t in anim.Tween(0, 1f, ct)) {
+        //         Update(t);
+        //     }
+        // }
 
 
         private void SetInitialState()

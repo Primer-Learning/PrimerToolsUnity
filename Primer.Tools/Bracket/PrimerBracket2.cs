@@ -150,30 +150,22 @@ namespace Primer.Tools
             rightPoint.isWorldPosition = isGlobal.Value;
         }
 
-        public async UniTask Animate(Vector3? anchor = null, Vector3? left = null, Vector3? right = null,
-            Tweener animation = null, CancellationToken ct = default)
+        public Tween Animate(Vector3? anchor = null, Vector3? left = null, Vector3? right = null)
         {
             var anchorTween = anchorPoint.Tween(anchor, out var isAnchorNoop);
             var leftTween = leftPoint.Tween(left, out var isLeftNoop);
             var rightTween = rightPoint.Tween(right, out var isRightNoop);
 
-            if (isAnchorNoop && isLeftNoop && isRightNoop)
-                return;
-
-            if (!Application.isPlaying) {
-                anchorPoint = anchorTween(1);
-                leftPoint = leftTween(1);
-                rightPoint = rightTween(1);
-                return;
-            }
-
-            await foreach (var t in animation.Tween(0, 1f, ct)) {
-                if (ct.IsCancellationRequested) return;
-                anchorPoint = anchorTween(t);
-                leftPoint = leftTween(t);
-                rightPoint = rightTween(t);
-                Refresh();
-            }
+            return isAnchorNoop && isLeftNoop && isRightNoop
+                ? Tween.noop
+                : new Tween(
+                    t => {
+                        anchorPoint = anchorTween(t);
+                        leftPoint = leftTween(t);
+                        rightPoint = rightTween(t);
+                        Refresh();
+                    }
+                );
         }
 
         // This method is marked as performance intensive because it logs a warning 🤦

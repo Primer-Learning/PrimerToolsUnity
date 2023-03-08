@@ -83,10 +83,9 @@ namespace Primer.Latex
             renderer.SetColorInGroups(groupColor, groupIndexes);
         }
 
-        public UniTask TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes, Tweener anim = null,
-            CancellationToken ct = default)
+        public Tween TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes)
         {
-            return renderer.TweenColorInGroups(groupColor, groupIndexes, anim, ct);
+            return renderer.TweenColorInGroups(groupColor, groupIndexes);
         }
 
         // Transitions
@@ -100,8 +99,7 @@ namespace Primer.Latex
             };
         }
 
-        public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions, Tweener anim = null,
-            CancellationToken ct = default)
+        public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions)
         {
             var scrubbable = CreateTransition(to, transitions.ToArray());
             await scrubbable.Play(anim, ct);
