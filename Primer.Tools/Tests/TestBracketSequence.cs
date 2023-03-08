@@ -25,7 +25,7 @@ namespace Primer.Tools.Tests
             yield return null;
 
             await bracket.Animate(
-                new Vector3(2, 0, 0),
+                new Vector3(-2, 2, 0),
                 new Vector3(0, 0, 4),
                 new Vector3(0, 0, -3)
             );

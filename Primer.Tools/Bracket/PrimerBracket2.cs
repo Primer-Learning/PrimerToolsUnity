@@ -153,33 +153,26 @@ namespace Primer.Tools
         public async UniTask Animate(Vector3? anchor = null, Vector3? left = null, Vector3? right = null,
             Tweener animation = null, CancellationToken ct = default)
         {
-            var anchorStart = this.anchor;
-            var leftStart = this.left;
-            var rightStart = this.right;
-            var anchorEnd = anchor ?? anchorStart;
-            var leftEnd = left ?? leftStart;
-            var rightEnd = right ?? rightStart;
+            var anchorTween = anchorPoint.Tween(anchor, out var isAnchorNoop);
+            var leftTween = leftPoint.Tween(left, out var isLeftNoop);
+            var rightTween = rightPoint.Tween(right, out var isRightNoop);
 
-            if (this.anchor == anchorEnd && this.left == leftEnd && this.right == rightEnd)
+            if (isAnchorNoop && isLeftNoop && isRightNoop)
                 return;
 
             if (!Application.isPlaying) {
-                this.anchor = anchorEnd;
-                this.left = leftEnd;
-                this.right = rightEnd;
+                anchorPoint = anchorTween(1);
+                leftPoint = leftTween(1);
+                rightPoint = rightTween(1);
                 return;
             }
 
             await foreach (var t in animation.Tween(0, 1f, ct)) {
                 if (ct.IsCancellationRequested) return;
-
-                var updatedAnchor = anchorPoint.isTracking ? anchorPoint.value : anchorStart;
-                var updatedLeft = leftPoint.isTracking ? leftPoint.value : leftStart;
-                var updatedRight = rightPoint.isTracking ? rightPoint.value : rightStart;
-
-                anchorPoint.value = Vector3.Lerp(updatedAnchor, anchor ?? updatedAnchor, t);
-                leftPoint.value = Vector3.Lerp(updatedLeft, left ?? updatedLeft, t);
-                rightPoint.value = Vector3.Lerp(updatedRight, right ?? updatedRight, t);
+                anchorPoint = anchorTween(t);
+                leftPoint = leftTween(t);
+                rightPoint = rightTween(t);
+                Refresh();
             }
         }
 

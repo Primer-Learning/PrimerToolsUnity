@@ -145,28 +145,23 @@ namespace Primer.Tools
             Tweener animation = null,
             CancellationToken ct = default)
         {
-            var initialStart = start;
-            var initialEnd = end;
-            var tailTo = from ?? initialEnd;
-            var headTo = to ?? initialEnd;
+            var startTween = startPoint.Tween(from, out var isStartNoop);
+            var endTween = startPoint.Tween(from, out var isEndNoop);
 
-            if (start == tailTo && end == headTo)
+            if (isStartNoop || isEndNoop)
                 return;
 
             if (!Application.isPlaying) {
-                startPoint.value = tailTo;
-                endPoint.value = headTo;
+                startPoint = startTween(1);
+                endPoint = endTween(1);
                 return;
             }
 
             await foreach (var t in animation.Tween(0, 1f, ct)) {
                 if (ct.IsCancellationRequested) return;
-
-                var updatedStart = startPoint.isTracking ? startPoint.value : initialStart;
-                var updatedEnd = endPoint.isTracking ? endPoint.value : initialEnd;
-
-                startPoint.value = Vector3.Lerp(updatedStart, from.HasValue ? from.Value : updatedStart, t);
-                endPoint.value = Vector3.Lerp(updatedEnd, to.HasValue ? to.Value : updatedEnd, t);
+                startPoint = startTween(t);
+                endPoint = endTween(t);
+                Recalculate();
             }
         }
         #endregion
