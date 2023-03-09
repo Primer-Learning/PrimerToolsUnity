@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Primer.Animation
 {
-    public record Tween(Action<float> lerp)
+    public record Tween(Action<float> lerp) : IDisposable
     {
         public static Tween noop = new Tween(_ => { });
 
@@ -19,18 +16,21 @@ namespace Primer.Animation
             set => easeMethod = value.GetMethod();
         }
 
-        private bool isCalculated = false;
-        private int _milliseconds = 500;
+        public float delay = 0f;
+
+        #region public float duration;
+        internal bool isCalculated = false;
+        internal int ms = 500;
 
         public int milliseconds {
-            get => _milliseconds;
+            get => ms;
             set  {
                 if (isCalculated) {
                     Debug.LogWarning("Forcing the duration of a calculated tween");
                     isCalculated = false;
                 }
 
-                _milliseconds = value;
+                ms = value;
             }
         }
 
@@ -43,15 +43,16 @@ namespace Primer.Animation
             get => milliseconds / 1000f;
             set => milliseconds = (int) (value * 1000);
         }
+        #endregion
 
         public float totalDuration => duration + delay;
+        internal float tStart => 1 / totalDuration * delay;
 
-        public float delay = 0f;
 
-        public void Evaluate(float t)
+        public virtual void Evaluate(float t)
         {
             if (delay is not 0)
-                t = Mathf.Clamp01(PrimerMath.Remap(0, 1, -delay / duration, 1, t));
+                t = Mathf.Clamp01(PrimerMath.Remap(tStart, 1, 0, 1, t));
 
             lerp(easeMethod.Evaluate(t));
         }
@@ -83,11 +84,26 @@ namespace Primer.Animation
             Evaluate(1);
         }
 
+        public virtual void Dispose() {}
+
+
+        #region Convinience methods
+        public Tween Delay(float amount)
+        {
+            return this with { delay = amount };
+        }
+        #endregion
+
+
+        #region Operators
         public static implicit operator Tween(Action<float> value)
         {
             return new Tween(value);
         }
+        #endregion
 
+
+        #region Static methods: Parallel & Series
         public static Tween Parallel(params Tween[] tweenList)
         {
             var fullDuration = tweenList.Max(x => x.totalDuration);
@@ -142,5 +158,6 @@ namespace Primer.Animation
                 duration = fullDuration,
             };
         }
+        #endregion
     }
 }
