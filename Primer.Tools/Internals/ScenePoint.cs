@@ -27,7 +27,7 @@ namespace Primer.Tools
         }
         #endregion
 
-        #region Tranform follow;
+        #region Transform follow;
         [SerializeField, HideInInspector]
         private Transform _follow;
 
@@ -48,6 +48,21 @@ namespace Primer.Tools
             }
         }
         #endregion
+        
+        #region Transform followAdjustmentVector;
+        [SerializeField, HideInInspector]
+        private Vector3 _followAdjustmentVector;
+        [ShowInInspector]
+        public Vector3 followAdjustmentVector
+        {
+            get => _followAdjustmentVector;
+            set
+            {
+                _followAdjustmentVector = value;
+                Changed();
+            }
+        }
+        #endregion
 
         #region Vector3 value;
         [SerializeField, HideInInspector]
@@ -56,7 +71,7 @@ namespace Primer.Tools
         [ShowInInspector]
         [DisableIf("follow")]
         public Vector3 value {
-            get => isTracking ? follow.position : _value;
+            get => isTracking ? follow.position : _value + followAdjustmentVector;
             set {
                 StopTracking();
 
