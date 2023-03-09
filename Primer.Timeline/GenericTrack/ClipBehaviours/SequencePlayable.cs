@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -28,7 +28,7 @@ namespace Primer.Timeline
         [SerializeField]
         [PropertyOrder(2)]
         [ShowIf(nameof(sequence))]
-        [MethodOf(nameof(sequence), returnType = typeof(IAsyncEnumerator<object>))]
+        [MethodOf(nameof(sequence), returnType = typeof(IAsyncEnumerator<Tween>))]
         internal MethodInvocation sequenceMethod;
 
 

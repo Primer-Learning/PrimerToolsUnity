@@ -23,6 +23,8 @@ namespace Primer.Tools.Tests
             bracket.left = new Vector3(0, 0, 2);
             bracket.right = new Vector3(0, 0, -2);
 
+            yield return null;
+
             yield return bracket.Animate(
                 new Vector3(-2, 2, 0),
                 new Vector3(0, 0, 4),

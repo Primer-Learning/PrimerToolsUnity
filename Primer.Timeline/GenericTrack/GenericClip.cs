@@ -54,10 +54,19 @@ namespace Primer.Timeline
         public IExposedPropertyTable resolver {
             get => scrubbable.resolver;
             set {
+                EnsurePlayablesExist();
                 scrubbable.resolver = value;
                 triggerable.resolver = value;
                 sequence.resolver = value;
             }
+        }
+
+        /// <summary>Clips may be set to null when refactoring</summary>
+        private void EnsurePlayablesExist()
+        {
+            scrubbable ??= new ScrubbablePlayable();
+            triggerable ??= new TriggerablePlayable();
+            sequence ??= new SequencePlayable();
         }
 
         public Transform trackTarget {

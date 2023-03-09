@@ -9,7 +9,7 @@ namespace Primer.Timeline
     internal class SequenceMixer
     {
         public CancellationTokenSource lastExecution = new();
-        public readonly Dictionary<WeakReference<Sequence>, SequencePlayer> players = new();
+        public readonly Dictionary<Sequence, SequencePlayer> players = new();
 
         public void Mix(SequencePlayable[] allBehaviours, float time)
         {
@@ -28,12 +28,11 @@ namespace Primer.Timeline
 
         public SequencePlayer GetPlayerFor(Sequence sequence)
         {
-            var reference = new WeakReference<Sequence>(sequence);
-            if (players.TryGetValue(reference, out var player))
+            if (players.TryGetValue(sequence, out var player))
                 return player;
 
             player = new SequencePlayer(sequence);
-            players.Add(reference, player);
+            players.Add(sequence, player);
             return player;
         }
 

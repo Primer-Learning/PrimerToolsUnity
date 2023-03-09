@@ -9,18 +9,18 @@ namespace Primer.Timeline
 {
     internal class SequencePlayer
     {
-        public enum Status { Idle, Cleaned, Playing, Done }
-        public Status status { get; set; }
+        private enum Status { Idle, Cleaned, Playing, Done }
+        private Status status = Status.Idle;
 
         private readonly Sequence sequence;
-        private List<SequencePlayable> ran;
+        private readonly List<SequencePlayable> ran = new();
         private IAsyncEnumerator<Tween> enumerator;
         private Tween currentTween;
+        private bool isDone = false;
 
         public SequencePlayer(Sequence sequence)
         {
             this.sequence = sequence;
-            status = Status.Idle;
         }
 
         public void Clean()
@@ -44,6 +44,8 @@ namespace Primer.Timeline
         private async UniTask Reset()
         {
             ran.Clear();
+            status = Status.Idle;
+            isDone = false;
 
             if (enumerator is null)
                 return;
@@ -69,13 +71,11 @@ namespace Primer.Timeline
             }
             #endregion
 
-            enumerator ??= sequence.Run();
-
             foreach (var pastClipToRun in clips.Where(x => x.end <= time && !ran.Contains(x))) {
                 if (await MoveNext(ct))
                     return;
 
-                currentTween.Evaluate(1);
+                currentTween?.Evaluate(1);
                 ran.Add(pastClipToRun);
             }
 
@@ -91,7 +91,14 @@ namespace Primer.Timeline
 
             var current = currentClips[0];
 
-            if (!ran.Contains(current) || await MoveNext(ct))
+            if (!ran.Contains(current)) {
+                if (await MoveNext(ct))
+                    return;
+
+                ran.Add(current);
+            }
+
+            if (currentTween is null)
                 return;
 
             var progress = (time - current.start) / current.duration;
@@ -101,6 +108,12 @@ namespace Primer.Timeline
 
         private async UniTask<bool> MoveNext(CancellationToken ct)
         {
+            if (isDone) {
+                Debug.LogWarning($"Sequence {sequence} has more clips that yield returns.");
+                return false;
+            }
+
+            enumerator ??= sequence.Run();
             var hasMore = await enumerator.MoveNextAsync();
 
             if (ct.IsCancellationRequested)
@@ -111,6 +124,7 @@ namespace Primer.Timeline
             if (hasMore)
                 return false;
 
+            isDone = true;
             await enumerator.DisposeAsync();
 
             if (ct.IsCancellationRequested)
