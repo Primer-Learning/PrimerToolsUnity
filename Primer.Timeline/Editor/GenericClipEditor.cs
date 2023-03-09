@@ -25,7 +25,7 @@ namespace Primer.Timeline.Editor
         private void ShowCodeEditorLink()
         {
             MonoBehaviour script = clip.template switch {
-                ScrubbablePlayable a => null,
+                ScrubbablePlayable _ => null,
                 TriggerablePlayable b => b.triggerable,
                 SequencePlayable c => c.sequence,
                 _ => throw new ArgumentOutOfRangeException()

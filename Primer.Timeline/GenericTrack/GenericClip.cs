@@ -14,6 +14,9 @@ namespace Primer.Timeline
 
         public ClipCaps clipCaps => ClipCaps.Extrapolation;
 
+        public float? expectedDuration = null;
+        public float? expectedDelay = null;
+
         [Space(32)]
         [HideLabel]
         [EnumToggleButtons]
@@ -88,7 +91,14 @@ namespace Primer.Timeline
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            return ScriptPlayable<GenericBehaviour>.Create(graph, template);
+            var playable = ScriptPlayable<GenericBehaviour>.Create(graph, template);
+
+            playable.GetBehaviour().onDurationReported = (duration, delay) => {
+                expectedDuration = duration;
+                expectedDelay = delay;
+            };
+
+            return playable;
         }
 
         public void Initialize()

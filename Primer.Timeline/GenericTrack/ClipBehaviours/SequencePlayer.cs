@@ -76,7 +76,7 @@ namespace Primer.Timeline
                 return;
 
             foreach (var pastClipToRun in clipsToRun.Where(x => x.end <= time && !ran.Contains(x))) {
-                if (await MoveNext(ct))
+                if (await MoveNext(pastClipToRun, ct))
                     return;
 
                 currentTween?.Evaluate(1);
@@ -133,7 +133,7 @@ namespace Primer.Timeline
             var current = currentClips[0];
 
             if (!ran.Contains(current)) {
-                if (await MoveNext(ct))
+                if (await MoveNext(current, ct))
                     return true;
 
                 ran.Add(current);
@@ -148,7 +148,7 @@ namespace Primer.Timeline
             return false;
         }
 
-        private async UniTask<bool> MoveNext(CancellationToken ct)
+        private async UniTask<bool> MoveNext(SequencePlayable clip, CancellationToken ct)
         {
             Log($"Executing clip {++index}");
 
@@ -164,6 +164,9 @@ namespace Primer.Timeline
                 return true;
 
             currentTween = enumerator.Current;
+
+            if (currentTween is not null)
+                clip.ReportDuration(currentTween.duration, currentTween.delay);
 
             if (hasMore)
                 return false;
