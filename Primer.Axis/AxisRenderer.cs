@@ -57,7 +57,7 @@ namespace Primer.Axis
 
         protected override ChildrenDeclaration CreateChildrenDeclaration() => new(
             transform,
-            onCreate: x => x.GetPrimer().ScaleUpFromZero().Forget(),
+            onCreate: x => x.GetPrimer().ScaleUpFromZero().PlayAndForget(),
             onRemove: x => x.GetPrimer().ShrinkAndDispose().Forget()
         );
 

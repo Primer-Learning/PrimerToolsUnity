@@ -1,3 +1,5 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -29,18 +31,18 @@ namespace Primer.Animation
             return self.transform.MoveTo(target);
         }
 
-        // public static async UniTask ShrinkAndDispose(this PrimerBehaviour self, Tweener anim = null)
-        // {
-        //     if (!self)
-        //         return;
-        //
-        //     if (Application.isPlaying)
-        //         await self.ScaleDownToZero(anim);
-        //
-        //     // This is false if the element has already been destroyed
-        //     if (self)
-        //         self.gameObject.Dispose();
-        // }
+        public static async UniTask ShrinkAndDispose(this PrimerBehaviour self, CancellationToken ct = default)
+        {
+            if (!self)
+                return;
+
+            if (Application.isPlaying)
+                await self.ScaleDownToZero().Play(ct);
+
+            // This is false if the element has already been destroyed
+            if (self)
+                self.gameObject.Dispose();
+        }
         //
         //
         // #region Ensure that only one animation per PrimerBehaviour is running at a time

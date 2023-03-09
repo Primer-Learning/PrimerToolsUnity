@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using UnityEngine;
 
 namespace Primer.Timeline
@@ -24,6 +25,16 @@ namespace Primer.Timeline
         {
             await UniTask.WhenAll(processes);
         }
+
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Parallel(tweenList);
+        }
+
+        public static Tween Series(params Tween[] tweenList)
+        {
+            return Tween.Series(tweenList);
+        }
     }
 
     public class AsyncMonoBehaviour : MonoBehaviour
@@ -44,12 +55,23 @@ namespace Primer.Timeline
         {
             await UniTask.WhenAll(processes);
         }
-        protected static async UniTask Series(params Func<UniTask>[] processes)
+
+        public static async UniTask Series(params Func<UniTask>[] processes)
         {
             foreach (var process in processes)
             {
                 await process();
             }
+        }
+
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Parallel(tweenList);
+        }
+
+        public static Tween Series(params Tween[] tweenList)
+        {
+            return Tween.Series(tweenList);
         }
     }
 }

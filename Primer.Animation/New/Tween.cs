@@ -56,6 +56,8 @@ namespace Primer.Animation
             lerp(easeMethod.Evaluate(t));
         }
 
+        public async void PlayAndForget(CancellationToken ct = default) => await Play(ct);
+
         public async UniTask Play(CancellationToken ct = default)
         {
             if (!Application.isPlaying) {
@@ -86,17 +88,58 @@ namespace Primer.Animation
             return new Tween(value);
         }
 
-        public static Tween Merge(params Tween[] tweenList)
+        public static Tween Parallel(params Tween[] tweenList)
         {
+            var fullDuration = tweenList.Max(x => x.totalDuration);
+
+            if (fullDuration is 0) {
+                Debug.LogWarning("Parallel tween list is empty");
+                return noop with { milliseconds = 0 };
+            }
+
             return new Tween(
                 t => {
                     for (var i = 0; i < tweenList.Length; i++) {
-                        tweenList[i].Evaluate(t);
+                        var tween = tweenList[i];
+                        tween.Evaluate(Mathf.Clamp01(t / tween.totalDuration * fullDuration));
                     }
                 }
             ) {
                 isCalculated = true,
-                duration = tweenList.Max(x => x.totalDuration),
+                duration = fullDuration,
+            };
+        }
+
+        public static Tween Series(Tween[] tweenList)
+        {
+            var fullDuration = tweenList.Sum(x => x.totalDuration);
+
+            if (fullDuration is 0) {
+                Debug.LogWarning("Series tween list is empty");
+                return noop with { milliseconds = 0 };
+            }
+
+            var cursor = 0;
+            var cursorStart = 0f;
+            var cursorEnd = tweenList[0].duration;
+            var cursorEndT = cursorEnd / fullDuration;
+
+            return new Tween(
+                t => {
+                    while (t < cursorEndT) {
+                        cursor++;
+                        cursorStart = cursorEnd;
+                        cursorEnd += tweenList[cursor].duration;
+                        cursorEndT = cursorEnd / fullDuration;
+                    }
+
+                    // formula wrote by copilot, is it right?
+                    t = Mathf.Clamp01((t - cursorStart) / (cursorEnd - cursorStart));
+                    tweenList[cursor].Evaluate(t);
+                }
+            ) {
+                isCalculated = true,
+                duration = fullDuration,
             };
         }
     }

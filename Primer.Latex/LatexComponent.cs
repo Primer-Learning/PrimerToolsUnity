@@ -102,7 +102,8 @@ namespace Primer.Latex
         public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions)
         {
             var scrubbable = CreateTransition(to, transitions.ToArray());
-            await scrubbable.Play(anim, ct);
+            // TODO:
+            // await scrubbable.Play();
             return scrubbable;
         }
 

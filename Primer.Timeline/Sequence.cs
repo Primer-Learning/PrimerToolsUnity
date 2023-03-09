@@ -10,11 +10,5 @@ namespace Primer.Timeline
         public virtual void Cleanup() {}
 
         public abstract IAsyncEnumerator<Tween> Run();
-
-
-        protected static Tween Parallel(params Tween[] tweenList)
-        {
-            return Tween.Merge(tweenList);
-        }
     }
 }
