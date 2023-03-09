@@ -166,7 +166,7 @@ namespace Primer.Timeline
             currentTween = enumerator.Current;
 
             if (currentTween is not null)
-                clip.ReportDuration(currentTween.duration, currentTween.delay);
+                clip.ReportDuration(currentTween.totalDuration);
 
             if (hasMore)
                 return false;

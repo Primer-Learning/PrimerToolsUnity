@@ -72,11 +72,11 @@ namespace Primer.Timeline
 
 
         #region Inform clip duration from the mixer
-        public Action<float, float> onDurationReported;
+        public Action<float> onDurationReported;
 
-        public void ReportDuration(float start, float duration)
+        public void ReportDuration(float duration)
         {
-            onDurationReported?.Invoke(start, duration);
+            onDurationReported?.Invoke(duration);
         }
         #endregion
 
