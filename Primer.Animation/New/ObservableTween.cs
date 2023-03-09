@@ -7,8 +7,8 @@ namespace Primer.Animation
         public enum State { Idle, Playing, Completed }
         private State state = State.Idle;
 
-        public Action beforePlay;
-        public Action onComplete;
+        public Action beforePlay { get; init; }
+        public Action onComplete { get; init; }
 
         public override void Evaluate(float t)
         {

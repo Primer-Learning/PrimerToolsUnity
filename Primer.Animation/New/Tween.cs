@@ -10,21 +10,21 @@ namespace Primer.Animation
     {
         public static Tween noop = new Tween(_ => { });
 
-        public IEasing easeMethod = IEasing.defaultMethod;
+        public IEasing easeMethod { get; init; } = IEasing.defaultMethod;
         public EaseMode ease {
             get => EaseModeExtensions.GetModeFor(easeMethod);
-            set => easeMethod = value.GetMethod();
+            init => easeMethod = value.GetMethod();
         }
 
         public float delay = 0f;
 
         #region public float duration;
-        internal bool isCalculated = false;
-        internal int ms = 500;
+        internal bool isCalculated { get; init; } = false;
+        internal int ms { get; init; } = 500;
 
         public int milliseconds {
             get => ms;
-            set  {
+            init  {
                 if (isCalculated) {
                     Debug.LogWarning("Forcing the duration of a calculated tween");
                     isCalculated = false;
@@ -36,12 +36,12 @@ namespace Primer.Animation
 
         public float seconds {
             get => milliseconds / 1000f;
-            set => milliseconds = (int) (value * 1000);
+            init => milliseconds = (int) (value * 1000);
         }
 
         public float duration {
             get => milliseconds / 1000f;
-            set => milliseconds = (int) (value * 1000);
+            init => milliseconds = (int) (value * 1000);
         }
         #endregion
 
