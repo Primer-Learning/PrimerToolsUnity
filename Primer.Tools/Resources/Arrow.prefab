@@ -93,7 +93,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4028468259306145289, guid: 7b6bdf82de5cc4f9e8cc1b573162b9ae, type: 3}
+  - {fileID: 2100000, guid: 7309bf14761c9794fb48c5f79de8c4e7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -198,14 +198,17 @@ MonoBehaviour:
   shaft: {fileID: 3196383622414401422}
   head: {fileID: 2032350495482225248}
   tail: {fileID: 2032514543369383664}
-  globalPositioning: 0
-  start: {x: 0, y: 0, z: 0}
+  startPoint:
+    _isWorldPosition: 0
+    _follow: {fileID: 0}
+    _value: {x: 0, y: 0, z: 0}
   startSpace: 0
-  startTracker: {fileID: 0}
   startPointer: 0
-  end: {x: 1, y: 1, z: 1}
+  endPoint:
+    _isWorldPosition: 0
+    _follow: {fileID: 0}
+    _value: {x: 1, y: 1, z: 1}
   endSpace: 0
-  endTracker: {fileID: 0}
   endPointer: 1
   thickness: 1
   axisRotation: 0
@@ -287,7 +290,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4028468259306145289, guid: e7e26b34445e1412a91c5c0cc5113344, type: 3}
+  - {fileID: 2100000, guid: 7309bf14761c9794fb48c5f79de8c4e7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -370,7 +373,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4028468259306145289, guid: e7e26b34445e1412a91c5c0cc5113344, type: 3}
+  - {fileID: 2100000, guid: 7309bf14761c9794fb48c5f79de8c4e7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
