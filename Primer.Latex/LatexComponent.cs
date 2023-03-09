@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
-using UnityEditor;
 using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.Events;
@@ -102,8 +100,7 @@ namespace Primer.Latex
         public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions)
         {
             var scrubbable = CreateTransition(to, transitions.ToArray());
-            // TODO:
-            // await scrubbable.Play();
+            await scrubbable.Play();
             return scrubbable;
         }
 

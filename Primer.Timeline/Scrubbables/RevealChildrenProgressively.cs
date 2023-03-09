@@ -1,4 +1,5 @@
 using System;
+using Primer.Timeline;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -23,7 +24,7 @@ namespace Primer.Animation
         }
 
 
-        public void Update(float t)
+        public override void Update(float t)
         {        
             // Execute(0) is now called instead of Cleanup. So calling this cleanup here for now.
             if (t == 0)

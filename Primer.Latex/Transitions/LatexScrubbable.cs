@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
-using Primer.Animation;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -112,7 +110,7 @@ namespace Primer.Latex
         }
 
         [UsedImplicitly]
-        public void Update(float time)
+        public override void Update(float time)
         {
             if (!isValid)
                 return;
@@ -129,18 +127,6 @@ namespace Primer.Latex
                     break;
             }
         }
-
-        // public async UniTask Play(Tweener anim = null, CancellationToken ct = default)
-        // {
-        //     if (!Application.isPlaying) {
-        //         SetEndState();
-        //         return;
-        //     }
-        //
-        //     await foreach (var t in anim.Tween(0, 1f, ct)) {
-        //         Update(t);
-        //     }
-        // }
 
 
         private void SetInitialState()

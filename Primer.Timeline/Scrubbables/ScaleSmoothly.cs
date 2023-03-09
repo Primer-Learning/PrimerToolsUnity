@@ -18,11 +18,18 @@ namespace Primer.Animation
         [Space] public EaseMode ease = EaseMode.Cubic;
 
 
-        public override void Prepare() => originalScale = target.localScale;
-        public void Cleanup() => target.localScale = originalScale;
+        public override void Prepare()
+        {
+            originalScale = target.localScale;
+        }
+
+        public override void Cleanup()
+        {
+            target.localScale = originalScale;
+        }
 
 
-        public void Update(float t)
+        public override void Update(float t)
         {
             // Execute(0) is now called instead of Cleanup. So calling this cleanup here for now.
             if (t == 0)
