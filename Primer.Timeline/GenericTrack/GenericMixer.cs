@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Jobs.LowLevel.Unsafe;
-using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -16,7 +14,7 @@ namespace Primer.Timeline
 
         private readonly ScrubbableMixer scrubbableMixer = new();
         private readonly TriggerableMixer triggerableMixer = new();
-        private readonly SequentialMixer sequentialMixer = new();
+        private readonly SequenceMixer sequenceMixer = new();
 
         public bool isMuted;
 
@@ -40,11 +38,11 @@ namespace Primer.Timeline
                 .ToDictionary(x => x.Key, x => x.ToList());
 
             // We tell the sequential mixer instance what the current iteration is so it can abort previous executions
-            sequentialMixer.currentIteration = currentIteration;
+            sequenceMixer.currentIteration = currentIteration;
 
             RunStrategy<ScrubbablePlayable>(scrubbableMixer.Mix, behaviours, time, iteration);
             RunStrategy<TriggerablePlayable>(triggerableMixer.Mix, behaviours, time, iteration);
-            RunStrategy<SequentialPlayable>(sequentialMixer.Mix, behaviours, time, iteration);
+            RunStrategy<SequencePlayable>(sequenceMixer.Mix, behaviours, time, iteration);
         }
 
 

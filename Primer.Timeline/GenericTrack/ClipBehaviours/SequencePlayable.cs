@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Primer.Timeline
 {
     [Serializable]
-    internal class SequentialPlayable : GenericBehaviour
+    internal class SequencePlayable : GenericBehaviour
     {
         public enum StepExecutionResult { Continue, Abort, Done }
         public const string NO_SEQUENCE_SELECTED = "No sequence selected";
@@ -47,7 +47,7 @@ namespace Primer.Timeline
 
 
         #region Clip name
-        static SequentialPlayable() => SetIcon<SequentialPlayable>('≡');
+        static SequencePlayable() => SetIcon<SequencePlayable>('≡');
 
         public override string playableName
             => sequence == null ? NO_SEQUENCE_SELECTED : sequenceMethod.ToString(sequence);

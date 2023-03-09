@@ -27,7 +27,7 @@ namespace Primer.Timeline.Editor
             MonoBehaviour script = clip.template switch {
                 ScrubbablePlayable a => null,
                 TriggerablePlayable b => b.triggerable,
-                SequentialPlayable c => c.sequence,
+                SequencePlayable c => c.sequence,
                 _ => throw new ArgumentOutOfRangeException()
             };
 

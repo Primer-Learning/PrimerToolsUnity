@@ -5,16 +5,16 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
-    internal class SequentialMixer
+    internal class SequenceMixer
     {
         private record SequenceState(Sequence sequence, int steps = 0, IAsyncEnumerator<object> enumerator = null);
 
         public uint currentIteration;
 
         private Dictionary<PropertyName, SequenceState> previouslyRan = new();
-        private readonly HashSet<SequentialPlayable> ranBehaviours = new();
+        private readonly HashSet<SequencePlayable> ranBehaviours = new();
 
-        public async void Mix(SequentialPlayable[] allBehaviours, float time, uint iteration)
+        public async void Mix(SequencePlayable[] allBehaviours, float time, uint iteration)
         {
             // In play mode clips actually take time to execute so we need a different approach
             if (Application.isPlaying)
@@ -23,7 +23,7 @@ namespace Primer.Timeline
                 await EditModeMix(allBehaviours, time, iteration);
         }
 
-        private async UniTask PlayModeMix(SequentialPlayable[] allBehaviours, float time)
+        private async UniTask PlayModeMix(SequencePlayable[] allBehaviours, float time)
         {
             if (time == 0) {
                 foreach (var behaviour in allBehaviours)
@@ -43,7 +43,7 @@ namespace Primer.Timeline
                 var lastEnumerator = last.enumerator ?? behaviour.Initialize();
 
                 var result = await behaviour.RunOneStep(lastEnumerator);
-                var isOver = result != SequentialPlayable.StepExecutionResult.Continue;
+                var isOver = result != SequencePlayable.StepExecutionResult.Continue;
 
                 if (isOver)
                     await lastEnumerator.DisposeAsync();
@@ -55,7 +55,7 @@ namespace Primer.Timeline
             }
         }
 
-        private async UniTask EditModeMix(IEnumerable<SequentialPlayable> allBehaviours, float time, uint iteration)
+        private async UniTask EditModeMix(IEnumerable<SequencePlayable> allBehaviours, float time, uint iteration)
         {
             var currentlyRunning = new Dictionary<PropertyName, SequenceState>();
 
@@ -71,7 +71,7 @@ namespace Primer.Timeline
             #endregion
 
             foreach (var entry in allBehaviours.GroupBy(x => x.playableName)) {
-                if (entry.Key == SequentialPlayable.NO_SEQUENCE_SELECTED)
+                if (entry.Key == SequencePlayable.NO_SEQUENCE_SELECTED)
                     continue;
 
                 var method = new PropertyName(entry.Key);
@@ -79,7 +79,7 @@ namespace Primer.Timeline
                 var stepsToRun = behaviours.Length;
 
                 if (stepsToRun == 0) {
-                    SequentialPlayable.Cleanup(entry.First().sequence);
+                    SequencePlayable.Cleanup(entry.First().sequence);
                     continue;
                 }
 
@@ -101,7 +101,7 @@ namespace Primer.Timeline
 
                     var remaining = stepsToRun - last.steps;
                     var result = await behaviour.RunSteps(lastEnumerator, remaining, IsExecutionObsolete);
-                    var isOver = result != SequentialPlayable.StepExecutionResult.Continue;
+                    var isOver = result != SequencePlayable.StepExecutionResult.Continue;
 
                     if (isOver && await DisposeEnumerator(lastEnumerator)) {
                         return;
@@ -126,7 +126,7 @@ namespace Primer.Timeline
                 if (currentlyRunning.ContainsKey(method))
                     continue;
 
-                SequentialPlayable.Cleanup(execution.sequence);
+                SequencePlayable.Cleanup(execution.sequence);
 
                 if (execution.enumerator is not null && await DisposeEnumerator(execution.enumerator)) {
                     return;

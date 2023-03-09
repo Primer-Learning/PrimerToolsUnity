@@ -1,9 +1,9 @@
 using System;
-using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 using UnityEngine.Timeline;
 
 namespace Primer.Timeline
@@ -35,18 +35,19 @@ namespace Primer.Timeline
         [HideLabel]
         internal TriggerablePlayable triggerable = new();
 
+        [FormerlySerializedAs("sequential")]
         [Space]
         [SerializeReference]
         [ShowIf("@kind == Kind.Sequence")]
         [DisableContextMenu]
         [HideReferenceObjectPicker]
         [HideLabel]
-        internal SequentialPlayable sequential = new();
+        internal SequencePlayable sequence = new();
 
         public GenericBehaviour template => kind switch {
             Kind.Scrubbable => scrubbable,
             Kind.Trigger => triggerable,
-            Kind.Sequence => sequential,
+            Kind.Sequence => sequence,
             _ => throw new ArgumentOutOfRangeException(),
         };
 
@@ -55,7 +56,7 @@ namespace Primer.Timeline
             set {
                 scrubbable.resolver = value;
                 triggerable.resolver = value;
-                sequential.resolver = value;
+                sequence.resolver = value;
             }
         }
 
@@ -63,7 +64,7 @@ namespace Primer.Timeline
             get {
                 if (scrubbable.trackTarget == null
                     || scrubbable.trackTarget != triggerable.trackTarget
-                    || scrubbable.trackTarget != sequential.trackTarget) {
+                    || scrubbable.trackTarget != sequence.trackTarget) {
                     return null;
                 }
 
@@ -72,7 +73,7 @@ namespace Primer.Timeline
             set {
                 scrubbable.trackTarget = value;
                 triggerable.trackTarget = value;
-                sequential.trackTarget = value;
+                sequence.trackTarget = value;
             }
         }
 
@@ -84,7 +85,7 @@ namespace Primer.Timeline
         public void Initialize()
         {
             triggerable._triggerable.exposedName = GUID.Generate().ToString();
-            sequential._sequence.exposedName = GUID.Generate().ToString();
+            sequence._sequence.exposedName = GUID.Generate().ToString();
         }
     }
 }
