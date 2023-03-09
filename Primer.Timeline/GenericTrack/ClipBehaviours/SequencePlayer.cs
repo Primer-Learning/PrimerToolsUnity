@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using UnityEngine;
 
 namespace Primer.Timeline
 {
+    /// <summary>
+    ///   Handles the execution of a sequence.
+    ///   Gets a list of clips and the time and executes the clips that are before the time.
+    ///   It will also execute tween the clip that is currently running.
+    /// </summary>
     internal class SequencePlayer
     {
         private enum Status { Idle, Cleaned, Playing, Done }
@@ -17,35 +23,42 @@ namespace Primer.Timeline
         private IAsyncEnumerator<Tween> enumerator;
         private Tween currentTween;
         private bool isDone = false;
+        private int index = 0;
 
         public SequencePlayer(Sequence sequence)
         {
             this.sequence = sequence;
         }
 
+        /// <summary>Sets the state before any clip is executed</summary>
         public void Clean()
         {
             if (status == Status.Cleaned)
                 return;
 
+            Log("Clean");
             status = Status.Cleaned;
             sequence.Cleanup();
         }
 
+        /// <summary>Executed immediately before any clip is executed</summary>
         public void Prepare()
         {
             if (status == Status.Playing)
                 return;
 
+            Log("Prepare");
             status = Status.Playing;
             sequence.Prepare();
         }
 
+        /// <summary>Rolls back the sequence execution to the beginning</summary>
         private async UniTask Reset()
         {
+            Log("Restart");
             ran.Clear();
-            status = Status.Idle;
             isDone = false;
+            index = 0;
 
             if (enumerator is null)
                 return;
@@ -57,21 +70,12 @@ namespace Primer.Timeline
 
         public async UniTask PlayTo(float time, List<SequencePlayable> clips, CancellationToken ct)
         {
-            #region Restart if necessary
-            var needsRestart = ran.Where((ranClip, i) => ranClip != clips[i]).Any();
+            var clipsToRun = clips.Where(x => x.start <= time).ToArray();
 
-            if (needsRestart) {
-                await Reset();
+            if (await RestartIfNecessary(clipsToRun, ct))
+                return;
 
-                if (ct.IsCancellationRequested)
-                    return;
-
-                Clean();
-                Prepare();
-            }
-            #endregion
-
-            foreach (var pastClipToRun in clips.Where(x => x.end <= time && !ran.Contains(x))) {
+            foreach (var pastClipToRun in clipsToRun.Where(x => x.end <= time && !ran.Contains(x))) {
                 if (await MoveNext(ct))
                     return;
 
@@ -79,11 +83,48 @@ namespace Primer.Timeline
                 ran.Add(pastClipToRun);
             }
 
-            #region Run current clip
-            var currentClips = clips.Where(x => x.start <= time && x.end > time).ToArray();
+            var currentClips = clipsToRun.Where(x => x.start <= time && x.end > time).ToArray();
 
+            await ExecuteCurrentClip(time, currentClips, ct);
+        }
+
+        private async Task<bool> RestartIfNecessary(SequencePlayable[] clipsToRun, CancellationToken ct)
+        {
+            if (clipsToRun.Length == 0) {
+                if (status == Status.Cleaned)
+                    return true;
+
+                await Reset();
+
+                if (ct.IsCancellationRequested)
+                    return true;
+
+                Clean();
+                return true;
+            }
+
+            var areRanClipsValid =
+                ran.Count <= clipsToRun.Length &&
+                ran.Where((ranClip, i) => ranClip == clipsToRun[i]).Any();
+
+            if (areRanClipsValid)
+                return false;
+
+            await Reset();
+
+            if (ct.IsCancellationRequested)
+                return true;
+
+            Clean();
+            Prepare();
+
+            return false;
+        }
+
+        private async Task<bool> ExecuteCurrentClip(float time, SequencePlayable[] currentClips, CancellationToken ct)
+        {
             if (currentClips.Length == 0)
-                return;
+                return true;
 
             if (currentClips.Length > 1) {
                 Debug.LogWarning($"Multiple clips are running for the same sequence {sequence}. This is not supported.");
@@ -93,21 +134,24 @@ namespace Primer.Timeline
 
             if (!ran.Contains(current)) {
                 if (await MoveNext(ct))
-                    return;
+                    return true;
 
                 ran.Add(current);
             }
 
             if (currentTween is null)
-                return;
+                return true;
 
             var progress = (time - current.start) / current.duration;
+            Log($"Execute tween at time {time} - {progress}");
             currentTween.Evaluate(progress);
-            #endregion
+            return false;
         }
 
         private async UniTask<bool> MoveNext(CancellationToken ct)
         {
+            Log($"Executing clip {++index}");
+
             if (isDone) {
                 Debug.LogWarning($"Sequence {sequence} has more clips that yield returns.");
                 return false;
@@ -133,6 +177,11 @@ namespace Primer.Timeline
             enumerator = null;
             status = Status.Done;
             return false;
+        }
+
+        public static void Log(params object[] args)
+        {
+            // PrimerLogger.Log("SequencePlayer", args);
         }
     }
 }
