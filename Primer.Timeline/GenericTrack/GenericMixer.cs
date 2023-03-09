@@ -9,7 +9,6 @@ namespace Primer.Timeline
     //  because this is a special case where we want to execute past clips and explore future ones.
     public class GenericMixer : PlayableBehaviour
     {
-        private uint currentIteration = 0;
         private Playable lastPlayable;
 
         private readonly ScrubbableMixer scrubbableMixer = new();
@@ -29,7 +28,6 @@ namespace Primer.Timeline
             if (!isLast)
                 return;
 
-            var iteration = ++currentIteration;
             var time = (float)playable.GetTime();
 
             var behaviours = mixers
@@ -37,23 +35,19 @@ namespace Primer.Timeline
                 .GroupBy(x => x.GetType())
                 .ToDictionary(x => x.Key, x => x.ToList());
 
-            // We tell the sequential mixer instance what the current iteration is so it can abort previous executions
-            sequenceMixer.currentIteration = currentIteration;
-
-            RunStrategy<ScrubbablePlayable>(scrubbableMixer.Mix, behaviours, time, iteration);
-            RunStrategy<TriggerablePlayable>(triggerableMixer.Mix, behaviours, time, iteration);
-            RunStrategy<SequencePlayable>(sequenceMixer.Mix, behaviours, time, iteration);
+            RunStrategy<ScrubbablePlayable>(scrubbableMixer.Mix, behaviours, time);
+            RunStrategy<TriggerablePlayable>(triggerableMixer.Mix, behaviours, time);
+            RunStrategy<SequencePlayable>(sequenceMixer.Mix, behaviours, time);
         }
 
 
-        private static void RunStrategy<T>(Action<T[], float, uint> strategy,
+        private static void RunStrategy<T>(Action<T[], float> strategy,
             IReadOnlyDictionary<Type, List<GenericBehaviour>> dictionary,
-            float time,
-            uint iteration)
+            float time)
             where T : GenericBehaviour
         {
             if (dictionary.ContainsKey(typeof(T))) {
-                strategy(dictionary[typeof(T)].Cast<T>().ToArray(), time, iteration);
+                strategy(dictionary[typeof(T)].Cast<T>().ToArray(), time);
             }
         }
 

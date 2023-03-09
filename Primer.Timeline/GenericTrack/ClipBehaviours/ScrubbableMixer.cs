@@ -7,7 +7,7 @@ namespace Primer.Timeline
     {
         private readonly Queue<ScrubbablePlayable> executed = new();
 
-        public void Mix(ScrubbablePlayable[] allBehaviours, float time, uint iteration)
+        public void Mix(ScrubbablePlayable[] allBehaviours, float time)
         {
             var validBehaviours = allBehaviours.Where(x => x.scrubbable is not null).ToArray();
             var toCleanup = validBehaviours.Where(x => x.start > time).ToArray();

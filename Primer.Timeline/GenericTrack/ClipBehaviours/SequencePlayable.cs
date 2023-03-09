@@ -9,7 +9,6 @@ namespace Primer.Timeline
     [Serializable]
     internal class SequencePlayable : GenericBehaviour
     {
-        public enum StepExecutionResult { Continue, Abort, Done }
         public const string NO_SEQUENCE_SELECTED = "No sequence selected";
 
 
@@ -46,69 +45,10 @@ namespace Primer.Timeline
         }
 
 
-        #region Clip name
         static SequencePlayable() => SetIcon<SequencePlayable>('≡');
 
         public override string playableName
             => sequence == null ? NO_SEQUENCE_SELECTED : sequenceMethod.ToString(sequence);
-        #endregion
-
-
-        #region Sequence management
-        private static PlayableTracker<Sequence> tracker = new();
-
-        public void Prepare() => Prepare(sequence);
-        public static void Prepare(Sequence sequence)
-        {
-            if (!tracker.IsPrepared(sequence))
-                sequence.Prepare();
-        }
-
-        public void Cleanup() => Cleanup(sequence);
-        public static void Cleanup(Sequence sequence)
-        {
-            if (!tracker.IsClean(sequence))
-                sequence.Cleanup();
-        }
-
-        public IAsyncEnumerator<object> Initialize()
-        {
-            Prepare();
-            return (IAsyncEnumerator<object>)sequenceMethod.Invoke(sequence);
-        }
-
-        public async UniTask<IAsyncEnumerator<object>> Execute(int count, Func<bool> shouldAbort)
-        {
-            var enumerator = Initialize();
-            var result = await RunSteps(enumerator, count, shouldAbort);
-
-            if (result == StepExecutionResult.Continue)
-                return enumerator;
-
-            await enumerator.DisposeAsync();
-            return null;
-        }
-
-        public async UniTask<StepExecutionResult> RunOneStep(IAsyncEnumerator<object> enumerator)
-        {
-            return await enumerator.MoveNextAsync()
-                ? StepExecutionResult.Continue
-                : StepExecutionResult.Done;
-        }
-
-        public async UniTask<StepExecutionResult> RunSteps(IAsyncEnumerator<object> enumerator, int count, Func<bool> shouldAbort)
-        {
-            for (var i = 0; i < count; i++) {
-                if (!await enumerator.MoveNextAsync())
-                    return StepExecutionResult.Done;
-
-                if (shouldAbort())
-                    return StepExecutionResult.Abort;
-            }
-
-            return StepExecutionResult.Continue;
-        }
-        #endregion
 
 
         public override string ToString()
