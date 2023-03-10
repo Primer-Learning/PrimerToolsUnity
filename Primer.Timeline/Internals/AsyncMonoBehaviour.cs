@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using UnityEngine;
@@ -9,6 +11,20 @@ namespace Primer.Timeline
 
     public class Async
     {
+        private readonly List<Tween> parallelQueue = new();
+
+        public void AddToParallel(Tween tween)
+        {
+            parallelQueue.Add(tween);
+        }
+
+        public Tween WaitForParallels()
+        {
+            var result = Parallel(parallelQueue.ToArray());
+            parallelQueue.Clear();
+            return result;
+        }
+
         protected static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
@@ -39,6 +55,20 @@ namespace Primer.Timeline
 
     public class AsyncMonoBehaviour : MonoBehaviour
     {
+        private readonly List<Tween> parallelQueue = new();
+
+        public void AddToParallel(Tween tween)
+        {
+            parallelQueue.Add(tween);
+        }
+
+        public Tween WaitForParallels()
+        {
+            var result = Parallel(parallelQueue.ToArray());
+            parallelQueue.Clear();
+            return result;
+        }
+
         protected static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
