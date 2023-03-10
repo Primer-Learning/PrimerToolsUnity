@@ -26,7 +26,7 @@ namespace Primer.Timeline.Tests
         public async void MyCustomNamedTrigger()
         {
             this.Log("ScaleUpFromZero");
-            await primer.ScaleUpFromZero();
+            await primer.ScaleUpFromZero().Play();
             this.Log($"Now wait {seconds} seconds");
             await Seconds(seconds);
             this.Log("MyCustomNamedTrigger done");
@@ -38,7 +38,7 @@ namespace Primer.Timeline.Tests
             var pos = transform.position;
 
             this.Log("Move UP!");
-            await primer.MoveTo(new Vector3(pos.x, pos.y + 1, pos.z));
+            await primer.MoveTo(new Vector3(pos.x, pos.y + 1, pos.z)).Play();
             this.Log("Movement complete");
         }
 

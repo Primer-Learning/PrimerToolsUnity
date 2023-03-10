@@ -1,9 +1,9 @@
 using System;
-using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 using UnityEngine.Timeline;
 
 namespace Primer.Timeline
@@ -13,6 +13,8 @@ namespace Primer.Timeline
         public enum Kind { Scrubbable, Trigger, Sequence }
 
         public ClipCaps clipCaps => ClipCaps.Extrapolation;
+
+        public float? expectedDuration = null;
 
         [Space(32)]
         [HideLabel]
@@ -35,35 +37,45 @@ namespace Primer.Timeline
         [HideLabel]
         internal TriggerablePlayable triggerable = new();
 
+        [FormerlySerializedAs("sequential")]
         [Space]
         [SerializeReference]
         [ShowIf("@kind == Kind.Sequence")]
         [DisableContextMenu]
         [HideReferenceObjectPicker]
         [HideLabel]
-        internal SequentialPlayable sequential = new();
+        internal SequencePlayable sequence = new();
 
         public GenericBehaviour template => kind switch {
             Kind.Scrubbable => scrubbable,
             Kind.Trigger => triggerable,
-            Kind.Sequence => sequential,
+            Kind.Sequence => sequence,
             _ => throw new ArgumentOutOfRangeException(),
         };
 
         public IExposedPropertyTable resolver {
             get => scrubbable.resolver;
             set {
+                EnsurePlayablesExist();
                 scrubbable.resolver = value;
                 triggerable.resolver = value;
-                sequential.resolver = value;
+                sequence.resolver = value;
             }
+        }
+
+        /// <summary>Clips may be set to null when refactoring</summary>
+        private void EnsurePlayablesExist()
+        {
+            scrubbable ??= new ScrubbablePlayable();
+            triggerable ??= new TriggerablePlayable();
+            sequence ??= new SequencePlayable();
         }
 
         public Transform trackTarget {
             get {
                 if (scrubbable.trackTarget == null
                     || scrubbable.trackTarget != triggerable.trackTarget
-                    || scrubbable.trackTarget != sequential.trackTarget) {
+                    || scrubbable.trackTarget != sequence.trackTarget) {
                     return null;
                 }
 
@@ -72,19 +84,21 @@ namespace Primer.Timeline
             set {
                 scrubbable.trackTarget = value;
                 triggerable.trackTarget = value;
-                sequential.trackTarget = value;
+                sequence.trackTarget = value;
             }
         }
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            return ScriptPlayable<GenericBehaviour>.Create(graph, template);
+            var playable = ScriptPlayable<GenericBehaviour>.Create(graph, template);
+            playable.GetBehaviour().onDurationReported = duration => expectedDuration = duration;;
+            return playable;
         }
 
         public void Initialize()
         {
             triggerable._triggerable.exposedName = GUID.Generate().ToString();
-            sequential._sequence.exposedName = GUID.Generate().ToString();
+            sequence._sequence.exposedName = GUID.Generate().ToString();
         }
     }
 }

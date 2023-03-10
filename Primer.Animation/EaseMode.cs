@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 namespace Primer.Animation
 {
@@ -13,85 +13,49 @@ namespace Primer.Animation
         DoubleSmoothStep,
         SmoothIn,
         SmoothOut,
+        Custom,
         None,
     }
 
-	public static class EasingMethods
+	public static class EaseModeExtensions
     {
-        public static float Apply(this EaseMode ease, float t) => ease switch {
-            EaseMode.Cubic => EaseInAndOutCubic(0, 1, t),
-            EaseMode.Quadratic => EaseInAndOutQuadratic(0, 1, t),
-            EaseMode.CubicIn => EaseInCubic(0, 1, t),
-            EaseMode.CubicOut => EaseOutCubic(0, 1, t),
-            EaseMode.SmoothStep => Mathf.SmoothStep(0, 1, t),
-            EaseMode.DoubleSmoothStep => (Mathf.SmoothStep(0, 1, t) + t) / 2,
-
-            // Stretch the function and just use first half
-            EaseMode.SmoothIn => Mathf.SmoothStep(0, 2, t / 2),
-
-            // Stretch the function and just use second half
-            EaseMode.SmoothOut => Mathf.SmoothStep(0, 2, (t + 1) / 2) - 1,
-
-            _ => t,
-        };
-
-        private static float EaseInAndOutCubic(float startVal, float endVal, float t) {
-            // Scale time relative to half duration
-            t *= 2;
-
-            switch (t) {
-                // handle different
-                case <= 0:
-                    return startVal;
-
-                case <= 1:
-                    // Ease in from startVal to half the overall change
-                    return (endVal - startVal) / 2 * t * t * t + startVal;
-
-                case <= 2:
-                    // Make t negative to use left side of cubic
-                    t -= 2;
-                    // Ease out from half to end of overall change
-                    return (endVal - startVal) / 2 * t * t * t + endVal;
-
-                default:
-                    return endVal;
-            }
+        public static float Apply(this EaseMode ease, float t)
+        {
+            return ease.GetMethod().Evaluate(t);
         }
 
-        private static float EaseInCubic(float startVal, float endVal, float t) {
-            // Ease in from startVal
-            return (endVal - startVal) * t * t * t + startVal;
+        public static IEasing GetMethod(this EaseMode ease)
+        {
+            // Custom can't be converted to a known IEasing method
+            // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+            return ease switch {
+                EaseMode.None => LinearEasing.instance,
+                EaseMode.Cubic => CubicEasing.instance,
+                EaseMode.Quadratic => QuadraticEasing.instance,
+                EaseMode.CubicIn => CubicInEasing.instance,
+                EaseMode.CubicOut => CubicOutEasing.instance,
+                EaseMode.SmoothStep => SmoothStepEasing.instance,
+                EaseMode.DoubleSmoothStep => DoubleSmoothStepEasing.instance,
+                EaseMode.SmoothIn => SmoothInEasing.instance,
+                EaseMode.SmoothOut => SmoothOutEasing.instance,
+                _ => throw new Exception("Can't automatically get easing method for " + ease),
+            };
         }
 
-        private static float EaseOutCubic(float startVal, float endVal, float t) {
-            // Make t negative to use left side of cubic
-            t -= 1;
-            // Ease out from half to end of overall change
-            return (endVal - startVal) * t * t * t + endVal;
+        public static EaseMode GetModeFor(IEasing method)
+        {
+            return method switch {
+                LinearEasing _ => EaseMode.None,
+                CubicEasing _ => EaseMode.Cubic,
+                QuadraticEasing _ => EaseMode.Quadratic,
+                CubicInEasing _ => EaseMode.CubicIn,
+                CubicOutEasing _ => EaseMode.CubicOut,
+                SmoothStepEasing _ => EaseMode.SmoothStep,
+                DoubleSmoothStepEasing _ => EaseMode.DoubleSmoothStep,
+                SmoothInEasing _ => EaseMode.SmoothIn,
+                SmoothOutEasing _ => EaseMode.SmoothOut,
+                _ => EaseMode.Custom,
+            };
         }
-
-        private static float EaseInAndOutQuadratic(float startVal, float endVal, float t) {
-            // Scale time relative to half duration
-            t *= 2;
-
-            switch (t) {
-                // handle different
-                case <= 0:
-                    return startVal;
-
-                case <= 1:
-                    //Ease in from zero to half the overall change
-                    return (endVal - startVal) / 2 * t * t + startVal;
-
-                case <= 2:
-                    t -= 2; //Make t negative to use other left side of quadratic
-                    //Ease out from half to end of overall change
-                    return -(endVal - startVal) / 2 * t * t + endVal;
-
-                default:
-                    return endVal;
-            }
-        }
-	}
+    }
 }

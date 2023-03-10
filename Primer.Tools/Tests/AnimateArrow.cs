@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Primer.Timeline;
 using UnityEngine;
@@ -38,9 +38,9 @@ namespace Primer.Tools.Tests
 
 
         [UsedImplicitly]
-        public void Animate()
+        public async Task Animate()
         {
-            arrow.Animate(start, end).Forget();
+            await arrow.Animate(start, end).Play();
         }
     }
 }

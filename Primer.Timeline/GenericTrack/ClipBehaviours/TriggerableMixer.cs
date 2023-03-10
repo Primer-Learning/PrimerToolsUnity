@@ -7,7 +7,7 @@ namespace Primer.Timeline
     {
         private readonly HashSet<TriggerablePlayable> ranTriggers = new();
 
-        public void Mix(TriggerablePlayable[] allBehaviours, float time, uint iteration)
+        public void Mix(TriggerablePlayable[] allBehaviours, float time)
         {
             var behaviours = allBehaviours.Where(x => x.start <= time).ToArray();
             var toClean = allBehaviours.Select(x => x.triggerable).ToHashSet();

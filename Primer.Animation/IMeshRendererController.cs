@@ -32,24 +32,20 @@ namespace Primer.Animation
             }
         }
 
-        public static async UniTask TweenColor(this IMeshRendererController control, Color newColor,
-            Tweener animation = null, CancellationToken ct = default)
+        public static Tween TweenColor(this IMeshRendererController control, Color newColor)
         {
             if (control.color == newColor)
-                return;
+                return Tween.noop;
 
+            var initial = control.color;
             var children = control.meshRenderers;
 
-            await foreach (var lerpedColor in animation.Tween(control.color, newColor, ct)) {
-                if (ct.IsCancellationRequested)
-                    return;
+            return new Tween(t => {
+                var lerpedColor =  Color.Lerp(initial, newColor, t);
 
                 foreach (var child in children)
                     child.SetColor(lerpedColor);
-            }
-
-            if (ct.IsCancellationRequested)
-                control.color = newColor;
+            });
         }
     }
 }

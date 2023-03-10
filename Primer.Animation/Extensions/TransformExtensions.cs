@@ -7,55 +7,40 @@ namespace Primer.Animation
 {
     public static class TransformExtensions
     {
-        [Obsolete("Use transform.GetPrimer().ScaleUpFromZero() instead")]
-        public static async UniTask ScaleUpFromZero(this Transform transform, Tweener animation = null)
-        {
-            await transform.GetPrimer().ScaleUpFromZero(animation);
-        }
-
-        [Obsolete("Use transform.GetPrimer().ScaleDownToZero() instead")]
-        public static async UniTask ScaleDownToZero(this Transform transform, Tweener animation = null)
-        {
-            await transform.GetPrimer().ScaleDownToZero(animation);
-        }
+        // [Obsolete("Use transform.GetPrimer().ScaleUpFromZero() instead")]
+        // public static Tween ScaleUpFromZero(this Transform transform)
+        // {
+        //     return transform.GetPrimer().ScaleUpFromZero();
+        // }
+        //
+        // [Obsolete("Use transform.GetPrimer().ScaleDownToZero() instead")]
+        // public static Tween ScaleDownToZero(this Transform transform)
+        // {
+        //     return transform.GetPrimer().ScaleDownToZero();
+        // }
 
         // Convenience overload method for scaling to multiples of Vector3.one
-        public static async UniTask ScaleTo(this Transform transform, float newScale,
-            Tweener animation = null, CancellationToken ct = default)
+        public static Tween ScaleTo(this Transform transform, float newScale)
         {
-            await transform.ScaleTo(newScale * Vector3.one, animation: animation, ct: ct);
+            return transform.ScaleTo(newScale * Vector3.one);
         }
 
-        public static async UniTask ScaleTo(this Transform transform, Vector3 newScale,
-            Tweener animation = null, CancellationToken ct = default)
+        public static Tween ScaleTo(this Transform transform, Vector3 newScale)
         {
-            if (transform == null || transform.localScale == newScale) return;
+            var initial = transform.localScale;
 
-            if (!Application.isPlaying) {
-                transform.localScale = newScale;
-                return;
-            }
-
-            await foreach (var scale in animation.Tween(transform.localScale, newScale, ct)) {
-                if (ct.IsCancellationRequested) return;
-                transform.localScale = scale;
-            }
+            return initial == newScale
+                ? Tween.noop
+                : new Tween(t => transform.localScale = Vector3.Lerp(initial, newScale, t));
         }
 
-        public static async UniTask MoveTo(this Transform transform, Vector3 newPosition,
-            Tweener animation = null, CancellationToken ct = default)
+        public static Tween MoveTo(this Transform transform, Vector3 newPosition)
         {
-            if (transform == null || transform.localPosition == newPosition) return;
+            var initial = transform.localPosition;
 
-            if (!Application.isPlaying) {
-                transform.localPosition = newPosition;
-                return;
-            }
-
-            await foreach (var pos in animation.Tween(transform.localPosition, newPosition, ct)) {
-                if (ct.IsCancellationRequested) return;
-                transform.localPosition = pos;
-            }
+            return initial == newPosition
+                ? Tween.noop
+                : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
         }
     }
 }

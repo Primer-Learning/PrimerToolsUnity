@@ -22,20 +22,13 @@ namespace Primer.Animation
             Get(renderer).color = color;
         }
 
-        public static async UniTask TweenColor(this MeshRenderer renderer, Color color, Tweener animation = null,
-            CancellationToken ct = default)
+        public static Tween TweenColor(this MeshRenderer renderer, Color color)
         {
             var material = Get(renderer);
 
-            if (material.color == color)
-                return;
-
-            await foreach (var lerpedColor in animation.Tween(material.color, color, ct)) {
-                if (ct.IsCancellationRequested)
-                    return;
-
-                material.color = lerpedColor;
-            }
+            return material.color == color
+                ? Tween.noop
+                : new Tween(t => material.color = Color.Lerp(material.color, color, t));
         }
 
         private static Material Get(MeshRenderer renderer)

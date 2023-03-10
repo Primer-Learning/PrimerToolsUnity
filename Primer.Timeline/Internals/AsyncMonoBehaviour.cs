@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using UnityEngine;
 
 namespace Primer.Timeline
@@ -8,6 +11,20 @@ namespace Primer.Timeline
 
     public class Async
     {
+        private readonly List<Tween> parallelQueue = new();
+
+        public void AddToParallel(Tween tween)
+        {
+            parallelQueue.Add(tween);
+        }
+
+        public Tween WaitForParallels()
+        {
+            var result = Parallel(parallelQueue.ToArray());
+            parallelQueue.Clear();
+            return result;
+        }
+
         protected static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
@@ -24,10 +41,34 @@ namespace Primer.Timeline
         {
             await UniTask.WhenAll(processes);
         }
+
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Parallel(tweenList);
+        }
+
+        public static Tween Series(params Tween[] tweenList)
+        {
+            return Tween.Series(tweenList);
+        }
     }
 
     public class AsyncMonoBehaviour : MonoBehaviour
     {
+        private readonly List<Tween> parallelQueue = new();
+
+        public void AddToParallel(Tween tween)
+        {
+            parallelQueue.Add(tween);
+        }
+
+        public Tween WaitForParallels()
+        {
+            var result = Parallel(parallelQueue.ToArray());
+            parallelQueue.Clear();
+            return result;
+        }
+
         protected static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
@@ -44,12 +85,23 @@ namespace Primer.Timeline
         {
             await UniTask.WhenAll(processes);
         }
-        protected static async UniTask Series(params Func<UniTask>[] processes)
+
+        public static async UniTask Series(params Func<UniTask>[] processes)
         {
             foreach (var process in processes)
             {
                 await process();
             }
+        }
+
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Parallel(tweenList);
+        }
+
+        public static Tween Series(params Tween[] tweenList)
+        {
+            return Tween.Series(tweenList);
         }
     }
 }

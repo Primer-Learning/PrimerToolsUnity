@@ -33,7 +33,7 @@ namespace Primer.Timeline
         #endregion
 
 
-        #region Clip name customisation
+        #region Clip name customization
         private const string DEFAULT_CLIP_NAME = "Generic Clip";
         private static Dictionary<Type, char> knownIcons = new() {
             [typeof(GenericBehaviour)] = '-',
@@ -67,6 +67,16 @@ namespace Primer.Timeline
                 return true;
 
             return value[1] == ' ' && knownIcons.ContainsValue(value[0]);
+        }
+        #endregion
+
+
+        #region Inform clip duration from the mixer
+        public Action<float> onDurationReported;
+
+        public void ReportDuration(float duration)
+        {
+            onDurationReported?.Invoke(duration);
         }
         #endregion
 

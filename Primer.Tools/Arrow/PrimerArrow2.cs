@@ -125,44 +125,32 @@ namespace Primer.Tools
 
 
         #region Animations
-        public UniTask GrowFromStart(Vector3 from, Vector3 to, Tweener anim = null, CancellationToken ct = default)
+        public Tween GrowFromStart(Vector3 from, Vector3 to)
         {
             SetFromTo(from, from);
-            return Animate(from, to, anim, ct);
+            return Animate(from, to);
         }
 
-        public UniTask ShrinkToEnd(Tweener anim = null, CancellationToken ct = default)
+        public Tween ShrinkToEnd()
         {
             startPoint.StopTracking();
             endPoint.StopTracking();
-            return Animate(end, end, anim, ct);
+            return Animate(end, end);
         }
 
         // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
-        public async UniTask Animate(
-            Vector3? from = null,
-            Vector3? to = null,
-            Tweener animation = null,
-            CancellationToken ct = default)
+        public Tween Animate(Vector3? from = null, Vector3? to = null)
         {
             var startTween = startPoint.Tween(from, out var isStartNoop);
             var endTween = startPoint.Tween(from, out var isEndNoop);
 
-            if (isStartNoop || isEndNoop)
-                return;
-
-            if (!Application.isPlaying) {
-                startPoint = startTween(1);
-                endPoint = endTween(1);
-                return;
-            }
-
-            await foreach (var t in animation.Tween(0, 1f, ct)) {
-                if (ct.IsCancellationRequested) return;
-                startPoint = startTween(t);
-                endPoint = endTween(t);
-                Recalculate();
-            }
+            return isStartNoop || isEndNoop
+                ? Tween.noop
+                : new Tween(t => {
+                    startPoint = startTween(t);
+                    endPoint = endTween(t);
+                    Recalculate();
+                });
         }
         #endregion
 

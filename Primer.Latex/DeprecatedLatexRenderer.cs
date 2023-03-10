@@ -15,7 +15,7 @@ namespace Primer.Latex
     [Obsolete("Use LatexComponent instead.")]
     [ExecuteAlways]
     [HideMonoScript]
-    public class DeprecatedLatexRenderer : GeneratorBehaviour
+    public class DeprecatedLatexRenderer : GeneratorBehaviour, IMeshRendererController
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
 
@@ -33,8 +33,15 @@ namespace Primer.Latex
         [Multiline(10)]
         internal string latex = "";
 
+        [SerializeField, HideInInspector]
+        private Material _material;
+
         [FoldoutGroup("Details", order: 10)]
-        public Material material;
+        [ShowInInspector]
+        public Material material {
+            get => _material;
+            set => _material = value;
+        }
 
         [SerializeField]
         [FoldoutGroup("Details")]
@@ -67,23 +74,8 @@ namespace Primer.Latex
             }
         }
 
-        public async UniTask TweenColor(Color newColor, Tweener animation = null, CancellationToken ct = default)
-        {
-            if (color == newColor)
-                return;
-
-            var children = GetComponentsInChildren<MeshRenderer>();
-
-            await foreach (var lerpedColor in animation.Tween(color, newColor, ct)) {
-                if (ct.IsCancellationRequested)
-                    return;
-
-                color = lerpedColor;
-
-                foreach(var child in children)
-                    child.SetColor(lerpedColor);
-            }
-        }
+        // This enables SetColor and TweenColor
+        MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
         #endregion
 
 

@@ -61,22 +61,27 @@ namespace Primer.Latex
                 child.SetColor(groupColor);
         }
 
-        public async UniTask TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes, Tweener animation = null, CancellationToken ct = default)
+        public Tween TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes)
         {
             var children = groupIndexes
                 .Select(index => transform.GetChild(index))
                 .SelectMany(group => group.GetComponentsInChildren<MeshRenderer>())
                 .ToArray();
 
-            await foreach (var lerpedColor in animation.Tween(color, groupColor, ct)) {
-                if (ct.IsCancellationRequested)
-                    return;
+            if (children.Length == 0)
+                return Tween.noop;
 
-                color = lerpedColor;
+            var initial = children[0].GetColor();
 
-                foreach(var child in children)
+            if (initial == groupColor)
+                return Tween.noop;
+
+            return new Tween(t => {
+                var lerpedColor = Color.Lerp(initial, groupColor, t);
+
+                foreach (var child in children)
                     child.SetColor(lerpedColor);
-            }
+            });
         }
 
         public void UpdateChildren()
