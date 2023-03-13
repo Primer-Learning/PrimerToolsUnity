@@ -121,8 +121,8 @@ namespace Primer.Animation
                     }
                 }
             ) {
-                isCalculated = true,
                 duration = fullDuration,
+                isCalculated = true,
             };
         }
 
@@ -154,8 +154,8 @@ namespace Primer.Animation
                     tweenList[cursor].Evaluate(t);
                 }
             ) {
-                isCalculated = true,
                 duration = fullDuration,
+                isCalculated = true,
             };
         }
         #endregion
