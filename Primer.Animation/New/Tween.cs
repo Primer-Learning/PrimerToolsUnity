@@ -142,7 +142,7 @@ namespace Primer.Animation
 
             return new Tween(
                 t => {
-                    while (t < cursorEndT) {
+                    while (t > cursorEndT) {
                         cursor++;
                         cursorStart = cursorEnd;
                         cursorEnd += tweenList[cursor].duration;
