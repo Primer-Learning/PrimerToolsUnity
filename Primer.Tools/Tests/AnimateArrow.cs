@@ -21,10 +21,10 @@ namespace Primer.Tools.Tests
             arrow = GetComponent<PrimerArrow2>();
 
             if (startInitial is not null)
-                arrow.startPoint.value = startInitial.Value;
+                arrow.tailPoint.value = startInitial.Value;
 
             if (endInitial is not null)
-                arrow.endPoint.value = endInitial.Value;
+                arrow.headPoint.value = endInitial.Value;
 
             arrow.Recalculate();
         }
@@ -32,8 +32,8 @@ namespace Primer.Tools.Tests
         public override void Prepare()
         {
             arrow = GetComponent<PrimerArrow2>();
-            startInitial = arrow.start;
-            endInitial = arrow.end;
+            startInitial = arrow.tail;
+            endInitial = arrow.head;
         }
 
 

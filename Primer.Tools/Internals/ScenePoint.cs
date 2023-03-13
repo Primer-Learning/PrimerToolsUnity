@@ -132,23 +132,11 @@ namespace Primer.Tools
             onChange?.Invoke();
         }
 
-        public Func<float, ScenePoint> Tween(Vector3? finalValue, out bool isNoop)
+        public Func<float, Vector3> Tween(Vector3Provider to = null, Vector3Provider from = null)
         {
-            var start = value;
-            var end = finalValue ?? start;
-            var isWorld = _isWorldPosition;
-
-            if (start == end || isTracking) {
-                var self = this;
-                isNoop = true;
-                return t => self;
-            }
-
-            isNoop = false;
-            return t => new ScenePoint {
-                _isWorldPosition = isWorld,
-                _value = Vector3.Lerp(start, end, t),
-            };
+            var start = from ?? value;
+            var end = to ?? value;
+            return t => Vector3.Lerp(start, end, t);
         }
 
         // Statics

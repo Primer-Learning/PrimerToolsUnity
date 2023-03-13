@@ -24,8 +24,8 @@ namespace Primer.Tools.Editor
 
             EditorGUI.BeginChangeCheck();
 
-            arrow.startPoint.DrawHandle(parent);
-            arrow.endPoint.DrawHandle(parent);
+            arrow.tailPoint.DrawHandle(parent);
+            arrow.headPoint.DrawHandle(parent);
 
             if (!EditorGUI.EndChangeCheck())
                 return;

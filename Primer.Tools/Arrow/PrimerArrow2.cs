@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Component = UnityEngine.Component;
 
 namespace Primer.Tools
@@ -14,26 +15,35 @@ namespace Primer.Tools
         private float startArrowLength;
         private float endArrowLength;
 
+        [FormerlySerializedAs("shaft")]
         [SerializeField, PrefabChild]
-        private Transform shaft;
+        private Transform shaftObject;
+        [FormerlySerializedAs("head")]
         [SerializeField, PrefabChild]
-        private Transform head;
+        private Transform headObject;
+        [FormerlySerializedAs("tail")]
         [SerializeField, PrefabChild]
-        private Transform tail;
+        private Transform tailObject;
 
+        [FormerlySerializedAs("startPoint")]
         [Title("Start")]
-        public ScenePoint startPoint = Vector3.zero;
+        public ScenePoint tailPoint = Vector3.zero;
+        [FormerlySerializedAs("startSpace")]
         [LabelText("Space")]
-        public float startSpace = 0;
+        public float tailSpace = 0;
+        [FormerlySerializedAs("startPointer")]
         [LabelText("Pointer")]
-        public bool startPointer = false;
+        public bool tailPointer = false;
 
+        [FormerlySerializedAs("endPoint")]
         [Title("End")]
-        public ScenePoint endPoint = Vector3.one;
+        public ScenePoint headPoint = Vector3.one;
+        [FormerlySerializedAs("endSpace")]
         [LabelText("Space")]
-        public float endSpace = 0;
+        public float headSpace = 0;
+        [FormerlySerializedAs("endPointer")]
         [LabelText("Pointer")]
-        public bool endPointer = true;
+        public bool headPointer = true;
 
         [Space(16)]
         [Title("Fine tuning")]
@@ -43,7 +53,7 @@ namespace Primer.Tools
         [ShowInInspector]
         [MinValue(0)]
         public float length {
-            get => (end  - start).magnitude - startSpace - endSpace;
+            get => (head  - tail).magnitude - tailSpace - headSpace;
             set => SetLength(value);
         }
 
@@ -53,16 +63,16 @@ namespace Primer.Tools
         public float arrowLength = 0.18f;
 
         public bool globalPositioning {
-            get => startPoint.isWorldPosition || endPoint.isWorldPosition;
+            get => tailPoint.isWorldPosition || headPoint.isWorldPosition;
             set {
-                startPoint.isWorldPosition = value;
-                endPoint.isWorldPosition = value;
+                tailPoint.isWorldPosition = value;
+                headPoint.isWorldPosition = value;
             }
         }
 
 
-        public Vector3 start => startPoint.GetWorldPosition(transform.parent);
-        public Vector3 end => endPoint.GetWorldPosition(transform.parent);
+        public Vector3 tail => tailPoint.GetWorldPosition(transform.parent);
+        public Vector3 head => headPoint.GetWorldPosition(transform.parent);
         private float realArrowLength => arrowLength * thickness;
 
 
@@ -73,19 +83,19 @@ namespace Primer.Tools
             // var scheduler = new Scheduler(Recalculate);
             // startPoint.onChange = scheduler.Schedule;
             // endPoint.onChange = scheduler.Schedule;
-            startPoint.onChange = Recalculate;
-            endPoint.onChange = Recalculate;
+            tailPoint.onChange = Recalculate;
+            headPoint.onChange = Recalculate;
         }
 
         public void OnDisable()
         {
-            startPoint.onChange = null;
-            endPoint.onChange = null;
+            tailPoint.onChange = null;
+            headPoint.onChange = null;
         }
 
         public void Update()
         {
-            if (ScenePoint.CheckTrackedObject(startPoint, endPoint)) {
+            if (ScenePoint.CheckTrackedObject(tailPoint, headPoint)) {
                 Recalculate();
             }
         }
@@ -96,8 +106,8 @@ namespace Primer.Tools
         public void Follow(GameObject from, GameObject to) => Follow(from.transform, to.transform);
         public void Follow(Component from, Component to)
         {
-            startPoint.follow = from.transform;
-            endPoint.follow = to.transform;
+            tailPoint.follow = from.transform;
+            headPoint.follow = to.transform;
         }
 
         public void SetFromTo(Vector3 from, Vector3 to, bool global)
@@ -108,49 +118,58 @@ namespace Primer.Tools
 
         public void SetFromTo(Vector3 from, Vector3 to)
         {
-            startPoint.value = from;
-            endPoint.value = to;
+            tailPoint.value = from;
+            headPoint.value = to;
         }
 
         private void SetLength(float value)
         {
             // If the length is too small, just prevent the change
-            if (value < (startPointer ? realArrowLength : 0) + (endPointer ? realArrowLength : 0))
+            if (value < (tailPointer ? realArrowLength : 0) + (headPointer ? realArrowLength : 0))
                 return;
 
-            var diff = end - start;
-            endPoint.value += (value - diff.magnitude) * Vector3.Normalize(diff);
+            var diff = head - tail;
+            headPoint.value += (value - diff.magnitude) * Vector3.Normalize(diff);
         }
         #endregion
 
 
         #region Animations
-        public Tween GrowFromStart(Vector3 from, Vector3 to)
+        public Tween GrowFromStart(Vector3Provider headPos, Vector3Provider tailPos)
         {
-            SetFromTo(from, from);
-            return Animate(from, to);
+            return Animate(
+                tailStart: tailPos,
+                headStart: tailPos,
+                tailEnd:tailPos,
+                headEnd: headPos
+            );
         }
 
         public Tween ShrinkToEnd()
         {
-            startPoint.StopTracking();
-            endPoint.StopTracking();
-            return Animate(end, end);
+            tailPoint.StopTracking();
+            headPoint.StopTracking();
+            return Animate(tailEnd: head);
         }
 
-        // ReSharper disable once ParameterHidesMember - the parameter we are hiding is obsolete
-        public Tween Animate(Vector3? from = null, Vector3? to = null)
-        {
-            var startTween = startPoint.Tween(from, out var isStartNoop);
-            var endTween = startPoint.Tween(from, out var isEndNoop);
+        public Tween Animate(
+            Vector3Provider headEnd = null,
+            Vector3Provider tailEnd = null,
+            Vector3Provider headStart = null,
+            Vector3Provider tailStart = null
+        ) {
+            var tailTween = tailPoint.Tween(tailEnd, tailStart);
+            var headTween = headPoint.Tween(headEnd, headStart);
 
-            return isStartNoop || isEndNoop
-                ? Tween.noop
-                : new Tween(t => {
-                    startPoint = startTween(t);
-                    endPoint = endTween(t);
-                    Recalculate();
-                });
+            return new Tween(t => {
+                if (tailTween is not null)
+                    tailPoint.value = tailTween(t);
+
+                if (headTween is not null)
+                    headPoint.value = headTween(t);
+
+                Recalculate();
+            });
         }
         #endregion
 
@@ -158,11 +177,11 @@ namespace Primer.Tools
         #region void Recalculate()
         public void Recalculate()
         {
-            if (shaft == null || head == null || tail == null || gameObject.IsPreset())
+            if (shaftObject == null || headObject == null || tailObject == null || gameObject.IsPreset())
                 return;
 
-            startArrowLength = startPointer ? realArrowLength : 0;
-            endArrowLength = endPointer ? realArrowLength : 0;
+            startArrowLength = tailPointer ? realArrowLength : 0;
+            endArrowLength = headPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
             var scale = this.GetPrimer().FindIntrinsicScale();
@@ -180,32 +199,32 @@ namespace Primer.Tools
         private void CalculatePosition()
         {
             var arrow = transform;
-            var diff = end - start;
+            var diff = head - tail;
 
             arrow.SetGlobalScale(Vector3.one);
             arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
-            arrow.position = diff / 2 + start;
+            arrow.position = diff / 2 + tail;
         }
 
         private void CalculateChildrenPosition()
         {
             var childRotation = Quaternion.Euler(axisRotation, 0, 0);
-            var shaftMiddle = (startSpace + startArrowLength) / 2 - (endSpace + endArrowLength) / 2;
+            var shaftMiddle = (tailSpace + startArrowLength) / 2 - (headSpace + endArrowLength) / 2;
 
-            shaft.localPosition = new Vector3(shaftMiddle, 0, 0);
-            shaft.localScale = new Vector3(shaftLength, thickness, thickness);
-            shaft.localRotation = childRotation;
+            shaftObject.localPosition = new Vector3(shaftMiddle, 0, 0);
+            shaftObject.localScale = new Vector3(shaftLength, thickness, thickness);
+            shaftObject.localRotation = childRotation;
 
-            var edge = (end - start).magnitude / 2;
+            var edge = (head - tail).magnitude / 2;
 
-            tail.gameObject.SetActive(startPointer);
-            head.gameObject.SetActive(endPointer);
+            tailObject.gameObject.SetActive(tailPointer);
+            headObject.gameObject.SetActive(headPointer);
 
-            if (startPointer)
-                CalculatePointer(tail, childRotation, -(edge - startSpace - startArrowLength));
+            if (tailPointer)
+                CalculatePointer(tailObject, childRotation, -(edge - tailSpace - startArrowLength));
 
-            if (endPointer)
-                CalculatePointer(head, childRotation, edge - endSpace - endArrowLength);
+            if (headPointer)
+                CalculatePointer(headObject, childRotation, edge - headSpace - endArrowLength);
         }
 
         private void CalculatePointer(Transform pointer, Quaternion childRotation, float x)
@@ -224,8 +243,8 @@ namespace Primer.Tools
         [Button(ButtonSizes.Large, Icon = SdfIconType.Recycle)]
         public void SwapStartEnd()
         {
-            (startPoint.value, endPoint.value) = (endPoint.value, startPoint.value);
-            (startPoint.follow, endPoint.follow) = (endPoint.follow, startPoint.follow);
+            (tailPoint.value, headPoint.value) = (headPoint.value, tailPoint.value);
+            (tailPoint.follow, headPoint.follow) = (headPoint.follow, tailPoint.follow);
         }
         #endregion
     }

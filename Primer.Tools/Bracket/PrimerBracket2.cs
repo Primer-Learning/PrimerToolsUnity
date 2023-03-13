@@ -150,22 +150,32 @@ namespace Primer.Tools
             rightPoint.isWorldPosition = isGlobal.Value;
         }
 
-        public Tween Animate(Vector3? anchor = null, Vector3? left = null, Vector3? right = null)
-        {
-            var anchorTween = anchorPoint.Tween(anchor, out var isAnchorNoop);
-            var leftTween = leftPoint.Tween(left, out var isLeftNoop);
-            var rightTween = rightPoint.Tween(right, out var isRightNoop);
+        public Tween Animate(
+            Vector3Provider anchorEnd = null,
+            Vector3Provider leftEnd = null,
+            Vector3Provider rightEnd = null,
+            Vector3Provider anchorStart = null,
+            Vector3Provider leftStart = null,
+            Vector3Provider rightStart = null
+        ) {
+            var anchorTween = anchorPoint.Tween(anchorEnd, anchorStart);
+            var leftTween = leftPoint.Tween(leftEnd, leftStart);
+            var rightTween = rightPoint.Tween(rightEnd, rightStart);
 
-            return isAnchorNoop && isLeftNoop && isRightNoop
-                ? Tween.noop
-                : new Tween(
-                    t => {
-                        anchorPoint = anchorTween(t);
-                        leftPoint = leftTween(t);
-                        rightPoint = rightTween(t);
-                        Refresh();
-                    }
-                );
+            return new Tween(
+                t => {
+                    if (anchorTween is not null)
+                        anchorPoint.value = anchorTween(t);
+
+                    if (leftTween is not null)
+                        leftPoint.value = leftTween(t);
+
+                    if (rightTween is not null)
+                        rightPoint.value = rightTween(t);
+
+                    Refresh();
+                }
+            );
         }
 
         // This method is marked as performance intensive because it logs a warning 🤦
