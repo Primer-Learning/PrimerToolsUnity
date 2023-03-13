@@ -34,6 +34,12 @@ namespace Primer.Timeline
             return found as T ?? director.CreateTrack<T>(boundTo);
         }
 
+        public static TimelineClip[] GetClipsInTrack(this PlayableDirector director, PlayableAsset asset)
+        {
+            var track = director.GetTrackOfClip(asset);
+            return track.GetClips().ToArray();
+        }
+
         public static TrackAsset GetTrackOfClip(this PlayableDirector director, PlayableAsset target)
         {
             return director.FindTrack(track => track.GetClips().Any(clip => ReferenceEquals(clip.asset, target)));

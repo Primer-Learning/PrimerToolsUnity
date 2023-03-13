@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
@@ -12,34 +11,36 @@ namespace Primer.Timeline.Editor
     [CustomEditor(typeof(GenericClip))]
     public class GenericClipEditor : OdinEditor
     {
-        private GenericClip clip => (GenericClip)target;
+        private GenericClip clipAsset => (GenericClip)target;
 
         public override void OnInspectorGUI()
         {
-            clip.resolver ??= TimelineEditor.inspectedDirector;
-            clip.trackTarget = GetTrackTarget();
+            clipAsset.resolver ??= TimelineEditor.inspectedDirector;
+            clipAsset.trackTarget = GetTrackTarget();
 
             base.OnInspectorGUI();
 
             ShowCodeEditorLink();
 
-            if (clip.expectedDuration is null)
+            if (clipAsset.expectedDuration is null)
                 return;
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Tween duration", clip.expectedDuration.ToString());
+            EditorGUILayout.LabelField("Tween duration", clipAsset.expectedDuration.ToString());
 
-            if (clip.expectedDuration != clip.duration) {
+            var clipDuration = (float)FindClipFor(clipAsset).duration;
+
+            if (clipAsset.expectedDuration != clipDuration) {
                 EditorGUILayout.HelpBox($"Clip duration doesn't match tween duration", MessageType.Warning);
 
-                if (GUILayout.Button($"Change clip duration to {clip.expectedDuration}", GUILayout.Height(32)))
-                    SetClipDuration(clip);
+                if (GUILayout.Button($"Change clip duration to {clipAsset.expectedDuration}", GUILayout.Height(32)))
+                    clipAsset.SetClipDuration(clipAsset.expectedDuration.Value);
             }
         }
 
         private void ShowCodeEditorLink()
         {
-            MonoBehaviour script = clip.template switch {
+            MonoBehaviour script = clipAsset.template switch {
                 ScrubbablePlayable _ => null,
                 TriggerablePlayable b => b.triggerable,
                 SequencePlayable c => c.sequence,
@@ -60,7 +61,7 @@ namespace Primer.Timeline.Editor
         private Transform GetTrackTarget()
         {
             var director = TimelineEditor.inspectedDirector;
-            var track = director.GetTrackOfClip(clip);
+            var track = director.GetTrackOfClip(clipAsset);
             var bounds = director.GetGenericBinding(track);
             var transform = bounds as Transform;
 
@@ -72,59 +73,11 @@ namespace Primer.Timeline.Editor
         }
 
 
-        #region void SetClipDuration(GenericClip asset)
-        private static void SetClipDuration(GenericClip asset)
+        private static TimelineClip FindClipFor(GenericClip asset)
         {
-            if (!asset.expectedDuration.HasValue)
-                return;
-
-            var track = TimelineEditor.inspectedDirector.GetTrackOfClip(asset);
-            var clips = track.GetClips().ToArray();
-
-            for (var i = 0; i < clips.Length; i++) {
-                if (clips[i].asset != asset)
-                    continue;
-
-                IncreaseClipDuration(clips, i, asset.expectedDuration.Value);
-                return;
-            }
+            var clips = TimelineEditor.inspectedDirector.GetClipsInTrack(asset);
+            var index = Array.FindIndex(clips, c => c.asset == asset);
+            return clips[index];
         }
-
-        private static void IncreaseClipDuration(TimelineClip[] clips, int i, float expectedDuration)
-        {
-            var targetClip = clips[i];
-            var neededSpace = expectedDuration - targetClip.duration;
-
-            if (i == clips.Length - 1) {
-                targetClip.duration = expectedDuration;
-                return;
-            }
-
-            var nextClip = clips[i + 1];
-            var availableSpace = nextClip.start - targetClip.end;
-
-            if (availableSpace < neededSpace)
-                MoveNextClips(clips, i + 1, neededSpace - availableSpace);
-
-            targetClip.duration += neededSpace;
-        }
-
-        private static void MoveNextClips(TimelineClip[] clips, int i, double neededSpace)
-        {
-            if (i == clips.Length - 1) {
-                clips[i].start += neededSpace;
-                return;
-            }
-
-            var targetClip = clips[i];
-            var nextClip = clips[i + 1];
-            var availableSpace = nextClip.start - targetClip.end;
-
-            if (neededSpace > availableSpace)
-                MoveNextClips(clips, i + 1, neededSpace - availableSpace);
-
-            targetClip.start += neededSpace;
-        }
-        #endregion
     }
 }
