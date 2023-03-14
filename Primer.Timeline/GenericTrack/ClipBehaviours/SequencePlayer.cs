@@ -20,17 +20,17 @@ namespace Primer.Timeline
 
         private readonly Sequence sequence;
         private readonly List<SequencePlayable> completedClips = new();
-        private SequencePlayable currentClip;
         private IAsyncEnumerator<Tween> enumerator;
+        private SequencePlayable activeClip;
         private Tween currentTween;
         private bool isDone = false;
-        private int index = 0;
 
         public SequencePlayer(Sequence sequence)
         {
             this.sequence = sequence;
         }
 
+        #region Clean() / Prepare() / Reset()
         /// <summary>Sets the state before any clip is executed</summary>
         public void Clean()
         {
@@ -56,11 +56,10 @@ namespace Primer.Timeline
         /// <summary>Rolls back the sequence execution to the beginning</summary>
         private async UniTask Reset()
         {
-            Log("Restart");
+            Log("Reset");
             completedClips.Clear();
-            currentClip = null;
+            activeClip = null;
             isDone = false;
-            index = 0;
 
             if (enumerator is null)
                 return;
@@ -68,43 +67,52 @@ namespace Primer.Timeline
             await enumerator.DisposeAsync();
             enumerator = null;
         }
+        #endregion
 
+        private List<SequencePlayable> _clips;
 
         public async UniTask PlayTo(float time, List<SequencePlayable> clips, CancellationToken ct)
         {
+            _clips = clips;
+            await PlayToInternal(time, clips, ct);
+            _clips = null;
+        }
+
+        private async Task PlayToInternal(float time, List<SequencePlayable> clips, CancellationToken ct)
+        {
             var clipsToRun = clips.Where(x => x.start <= time).ToArray();
+            var pastClips = clipsToRun.Where(x => x.end <= time).ToArray();
+            var currentClip = GetCurrentClip(clipsToRun.Where(x => x.end > time).ToArray());
 
-            if (await RestartIfNecessary(clipsToRun, ct))
+            // Any function returning true means that the execution should be stopped
+            // Either because the CancellationToken was cancelled or because there is nothing to do
+
+            if (await RestartIfNecessary(pastClips, currentClip, ct))
                 return;
-
-            var pastClips = clipsToRun.Where(x => x.end <= time);
 
             if (await ExecutePastClips(pastClips, ct))
                 return;
 
-            var currentClips = clipsToRun.Where(x => x.end > time).ToArray();
-
-            if (await ExecuteCurrentClip(time, currentClips, ct))
-                // yes, there is no need for this return but shows that all three operations follow the same pattern
+            if (await ExecuteCurrentClip(time, currentClip, ct))
+                // there is no need for this return but shows that all three operations follow the same pattern
                 return;
         }
 
-        private async Task<bool> ExecutePastClips(IEnumerable<SequencePlayable> pastClips, CancellationToken ct)
+        private SequencePlayable GetCurrentClip(SequencePlayable[] currentClips)
         {
-            foreach (var pastClipToRun in pastClips.Where(x => !completedClips.Contains(x))) {
-                if (await MoveNext(pastClipToRun, ct))
-                    return true;
+            if (currentClips.Length == 0)
+                return null;
 
-                currentTween?.Evaluate(1);
-                completedClips.Add(pastClipToRun);
+            if (currentClips.Length > 1) {
+                Debug.LogWarning($"Multiple clips are running for the same sequence {sequence}. This is not supported.");
             }
 
-            return false;
+            return currentClips[0];
         }
 
-        private async Task<bool> RestartIfNecessary(SequencePlayable[] clipsToRun, CancellationToken ct)
+        private async Task<bool> RestartIfNecessary(SequencePlayable[] pastClips, SequencePlayable currentClip, CancellationToken ct)
         {
-            if (clipsToRun.Length == 0) {
+            if (pastClips.Length == 0 && currentClip is null) {
                 if (status == Status.Cleaned)
                     return true;
 
@@ -118,10 +126,12 @@ namespace Primer.Timeline
             }
 
             var areRanClipsValid =
-                completedClips.Count <= clipsToRun.Length &&
-                completedClips.Where((ranClip, i) => ranClip == clipsToRun[i]).Any();
+                completedClips.Count <= pastClips.Length &&
+                completedClips.Where((ranClip, i) => ranClip == pastClips[i]).Count() == completedClips.Count;
 
-            if (areRanClipsValid)
+            var isActiveClipValid = activeClip == currentClip || pastClips.Contains(activeClip);
+
+            if (areRanClipsValid && isActiveClipValid)
                 return false;
 
             await Reset();
@@ -135,32 +145,41 @@ namespace Primer.Timeline
             return false;
         }
 
-        private async Task<bool> ExecuteCurrentClip(float time, SequencePlayable[] currentClips, CancellationToken ct)
+        private async Task<bool> ExecutePastClips(SequencePlayable[] pastClips, CancellationToken ct)
         {
-            if (currentClips.Length == 0)
-                return true;
+            foreach (var pastClipToRun in pastClips.Where(x => !completedClips.Contains(x))) {
+                var isActiveClip = activeClip == pastClipToRun;
 
-            if (currentClips.Length > 1) {
-                Debug.LogWarning($"Multiple clips are running for the same sequence {sequence}. This is not supported.");
+                if (!isActiveClip && await MoveNext(pastClipToRun, ct))
+                    return true;
+
+                currentTween?.Evaluate(1);
+                completedClips.Add(pastClipToRun);
             }
 
-            var current = currentClips[0];
+            return false;
+        }
 
-            if (currentClip != current && await MoveNext(current, ct))
+        private async Task<bool> ExecuteCurrentClip(float time, SequencePlayable currentClip, CancellationToken ct)
+        {
+            if (currentClip is null)
+                return true;
+
+            if (activeClip != currentClip && await MoveNext(currentClip, ct))
                 return true;
 
             if (currentTween is null)
                 return true;
 
-            var progress = (time - current.start) / current.duration;
-            Log($"Execute tween at time {time} - {progress}");
+            var progress = (time - currentClip.start) / currentClip.duration;
+            // Log($"Execute tween at time {time} - {progress}");
             currentTween.Evaluate(progress);
             return false;
         }
 
         private async UniTask<bool> MoveNext(SequencePlayable clip, CancellationToken ct)
         {
-            Log($"Executing clip {++index}");
+            Log($"Executing clip", clip);
 
             if (isDone) {
                 Debug.LogWarning($"Sequence {sequence} has more clips that yield returns.");
@@ -173,7 +192,7 @@ namespace Primer.Timeline
             if (ct.IsCancellationRequested)
                 return true;
 
-            currentClip = clip;
+            activeClip = clip;
             currentTween = enumerator.Current;
 
             if (currentTween is not null)
@@ -193,9 +212,16 @@ namespace Primer.Timeline
             return false;
         }
 
-        public static void Log(params object[] args)
+
+
+        public void Log(string message, SequencePlayable clip = null)
         {
-            // PrimerLogger.Log("SequencePlayer", args);
+            // var label = $"{sequence} [Player]";
+            //
+            // if (clip is null)
+            //     PrimerLogger.Log(label, message);
+            // else
+            //     PrimerLogger.Log(label, message, _clips.IndexOf(clip));
         }
     }
 }
