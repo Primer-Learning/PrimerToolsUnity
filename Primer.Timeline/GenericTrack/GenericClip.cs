@@ -94,11 +94,5 @@ namespace Primer.Timeline
             playable.GetBehaviour().onDurationReported = duration => expectedDuration = duration;;
             return playable;
         }
-
-        public void Initialize()
-        {
-            triggerable._triggerable.exposedName = GUID.Generate().ToString();
-            sequence._sequence.exposedName = GUID.Generate().ToString();
-        }
     }
 }

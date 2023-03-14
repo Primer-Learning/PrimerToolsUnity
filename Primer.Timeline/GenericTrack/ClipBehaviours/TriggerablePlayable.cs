@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,9 +8,7 @@ namespace Primer.Timeline
     [Serializable]
     internal class TriggerablePlayable : GenericBehaviour, IEquatable<TriggerablePlayable>
     {
-        [SerializeField]
-        [HideInInspector]
-        internal ExposedReference<Triggerable> _triggerable;
+        internal NoBullshitExposedReference<Triggerable> _triggerable = "TriggerablePlayable";
 
         [ShowInInspector]
         [PropertyOrder(1)]

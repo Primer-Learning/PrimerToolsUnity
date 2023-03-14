@@ -63,9 +63,6 @@ namespace Primer.Timeline.FakeUnityEngine
 
             clip.duration = defaultDuration;
 
-            if (clip.asset is GenericClip asset)
-                asset.Initialize();
-
             // clip.postExtrapolationMode = TimelineClip.ClipExtrapolation.Hold;
             //
             // HACK: Property's setter above is internal (why? ask Unity), so we use reflection to set it.

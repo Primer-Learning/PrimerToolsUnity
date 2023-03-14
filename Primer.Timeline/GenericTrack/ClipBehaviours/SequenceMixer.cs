@@ -16,6 +16,7 @@ namespace Primer.Timeline
             CancelPreviousExecution();
 
             var bySequence = allBehaviours
+                .Where(x => x.sequence is not null)
                 .GroupBy(x => x.sequence)
                 .ToDictionary(x => x.Key, x => x.ToList());
 

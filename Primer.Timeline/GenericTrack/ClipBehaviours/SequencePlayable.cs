@@ -14,7 +14,7 @@ namespace Primer.Timeline
 
         [SerializeField]
         [HideInInspector]
-        internal ExposedReference<Sequence> _sequence;
+        internal NoBullshitExposedReference<Sequence> _sequence = "SequencePlayable";
 
         [ShowInInspector]
         [PropertyOrder(1)]
