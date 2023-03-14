@@ -1,5 +1,3 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -103,11 +101,12 @@ namespace Primer.Tools
 
 
         #region Setters
-        public void Follow(GameObject from, GameObject to) => Follow(from.transform, to.transform);
-        public void Follow(Component from, Component to)
+        public PrimerArrow2 Follow(GameObject from, GameObject to) => Follow(from.transform, to.transform);
+        public PrimerArrow2 Follow(Component from, Component to)
         {
             tailPoint.follow = from.transform;
             headPoint.follow = to.transform;
+            return this;
         }
 
         public void SetFromTo(Vector3 from, Vector3 to, bool global)
