@@ -19,7 +19,8 @@ namespace Primer.Timeline
         private Status status = Status.Idle;
 
         private readonly Sequence sequence;
-        private readonly List<SequencePlayable> ran = new();
+        private readonly List<SequencePlayable> completedClips = new();
+        private SequencePlayable currentClip;
         private IAsyncEnumerator<Tween> enumerator;
         private Tween currentTween;
         private bool isDone = false;
@@ -56,7 +57,8 @@ namespace Primer.Timeline
         private async UniTask Reset()
         {
             Log("Restart");
-            ran.Clear();
+            completedClips.Clear();
+            currentClip = null;
             isDone = false;
             index = 0;
 
@@ -75,17 +77,29 @@ namespace Primer.Timeline
             if (await RestartIfNecessary(clipsToRun, ct))
                 return;
 
-            foreach (var pastClipToRun in clipsToRun.Where(x => x.end <= time && !ran.Contains(x))) {
+            var pastClips = clipsToRun.Where(x => x.end <= time);
+
+            if (await ExecutePastClips(pastClips, ct))
+                return;
+
+            var currentClips = clipsToRun.Where(x => x.end > time).ToArray();
+
+            if (await ExecuteCurrentClip(time, currentClips, ct))
+                // yes, there is no need for this return but shows that all three operations follow the same pattern
+                return;
+        }
+
+        private async Task<bool> ExecutePastClips(IEnumerable<SequencePlayable> pastClips, CancellationToken ct)
+        {
+            foreach (var pastClipToRun in pastClips.Where(x => !completedClips.Contains(x))) {
                 if (await MoveNext(pastClipToRun, ct))
-                    return;
+                    return true;
 
                 currentTween?.Evaluate(1);
-                ran.Add(pastClipToRun);
+                completedClips.Add(pastClipToRun);
             }
 
-            var currentClips = clipsToRun.Where(x => x.start <= time && x.end > time).ToArray();
-
-            await ExecuteCurrentClip(time, currentClips, ct);
+            return false;
         }
 
         private async Task<bool> RestartIfNecessary(SequencePlayable[] clipsToRun, CancellationToken ct)
@@ -104,8 +118,8 @@ namespace Primer.Timeline
             }
 
             var areRanClipsValid =
-                ran.Count <= clipsToRun.Length &&
-                ran.Where((ranClip, i) => ranClip == clipsToRun[i]).Any();
+                completedClips.Count <= clipsToRun.Length &&
+                completedClips.Where((ranClip, i) => ranClip == clipsToRun[i]).Any();
 
             if (areRanClipsValid)
                 return false;
@@ -132,12 +146,8 @@ namespace Primer.Timeline
 
             var current = currentClips[0];
 
-            if (!ran.Contains(current)) {
-                if (await MoveNext(current, ct))
-                    return true;
-
-                ran.Add(current);
-            }
+            if (currentClip != current && await MoveNext(current, ct))
+                return true;
 
             if (currentTween is null)
                 return true;
@@ -163,6 +173,7 @@ namespace Primer.Timeline
             if (ct.IsCancellationRequested)
                 return true;
 
+            currentClip = clip;
             currentTween = enumerator.Current;
 
             if (currentTween is not null)
