@@ -11,6 +11,9 @@ namespace Primer.Timeline.Editor
         {
             var clips = TimelineEditor.inspectedDirector.GetClipsInTrack(asset);
             var index = Array.FindIndex(clips, c => c.asset == asset);
+
+            UndoExtensions.RegisterClips(clips, $"Set clip duration to {clipAssetExpectedDuration}");
+
             clips.IncreaseClipDuration(index, clipAssetExpectedDuration);
         }
 
