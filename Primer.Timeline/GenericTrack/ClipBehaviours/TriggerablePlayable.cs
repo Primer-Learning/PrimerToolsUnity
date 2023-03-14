@@ -8,6 +8,7 @@ namespace Primer.Timeline
     [Serializable]
     internal class TriggerablePlayable : GenericBehaviour, IEquatable<TriggerablePlayable>
     {
+        [SerializeField, HideInInspector]
         internal NoBullshitExposedReference<Triggerable> _triggerable = "TriggerablePlayable";
 
         [ShowInInspector]
