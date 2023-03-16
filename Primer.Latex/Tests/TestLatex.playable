@@ -288,8 +288,8 @@ MonoBehaviour:
     rid: 5481954407885307907
   triggerable:
     rid: 5481954407885307908
-  sequential:
-    rid: 5481954407885307909
+  sequence:
+    rid: 6955339387600109572
   references:
     version: 2
     RefIds:
@@ -309,28 +309,22 @@ MonoBehaviour:
         weight: 0
         start: 1
         duration: 2
-        _triggerable:
-          exposedName: 43a654ecaaf11414d8927edcd23ee8d8
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: Transition
-    - rid: 5481954407885307909
-      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
-      data:
-        weight: 0
-        start: 1
-        duration: 2
-        _sequence:
-          exposedName: 74387284507c9479dba53876cdd9b7b0
-          defaultValue: {fileID: 0}
-        sequenceMethod:
-          methodName: 
     - rid: 5481954496223379457
       type: {class: LatexScrubbable, ns: Primer.Latex, asm: Primer.Latex}
       data:
         _from: {fileID: 0}
         _to: {fileID: 0}
         _groups: 020000000100000004000000
+    - rid: 6955339387600109572
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0
+        duration: 0
+        sequenceMethod:
+          methodName: 
 --- !u!114 &-2872404345629012489
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -453,7 +447,7 @@ MonoBehaviour:
     rid: 5481954407885307907
   triggerable:
     rid: 5481954407885307908
-  sequential:
+  sequence:
     rid: 5481954407885307909
   references:
     version: 2
@@ -476,9 +470,6 @@ MonoBehaviour:
         weight: 0
         start: 1
         duration: 1
-        _triggerable:
-          exposedName: 854c2d8dcd567410a98fa516f0880618
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: Transition
     - rid: 5481954407885307909
@@ -509,8 +500,8 @@ MonoBehaviour:
     rid: 5481954407885307907
   triggerable:
     rid: 5481954407885307908
-  sequential:
-    rid: 5481954407885307909
+  sequence:
+    rid: 6955339387600109573
   references:
     version: 2
     RefIds:
@@ -530,28 +521,22 @@ MonoBehaviour:
         weight: 0
         start: 1
         duration: 2
-        _triggerable:
-          exposedName: c9a0a5fb042cc43deb969aa37d3e89da
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: Transition
-    - rid: 5481954407885307909
-      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
-      data:
-        weight: 0
-        start: 1
-        duration: 2
-        _sequence:
-          exposedName: 6639a02a6335f4af2a593e4972f3e46a
-          defaultValue: {fileID: 0}
-        sequenceMethod:
-          methodName: 
     - rid: 5481954496223379457
       type: {class: LatexScrubbable, ns: Primer.Latex, asm: Primer.Latex}
       data:
         _from: {fileID: 0}
         _to: {fileID: 0}
         _groups: 030000000100000004000000
+    - rid: 6955339387600109573
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        weight: 0
+        start: 0
+        duration: 0
+        sequenceMethod:
+          methodName: 
 --- !u!114 &7322016901008185252
 MonoBehaviour:
   m_ObjectHideFlags: 1
