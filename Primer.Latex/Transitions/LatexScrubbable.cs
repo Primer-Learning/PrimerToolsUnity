@@ -13,8 +13,7 @@ namespace Primer.Latex
     public class LatexScrubbable : Scrubbable, IDisposable
     {
         #region Inspector
-        [SerializeReference]
-        [HideInInspector]
+        [SerializeReference, HideInInspector]
         private LatexComponent _from;
 
         [ShowInInspector]
@@ -27,8 +26,7 @@ namespace Primer.Latex
             }
         }
 
-        [SerializeReference]
-        [HideInInspector]
+        [SerializeReference, HideInInspector]
         private LatexComponent _to;
 
         [ShowInInspector]
@@ -41,12 +39,12 @@ namespace Primer.Latex
             }
         }
 
-        [SerializeReference]
-        [HideInInspector]
+        [SerializeReference, HideInInspector]
         private List<TransitionType> _groups = new();
 
         [ShowInInspector]
-        public IEnumerable<TransitionType> groups {
+        [LatexTransitionGroup(nameof(_from), nameof(_to))]
+        public List<TransitionType> groups {
             get => _groups;
             set {
                 _groups = value?.ToList() ?? new List<TransitionType>();

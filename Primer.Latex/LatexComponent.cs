@@ -64,6 +64,11 @@ namespace Primer.Latex
             groups.SetGroupLengths(lengths);
         }
 
+        internal IEnumerable<LatexExpression> GetGroups()
+        {
+            return groups.ranges.Select(x => expression.Slice(x.start, x.end));
+        }
+
         // Rendering
 
         public Color color {
@@ -93,7 +98,7 @@ namespace Primer.Latex
             return new LatexScrubbable {
                 from = this,
                 to = transitionTo,
-                groups = transitions,
+                groups = transitions.ToList(),
             };
         }
 

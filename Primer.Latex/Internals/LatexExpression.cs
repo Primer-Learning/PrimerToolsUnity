@@ -62,7 +62,7 @@ namespace Primer.Latex
         public IEnumerable<LatexExpression> Split(List<(int start, int end)> ranges)
             => ranges.Select(x => Slice(x.start, x.end));
 
-        // TODO: Move to LatexGroups
+        // TODO: Move to LatexGroups now
         public List<(int start, int end)> CalculateRanges(List<int> indexes)
         {
             var last = 0;

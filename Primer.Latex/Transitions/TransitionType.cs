@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Primer.Latex
 {
@@ -20,9 +21,14 @@ namespace Primer.Latex
             var array = transitions.ToArray();
 
             if (array.Count(x => x == TransitionType.Anchor) > 1)
-                throw new System.Exception("Cannot have more than one anchor transition");
+                throw new Exception("Cannot have more than one anchor transition");
 
             return array;
+        }
+
+        public static int GetTransitionAmountFor(LatexComponent from, LatexComponent to)
+        {
+            return Mathf.Max(from.transform.childCount, to.transform.childCount);
         }
 
         public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions, LatexComponent from, LatexComponent to)

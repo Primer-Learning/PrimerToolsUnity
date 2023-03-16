@@ -46,13 +46,12 @@ namespace Primer.Latex
         public static int ShowGroup(LatexExpression expression, (int start, int end) range)
             => ShowGroup(expression.Slice(range.start, range.end));
 
-        public static int ShowGroup(LatexExpression expression)
+        public static int ShowGroup(LatexExpression expression) => ShowGroup(expression, Screen.width);
+        public static int ShowGroup(LatexExpression expression, float width)
         {
-            var width = Screen.width;
-            var cols = width / (charPreviewSize + 20);
-
+            var cols = Mathf.Max(width / (charPreviewSize + 20), 1);
             var textures = GetPreviewsFor(expression);
-            return GUILayout.SelectionGrid(0, textures, cols);
+            return GUILayout.SelectionGrid(0, textures, Mathf.FloorToInt(cols), GUILayout.Width(width));
         }
     }
 }
