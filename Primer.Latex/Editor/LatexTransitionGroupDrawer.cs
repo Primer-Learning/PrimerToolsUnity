@@ -98,13 +98,16 @@ namespace Primer.Latex.Editor
                 }
             }
 
-            if (!newValues.SequenceEqual(transitions))
-                ValueEntry.SmartValue = newValues;
-
             if (GUILayout.Button("Validate transitions"))
                 newValues.Validate(from, to);
 
             EditorGUILayout.Space(32);
+
+            if (newValues.SequenceEqual(transitions))
+                return;
+
+            ValueEntry.SmartValue = newValues;
+            newValues.Validate(from, to);
         }
     }
 }
