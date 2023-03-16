@@ -71,7 +71,7 @@ namespace Primer.Tools
         [ShowInInspector]
         [DisableIf("follow")]
         public Vector3 value {
-            get => isTracking ? follow.position : _value + followAdjustmentVector;
+            get => (isTracking ? follow.position : _value) + followAdjustmentVector;
             set {
                 StopTracking();
 
