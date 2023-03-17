@@ -27,7 +27,21 @@ namespace Primer.Timeline
 
         private IExposedPropertyTable _resolver;
         internal IExposedPropertyTable resolver {
-            get => _resolver == null ? null : _resolver;
+            get {
+                if (_resolver is null)
+                    return null;
+
+                // HACK: This is the only way we could make sure the resolver is still valid.
+                // _resolver == null returns false
+                try {
+                    _resolver.ClearReferenceValue(default(PropertyName));
+                }
+                catch (Exception) {
+                    _resolver = null;
+                }
+
+                return _resolver;
+            }
             set => _resolver = value;
         }
         #endregion
