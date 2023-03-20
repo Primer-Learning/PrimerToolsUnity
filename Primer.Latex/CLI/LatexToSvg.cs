@@ -52,6 +52,7 @@ namespace Primer.Latex
                 \end{{document}}
             ");
 
+            // PrimerLogger.Log("AAAAAA", new { dir, sourcePath});
             ExecuteXelatex(dir, sourcePath, ct);
             ExecuteDvisvgm(dir, outputPath, ct);
 
