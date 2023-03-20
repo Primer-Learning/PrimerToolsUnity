@@ -106,6 +106,9 @@ namespace Primer.Animation
         #region Static methods: Parallel & Series
         public static Tween Parallel(params Tween[] tweenList)
         {
+            if (tweenList.Length == 0)
+                return noop with { milliseconds = 0 };
+            
             var fullDuration = tweenList.Max(x => x.totalDuration);
 
             if (fullDuration is 0) {
