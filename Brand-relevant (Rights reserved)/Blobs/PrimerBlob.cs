@@ -29,7 +29,9 @@ public class PrimerBlob : PrimerCharacter
         AccessoryType.monocle
     };
 
-    public Color color = PrimerColor.Blue;
+    public PrimerColor.PrimerColors presetColor;
+    internal Color color;
+    
     public List<BlobAccessory> accessories = new();
 
     [SerializeField] private PrimerObject lEye;
@@ -78,6 +80,14 @@ public class PrimerBlob : PrimerCharacter
         lEye = transform.FindDeepChild("eye_l").GetComponent<PrimerObject>();
         rEye = transform.FindDeepChild("eye_r").GetComponent<PrimerObject>();
         mouth = transform.FindDeepChild("mouth").GetComponent<PrimerObject>();
+    }
+
+    private void OnValidate()
+    {
+        var colorFromUI = PrimerColor.primerColorsDict[presetColor];
+        // TODO: Make the MeshRendererExtension method of setting colors work with SkinnedMeshRendeders
+        transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().material.color = colorFromUI;
+        color = colorFromUI;
     }
 
     protected virtual void Start()
@@ -456,9 +466,9 @@ public class PrimerBlob : PrimerCharacter
 
     public void DestoyAccessories()
     {
-        for (var i = accessories.Count - 1; i == 0; i++)
+        foreach (var accessory in accessories)
         {
-            DestroyImmediate(accessories[i].gameObject);
+            DestroyImmediate(accessory.gameObject);
         }
         accessories.Clear();
     }

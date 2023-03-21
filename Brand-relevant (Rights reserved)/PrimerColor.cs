@@ -87,4 +87,32 @@ public static class PrimerColor
     public static Color UnityColorFromVector4(Vector4 sc) {
         return sc / 255;
     }
+
+    public enum PrimerColors
+    {
+        Blue,
+        Orange,
+        Yellow,
+        Red,
+        Green,
+        Purple,
+        Gray,
+        LightGray,
+        White,
+        Black
+    }
+
+    public static Dictionary<PrimerColors, Color> primerColorsDict = new()
+    {
+        {PrimerColors.Blue, Blue},
+        {PrimerColors.Orange, Orange},
+        {PrimerColors.Yellow, Yellow},
+        {PrimerColors.Red, Red},
+        {PrimerColors.Green, Green},
+        {PrimerColors.Purple, Purple},
+        {PrimerColors.Gray, Gray},
+        {PrimerColors.LightGray, LightGray},
+        {PrimerColors.White, White},
+        {PrimerColors.Black, Black}
+    };
 }
