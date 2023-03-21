@@ -63,6 +63,20 @@ public static class Helpers
         // if (loops == 30) { Debug.Log("Couldn't find a point"); }
         return newPos;
     }
+
+    public static float GetEvenlySpacedFloatGivenTotal(int objectIndex, int totalObjects, float totalSpace)
+    {
+        // var totalDistance = distanceBetweenObjects * (objects.Count - 1);
+        var distanceBetweenObjects = totalSpace / (totalObjects - 1);
+        var min = -totalSpace / 2;
+        return min + objectIndex * distanceBetweenObjects;
+    }
+    public static float GetEvenlySpacedFloatGivenStep(int objectIndex, int totalObjects, float distanceBetweenObjects)
+    {
+        var totalSpace = distanceBetweenObjects * (totalObjects - 1);
+        var min = -totalSpace / 2;
+        return min + objectIndex * distanceBetweenObjects;
+    }
    
     //I ended up not using this, but seems useful!
     public static Component CopyComponentTo(Component original, GameObject destination)
