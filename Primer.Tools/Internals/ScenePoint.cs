@@ -19,8 +19,11 @@ namespace Primer.Tools
             get => _isWorldPosition;
             set {
                 _isWorldPosition = value;
-                CheckTrackedObject(emitOnChange: false);
-                Changed();
+
+                if (isTracking)
+                    CheckTrackedObject();
+                else
+                    Changed();
             }
         }
         #endregion
@@ -30,7 +33,7 @@ namespace Primer.Tools
         private Transform _follow;
 
         [ShowInInspector]
-        [InlineButton(nameof(StopTracking), SdfIconType.X, "", ShowIf = "_follow")]
+        [InlineButton(nameof(StopTracking), SdfIconType.X, "", ShowIf = nameof(_follow))]
         public Transform follow {
             get => _follow;
             set {
@@ -42,11 +45,25 @@ namespace Primer.Tools
                 else
                     _follow = value;
 
-                Changed();
+                CheckTrackedObject();
             }
         }
+        #endregion
 
-        public Vector3 followedValue => isWorldPosition ? follow.position : follow.localPosition;
+        #region Func<Vector3> getter;
+        private Func<Vector3> _getter;
+
+        public Func<Vector3> getter {
+            get => _getter;
+            set {
+                if (_getter == value)
+                    return;
+
+                StopTracking();
+                _getter = value;
+                CheckTrackedObject();
+            }
+        }
         #endregion
 
         #region Vector3 value;
@@ -76,12 +93,7 @@ namespace Primer.Tools
         private Vector3 _adjustment;
 
         [ShowInInspector]
-        [InlineButton(
-            nameof(ResetAdjustment),
-            SdfIconType.X,
-            "",
-            ShowIf = nameof(hasAdjustment)
-        )]
+        [InlineButton(nameof(ResetAdjustment), SdfIconType.X, "", ShowIf = nameof(hasAdjustment))]
         public Vector3 adjustment {
             get => _adjustment;
             set {
@@ -104,22 +116,31 @@ namespace Primer.Tools
 
         public Action onChange;
 
-        public bool isTracking => _follow != null;
+        public bool isTracking => _getter is not null || _follow != null;
+
+        public Vector3 trackedValue {
+            get {
+                if (_getter is not null)
+                    return _getter();
+
+                return isWorldPosition ? follow.position : follow.localPosition;
+            }
+        }
 
         /// <summary>
         /// This may return the local or world position coordinates.
-        /// You probably want to use GetLocalPosition or GetWorldPosition instead.
+        /// You probably want to use GetLocalPosition() or GetWorldPosition() instead.
         /// </summary>
         [ShowInInspector]
-        private Vector3 value => (isTracking ? followedValue : _vector) + adjustment;
+        private Vector3 value => (isTracking ? trackedValue : vector) + adjustment;
 
 
         public bool CheckTrackedObject(bool emitOnChange = true)
         {
-            if (!isTracking || _vector == followedValue)
+            if (!isTracking || _vector == trackedValue)
                 return false;
 
-            _vector = followedValue;
+            _vector = trackedValue;
 
             if (emitOnChange)
                 Changed();
@@ -132,8 +153,9 @@ namespace Primer.Tools
             if (!isTracking)
                 return;
 
-            _vector = followedValue;
+            _vector = trackedValue;
             _follow = null;
+            _getter = null;
         }
 
         public Vector3 GetLocalPosition(Transform parent)
