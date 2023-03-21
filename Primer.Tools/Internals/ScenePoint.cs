@@ -157,8 +157,8 @@ namespace Primer.Tools
 
         public Func<float, Vector3> Tween(Vector3Provider to = null, Vector3Provider from = null)
         {
-            var start = from ?? vector;
-            var end = to ?? vector;
+            var start = from ?? value;
+            var end = to ?? value;
             return t => Vector3.Lerp(start, end, t);
         }
 
@@ -198,8 +198,8 @@ namespace Primer.Tools
                 return false;
 
             StopTracking();
-            _isWorldPosition = true;
-            _vector = newValue;
+            _vector = isWorldPosition ? newValue : parent.InverseTransformPoint(newValue);
+
             return true;
         }
 #endif
