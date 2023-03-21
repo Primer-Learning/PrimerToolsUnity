@@ -28,9 +28,11 @@ namespace Primer.Tools
         public ScenePoint tailPoint = Vector3.zero;
         [FormerlySerializedAs("startSpace")]
         [LabelText("Space")]
+        [OnValueChanged(nameof(Recalculate))]
         public float tailSpace = 0;
         [FormerlySerializedAs("startPointer")]
         [LabelText("Pointer")]
+        [OnValueChanged(nameof(Recalculate))]
         public bool tailPointer = false;
 
         [FormerlySerializedAs("endPoint")]
@@ -38,14 +40,18 @@ namespace Primer.Tools
         public ScenePoint headPoint = Vector3.one;
         [FormerlySerializedAs("endSpace")]
         [LabelText("Space")]
+        [OnValueChanged(nameof(Recalculate))]
         public float headSpace = 0;
         [FormerlySerializedAs("endPointer")]
         [LabelText("Pointer")]
+        [OnValueChanged(nameof(Recalculate))]
         public bool headPointer = true;
 
         [Space(16)]
         [Title("Fine tuning")]
+        [OnValueChanged(nameof(Recalculate))]
         public float thickness = 1f;
+        [OnValueChanged(nameof(Recalculate))]
         public float axisRotation = 0;
 
         [ShowInInspector]
