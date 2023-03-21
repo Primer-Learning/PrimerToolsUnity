@@ -117,8 +117,8 @@ namespace Primer.Tools
 
         public void SetFromTo(Vector3 from, Vector3 to)
         {
-            tailPoint.value = from;
-            headPoint.value = to;
+            tailPoint.vector = from;
+            headPoint.vector = to;
         }
 
         private void SetLength(float value)
@@ -128,7 +128,7 @@ namespace Primer.Tools
                 return;
 
             var diff = head - tail;
-            headPoint.value += (value - diff.magnitude) * Vector3.Normalize(diff);
+            headPoint.vector += (value - diff.magnitude) * Vector3.Normalize(diff);
         }
         #endregion
 
@@ -162,10 +162,10 @@ namespace Primer.Tools
 
             return new Tween(t => {
                 if (tailTween is not null)
-                    tailPoint.value = tailTween(t);
+                    tailPoint.vector = tailTween(t);
 
                 if (headTween is not null)
-                    headPoint.value = headTween(t);
+                    headPoint.vector = headTween(t);
 
                 Recalculate();
             });
@@ -242,8 +242,8 @@ namespace Primer.Tools
         [Button(ButtonSizes.Large, Icon = SdfIconType.Recycle)]
         public void SwapStartEnd()
         {
-            (tailPoint.value, headPoint.value) = (headPoint.value, tailPoint.value);
-            (tailPoint.follow, headPoint.follow) = (headPoint.follow, tailPoint.follow);
+            (tailPoint, headPoint) = (headPoint, tailPoint);
+            Recalculate();
         }
         #endregion
     }

@@ -79,8 +79,8 @@ namespace Primer.Tools
         public ScenePoint anchorPoint = Vector3.zero;
 
         public Vector3 anchor {
-            get => anchorPoint.value;
-            set => anchorPoint.value = value;
+            get => anchorPoint.vector;
+            set => anchorPoint.vector = value;
         }
         #endregion
 
@@ -89,8 +89,8 @@ namespace Primer.Tools
         public ScenePoint leftPoint = new Vector3(-1, 0, 1);
 
         public Vector3 left {
-            get => leftPoint.value;
-            set => leftPoint.value = value;
+            get => leftPoint.vector;
+            set => leftPoint.vector = value;
         }
         #endregion
 
@@ -99,8 +99,8 @@ namespace Primer.Tools
         public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
         public Vector3 right {
-            get => rightPoint.value;
-            set => rightPoint.value = value;
+            get => rightPoint.vector;
+            set => rightPoint.vector = value;
         }
         #endregion
 
@@ -165,13 +165,13 @@ namespace Primer.Tools
             return new Tween(
                 t => {
                     if (anchorTween is not null)
-                        anchorPoint.value = anchorTween(t);
+                        anchorPoint.vector = anchorTween(t);
 
                     if (leftTween is not null)
-                        leftPoint.value = leftTween(t);
+                        leftPoint.vector = leftTween(t);
 
                     if (rightTween is not null)
-                        rightPoint.value = rightTween(t);
+                        rightPoint.vector = rightTween(t);
 
                     Refresh();
                 }

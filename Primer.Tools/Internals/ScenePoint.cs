@@ -1,6 +1,7 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Tools
 {
@@ -14,14 +15,11 @@ namespace Primer.Tools
         private bool _isWorldPosition;
 
         [ShowInInspector]
-        [DisableIf("follow")]
         public bool isWorldPosition {
-            get => isTracking || _isWorldPosition;
+            get => _isWorldPosition;
             set {
-                if (isTracking)
-                    follow = null;
-
                 _isWorldPosition = value;
+                CheckTrackedObject(emitOnChange: false);
                 Changed();
             }
         }
@@ -47,55 +45,81 @@ namespace Primer.Tools
                 Changed();
             }
         }
-        #endregion
-        
-        #region Transform followAdjustmentVector;
-        [SerializeField, HideInInspector]
-        private Vector3 _followAdjustmentVector;
-        [ShowInInspector]
-        public Vector3 followAdjustmentVector
-        {
-            get => _followAdjustmentVector;
-            set
-            {
-                _followAdjustmentVector = value;
-                Changed();
-            }
-        }
+
+        public Vector3 followedValue => isWorldPosition ? follow.position : follow.localPosition;
         #endregion
 
         #region Vector3 value;
+        [FormerlySerializedAs("_value")]
         [SerializeField, HideInInspector]
-        private Vector3 _value;
+        private Vector3 _vector;
 
         [ShowInInspector]
         [DisableIf("follow")]
-        public Vector3 value {
-            get => (isTracking ? follow.position : _value) + followAdjustmentVector;
+        public Vector3 vector {
+            get => _vector;
             set {
                 StopTracking();
 
-                if (_value == value)
+                if (_vector == value)
                     return;
 
-                _value = value;
+                _vector = value;
                 Changed();
             }
         }
         #endregion
 
-        private Vector3? lastTrackedValue;
+        #region Vector3 followAdjustmentVector;
+        [FormerlySerializedAs("_followAdjustmentVector")]
+        [SerializeField, HideInInspector]
+        private Vector3 _adjustment;
+
+        [ShowInInspector]
+        [InlineButton(
+            nameof(ResetAdjustment),
+            SdfIconType.X,
+            "",
+            ShowIf = nameof(hasAdjustment)
+        )]
+        public Vector3 adjustment {
+            get => _adjustment;
+            set {
+                if (_adjustment == value)
+                    return;
+
+                _adjustment = value;
+                Changed();
+            }
+        }
+
+        private bool hasAdjustment => adjustment.x != 0 || adjustment.y != 0 || adjustment.z != 0;
+
+        private void ResetAdjustment()
+        {
+            adjustment = Vector3.zero;
+            Changed();
+        }
+        #endregion
+
         public Action onChange;
 
         public bool isTracking => _follow != null;
 
+        /// <summary>
+        /// This may return the local or world position coordinates.
+        /// You probably want to use GetLocalPosition or GetWorldPosition instead.
+        /// </summary>
+        [ShowInInspector]
+        private Vector3 value => (isTracking ? followedValue : _vector) + adjustment;
+
 
         public bool CheckTrackedObject(bool emitOnChange = true)
         {
-            if (!isTracking || lastTrackedValue == follow.position)
+            if (!isTracking || _vector == followedValue)
                 return false;
 
-            lastTrackedValue = follow.position;
+            _vector = followedValue;
 
             if (emitOnChange)
                 Changed();
@@ -108,9 +132,8 @@ namespace Primer.Tools
             if (!isTracking)
                 return;
 
-            _value = _follow.position;
+            _vector = followedValue;
             _follow = null;
-            lastTrackedValue = null;
         }
 
         public Vector3 GetLocalPosition(Transform parent)
@@ -134,8 +157,8 @@ namespace Primer.Tools
 
         public Func<float, Vector3> Tween(Vector3Provider to = null, Vector3Provider from = null)
         {
-            var start = from ?? value;
-            var end = to ?? value;
+            var start = from ?? vector;
+            var end = to ?? vector;
             return t => Vector3.Lerp(start, end, t);
         }
 
@@ -162,7 +185,7 @@ namespace Primer.Tools
 
         public static implicit operator ScenePoint(Vector3 value)
         {
-            return new ScenePoint { value = value };
+            return new ScenePoint { vector = value };
         }
 
 #if UNITY_EDITOR
@@ -176,7 +199,7 @@ namespace Primer.Tools
 
             StopTracking();
             _isWorldPosition = true;
-            _value = newValue;
+            _vector = newValue;
             return true;
         }
 #endif
