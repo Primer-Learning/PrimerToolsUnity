@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -129,6 +131,11 @@ namespace Primer.Animation
             };
         }
 
+        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
+        {
+            return Parallel(tweenList.Select(tween => tween with { delay = delayBetweenStarts * tweenList.ToList().IndexOf(tween) }).ToArray());
+        }
+        
         public static Tween Series(Tween[] tweenList)
         {
             var fullDuration = tweenList.Sum(x => x.totalDuration);
