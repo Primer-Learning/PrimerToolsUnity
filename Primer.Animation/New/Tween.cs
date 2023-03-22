@@ -79,7 +79,7 @@ namespace Primer.Animation
                 Evaluate(t);
                 await UniTask.DelayFrame(1, cancellationToken: ct);
 
-                if (!ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested)
                     return;
             }
 
