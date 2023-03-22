@@ -7,9 +7,9 @@ namespace Primer
         private readonly Transform target;
         private readonly Transform parent;
 
-        public readonly Vector3 position;
-        public readonly Quaternion rotation;
-        public readonly Vector3 scale;
+        public Vector3 position { init; get; }
+        public Quaternion rotation { init; get; }
+        public Vector3 scale { init; get; }
 
 
         public TransformSnapshot(Transform target)
