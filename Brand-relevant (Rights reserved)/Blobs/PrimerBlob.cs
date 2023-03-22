@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Primer.Animation;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 using Random = System.Random;
@@ -28,7 +29,8 @@ public class PrimerBlob : PrimerCharacter
         AccessoryType.wizardHat,
         AccessoryType.monocle
     };
-
+    
+    [OnValueChanged("SetColorToUIColor")]
     public PrimerColor.PrimerColors presetColor;
     internal Color color;
     
@@ -82,12 +84,10 @@ public class PrimerBlob : PrimerCharacter
         mouth = transform.FindDeepChild("mouth").GetComponent<PrimerObject>();
     }
 
-    private void OnValidate()
+    private void SetColorToUIColor()
     {
         var colorFromUI = PrimerColor.primerColorsDict[presetColor];
-        // TODO: Make the MeshRendererExtension method of setting colors work with SkinnedMeshRendeders
-        // transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().SetColor(colorFromUI);
-        transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().material.color = colorFromUI;
+        transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().SetColor(colorFromUI);
         color = colorFromUI;
     }
 
