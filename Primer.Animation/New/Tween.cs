@@ -133,7 +133,7 @@ namespace Primer.Animation
 
         public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
         {
-            return Parallel(tweenList.Select(tween => tween with { delay = delayBetweenStarts * tweenList.ToList().IndexOf(tween) }).ToArray());
+            return Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }).ToArray());
         }
         
         public static Tween Series(params Tween[] tweenList)
