@@ -86,7 +86,7 @@ public class PrimerBlob : PrimerCharacter
     {
         var colorFromUI = PrimerColor.primerColorsDict[presetColor];
         // TODO: Make the MeshRendererExtension method of setting colors work with SkinnedMeshRendeders
-        transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().material.color = colorFromUI;
+        transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().SetColor(colorFromUI);
         color = colorFromUI;
     }
 
