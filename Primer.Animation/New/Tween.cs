@@ -136,7 +136,7 @@ namespace Primer.Animation
             return Parallel(tweenList.Select(tween => tween with { delay = delayBetweenStarts * tweenList.ToList().IndexOf(tween) }).ToArray());
         }
         
-        public static Tween Series(Tween[] tweenList)
+        public static Tween Series(params Tween[] tweenList)
         {
             var fullDuration = tweenList.Sum(x => x.totalDuration);
 
