@@ -17,6 +17,9 @@ namespace Primer.Animation
 
         public static void SetColor(this MeshRenderer renderer, Color color)
         {
+            if (renderer.sharedMaterial is null)
+                return;
+
             Get(renderer).color = color;
         }
 
