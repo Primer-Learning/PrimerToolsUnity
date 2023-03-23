@@ -104,7 +104,12 @@ namespace Primer
 
             areOrphansCollected = true;
 
-            foreach (var go in GameObject.FindGameObjectsWithTag(POOL_OBJECT_TAG)) {
+            var list = Resources.FindObjectsOfTypeAll<PoolData>()
+                .Select(x => x.gameObject)
+                .Concat(GameObject.FindGameObjectsWithTag(POOL_OBJECT_TAG))
+                .ToHashSet();
+
+            foreach (var go in list) {
                 Recycle(go);
             }
         }

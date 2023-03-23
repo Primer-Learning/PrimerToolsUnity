@@ -19,9 +19,11 @@ namespace Primer
             return new SpecializedPool<T>(self) {
                 onRecycle = t => {
                     t.GetComponent<PoolData>().isInTimeline = false;
+                    t.hideFlags = HideFlags.None;
                 },
                 onUse = t => {
                     t.GetComponent<PoolData>().isInTimeline = true;
+                    t.hideFlags = HideFlags.DontSave;
                 },
             };
         }
