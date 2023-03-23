@@ -195,21 +195,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7db139a8754927bb0511e086adf96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaft: {fileID: 3196383622414401422}
-  head: {fileID: 2032350495482225248}
-  tail: {fileID: 2032514543369383664}
-  startPoint:
+  shaftObject: {fileID: 3196383622414401422}
+  headObject: {fileID: 2032350495482225248}
+  tailObject: {fileID: 2032514543369383664}
+  tailPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}
-    _value: {x: 0, y: 0, z: 0}
-  startSpace: 0
-  startPointer: 0
-  endPoint:
+    _vector: {x: 0, y: 0, z: 0}
+    _adjustment: {x: 0, y: 0, z: 0}
+  tailSpace: 0
+  tailPointer: 0
+  headPoint:
     _isWorldPosition: 0
     _follow: {fileID: 0}
-    _value: {x: 1, y: 1, z: 1}
-  endSpace: 0
-  endPointer: 1
+    _vector: {x: 1, y: 1, z: 1}
+    _adjustment: {x: 0, y: 0, z: 0}
+  headSpace: 0
+  headPointer: 1
   thickness: 1
   axisRotation: 0
   arrowLength: 0.05

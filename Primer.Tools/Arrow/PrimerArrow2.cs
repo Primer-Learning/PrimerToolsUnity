@@ -106,9 +106,16 @@ namespace Primer.Tools
 
 
         #region Inspector panel
-        [OnInspectorGUI] private void Space() => GUILayout.Space(16);
+        // [OnInspectorGUI] private void Space() => GUILayout.Space(16);
 
-        [ButtonGroup]
+        [PropertySpace]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
+        private void Refresh()
+        {
+            Recalculate();
+        }
+
+        [PropertySpace]
         [Button(ButtonSizes.Large, Icon = SdfIconType.Recycle)]
         public void SwapStartEnd()
         {
