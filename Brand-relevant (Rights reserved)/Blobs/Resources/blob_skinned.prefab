@@ -856,7 +856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
-  color: {r: 0.24313726, g: 0.49411765, b: 0.627451, a: 1}
+  presetColor: 0
   accessories: []
   lEye: {fileID: 544653982}
   rEye: {fileID: 2057487421}
