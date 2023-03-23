@@ -31,7 +31,8 @@ namespace Primer.Latex
             return Mathf.Max(from.transform.childCount, to.transform.childCount);
         }
 
-        public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions, LatexComponent from, LatexComponent to)
+        public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions, LatexComponent from,
+            LatexComponent to)
         {
             var array = transitions.Validate();
 
@@ -43,11 +44,19 @@ namespace Primer.Latex
             var remove = array.Count(x => x == TransitionType.Remove);
             var common = array.Length - add - remove;
 
-            if (from.transform.childCount < common + remove)
-                throw new Exception("Source LatexComponent doesn't have enough groups to transition");
+            if (from.transform.childCount < common + remove) {
+                if (from.groupsCount == common + remove)
+                    Debug.LogWarning("LatexComponent didn't have time to update groups, the transition may fail");
+                else
+                    throw new Exception("Source LatexComponent doesn't have enough groups to transition");
+            }
 
-            if (to.transform.childCount < common + add)
-                throw new Exception("Target LatexComponent doesn't have enough groups to transition");
+            if (to.transform.childCount < common + add) {
+                if (to.groupsCount == common + add)
+                    Debug.LogWarning("LatexComponent didn't have time to update groups, the transition may fail");
+                else
+                    throw new Exception("Target LatexComponent doesn't have enough groups to transition");
+            }
 
             return array;
         }

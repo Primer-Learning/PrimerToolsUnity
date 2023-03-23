@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -74,8 +72,10 @@ namespace Primer.Latex
             var endGroups = end.transform.GetChildren();
 
             for (var i = 0; i < transitions.Length; i++) {
-                if (transitions[i] is TransitionType.Add or TransitionType.Replace)
-                    yield return endGroups[endCursor];
+                if (transitions[i] is TransitionType.Add or TransitionType.Replace) {
+                    if (endGroups.Length > endCursor)
+                        yield return endGroups[endCursor];
+                }
 
                 if (transitions[i] is not TransitionType.Remove)
                     endCursor++;
@@ -88,8 +88,10 @@ namespace Primer.Latex
             var startGroups = start.transform.GetChildren();
 
             for (var i = 0; i < transitions.Length; i++) {
-                if (transitions[i] is TransitionType.Remove or TransitionType.Replace)
-                    yield return startGroups[startCursor];
+                if (transitions[i] is TransitionType.Remove or TransitionType.Replace) {
+                    if (startGroups.Length > startCursor)
+                        yield return startGroups[startCursor];
+                }
 
                 if (transitions[i] is not TransitionType.Add)
                     startCursor++;
@@ -104,8 +106,10 @@ namespace Primer.Latex
             var endGroups = end.transform.GetChildren();
 
             for (var i = 0; i < transitions.Length; i++) {
-                if (transitions[i] is not TransitionType.Add and not TransitionType.Remove and not TransitionType.Replace)
-                    yield return (startGroups[startCursor], endGroups[endCursor]);
+                if (transitions[i] is not TransitionType.Add and not TransitionType.Remove and not TransitionType.Replace) {
+                    if (startGroups.Length > startCursor && endGroups.Length > endCursor)
+                        yield return (startGroups[startCursor], endGroups[endCursor]);
+                }
 
                 if (transitions[i] is not TransitionType.Add)
                     startCursor++;
