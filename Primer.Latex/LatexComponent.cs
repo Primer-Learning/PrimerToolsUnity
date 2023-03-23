@@ -98,6 +98,9 @@ namespace Primer.Latex
 
         public LatexScrubbable CreateTransition(LatexComponent transitionTo, params TransitionType[] transitions)
         {
+            gameObject.SetActive(true);
+            transitionTo.gameObject.SetActive(true);
+
             return new LatexScrubbable {
                 from = this,
                 to = transitionTo,
@@ -122,6 +125,7 @@ namespace Primer.Latex
             groups = new LatexGroups();
             renderer = new LatexRenderer();
             onChange = new UnityEvent<LatexExpression>();
+            ConnectParts();
         }
 
 
