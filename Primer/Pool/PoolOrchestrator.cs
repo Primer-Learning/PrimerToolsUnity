@@ -22,7 +22,7 @@ namespace Primer
                     Object.Destroy(_container);
 
                 var go = GameObject.Find(POOL_CONTAINER_NAME) ?? new GameObject(POOL_CONTAINER_NAME);
-                go.hideFlags = HideFlags.DontSave;
+                // go.hideFlags = HideFlags.DontSave;
 
                 // If we disable it GameObject.Find() won't find it
                 // go.SetActive(false);
