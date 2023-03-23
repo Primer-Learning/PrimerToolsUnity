@@ -186,6 +186,8 @@ namespace Primer.Timeline
                 return false;
             }
 
+            Prepare();
+
             enumerator ??= sequence.Run();
             var hasMore = await enumerator.MoveNextAsync();
 
