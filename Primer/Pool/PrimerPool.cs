@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -71,21 +72,20 @@ namespace Primer
 
         protected T Create(Transform parent)
         {
-            prefab ??= PoolOrchestrator.GetPrefab(prefabName);
+            prefab ??= GetPrefab(prefabName);
             var component = PoolOrchestrator.Create<T>(prefabName, prefab, parent);
             return component;
         }
 
-        private void EnsureOrphansAreCollected()
+        private static Object GetPrefab(string prefabName)
         {
-            if (hasCollectedOrphans)
-                return;
+            var prefab = Resources.Load(prefabName);
 
-            hasCollectedOrphans = true;
-
-            foreach (var orphan in PoolOrchestrator.OrphanObjects<T>(prefabName)) {
-                Recycle(orphan);
+            if (prefab is null) {
+                throw new Exception($"Cannot find prefab {prefabName}");
             }
+
+            return prefab;
         }
     }
 }
