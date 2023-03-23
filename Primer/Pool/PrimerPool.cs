@@ -32,7 +32,6 @@ namespace Primer
             if (target.transform.parent != parent)
                 target.transform.SetParent(parent, worldPositionStays: true);
 
-            go.SetActive(true);
             PoolOrchestrator.Reuse(go);
 
             if (target is IPoolable poolable)
@@ -61,7 +60,6 @@ namespace Primer
 
             var go = target.gameObject;
 
-            go.SetActive(false);
             PoolOrchestrator.Recycle(go);
 
             if (target is IPoolable poolable)

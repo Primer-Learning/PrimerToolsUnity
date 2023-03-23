@@ -74,12 +74,14 @@ namespace Primer
             var data = GetData(target);
             data.state = PoolState.InUse;
             target.gameObject.name = data.prefabName;
+            target.gameObject.SetActive(true);
             GameObjectUtility.EnsureUniqueNameForSibling(target.gameObject);
         }
 
         public static void Recycle(GameObject target)
         {
             target.transform.SetParent(container, worldPositionStays: true);
+            target.gameObject.SetActive(false);
             GetData(target).state = PoolState.Recycled;
         }
 
