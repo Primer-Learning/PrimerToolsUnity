@@ -8,10 +8,4 @@ namespace Primer
         public PoolState state;
         public bool isInTimeline;
     }
-
-    public enum PoolState
-    {
-        Recycled,
-        InUse,
-    }
 }
