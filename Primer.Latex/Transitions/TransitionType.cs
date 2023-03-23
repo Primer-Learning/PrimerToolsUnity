@@ -35,6 +35,10 @@ namespace Primer.Latex
         {
             var array = transitions.Validate();
 
+            // If either component is processing, we can't validate the transition
+            if (from.isProcessing || to.isProcessing)
+                return array;
+
             var add = array.Count(x => x == TransitionType.Add);
             var remove = array.Count(x => x == TransitionType.Remove);
             var common = array.Length - add - remove;

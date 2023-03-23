@@ -19,10 +19,11 @@ namespace Primer.Latex
         [HideInInspector]
         internal string _latex;
 
+        public bool isProcessing => processor.state == LatexProcessingState.Processing;
+
 #if UNITY_EDITOR
         private bool isIdle => !isProcessing && !isCancelling && !hasError;
         private bool isCancelling => processor.state == LatexProcessingState.Cancelled && isProcessing;
-        private bool isProcessing => processor.state == LatexProcessingState.Processing;
         private bool hasError => processor.renderError != null;
 
         [InfoBox("Ok", VisibleIf = nameof(isIdle))]
@@ -105,9 +106,6 @@ namespace Primer.Latex
 
             expression = newExpression;
             onChange?.Invoke();
-// #if UNITY_EDITOR
-//             GUIHelper.RequestRepaint();
-// #endif
             return true;
         }
     }

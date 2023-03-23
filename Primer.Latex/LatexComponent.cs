@@ -42,6 +42,7 @@ namespace Primer.Latex
         }
 
         public LatexExpression expression => integration.expression;
+        public bool isProcessing => integration.isProcessing;
 
         public UniTask Process(int input) => Process($"${input}$");
         public UniTask Process(float input) => Process($"${input}$");
