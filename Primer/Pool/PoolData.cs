@@ -6,6 +6,5 @@ namespace Primer
     {
         public string prefabName;
         public PoolState state;
-        public bool isInTimeline;
     }
 }
