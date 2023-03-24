@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Primer.Scene;
-using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.SceneManagement;
 
 namespace Primer.Timeline
 {
