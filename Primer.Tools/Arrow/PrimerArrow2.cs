@@ -11,27 +11,36 @@ namespace Primer.Tools
         private float startArrowLength;
         private float endArrowLength;
 
+        [FormerlySerializedAs("shaft")]
         [SerializeField, PrefabChild]
         private Transform shaftObject;
+        [FormerlySerializedAs("head")]
         [SerializeField, PrefabChild]
         private Transform headObject;
+        [FormerlySerializedAs("tail")]
         [SerializeField, PrefabChild]
         private Transform tailObject;
 
+        [FormerlySerializedAs("startPoint")]
         [Title("Start")]
         public ScenePoint tailPoint = Vector3.zero;
+        [FormerlySerializedAs("startSpace")]
         [LabelText("Space")]
         [OnValueChanged(nameof(Recalculate))]
         public float tailSpace = 0;
+        [FormerlySerializedAs("startPointer")]
         [LabelText("Pointer")]
         [OnValueChanged(nameof(Recalculate))]
         public bool tailPointer = false;
 
+        [FormerlySerializedAs("endPoint")]
         [Title("End")]
         public ScenePoint headPoint = Vector3.one;
+        [FormerlySerializedAs("endSpace")]
         [LabelText("Space")]
         [OnValueChanged(nameof(Recalculate))]
         public float headSpace = 0;
+        [FormerlySerializedAs("endPointer")]
         [LabelText("Pointer")]
         [OnValueChanged(nameof(Recalculate))]
         public bool headPointer = true;
