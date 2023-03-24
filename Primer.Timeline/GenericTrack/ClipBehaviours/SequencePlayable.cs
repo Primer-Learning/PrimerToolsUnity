@@ -47,8 +47,26 @@ namespace Primer.Timeline
 
         static SequencePlayable() => SetIcon<SequencePlayable>('≡');
 
-        public override string playableName
-            => sequence == null ? NO_SEQUENCE_SELECTED : sequenceMethod.ToString(sequence);
+        public Action<int> onClipIndexReported;
+
+        public int _clipIndex = 0;
+        public int? clipIndex {
+            get => _clipIndex;
+            set {
+                _clipIndex = value ?? 0;
+                onClipIndexReported?.Invoke(_clipIndex);
+            }
+        }
+
+        public override string playableName {
+            get {
+                if (sequence == null)
+                    return NO_SEQUENCE_SELECTED;
+
+                var indexPart = clipIndex == 0 ? "" : $"[{clipIndex}] ";
+                return $"{indexPart}{sequenceMethod.ToString(sequence)}";
+            }
+        }
 
 
         public override string ToString()

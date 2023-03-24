@@ -74,6 +74,10 @@ namespace Primer.Timeline
         public async UniTask PlayTo(float time, List<SequencePlayable> clips, CancellationToken ct)
         {
             _clips = clips;
+
+            for (var i = 0; i < clips.Count; i++)
+                clips[i].clipIndex = i + 1;
+
             await PlayToInternal(time, clips, ct);
             _clips = null;
         }

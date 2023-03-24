@@ -91,7 +91,14 @@ namespace Primer.Timeline
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<GenericBehaviour>.Create(graph, template);
-            playable.GetBehaviour().onDurationReported = duration => expectedDuration = duration;;
+            var behaviour = playable.GetBehaviour();
+
+            if (behaviour is SequencePlayable sequenceBehaviour) {
+                sequenceBehaviour.onClipIndexReported = index => sequence.clipIndex = index;
+            }
+
+            behaviour.onDurationReported = duration => expectedDuration = duration;
+
             return playable;
         }
     }
