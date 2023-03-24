@@ -11,6 +11,11 @@ namespace Primer.Timeline
         public CancellationTokenSource lastExecution = new();
         public readonly Dictionary<Sequence, SequencePlayer> players = new();
 
+        public void Reset()
+        {
+            players.Clear();
+        }
+
         public void Mix(SequencePlayable[] allBehaviours, float time)
         {
             CancelPreviousExecution();
@@ -27,7 +32,7 @@ namespace Primer.Timeline
             }
         }
 
-        public SequencePlayer GetPlayerFor(Sequence sequence)
+        private SequencePlayer GetPlayerFor(Sequence sequence)
         {
             if (players.TryGetValue(sequence, out var player))
                 return player;
