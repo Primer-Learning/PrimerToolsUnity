@@ -7,7 +7,15 @@ using Object = UnityEngine.Object;
 
 namespace Primer
 {
-    public static class PoolOrchestrator
+    /// <summary>
+    ///     This class coordinates all pools of different types and with different specializations.
+    ///     Provides a single, centralized place to find and create objects.
+    ///     As well as collecting any orphans that may have been lost after recompilation.
+    ///
+    ///     If we ever implement a way for objects to return themselves to the pool this class will be responsible
+    ///     for finding the correct pool and returning the object to it.
+    /// </summary>
+    internal static class PoolOrchestrator
     {
         private const string POOL_OBJECT_TAG = "PoolObject";
         private const string POOL_CONTAINER_NAME = "PoolContainer";

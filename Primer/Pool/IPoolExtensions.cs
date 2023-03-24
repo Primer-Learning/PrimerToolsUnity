@@ -17,13 +17,13 @@ namespace Primer
         public static IPool<T> ForTimeline<T>(this IPool<T> self) where T : Component
         {
             return new SpecializedPool<T>(self) {
-                onRecycle = t => {
-                    t.GetComponent<PoolData>().isInTimeline = false;
-                    t.hideFlags = HideFlags.None;
-                },
                 onUse = t => {
                     t.GetComponent<PoolData>().isInTimeline = true;
                     t.hideFlags = HideFlags.DontSave;
+                },
+                onRecycle = t => {
+                    t.GetComponent<PoolData>().isInTimeline = false;
+                    t.hideFlags = HideFlags.None;
                 },
             };
         }
