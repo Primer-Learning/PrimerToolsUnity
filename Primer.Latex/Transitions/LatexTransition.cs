@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Primer.Animation;
+using Primer.Timeline;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -149,6 +150,7 @@ namespace Primer.Latex
                 hideFlags = HideFlags.DontSave,
             };
 
+            PrimerTimeline.MarkAsEphemeral(container);
             CreateTransforms(container.transform);
             return container;
         }

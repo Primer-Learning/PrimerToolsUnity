@@ -90,6 +90,7 @@ namespace Primer
         {
             target.transform.SetParent(container, worldPositionStays: true);
             target.gameObject.SetActive(false);
+            target.gameObject.tag = POOL_OBJECT_TAG;
             GetData(target).state = PoolState.Recycled;
         }
 

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Scene;
+using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 namespace Primer.Timeline
 {
@@ -18,6 +21,11 @@ namespace Primer.Timeline
         public bool isMuted;
 
 
+        public override void OnPlayableDestroy(Playable playable)
+        {
+            PrimerTimeline.DisposeEphemeralObjects();
+        }
+
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             lastPlayable = playable;
@@ -30,14 +38,20 @@ namespace Primer.Timeline
 
             var time = (float)playable.GetTime();
 
-            var behaviours = mixers
+            var allBehaviours = mixers
                 .SelectMany(mixer => CollectBehaviours(mixer.lastPlayable))
+                .ToArray();
+
+            var behaviours = allBehaviours
                 .GroupBy(x => x.GetType())
                 .ToDictionary(x => x.Key, x => x.ToList());
 
             RunStrategy<ScrubbablePlayable>(scrubbableMixer.Mix, behaviours, time);
             RunStrategy<TriggerablePlayable>(triggerableMixer.Mix, behaviours, time);
             RunStrategy<SequencePlayable>(sequenceMixer.Mix, behaviours, time);
+
+            if (allBehaviours.Count(x => x.start < time) == 0)
+                PrimerTimeline.DisposeEphemeralObjects();
         }
 
 
@@ -91,24 +105,6 @@ namespace Primer.Timeline
             }
 
             return  mixers;
-        }
-    }
-
-    public class PlayableTimeComparer : IComparer<GenericBehaviour>
-    {
-        public int Compare(GenericBehaviour left, GenericBehaviour right)
-        {
-            if (left is null && right is null)
-                return 0;
-
-            if (left is null)
-                return 1;
-
-            if (right is null)
-                return -1;
-
-            var delta = left.start - right.start;
-            return (int) (delta * 10000);
         }
     }
 }
