@@ -14,6 +14,7 @@ namespace Primer.Timeline
             UnityTagManager.CreateTag(COLLECTABLE_OBJECT_TAG);
         }
 
+        public static void MarkAsEphemeral(Component component) => MarkAsEphemeral(component.gameObject);
         public static void MarkAsEphemeral(GameObject gameObject)
         {
             haveEphemeralObjectsBeenCollected = false;
