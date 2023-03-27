@@ -8,6 +8,7 @@ namespace Primer
     public class PrimerPool<T> : IPool<T> where T : Component
     {
         private readonly Queue<T> pool = new();
+        private readonly WeakSet<T> inUse = new();
 
         private readonly string prefabName;
         private Object prefab;
@@ -37,6 +38,7 @@ namespace Primer
             if (target is IPoolable poolable)
                 poolable.OnReuse();
 
+            inUse.Add(target);
             return target;
         }
 
@@ -65,7 +67,15 @@ namespace Primer
             if (target is IPoolable poolable)
                 poolable.OnRecycle();
 
+            inUse.Remove(target);
             pool.Enqueue(target);
+        }
+
+        public void RecycleAll()
+        {
+            foreach (var target in inUse) {
+                Recycle(target);
+            }
         }
 
         protected T Create(Transform parent)

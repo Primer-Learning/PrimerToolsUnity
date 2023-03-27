@@ -9,6 +9,7 @@ namespace Primer
         public Action<T> onUse { init; get; }
 
         private readonly IPool<T> basePool;
+        private readonly WeakSet<T> inUse = new();
 
         public SpecializedPool(IPool<T> basePool)
         {
@@ -19,6 +20,7 @@ namespace Primer
         {
             var component = basePool.Get(parent);
             onUse?.Invoke(component);
+            inUse.Add(component);
             return component;
         }
 
@@ -27,8 +29,16 @@ namespace Primer
             if (target == null)
                 return;
 
+            inUse.Remove(target);
             basePool.Recycle(target);
             onRecycle?.Invoke(target);
+        }
+
+        public void RecycleAll()
+        {
+            foreach (var target in inUse) {
+                Recycle(target);
+            }
         }
 
         public void Fill(int amount)
