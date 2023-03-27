@@ -8,7 +8,7 @@ namespace Primer.Timeline
 {
     internal class SequenceMixer
     {
-        public CancellationTokenSource lastExecution = new();
+        public SingleExecutionGuarantee executionGuarantee = new();
         public readonly Dictionary<Sequence, SequencePlayer> players = new();
 
         public void Reset()
@@ -18,7 +18,7 @@ namespace Primer.Timeline
 
         public void Mix(SequencePlayable[] allBehaviours, float time)
         {
-            CancelPreviousExecution();
+            var ct = executionGuarantee.NewExecution();
 
             var bySequence = allBehaviours
                 .Where(x => x.sequence is not null)
@@ -27,7 +27,7 @@ namespace Primer.Timeline
 
             foreach (var (sequence, behaviours) in bySequence) {
                 GetPlayerFor(sequence)
-                    .PlayTo(time, behaviours, lastExecution.Token)
+                    .PlayTo(time, behaviours, ct)
                     .Forget();
             }
         }
@@ -40,14 +40,6 @@ namespace Primer.Timeline
             player = new SequencePlayer(sequence);
             players.Add(sequence, player);
             return player;
-        }
-
-        private void CancelPreviousExecution()
-        {
-            if (lastExecution is not null)
-                lastExecution.Cancel();
-
-            lastExecution = new CancellationTokenSource();
         }
     }
 }
