@@ -48,7 +48,7 @@ namespace Primer.Timeline
             RunStrategy<TriggerablePlayable>(triggerableMixer.Mix, behaviours, time);
             RunStrategy<SequencePlayable>(sequenceMixer.Mix, behaviours, time);
 
-            if (allBehaviours.Count(x => x.start < time) == 0)
+            if (allBehaviours.Count(x => x.start <= time) == 0)
                 PrimerTimeline.DisposeEphemeralObjects();
         }
 
