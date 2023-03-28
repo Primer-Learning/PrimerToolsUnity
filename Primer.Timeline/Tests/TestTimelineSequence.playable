@@ -17,8 +17,8 @@ MonoBehaviour:
     rid: 5481954043140767762
   triggerable:
     rid: 5481954043140767763
-  sequential:
-    rid: 5481954043140767764
+  sequence:
+    rid: 6955339677101195266
   references:
     version: 2
     RefIds:
@@ -40,22 +40,17 @@ MonoBehaviour:
         weight: 0
         start: 5
         duration: 1
-        _triggerable:
-          exposedName: cf23ae4e4afa8442382109f9ee12a224
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: 
-    - rid: 5481954043140767764
-      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+    - rid: 6955339677101195266
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
         weight: 0
         start: 5
         duration: 1
-        _sequence:
-          exposedName: 2fddb010f50b547369a098419a446977
-          defaultValue: {fileID: 0}
         sequenceMethod:
-          methodName: Run
+          methodName: 
+        _clipIndex: 3
 --- !u!114 &-8221759976430781531
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -162,7 +157,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 1
     m_PreExtrapolationTime: 1
-    m_DisplayName: "\u2261 TestTimelineSequence.Run()"
+    m_DisplayName: "\u2261 [1] TestTimelineSequence.Run()"
   - m_Version: 1
     m_Start: 3
     m_ClipIn: 0
@@ -231,7 +226,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: 1
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u2261 TestTimelineSequence.Run()"
+    m_DisplayName: "\u2261 [2] TestTimelineSequence.No method selected"
   - m_Version: 1
     m_Start: 5
     m_ClipIn: 0
@@ -300,7 +295,7 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: Infinity
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u2261 TestTimelineSequence.Run()"
+    m_DisplayName: "\u2261 [3] TestTimelineSequence.No method selected"
   m_Markers:
     m_Objects: []
   defaultDuration: 1
@@ -376,8 +371,8 @@ MonoBehaviour:
     rid: 5481954043140767756
   triggerable:
     rid: 5481954043140767757
-  sequential:
-    rid: 5481954043140767758
+  sequence:
+    rid: 6955339677101195264
   references:
     version: 2
     RefIds:
@@ -399,22 +394,17 @@ MonoBehaviour:
         weight: 0
         start: 0
         duration: 0
-        _triggerable:
-          exposedName: 0f66561baf68f4490bc1b932d52e576a
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: 
-    - rid: 5481954043140767758
-      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+    - rid: 6955339677101195264
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
         weight: 0
         start: 1
         duration: 1
-        _sequence:
-          exposedName: b752e83d8af8e44e19f13197c217269b
-          defaultValue: {fileID: 0}
         sequenceMethod:
           methodName: Run
+        _clipIndex: 1
 --- !u!114 &8488974010620000498
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -432,8 +422,8 @@ MonoBehaviour:
     rid: 5481954043140767759
   triggerable:
     rid: 5481954043140767760
-  sequential:
-    rid: 5481954043140767761
+  sequence:
+    rid: 6955339677101195265
   references:
     version: 2
     RefIds:
@@ -455,22 +445,17 @@ MonoBehaviour:
         weight: 0
         start: 0
         duration: 0
-        _triggerable:
-          exposedName: b862ecb394f0f4a6085477c6e006f11d
-          defaultValue: {fileID: 0}
         triggerMethod:
           methodName: 
-    - rid: 5481954043140767761
-      type: {class: SequentialPlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+    - rid: 6955339677101195265
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
         weight: 0
         start: 3
         duration: 1
-        _sequence:
-          exposedName: 4c56ae4a80f364a098c3dc66ef5b81a9
-          defaultValue: {fileID: 0}
         sequenceMethod:
-          methodName: Run
+          methodName: 
+        _clipIndex: 2
 --- !u!114 &9117094690620461942
 MonoBehaviour:
   m_ObjectHideFlags: 1

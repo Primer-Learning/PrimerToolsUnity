@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Primer.Animation;
-using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Primer.Timeline.Tests
 {
@@ -24,25 +24,16 @@ namespace Primer.Timeline.Tests
 
         public override async IAsyncEnumerator<Tween> Run()
         {
-            await new Tween(
-                t => {}
-            ).Play();
-
             this.Log("ScaleUpFromZero");
-            await primer.ScaleUpFromZero().Play();
+            yield return primer.ScaleUpFromZero();
+
             this.Log($"Now wait {seconds} seconds");
             await Seconds(seconds);
             this.Log("MyCustomNamedTrigger done");
-
             yield return null;
-
-            var pos = transform.position;
 
             this.Log("Move UP!");
-            await primer.MoveTo(new Vector3(pos.x, pos.y + 1, pos.z)).Play();
-            this.Log("Movement complete");
-
-            yield return null;
+            yield return primer.MoveTo(transform.position + Vector3.up);
 
             this.Log("I'm going to wait");
             await Milliseconds(500);
