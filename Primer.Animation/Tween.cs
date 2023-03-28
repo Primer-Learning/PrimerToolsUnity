@@ -104,6 +104,7 @@ namespace Primer.Animation
 
 
         #region Static methods: Parallel & Series
+        // ReSharper disable Unity.PerformanceAnalysis
         public static Tween Parallel(params Tween[] tweenList)
         {
             if (tweenList.Length == 0)
