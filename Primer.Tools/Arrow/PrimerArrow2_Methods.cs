@@ -41,21 +41,28 @@ namespace Primer.Tools
 
 
         #region Animations
-        public Tween GrowFromStart(Vector3Provider headPos, Vector3Provider tailPos)
+        public Tween GrowFromStart()
         {
-            return Animate(
-                tailStart: tailPos,
-                headStart: tailPos,
-                tailEnd: tailPos,
-                headEnd: headPos
-            );
+            var growTween = Animate(headStart: tailPoint);
+
+            return tailPoint.adjustment == headPoint.adjustment
+                ? growTween
+                : Tween.Parallel(
+                    growTween,
+                    headPoint.Tween("adjustment", headPoint.adjustment, tailPoint.adjustment)
+                );
         }
 
         public Tween ShrinkToEnd()
         {
-            tailPoint.StopTracking();
-            headPoint.StopTracking();
-            return Animate(tailEnd: head);
+            var shrinkTween = Animate(tailEnd: head);
+
+            return tailPoint.adjustment == headPoint.adjustment
+                ? shrinkTween
+                : Tween.Parallel(
+                    shrinkTween,
+                    tailPoint.Tween("adjustment", headPoint.adjustment, tailPoint.adjustment)
+                );
         }
 
         public Tween Animate(
