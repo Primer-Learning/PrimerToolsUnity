@@ -63,12 +63,13 @@ namespace Primer.Tools
             Vector3Provider tailEnd = null,
             Vector3Provider headStart = null,
             Vector3Provider tailStart = null
-        )
-        {
+        ) {
+            var tailTracking = tailPoint.isTracking ? (Vector3Provider)tailPoint : null;
+            var headTracking = headPoint.isTracking ? (Vector3Provider)headPoint : null;
             var tailTween = tailPoint.Tween(tailEnd, tailStart);
             var headTween = headPoint.Tween(headEnd, headStart);
 
-            return new Tween(
+            var tween = new Tween(
                 t => {
                     if (tailTween is not null)
                         tailPoint.vector = tailTween(t);
@@ -77,6 +78,16 @@ namespace Primer.Tools
                         headPoint.vector = headTween(t);
 
                     Recalculate();
+                }
+            );
+
+            if (tailTracking is null && headTracking is null)
+                return tween;
+
+            return tween.Observe(
+                onComplete: () => {
+                    tailTracking?.ApplyTo(tailPoint);
+                    headTracking?.ApplyTo(headPoint);
                 }
             );
         }

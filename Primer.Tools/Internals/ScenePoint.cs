@@ -179,8 +179,8 @@ namespace Primer.Tools
 
         public Func<float, Vector3> Tween(Vector3Provider to = null, Vector3Provider from = null)
         {
-            var start = from ?? value;
-            var end = to ?? value;
+            var start = from ?? this;
+            var end = to ?? this;
             return t => Vector3.Lerp(start, end, t);
         }
 
