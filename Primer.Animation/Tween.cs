@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -126,6 +124,7 @@ namespace Primer.Animation
                     }
                 }
             ) {
+                easeMethod = LinearEasing.instance,
                 duration = fullDuration,
                 isCalculated = true,
             };
@@ -164,6 +163,7 @@ namespace Primer.Animation
                     tweenList[cursor].Evaluate(t);
                 }
             ) {
+                easeMethod = LinearEasing.instance,
                 duration = fullDuration,
                 isCalculated = true,
             };

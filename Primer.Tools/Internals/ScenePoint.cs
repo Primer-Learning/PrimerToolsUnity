@@ -87,7 +87,7 @@ namespace Primer.Tools
         }
         #endregion
 
-        #region Vector3 followAdjustmentVector;
+        #region Vector3 adjustment;
         [FormerlySerializedAs("_followAdjustmentVector")]
         [SerializeField, HideInInspector]
         private Vector3 _adjustment;
