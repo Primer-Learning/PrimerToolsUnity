@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer.Tools
 {
-    public class Vector3Provider
+    public class Vector3Provider : IEquatable<Vector3Provider>
     {
         private readonly Vector3? constant;
         private readonly Func<Vector3> getter;
@@ -68,5 +68,41 @@ namespace Primer.Tools
         public static implicit operator Vector3Provider(Transform val) => new(val);
 
         public static implicit operator Vector3(Vector3Provider @this) => @this.value;
+
+
+        #region Equality
+        public bool Equals(Vector3Provider other)
+        {
+            if (ReferenceEquals(null, other))
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Nullable.Equals(constant, other.constant)
+                && Equals(getter, other.getter)
+                && Equals(followGlobal, other.followGlobal)
+                && Equals(followLocal, other.followLocal);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+                return false;
+
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj.GetType() != GetType())
+                return false;
+
+            return Equals((Vector3Provider)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(constant, getter, followGlobal, followLocal);
+        }
+        #endregion
     }
 }
