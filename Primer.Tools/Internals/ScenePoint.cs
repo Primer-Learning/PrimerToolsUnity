@@ -184,6 +184,17 @@ namespace Primer.Tools
             return t => Vector3.Lerp(start, end, t);
         }
 
+        public override string ToString()
+        {
+            if (!isTracking)
+                return $"ScenePoint.Value({vector})";
+
+            if (getter is not null)
+                return $"ScenePoint.Getter({getter()})";
+
+            return $"ScenePoint.Follow(\"{follow.name}\", {trackedValue})";
+        }
+
         // Statics
 
         public static bool CheckTrackedObject(params ScenePoint[] points)
@@ -208,6 +219,17 @@ namespace Primer.Tools
         public static implicit operator ScenePoint(Vector3 value)
         {
             return new ScenePoint { vector = value };
+        }
+
+        public static implicit operator Vector3Provider(ScenePoint point)
+        {
+            if (!point.isTracking)
+                return point.vector;
+
+            if (point.getter is not null)
+                return point.getter;
+
+            return new Vector3Provider(point.follow, point.isWorldPosition);
         }
 
 #if UNITY_EDITOR
