@@ -7,11 +7,12 @@ namespace Primer.Tools
     {
         #region Setters
         public PrimerArrow2 Follow(GameObject from, GameObject to) => Follow(from.transform, to.transform);
+        public PrimerArrow2 Follow(Component from, Component to) => Follow(from.transform, to.transform);
 
-        public PrimerArrow2 Follow(Component from, Component to)
+        public PrimerArrow2 Follow(Transform from, Transform to)
         {
-            tailPoint.follow = from.transform;
-            headPoint.follow = to.transform;
+            tailPoint.follow = from;
+            headPoint.follow = to;
             return this;
         }
 
