@@ -33,8 +33,8 @@ public class PrimerBlob : PrimerCharacter {
     };
     
     [OnValueChanged("SetColorToUIColor")]
-    public PrimerColor.PrimerColors presetColor;
-    internal Color color;
+    public PrimerColor.PrimerColors brokenPresetColor;
+    public Color color;
     
     public List<BlobAccessory> accessories = new();
 
@@ -88,7 +88,7 @@ public class PrimerBlob : PrimerCharacter {
 
     private void SetColorToUIColor()
     {
-        var colorFromUI = PrimerColor.primerColorsDict[presetColor];
+        var colorFromUI = PrimerColor.primerColorsDict[brokenPresetColor];
         transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().SetColor(colorFromUI);
         color = colorFromUI;
     }

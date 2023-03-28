@@ -553,7 +553,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7309bf14761c9794fb48c5f79de8c4e7, type: 2}
+  - {fileID: 2100000, guid: 0d62c4347785e0f449732dc4bb1a2a83, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -856,7 +856,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
-  presetColor: 0
+  brokenPresetColor: 0
+  color: {r: 0.24313726, g: 0.49411765, b: 0.627451, a: 1}
   accessories: []
   lEye: {fileID: 544653982}
   rEye: {fileID: 2057487421}
