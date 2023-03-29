@@ -153,14 +153,11 @@ namespace Primer.Tools
         public Tween Animate(
             Vector3Provider anchorEnd = null,
             Vector3Provider leftEnd = null,
-            Vector3Provider rightEnd = null,
-            Vector3Provider anchorStart = null,
-            Vector3Provider leftStart = null,
-            Vector3Provider rightStart = null
+            Vector3Provider rightEnd = null
         ) {
-            var anchorTween = anchorPoint.Tween(anchorEnd, anchorStart);
-            var leftTween = leftPoint.Tween(leftEnd, leftStart);
-            var rightTween = rightPoint.Tween(rightEnd, rightStart);
+            var anchorTween = anchorPoint.Tween(anchorEnd, anchorPoint.vector);
+            var leftTween = leftPoint.Tween(leftEnd, leftPoint.vector);
+            var rightTween = rightPoint.Tween(rightEnd, rightPoint.vector);
 
             return new Tween(
                 t => {
