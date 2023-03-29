@@ -14,7 +14,9 @@ namespace Primer.Animation
         SmoothIn,
         SmoothOut,
         Custom,
+        [Obsolete("Use Linear instead")]
         None,
+        Linear,
     }
 
 	public static class EaseModeExtensions
@@ -30,6 +32,7 @@ namespace Primer.Animation
             // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
             return ease switch {
                 EaseMode.None => LinearEasing.instance,
+                EaseMode.Linear => LinearEasing.instance,
                 EaseMode.Cubic => CubicEasing.instance,
                 EaseMode.Quadratic => QuadraticEasing.instance,
                 EaseMode.CubicIn => CubicInEasing.instance,
@@ -45,7 +48,7 @@ namespace Primer.Animation
         public static EaseMode GetModeFor(IEasing method)
         {
             return method switch {
-                LinearEasing _ => EaseMode.None,
+                LinearEasing _ => EaseMode.Linear,
                 CubicEasing _ => EaseMode.Cubic,
                 QuadraticEasing _ => EaseMode.Quadratic,
                 CubicInEasing _ => EaseMode.CubicIn,
