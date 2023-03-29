@@ -178,6 +178,14 @@ namespace Primer.Tools
             );
         }
 
+        public Tween GrowFromAnchor()
+        {
+            Refresh();
+            var storedScale = transform.localScale;
+            transform.localScale = Vector3.zero;
+            return transform.ScaleTo(storedScale);
+        }
+
         // This method is marked as performance intensive because it logs a warning 🤦
         // ReSharper disable Unity.PerformanceAnalysis
         [Title("Controls", horizontalLine: false)]
