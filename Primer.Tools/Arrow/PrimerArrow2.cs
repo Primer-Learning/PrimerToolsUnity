@@ -62,7 +62,7 @@ namespace Primer.Tools
         [Title("Constants")]
         [Tooltip("This is the distance for the arrow heads before the shaft starts. " +
             "This only needs to be changed if the arrow mesh changes.")]
-        public float arrowLength = 0.18f;
+        public float arrowLength = 0.05f;
 
         public bool globalPositioning {
             get => tailPoint.isWorldPosition || headPoint.isWorldPosition;
@@ -88,7 +88,7 @@ namespace Primer.Tools
             headPointer = true;
             thickness = 1f;
             axisRotation = 0;
-            arrowLength = 0.18f;
+            arrowLength = 0.05f;
         }
 
 

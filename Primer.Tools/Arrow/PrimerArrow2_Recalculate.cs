@@ -13,14 +13,13 @@ namespace Primer.Tools
             endArrowLength = headPointer ? realArrowLength : 0;
             shaftLength = length - startArrowLength - endArrowLength;
 
-            var scale = this.GetPrimer().FindIntrinsicScale();
+            this.GetPrimer().FindIntrinsicScale();
 
             if (shaftLength <= 0) {
                 transform.localScale = Vector3.zero;
                 return;
             }
 
-            transform.localScale = scale;
             CalculatePosition();
             CalculateChildrenPosition();
         }
