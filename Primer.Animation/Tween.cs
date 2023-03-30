@@ -146,22 +146,22 @@ namespace Primer.Animation
             }
 
             var cursor = 0;
-            var cursorStart = 0f;
             var cursorEnd = tweenList[0].duration;
+            var cursorStartT = 0f;
             var cursorEndT = cursorEnd / fullDuration;
 
             return new Tween(
                 t => {
                     while (t > cursorEndT) {
                         cursor++;
-                        cursorStart = cursorEnd;
+                        var cursorStart = cursorEnd;
                         cursorEnd += tweenList[cursor].duration;
+                        cursorStartT = cursorStart / fullDuration;
                         cursorEndT = cursorEnd / fullDuration;
                     }
 
-                    // formula wrote by copilot, is it right?
-                    t = Mathf.Clamp01((t - cursorStart) / (cursorEnd - cursorStart));
-                    tweenList[cursor].Evaluate(t);
+                    var tweenT = PrimerMath.Remap(cursorStartT, cursorEndT, 0, 1, t);
+                    tweenList[cursor].Evaluate(tweenT);
                 }
             ) {
                 easeMethod = LinearEasing.instance,
