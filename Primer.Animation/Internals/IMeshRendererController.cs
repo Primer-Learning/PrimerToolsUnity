@@ -9,7 +9,7 @@ namespace Primer.Animation
     {
         private static Material defaultMaterialCache;
         public static Material defaultMaterial =>
-            defaultMaterialCache ??= AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+            defaultMaterialCache ??= Resources.Load<Material>("BasicDiffuseWhite");
 
         protected internal MeshRenderer[] meshRenderers { get; }
         public Color color { get; set; }
