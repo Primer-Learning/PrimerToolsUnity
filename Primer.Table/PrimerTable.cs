@@ -11,7 +11,6 @@ namespace Primer.Table
 
         [InlineEditor]
         [ChildGameObjectsOnly]
-        // [RequiredIn(PrefabKind.PrefabAsset)]
         public GridGenerator grid;
 
         [Title("Axes references")]

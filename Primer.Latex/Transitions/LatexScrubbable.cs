@@ -54,6 +54,7 @@ namespace Primer.Latex
         }
         #endregion
 
+
         #region private LatexTransition transition { get; set; }
         private LatexTransition _transition;
         private LatexTransition transition {
@@ -84,6 +85,7 @@ namespace Primer.Latex
             _transition = value;
         }
         #endregion
+
 
         private enum State { Unset, Initial, Transitioning, Ended }
         private State state = State.Unset;

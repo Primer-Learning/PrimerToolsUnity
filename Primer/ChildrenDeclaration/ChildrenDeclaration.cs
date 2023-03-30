@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Primer
@@ -39,8 +38,8 @@ namespace Primer
         public ChildrenDeclaration(
             Transform parent,
             Action<Component> onCreate = null,
-            Action<Transform> onRemove = null)
-        {
+            Action<Transform> onRemove = null
+        ) {
             DontCallMeOnPrefabException.ThrowIfIsPrefab(parent, nameof(ChildrenDeclaration));
 
             this.parent = parent;

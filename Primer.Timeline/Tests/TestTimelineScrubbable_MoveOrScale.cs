@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using Primer;
 using UnityEngine;
 
 namespace Primer.Timeline.Tests

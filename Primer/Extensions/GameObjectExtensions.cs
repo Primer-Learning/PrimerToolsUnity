@@ -14,7 +14,9 @@ namespace Primer
         ///     that we'll want to figure out how to exclude. But we'll handle those as needed.
         /// </remarks>
         public static bool IsPreset(this GameObject gameObject)
-            => gameObject.scene.handle == 0 || gameObject.scene.path == "";
+        {
+            return gameObject.scene.handle == 0 || gameObject.scene.path == "";
+        }
 
         public static async void Dispose(this GameObject gameObject, bool urgent = false)
         {
@@ -49,33 +51,8 @@ namespace Primer
         }
 
         public static PrimerBehaviour GetPrimer(this GameObject gameObject)
-            => GetOrAddComponent<PrimerBehaviour>(gameObject);
-
-
-        #region Visibility
-        private const int HIDE_THRESHOLD = -100;
-
-        public static void Hide(this GameObject go)
         {
-            var pos = go.transform.position;
-
-            if (pos.z <= HIDE_THRESHOLD)
-                return;
-
-            pos.z = -pos.z + HIDE_THRESHOLD;
-            go.transform.position = pos;
+            return GetOrAddComponent<PrimerBehaviour>(gameObject);
         }
-
-        public static void Show(this GameObject go)
-        {
-            var pos = go.transform.position;
-
-            if (pos.z > HIDE_THRESHOLD)
-                return;
-
-            pos.z = -(pos.z - HIDE_THRESHOLD);
-            go.transform.position = pos;
-        }
-        #endregion
     }
 }

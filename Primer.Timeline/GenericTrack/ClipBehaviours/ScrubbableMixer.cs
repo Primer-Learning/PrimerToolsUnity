@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Primer.Timeline
 {
     internal class ScrubbableMixer
     {
-        private readonly Queue<ScrubbablePlayable> executed = new();
-
         public void Mix(ScrubbablePlayable[] allBehaviours, float time)
         {
             var validBehaviours = allBehaviours.Where(x => x.scrubbable is not null).ToArray();

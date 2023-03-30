@@ -25,6 +25,7 @@ namespace Primer.Scene
         private void OnDrawGizmos() => Gizmos.DrawSphere(swivelOrigin, 0.1f);
 
 
+        // TODO: using properties with getter / setter we can get rid of the old* variables
         private Vector3? oldSwivelOrigin;
         private Vector3? oldSwivel;
         private bool? lastFaceSwivel;

@@ -51,18 +51,5 @@ namespace Primer.Latex.Editor
                 "Disable cache"
             );
         }
-
-        // private void ChildrenManagement()
-        // {
-        //     using var scope = new GUILayout.HorizontalScope();
-        //
-        //     if (GUILayout.Button("Update children")) {
-        //         component.UpdateChildren();
-        //     }
-        //
-        //     if (GUILayout.Button("Rebuild children")) {
-        //         component.Process(component.config).Forget();
-        //     }
-        // }
     }
 }

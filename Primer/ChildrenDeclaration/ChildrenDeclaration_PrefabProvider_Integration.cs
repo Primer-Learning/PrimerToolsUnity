@@ -141,9 +141,4 @@ namespace Primer
         }
         #endregion
     }
-
-    public class EmptyProviderException : Exception
-    {
-        public EmptyProviderException() : base("Prefab provider is empty") {}
-    }
 }

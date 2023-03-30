@@ -39,6 +39,8 @@ namespace Primer
 
 
         public override string ToString()
-            => $"pos({position}) rot({rotation}) scale({scale})";
+        {
+            return $"pos({position}) rot({rotation}) scale({scale})";
+        }
     }
 }

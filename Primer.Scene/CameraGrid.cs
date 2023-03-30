@@ -13,12 +13,10 @@ namespace Primer.Scene
         [Min(0)] public int yDivisions = 3;
         [Min(1)] public int lineWidth = 5;
 
-
         private Canvas canvas;
 
 
         private void OnDisable() => canvas.Dispose();
-
 
         private void OnValidate()
         {

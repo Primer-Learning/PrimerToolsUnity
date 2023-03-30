@@ -10,11 +10,15 @@ namespace Primer.Timeline
     {
         public Transform target { get; set; }
 
+        // Abstract methods
+
         public virtual void Prepare() {}
 
         public virtual void Cleanup() {}
 
         public abstract void Update(float t);
+
+        // Implemented methods
 
         public void PlayAndForget() => Play();
 

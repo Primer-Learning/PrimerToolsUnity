@@ -13,7 +13,7 @@ namespace Primer
         {
             if (Contains(item))
                 return;
-            
+
             set.Add(new WeakReference<T>(item));
         }
 
@@ -36,7 +36,7 @@ namespace Primer
         {
             Purge();
 
-            var copy = new HashSet<T>(set.Select(x => x.TryGetTarget(out var t) ? t : null));
+            var copy = new List<T>(set.Select(x => x.TryGetTarget(out var t) ? t : null));
             return copy.GetEnumerator();
         }
 

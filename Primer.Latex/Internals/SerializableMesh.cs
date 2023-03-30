@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Copied from
+// Copied and adapted from
 // https://www.riccardostecca.net/articles/save_and_load_mesh_data_in_unity/
 
 namespace Primer.Latex

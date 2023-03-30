@@ -60,9 +60,7 @@ namespace Primer
             if (target == null)
                 return;
 
-            var go = target.gameObject;
-
-            PoolOrchestrator.Recycle(go);
+            PoolOrchestrator.Recycle(target.gameObject);
 
             if (target is IPoolable poolable)
                 poolable.OnRecycle();
@@ -81,8 +79,7 @@ namespace Primer
         protected T Create(Transform parent)
         {
             prefab ??= GetPrefab(prefabName);
-            var component = PoolOrchestrator.Create<T>(prefabName, prefab, parent);
-            return component;
+            return PoolOrchestrator.Create<T>(prefabName, prefab, parent);
         }
 
         private static Object GetPrefab(string prefabName)

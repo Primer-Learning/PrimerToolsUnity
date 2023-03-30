@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Primer
 {
     // From https://youtu.be/R6UB7mVO3fY?t=1462

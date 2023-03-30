@@ -7,18 +7,6 @@ namespace Primer.Animation
 {
     public static class TransformExtensions
     {
-        // [Obsolete("Use transform.GetPrimer().ScaleUpFromZero() instead")]
-        // public static Tween ScaleUpFromZero(this Transform transform)
-        // {
-        //     return transform.GetPrimer().ScaleUpFromZero();
-        // }
-        //
-        // [Obsolete("Use transform.GetPrimer().ScaleDownToZero() instead")]
-        // public static Tween ScaleDownToZero(this Transform transform)
-        // {
-        //     return transform.GetPrimer().ScaleDownToZero();
-        // }
-
         // Convenience overload method for scaling to multiples of Vector3.one
         public static Tween ScaleTo(this Transform transform, float newScale)
         {

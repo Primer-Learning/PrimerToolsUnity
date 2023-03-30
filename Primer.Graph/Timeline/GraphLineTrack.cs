@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Primer.Timeline;
 using Shapes;
 using UnityEngine;
