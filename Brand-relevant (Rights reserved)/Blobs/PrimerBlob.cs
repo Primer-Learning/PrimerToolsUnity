@@ -5,11 +5,10 @@ using Primer;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
 using Random = System.Random;
 
 public class PrimerBlob : PrimerCharacter {
-    public static readonly IPool<PrimerBlob> pool = new PrimerPool<PrimerBlob>("blob_skinned");
+    public static readonly IPool<PrimerBlob> pool = new PrefabPool<PrimerBlob>("blob_skinned");
 
     public enum MeshType
     {

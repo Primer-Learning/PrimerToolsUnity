@@ -45,7 +45,7 @@ namespace Primer
             UnityTagManager.CreateTag(POOL_OBJECT_TAG);
         }
 
-        public static T Find<T>(string prefabName) where T : Component
+        public static T FindPrefab<T>(string prefabName) where T : Component
         {
             EnsureOrphansAreCollected();
 
@@ -59,7 +59,7 @@ namespace Primer
             ).FirstOrDefault();
         }
 
-        public static T Create<T>(string prefabName, Object prefab, Transform parent)
+        public static T CreatePrefab<T>(string prefabName, Object prefab, Transform parent)
         {
             var go = PrefabUtility.InstantiatePrefab(prefab, parent) as GameObject;
             var component = go.GetComponent<T>();
@@ -68,13 +68,17 @@ namespace Primer
                 throw new Exception($"Prefab {prefabName} does not have component {typeof(T)}");
             }
 
+            OnCreate(go, prefabName);
+            return component;
+        }
+
+        public static void OnCreate(GameObject go, string prefabName)
+        {
             var poolData = go.AddComponent<PoolData>();
             poolData.prefabName = prefabName;
 
             StageUtility.PlaceGameObjectInCurrentStage(go);
             go.tag = POOL_OBJECT_TAG;
-
-            return component;
         }
 
         public static void Reuse(GameObject target)

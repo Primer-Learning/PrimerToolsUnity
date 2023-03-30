@@ -13,7 +13,7 @@ namespace Primer.Latex
     [AddComponentMenu("Primer / LaTeX")]
     public class LatexComponent : MonoBehaviour, IMeshRendererController, IPoolable
     {
-        public static readonly IPool<LatexComponent> pool = new PrimerPool<LatexComponent>("LaTeX");
+        public static readonly IPool<LatexComponent> pool = new PrefabPool<LatexComponent>("LaTeX");
 
         [SerializeReference] private LatexCliIntegration integration = new();
         [SerializeReference] private LatexGroups groups = new();

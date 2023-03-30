@@ -5,16 +5,15 @@ using Object = UnityEngine.Object;
 
 namespace Primer
 {
-    public class PrimerPool<T> : IPool<T> where T : Component
+    public class PrefabPool<T> : IPool<T> where T : Component
     {
         private readonly Queue<T> pool = new();
         private readonly WeakSet<T> inUse = new();
 
         private readonly string prefabName;
         private Object prefab;
-        private bool hasCollectedOrphans;
 
-        public PrimerPool(string prefabName)
+        public PrefabPool(string prefabName)
         {
             this.prefabName = prefabName;
         }
@@ -49,7 +48,7 @@ namespace Primer
             do {
                 result = pool.Count != 0
                     ? pool.Dequeue()
-                    : PoolOrchestrator.Find<T>(prefabName) ?? Create(parent);
+                    : PoolOrchestrator.FindPrefab<T>(prefabName) ?? Create(parent);
             } while (result == null);
 
             return result;
@@ -79,7 +78,7 @@ namespace Primer
         protected T Create(Transform parent)
         {
             prefab ??= GetPrefab(prefabName);
-            return PoolOrchestrator.Create<T>(prefabName, prefab, parent);
+            return PoolOrchestrator.CreatePrefab<T>(prefabName, prefab, parent);
         }
 
         private static Object GetPrefab(string prefabName)
