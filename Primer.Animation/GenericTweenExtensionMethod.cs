@@ -9,55 +9,34 @@ namespace Primer.Animation
     public static class GenericTweenExtensionMethod
     {
         #region target.Tween("member", to: 10)
-        public static Tween Tween<T>(this object target, string member, T to)
-        {
-            var accessors = GetAccessors<T>(target, member);
-            return CreateTween(accessors, to, accessors.get());
-        }
-
-        public static Tween Tween<T>(this object target, string member, T to, T from)
-        {
-            return CreateTween(GetAccessors<T>(target, member), to, from);
-        }
-
-        public static Tween Tween<T>(this object target, string member, T to, Func<T, T, float, T> lerp)
+        public static Tween Tween<T>(this object target, string member, T to, Func<T, T, float, T> lerp = null)
         {
             var accessors = GetAccessors<T>(target, member);
             return CreateTween(accessors, to, accessors.get(), lerp);
         }
 
-        public static Tween Tween<T>(this object target, string member, T to, T from, Func<T, T, float, T> lerp)
+        public static Tween Tween<T>(this object target, string member, T to, T from, Func<T, T, float, T> lerp = null)
         {
-            return CreateTween(GetAccessors<T>(target, member), to, from, lerp);
+            var accessors = GetAccessors<T>(target, member);
+            return CreateTween(accessors, to, from, lerp);
         }
         #endregion
 
 
         #region target.Tween(x => x.member, to: 10)
         public static Tween Tween<TContainer, TValue>(this TContainer target,
-            Expression<Func<TContainer, TValue>> member, TValue to)
-        {
-            var accessors = GetAccessors(target, member);
-            return CreateTween(accessors, to, accessors.get());
-        }
-
-        public static Tween Tween<TContainer, TValue>(this TContainer target,
-            Expression<Func<TContainer, TValue>> member, TValue to, TValue from)
-        {
-            return CreateTween(GetAccessors(target, member), to, from);
-        }
-
-        public static Tween Tween<TContainer, TValue>(this TContainer target,
-            Expression<Func<TContainer, TValue>> member, TValue to, Func<TValue, TValue, float, TValue> lerp)
+            Expression<Func<TContainer, TValue>> member, TValue to, Func<TValue, TValue, float, TValue> lerp = null)
         {
             var accessors = GetAccessors(target, member);
             return CreateTween(accessors, to, accessors.get(), lerp);
         }
 
         public static Tween Tween<TContainer, TValue>(this TContainer target,
-            Expression<Func<TContainer, TValue>> member, TValue to, TValue from, Func<TValue, TValue, float, TValue> lerp)
+            Expression<Func<TContainer, TValue>> member, TValue to, TValue from,
+            Func<TValue, TValue, float, TValue> lerp = null)
         {
-            return CreateTween(GetAccessors(target, member), to, from, lerp);
+            var accessors = GetAccessors(target, member);
+            return CreateTween(accessors, to, from, lerp);
         }
         #endregion
 
@@ -71,7 +50,7 @@ namespace Primer.Animation
 
 
         #region Internals
-        private static readonly Dictionary<Type, MethodInfo> lerpMethods = new Dictionary<Type, MethodInfo>();
+        private static readonly Dictionary<Type, MethodInfo> lerpMethods = new();
 
         private static Func<T, T, float, T> GetLerpMethod<T>()
         {
@@ -95,7 +74,7 @@ namespace Primer.Animation
             var lerp = typeof(T).GetMethod("Lerp");
 
             if (lerp is null) {
-                throw new ArgumentException($"Tween() couldn't find static .Lerp() in {typeof(T).FullName}");
+                throw new ArgumentException($"{nameof(Tween)}() couldn't find static .Lerp() in {typeof(T).FullName}");
             }
 
             return lerp;
