@@ -153,9 +153,9 @@ namespace Primer.Tools
             Vector3Provider leftEnd = null,
             Vector3Provider rightEnd = null
         ) {
-            var anchorTween = anchorPoint.Tween(anchorEnd, anchorPoint.vector);
-            var leftTween = leftPoint.Tween(leftEnd, leftPoint.vector);
-            var rightTween = rightPoint.Tween(rightEnd, rightPoint.vector);
+            var anchorTween = anchorPoint.Tween(anchorEnd);
+            var leftTween = leftPoint.Tween(leftEnd);
+            var rightTween = rightPoint.Tween(rightEnd);
 
             return new Tween(
                 t => {
