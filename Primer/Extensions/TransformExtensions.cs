@@ -22,6 +22,13 @@ namespace Primer
             return children;
         }
 
+        public static void SetPosition(this Transform transform, float? x = null, float? y = null, float? z = null, bool global = false)
+        {
+            var pos = global ? transform.position : transform.localPosition;
+            var newPos = new Vector3(x ?? pos.x, y ?? pos.y, z ?? pos.z);
+            transform.SetPosition(newPos, global);
+        }
+
         public static void SetPosition(this Transform transform, Vector3 newPosition, bool global = false)
         {
             if (global) {
