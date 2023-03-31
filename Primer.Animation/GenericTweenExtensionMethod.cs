@@ -20,6 +20,13 @@ namespace Primer.Animation
             var accessors = GetAccessors<T>(target, member);
             return CreateTween(accessors, to, from, lerp);
         }
+
+        public static Tween Tween<T>(this object target, string member, Func<T, T> to, Func<T, T, float, T> lerp = null)
+        {
+            var accessors = GetAccessors<T>(target, member);
+            var from = accessors.get();
+            return CreateTween(accessors, to(from), from, lerp);
+        }
         #endregion
 
 
@@ -29,6 +36,14 @@ namespace Primer.Animation
         {
             var accessors = GetAccessors(target, member);
             return CreateTween(accessors, to, accessors.get(), lerp);
+        }
+
+        public static Tween Tween<TContainer, TValue>(this TContainer target,
+            Expression<Func<TContainer, TValue>> member, Func<TValue, TValue> to, Func<TValue, TValue, float, TValue> lerp = null)
+        {
+            var accessors = GetAccessors(target, member);
+            var from = accessors.get();
+            return CreateTween(accessors, to(from), from, lerp);
         }
 
         public static Tween Tween<TContainer, TValue>(this TContainer target,
