@@ -49,10 +49,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e9ad337fe7140e380df94ee7829264c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasIntrinsicScale: 0
-  intrinsicScale: {x: 1, y: 1, z: 1}
-  hasIntrinsicPosition: 0
-  intrinsicPosition: {x: 0, y: 0, z: 0}
   enableZAxis: 1
   isRightHanded: 1
   domain: {fileID: 9170909329295579749}
@@ -72,7 +68,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scale: 0.2
-  paddingFraction: 0.05
   rodThickness: 1
   arrowPresence: 2
   arrowPrefab:
@@ -88,6 +83,7 @@ MonoBehaviour:
   tickSteps: 2
   maxTicks: 50
   maxDecimals: 2
+  offset: 0
   manualTicks: []
   ticksPrefab:
     stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}

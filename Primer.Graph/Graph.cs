@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Primer.Axis;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -7,12 +8,13 @@ namespace Primer.Graph
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph : PrimerBehaviour
+    public class Graph : MonoBehaviour
     {
         [Title("Graph controls")]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool enableZAxis = true;
 
+        [EnableIf(nameof(enableZAxis))]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
 
@@ -52,6 +54,8 @@ namespace Primer.Graph
             enabledYAxis ? 1 : 0,
             enabledZAxis ? 1 : 0
         );
+
+        public Action onDomainChanged;
 
 
         private void OnEnable() => UpdateAxes();
@@ -106,9 +110,14 @@ namespace Primer.Graph
             if (domain is null || domain.localScale == scale)
                 return;
 
+            // TODO: this causes problems when we don't want to change the scale of domain childrens
+            // this should be converted into a Component "InvertParentScale" that listens to onDomainChange
+            // beforeDomainChange can be added to track the previous scale value
+
             var childCount = domain.childCount;
             var children = new List<(Transform child, Vector3 pos, Vector3 scale)>();
 
+            // Reverse iteration because we remove them as we go
             for (var i = childCount - 1; i >= 0; i--) {
                 var child = domain.GetChild(i);
                 children.Add((child, child.localPosition, child.localScale));
@@ -117,12 +126,13 @@ namespace Primer.Graph
 
             domain.localScale = scale;
 
-            for (var i = childCount - 1; i >= 0; i--) {
-                var (child, pos, prevScale) = children[i];
+            foreach (var (child, pos, prevScale) in children) {
                 child.parent = domain;
                 child.localPosition = pos;
                 child.localScale = prevScale;
             }
+
+            onDomainChanged?.Invoke();
         }
     }
 }
