@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -104,6 +105,7 @@ namespace Primer.Animation
 
 
         #region Static methods: Parallel & Series
+        public static Tween Parallel(IEnumerable<Tween> tweenList) => Parallel(tweenList.ToArray());
         // ReSharper disable Unity.PerformanceAnalysis
         public static Tween Parallel(params Tween[] tweenList)
         {
@@ -136,6 +138,7 @@ namespace Primer.Animation
             return Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }).ToArray());
         }
         
+        public static Tween Series(IEnumerable<Tween> tweenList) => Series(tweenList.ToArray());
         public static Tween Series(params Tween[] tweenList)
         {
             var fullDuration = tweenList.Sum(x => x.totalDuration);

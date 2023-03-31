@@ -42,11 +42,13 @@ namespace Primer.Timeline
             await UniTask.WhenAll(processes);
         }
 
+        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(tweenList.ToArray());
         public static Tween Parallel(params Tween[] tweenList)
         {
             return Tween.Parallel(tweenList);
         }
 
+        public static Tween Series(IEnumerable<Tween> tweenList) =>Series(tweenList.ToArray());
         public static Tween Series(params Tween[] tweenList)
         {
             return Tween.Series(tweenList);
@@ -94,11 +96,13 @@ namespace Primer.Timeline
             }
         }
 
+        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(tweenList.ToArray());
         public static Tween Parallel(params Tween[] tweenList)
         {
             return Tween.Parallel(tweenList);
         }
 
+        public static Tween Series(IEnumerable<Tween> tweenList) =>Series(tweenList.ToArray());
         public static Tween Series(params Tween[] tweenList)
         {
             return Tween.Series(tweenList);
