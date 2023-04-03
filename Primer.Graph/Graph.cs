@@ -45,9 +45,9 @@ namespace Primer.Graph
 
         // This warning is show where these properties are used, we checked for != null here
         // ReSharper disable Unity.NoNullPropagation
-        private AxisRenderer enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
-        private AxisRenderer enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
-        private AxisRenderer enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
+        public AxisRenderer enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
+        public AxisRenderer enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
+        public AxisRenderer enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
 
         public Vector3 positionMultiplier => new(
             enabledXAxis ? 1 : 0,
@@ -114,23 +114,23 @@ namespace Primer.Graph
             // this should be converted into a Component "InvertParentScale" that listens to onDomainChange
             // beforeDomainChange can be added to track the previous scale value
 
-            var childCount = domain.childCount;
-            var children = new List<(Transform child, Vector3 pos, Vector3 scale)>();
+            // var childCount = domain.childCount;
+            // var children = new List<(Transform child, Vector3 pos, Vector3 scale)>();
 
             // Reverse iteration because we remove them as we go
-            for (var i = childCount - 1; i >= 0; i--) {
-                var child = domain.GetChild(i);
-                children.Add((child, child.localPosition, child.localScale));
-                child.parent = null;
-            }
+            // for (var i = childCount - 1; i >= 0; i--) {
+            //     var child = domain.GetChild(i);
+            //     children.Add((child, child.localPosition, child.localScale));
+            //     child.parent = null;
+            // }
 
             domain.localScale = scale;
 
-            foreach (var (child, pos, prevScale) in children) {
-                child.parent = domain;
-                child.localPosition = pos;
-                child.localScale = prevScale;
-            }
+            // foreach (var (child, pos, prevScale) in children) {
+            //     child.parent = domain;
+            //     child.localPosition = pos;
+            //     child.localScale = prevScale;
+            // }
 
             onDomainChanged?.Invoke();
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Primer.Animation;
+using Primer.Shapes;
 using Primer.Timeline;
 using UnityEngine;
 
@@ -7,11 +8,17 @@ namespace Primer.Graph.Tests
 {
     public class TestBarGraphSequence : Sequence
     {
+        private readonly IPool<PrimerLine> linePool = PrimerLine.pool
+            .ForTimeline()
+            .Specialize(x => x.DashedAnimated());
+
         public BarPlot barPlot;
 
         public override void Cleanup()
         {
             base.Cleanup();
+
+            linePool.RecycleAll();
 
             if (barPlot is null)
                 return;
@@ -19,6 +26,7 @@ namespace Primer.Graph.Tests
             barPlot.SetDefaults();
             barPlot.Clear();
             barPlot.SetNames("First", "Second", "Third");
+            barPlot.SetColors(Color.green, Color.blue, Color.magenta);
         }
 
         public override async IAsyncEnumerator<Tween> Run()
@@ -36,6 +44,12 @@ namespace Primer.Graph.Tests
             // it knows we're accessing "value" field of BarData
             yield return barPlot["Second"].Tween<float>("value", current => current * 2);
             // yield return barPlot["Second"].Tween(x => x.value, current => current * 2);
+
+            yield return barPlot[0].Tween(x=>x.color, current => current * 0.5f);
+
+            var line = barPlot.VerticalLine(linePool);
+            line.Set(x: barPlot.GetPointBefore("First"));
+            yield return line.MoveTo(x: barPlot.GetPointAfter("First"));
 
             yield return barPlot.Tween(x => x.offset, Vector3.one);
         }

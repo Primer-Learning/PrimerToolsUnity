@@ -9,6 +9,7 @@
     "Primer",
     "Primer.Math",
     "Primer.Animation",
+    "Primer.Shapes",
     "Primer.Timeline",
     "Primer.Axis"
   ]

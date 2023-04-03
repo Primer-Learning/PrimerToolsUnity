@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
+using Primer.Shapes;
 using Primer.Timeline;
 using Shapes;
 using Sirenix.OdinInspector;
@@ -18,7 +19,7 @@ namespace Primer.Graph
     [RequireComponent(typeof(Graph))]
     public class BarPlot : MonoBehaviour
     {
-        public static readonly Color defaultColor = Color.red;
+        public static Color defaultColor = Color.red;
 
         private Graph graphCache;
         private Graph graph => graphCache ??= GetComponent<Graph>();
@@ -266,11 +267,42 @@ namespace Primer.Graph
         public void TweenColor(string name, Color color) => this[name].Tween("color", color);
         #endregion
 
+
+        #region Line helpers
+        public PrimerLine VerticalLine(IPool<PrimerLine> pool = null)
+        {
+            var line = (pool ?? PrimerLine.pool).Get();
+            line.transform.SetParent(graph.domain, true);
+            line.transform.localScale = Vector3.one;
+            line.start = Vector3.zero;
+            line.end = Vector3.up * graph.enabledYAxis.max;
+            return line;
+        }
+
+        public float GetPointBefore(int index) => GetPointBefore(GetBar(index));
+        public float GetPointBefore(string name) => GetPointBefore(GetBar(name));
+        public float GetPointBefore(BarData bar)
+        {
+            var index = bars.IndexOf(bar);
+            return index * (barWidth + spacing) + offset.x - spacing / 2;
+        }
+
+        public float GetPointAfter(int index) => GetPointAfter(GetBar(index));
+        public float GetPointAfter(string name) => GetPointAfter(GetBar(name));
+        public float GetPointAfter(BarData bar)
+        {
+            var index = bars.IndexOf(bar);
+            return index * (barWidth + spacing) + offset.x + barWidth + spacing / 2;
+        }
+        #endregion
+
+
         // public static Dictionary<float, string> GenerateIntegerCategories(
         //     int num,
         //     int min = 0,
         //     int step = 1
         // ) {}
+
 
         [Button]
         public void UpdateBars()
@@ -290,8 +322,7 @@ namespace Primer.Graph
                     }
                 );
 
-                // FIXME: Setting the color to data.color doesn't work!
-                bar.Color = Color.red; // data.color;
+                bar.Color = data.color;
                 bar.Width = barWidth;
                 bar.Height = data.value;
 
