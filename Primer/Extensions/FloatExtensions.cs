@@ -9,7 +9,7 @@ namespace Primer
 
 
         public static string FormatNumber(this float number) => $"{number:N0}";
-        public static string FormatNumberWithDecimals(this float number) => number == 0 ? "0" : $"{number:#.##}";
+        public static string FormatNumberWithDecimals(this float number) => number == 0 ? "0" : $"{number:0.##}";
 
 
         public static float Remap(this float value, float aLow, float aHigh, float bLow, float bHigh) {
