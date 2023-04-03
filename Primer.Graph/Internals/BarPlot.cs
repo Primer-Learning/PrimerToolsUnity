@@ -19,7 +19,7 @@ namespace Primer.Graph
     [RequireComponent(typeof(Graph))]
     public class BarPlot : MonoBehaviour
     {
-        public static Color defaultColor = Color.red;
+        public static Color defaultColor = new Vector4(62, 126, 160, 255) / 255;
 
         private Graph graphCache;
         private Graph graph => graphCache ??= GetComponent<Graph>();
@@ -114,6 +114,7 @@ namespace Primer.Graph
             _spacing = 1f;
             _cornerRadius = 0.25f;
             _offset = Vector3.right;
+            _bars.Clear();
         }
 
 

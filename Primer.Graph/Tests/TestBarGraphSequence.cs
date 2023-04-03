@@ -24,9 +24,13 @@ namespace Primer.Graph.Tests
                 return;
 
             barPlot.SetDefaults();
-            barPlot.Clear();
             barPlot.SetNames("First", "Second", "Third");
             barPlot.SetColors(Color.green, Color.blue, Color.magenta);
+
+            // or
+            // barPlot.AddBar("First", 0, Color.green);
+            // barPlot.AddBar("Second", 0, Color.blue);
+            // barPlot.AddBar("Third", 0, Color.magenta);
         }
 
         public override async IAsyncEnumerator<Tween> Run()
@@ -45,7 +49,7 @@ namespace Primer.Graph.Tests
             yield return barPlot["Second"].Tween<float>("value", current => current * 2);
             // yield return barPlot["Second"].Tween(x => x.value, current => current * 2);
 
-            yield return barPlot[0].Tween(x=>x.color, current => current * 0.5f);
+            yield return barPlot[0].Tween(x => x.color, current => current * 0.5f);
 
             var line = barPlot.VerticalLine(linePool);
             line.Set(x: barPlot.GetPointBefore("First"));
