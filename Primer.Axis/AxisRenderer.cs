@@ -10,7 +10,7 @@ namespace Primer.Axis
     public class AxisRenderer : GeneratorBehaviour
     {
         [SerializeField]
-        internal AxisDomain domain = new();
+        public AxisDomain domain = new();
 
         [SerializeField]
         [HideInInlineEditors]
@@ -25,17 +25,25 @@ namespace Primer.Axis
 
         [SerializeField]
         [HideInInlineEditors]
-        internal AxisTicks ticks = new();
+        public AxisTicks ticks = new();
 
 
         public float min {
             get => domain.min;
-            set => domain.min = value;
+            set
+            {
+                domain.min = value;
+                UpdateChildren();
+            } 
         }
 
         public float max {
             get => domain.max;
-            set => domain.max = value;
+            set
+            {
+                domain.max = value;
+                UpdateChildren();
+            } 
         }
 
 

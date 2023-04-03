@@ -11,7 +11,7 @@ namespace Primer.Axis
     [DisableContextMenu]
     [HideReferenceObjectPicker]
     [Title("Domain")]
-    internal class AxisDomain
+     public class AxisDomain
     {
         public Action onChange;
 

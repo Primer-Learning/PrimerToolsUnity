@@ -12,7 +12,7 @@ namespace Primer.Axis
     [DisableContextMenu]
     [HideReferenceObjectPicker]
     [Title("Ticks")]
-    internal class AxisTicks
+    public class AxisTicks
     {
         public bool showTicks = true;
 
