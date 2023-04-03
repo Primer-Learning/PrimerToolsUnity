@@ -46,16 +46,6 @@ namespace Primer.Graph
         #region float spacing;
         [SerializeField, HideInInspector]
         private float _spacing = 1f;
-
-        [ShowInInspector]
-        public float spacing {
-            get => _spacing;
-            set {
-                if (_spacing == value) return;
-                _spacing = value;
-                UpdateBars();
-            }
-        }
         #endregion
 
         #region float cornerRadius;
@@ -110,10 +100,9 @@ namespace Primer.Graph
 
         public void SetDefaults()
         {
-            _barWidth = 1f;
-            _spacing = 1f;
+            _barWidth = 0.8f;
             _cornerRadius = 0.25f;
-            _offset = Vector3.right;
+            _offset = Vector3.right * 0.5f;
             _bars.Clear();
         }
 
@@ -285,7 +274,7 @@ namespace Primer.Graph
         public float GetPointBefore(BarData bar)
         {
             var index = bars.IndexOf(bar);
-            return index * (barWidth + spacing) + offset.x - spacing / 2;
+            return index + offset.x;
         }
 
         public float GetPointAfter(int index) => GetPointAfter(GetBar(index));
@@ -293,7 +282,7 @@ namespace Primer.Graph
         public float GetPointAfter(BarData bar)
         {
             var index = bars.IndexOf(bar);
-            return index * (barWidth + spacing) + offset.x + barWidth + spacing / 2;
+            return index + offset.x + 1;
         }
         #endregion
 
@@ -327,7 +316,7 @@ namespace Primer.Graph
                 bar.Width = barWidth;
                 bar.Height = data.value;
 
-                bar.transform.localPosition = new Vector3(i * (barWidth + spacing), 0, 0) + offset;
+                bar.transform.localPosition = new Vector3(i  + (1 - barWidth) / 2, 0, 0) + offset;
                 bar.transform.localScale = Vector3.one;
                 bar.CornerRadii = new Vector4(0, cornerRadius, cornerRadius, 0);
 

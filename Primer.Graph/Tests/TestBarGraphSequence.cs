@@ -38,8 +38,8 @@ namespace Primer.Graph.Tests
             yield return barPlot.TweenValues(1, 2, 3);
 
             yield return Parallel(
-                barPlot.Tween(x => x.barWidth, 2),
-                barPlot.Tween("spacing", 0.5f),
+                barPlot.Tween(x => x.barWidth, 0.7f),
+                // barPlot.Tween("spacing", 0.5f),
                 barPlot.Tween(x => x.cornerRadius, 1)
             );
 
