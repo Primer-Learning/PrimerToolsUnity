@@ -8,9 +8,9 @@ namespace Primer.Axis
         public float value;
         public string label;
 
-        public TicData(float value) {
+        public TicData(float value, int labelOffset) {
             this.value = value;
-            label = value.FormatNumberWithDecimals();
+            label = (value + labelOffset).FormatNumberWithDecimals();
         }
     }
 }

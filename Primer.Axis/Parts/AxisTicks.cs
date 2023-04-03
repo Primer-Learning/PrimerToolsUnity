@@ -36,6 +36,9 @@ namespace Primer.Axis
         public float offset = 0;
 
         [EnableIf("showTicks")]
+        public int labelNumberOffset = 0;
+        
+        [EnableIf("showTicks")]
         public List<TicData> manualTicks = new();
 
         [RequiredIn(PrefabKind.PrefabAsset)]
@@ -86,13 +89,13 @@ namespace Primer.Axis
                 return calculated;
 
             if (showZero)
-                calculated.Add(new TicData(0));
+                calculated.Add(new TicData(0, labelNumberOffset));
 
             for (var i = Mathf.Max(roundedStep, domain.min); i <= domain.max; i += roundedStep)
-                calculated.Add(new TicData(i));
+                calculated.Add(new TicData(i, labelNumberOffset));
 
             for (var i = Mathf.Min(-roundedStep, domain.max); i >= domain.min; i -= roundedStep)
-                calculated.Add(new TicData(i));
+                calculated.Add(new TicData(i, labelNumberOffset));
 
             return calculated;
         }
