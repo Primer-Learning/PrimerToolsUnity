@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Primer.Tools
+namespace Primer.Shapes
 {
     [Serializable]
     [HideLabel]
@@ -15,9 +15,11 @@ namespace Primer.Tools
         private bool _isWorldPosition;
 
         [ShowInInspector]
-        public bool isWorldPosition {
+        public bool isWorldPosition
+        {
             get => _isWorldPosition;
-            set {
+            set
+            {
                 _isWorldPosition = value;
 
                 if (isTracking)
@@ -34,9 +36,11 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [InlineButton(nameof(StopTracking), SdfIconType.X, "", ShowIf = nameof(_follow))]
-        public Transform follow {
+        public Transform follow
+        {
             get => _follow;
-            set {
+            set
+            {
                 if (value == _follow)
                     return;
 
@@ -53,9 +57,11 @@ namespace Primer.Tools
         #region Func<Vector3> getter;
         private Func<Vector3> _getter;
 
-        public Func<Vector3> getter {
+        public Func<Vector3> getter
+        {
             get => _getter;
-            set {
+            set
+            {
                 if (_getter == value)
                     return;
 
@@ -73,9 +79,11 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [DisableIf("follow")]
-        public Vector3 vector {
+        public Vector3 vector
+        {
             get => _vector;
-            set {
+            set
+            {
                 StopTracking();
 
                 if (_vector == value)
@@ -94,9 +102,11 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [InlineButton(nameof(ResetAdjustment), SdfIconType.X, "", ShowIf = nameof(hasAdjustment))]
-        public Vector3 adjustment {
+        public Vector3 adjustment
+        {
             get => _adjustment;
-            set {
+            set
+            {
                 if (_adjustment == value)
                     return;
 
@@ -118,8 +128,10 @@ namespace Primer.Tools
 
         public bool isTracking => _getter is not null || _follow != null;
 
-        public Vector3 trackedValue {
-            get {
+        public Vector3 trackedValue
+        {
+            get
+            {
                 if (_getter is not null)
                     return _getter();
 
@@ -201,7 +213,8 @@ namespace Primer.Tools
         {
             var hasChanges = false;
 
-            for (var i = 0; i < points.Length; i++) {
+            for (var i = 0; i < points.Length; i++)
+            {
                 if (points[i].CheckTrackedObject(emitOnChange: false))
                     hasChanges = true;
             }

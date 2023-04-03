@@ -3,7 +3,7 @@ using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 
-namespace Primer.Tools.Tests
+namespace Primer.Shapes.Tests
 {
     public class TestBracketSequence : Sequence
     {

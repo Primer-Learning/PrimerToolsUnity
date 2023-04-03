@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Primer.Tools
+namespace Primer.Shapes
 {
     public partial class PrimerArrow2
     {
@@ -15,7 +15,8 @@ namespace Primer.Tools
 
             this.GetPrimer().FindIntrinsicScale();
 
-            if (shaftLength <= 0) {
+            if (shaftLength <= 0)
+            {
                 transform.localScale = Vector3.zero;
                 return;
             }

@@ -1,4 +1,4 @@
-namespace Primer.Tools
+namespace Primer.Shapes
 {
     public partial class PrimerArrow2 : IPoolable
     {

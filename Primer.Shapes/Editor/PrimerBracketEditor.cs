@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 
-namespace Primer.Tools.Editor
+namespace Primer.Shapes.Editor
 {
     [CustomEditor(typeof(PrimerBracket2)), CanEditMultipleObjects]
     public class PrimerBracketEditor : OdinEditor

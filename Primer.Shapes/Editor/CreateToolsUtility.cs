@@ -1,7 +1,7 @@
 using Primer.Editor;
 using UnityEditor;
 
-namespace Primer.Tools.Editor
+namespace Primer.Shapes.Editor
 {
     public static class ToolsCreateUtility
     {

@@ -2,7 +2,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Primer.Tools
+namespace Primer.Shapes
 {
     [ExecuteAlways]
     public partial class PrimerArrow2 : MonoBehaviour
@@ -54,8 +54,9 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [MinValue(0)]
-        public float length {
-            get => (head  - tail).magnitude - tailSpace - headSpace;
+        public float length
+        {
+            get => (head - tail).magnitude - tailSpace - headSpace;
             set => SetLength(value);
         }
 
@@ -64,9 +65,11 @@ namespace Primer.Tools
             "This only needs to be changed if the arrow mesh changes.")]
         public float arrowLength = 0.05f;
 
-        public bool globalPositioning {
+        public bool globalPositioning
+        {
             get => tailPoint.isWorldPosition || headPoint.isWorldPosition;
-            set {
+            set
+            {
                 tailPoint.isWorldPosition = value;
                 headPoint.isWorldPosition = value;
             }
@@ -107,7 +110,8 @@ namespace Primer.Tools
 
         public void Update()
         {
-            if (ScenePoint.CheckTrackedObject(tailPoint, headPoint)) {
+            if (ScenePoint.CheckTrackedObject(tailPoint, headPoint))
+            {
                 Recalculate();
             }
         }

@@ -2,7 +2,7 @@ using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Tools
+namespace Primer.Shapes
 {
     [ExecuteAlways]
     public class PrimerBracket2 : MonoBehaviour, IMeshRendererController
@@ -29,9 +29,11 @@ namespace Primer.Tools
         [ShowInInspector]
         [PropertyOrder(-1)]
         [PropertyRange(0.01f, 10f)]
-        public float width {
+        public float width
+        {
             get => _width;
-            set {
+            set
+            {
                 _width = value;
                 Refresh();
             }
@@ -44,9 +46,11 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [PropertyOrder(-1)]
-        public Color color {
+        public Color color
+        {
             get => _color;
-            set {
+            set
+            {
                 _color = value;
                 this.SetColor(value);
             }
@@ -59,9 +63,11 @@ namespace Primer.Tools
 
         [ShowInInspector]
         [PropertyOrder(-1)]
-        public Material material {
+        public Material material
+        {
             get => _material ??= IMeshRendererController.defaultMaterial;
-            set {
+            set
+            {
                 _material = value;
                 this.SetMaterial(value);
             }
@@ -76,7 +82,8 @@ namespace Primer.Tools
         [Title("Anchor")]
         public ScenePoint anchorPoint = Vector3.zero;
 
-        public Vector3 anchor {
+        public Vector3 anchor
+        {
             get => anchorPoint.vector;
             set => anchorPoint.vector = value;
         }
@@ -86,7 +93,8 @@ namespace Primer.Tools
         [Title("Left")]
         public ScenePoint leftPoint = new Vector3(-1, 0, 1);
 
-        public Vector3 left {
+        public Vector3 left
+        {
             get => leftPoint.vector;
             set => leftPoint.vector = value;
         }
@@ -96,7 +104,8 @@ namespace Primer.Tools
         [Title("Right")]
         public ScenePoint rightPoint = new Vector3(1, 0, 1);
 
-        public Vector3 right {
+        public Vector3 right
+        {
             get => rightPoint.vector;
             set => rightPoint.vector = value;
         }
@@ -127,7 +136,8 @@ namespace Primer.Tools
 
         private void Update()
         {
-            if (ScenePoint.CheckTrackedObject(anchorPoint, leftPoint, rightPoint)) {
+            if (ScenePoint.CheckTrackedObject(anchorPoint, leftPoint, rightPoint))
+            {
                 Refresh();
             }
         }
@@ -152,13 +162,15 @@ namespace Primer.Tools
             Vector3Provider anchorEnd = null,
             Vector3Provider leftEnd = null,
             Vector3Provider rightEnd = null
-        ) {
+        )
+        {
             var anchorTween = anchorPoint.Tween(anchorEnd);
             var leftTween = leftPoint.Tween(leftEnd);
             var rightTween = rightPoint.Tween(rightEnd);
 
             return new Tween(
-                t => {
+                t =>
+                {
                     if (anchorTween is not null)
                         anchorPoint.vector = anchorTween(t);
 
@@ -210,7 +222,8 @@ namespace Primer.Tools
             var leftLength = BarLength(toLeft, center);
             var rightLength = BarLength(toRight, center);
 
-            if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude) {
+            if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude)
+            {
                 Debug.LogWarning("Refusing to render a broken-looking bracket");
                 return;
             }
@@ -218,7 +231,7 @@ namespace Primer.Tools
             leftBar.localScale = new Vector3(leftLength, 1, 1);
             rightBar.localScale = new Vector3(rightLength, 1, 1);
 
-            self.rotation = Quaternion.LookRotation(forward,  upwards);
+            self.rotation = Quaternion.LookRotation(forward, upwards);
             self.localScale = new Vector3(width, width, center.magnitude);
 
             self.position = anchorPoint.GetWorldPosition(parent);
