@@ -156,7 +156,10 @@ namespace Primer.Animation
             return new Tween(
                 t => {
                     while (t > cursorEndT) {
+                        tweenList[cursor].Evaluate(1);
                         cursor++;
+                        tweenList[cursor].Evaluate(0);
+
                         var cursorStart = cursorEnd;
                         cursorEnd += tweenList[cursor].duration;
                         cursorStartT = cursorStart / fullDuration;
