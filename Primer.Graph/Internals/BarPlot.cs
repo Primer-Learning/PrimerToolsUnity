@@ -8,12 +8,6 @@ using Shapes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-// We compare floats against another float value to prevent updating the game objects when the value is the same
-// This only cares if they are EXACTLY the same binary value in memory
-// This is an optimization and doesn't care about precision
-// So we disable this warning for this file
-// ReSharper disable CompareOfFloatsByEqualityOperator
-
 namespace Primer.Graph
 {
     [RequireComponent(typeof(Graph))]
@@ -28,74 +22,40 @@ namespace Primer.Graph
         public BarData this[int index] => GetBar(index);
         public BarData this[string name] => GetBar(name);
 
-        #region float barWidth;
         [SerializeField, HideInInspector]
         private float _barWidth = 1f;
-
         [ShowInInspector]
         public float barWidth {
             get => _barWidth;
-            set {
-                if (_barWidth == value) return;
-                _barWidth = value;
-                UpdateBars();
-            }
+            set => Meta.ReactiveProp(ref _barWidth, value, UpdateBars);
         }
-        #endregion
 
-        #region float spacing;
-        [SerializeField, HideInInspector]
-        private float _spacing = 1f;
-        #endregion
-
-        #region float cornerRadius;
         [SerializeField, HideInInspector]
         private float _cornerRadius = 0.25f;
-
         [ShowInInspector]
         public float cornerRadius {
             get => _cornerRadius;
-            set {
-                if (_cornerRadius == value) return;
-                _cornerRadius = value;
-                UpdateBars();
-            }
+            set => Meta.ReactiveProp(ref _cornerRadius, value, UpdateBars);
         }
-        #endregion
 
-        #region Vector3 offset;
         [SerializeField, HideInInspector]
         private Vector3 _offset = Vector3.zero;
-
         [ShowInInspector]
         public Vector3 offset {
             get => _offset;
-            set {
-                if (_offset == value) return;
-                _offset = value;
-                UpdateBars();
-            }
+            set => Meta.ReactiveProp(ref _offset, value, UpdateBars);
         }
-        #endregion
 
-        #region List<BarData> bars
         [SerializeField, HideInInspector]
         private List<BarData> _bars = new();
-
         [ShowInInspector]
         [HorizontalGroup("Data")]
         [HideReferenceObjectPicker]
         [ListDrawerSettings(Expanded = true, AlwaysAddDefaultValue = true)]
-        private List<BarData> bars
-        {
+        private List<BarData> bars {
             get => _bars;
-            set
-            {
-                _bars = value;
-                UpdateBars();
-            }
+            set => Meta.ReactiveProp(ref _bars, value, UpdateBars);
         }
-        #endregion
 
 
         public void SetDefaults()

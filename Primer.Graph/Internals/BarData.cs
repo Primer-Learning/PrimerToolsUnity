@@ -18,11 +18,7 @@ namespace Primer.Graph
         [ShowInInspector]
         public string name {
             get => _name;
-            set {
-                if (value == _name) return;
-                _name = value;
-                onNameChange?.Invoke(value);
-            }
+            set => Meta.ReactiveProp(ref _name, value, onNameChange);
         }
 
 
@@ -33,12 +29,7 @@ namespace Primer.Graph
         [ShowInInspector]
         public float value {
             get => _value;
-            set {
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (value == _value) return;
-                _value = value;
-                onValueChange?.Invoke(value);
-            }
+            set => Meta.ReactiveProp(ref _value, value, onValueChange);
         }
 
 
@@ -49,11 +40,7 @@ namespace Primer.Graph
         [ShowInInspector]
         public Color color {
             get => _color;
-            set {
-                if (value == _color) return;
-                _color = value;
-                onColorChange?.Invoke(value);
-            }
+            set => Meta.ReactiveProp(ref _color, value, onColorChange);
         }
     }
 }

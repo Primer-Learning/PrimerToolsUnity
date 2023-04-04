@@ -30,20 +30,12 @@ namespace Primer.Axis
 
         public float min {
             get => domain.min;
-            set
-            {
-                domain.min = value;
-                UpdateChildren();
-            } 
+            set => Meta.ReactiveProp(() => domain.min, value, UpdateChildren);
         }
 
         public float max {
             get => domain.max;
-            set
-            {
-                domain.max = value;
-                UpdateChildren();
-            } 
+            set => Meta.ReactiveProp(() => domain.max, value, UpdateChildren);
         }
 
 

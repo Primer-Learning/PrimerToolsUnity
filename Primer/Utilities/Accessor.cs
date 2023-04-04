@@ -8,20 +8,36 @@ namespace Primer
 
     public class Accessor<T>
     {
-        private readonly Action<T> setter;
+        private readonly MemberExpression memberExpression;
         private readonly Func<T> getter;
+        private Action<T> setter;
 
         public Accessor(Expression<Func<T>> expression)
         {
-            if (expression.Body is not MemberExpression memberExpression)
+            if (expression.Body is not MemberExpression member)
                 throw new ArgumentException("expression must return a field or property");
 
-            var parameterExpression = Expression.Parameter(typeof(T));
-            setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameterExpression), parameterExpression).Compile();
             getter = expression.Compile();
+            memberExpression = member;
         }
 
-        public void Set(T value) => setter(value);
-        public T Get() => getter();
+        private Action<T> CreateSetter()
+        {
+            var parameterExpression = Expression.Parameter(typeof(T));
+            var assignExpression = Expression.Assign(memberExpression, parameterExpression);
+            var lambda = Expression.Lambda<Action<T>>(assignExpression, parameterExpression);
+            return lambda.Compile();
+        }
+
+        public T Get()
+        {
+            return getter();
+        }
+
+        public void Set(T value)
+        {
+            setter ??= CreateSetter();
+            setter(value);
+        }
     }
 }
