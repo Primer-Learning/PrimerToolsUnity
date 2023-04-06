@@ -224,8 +224,9 @@ namespace Primer.Shapes
 
             if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude)
             {
-                Debug.LogWarning("Refusing to render a broken-looking bracket");
-                return;
+                Debug.LogWarning("Bracket may look broken");
+                // Debug.LogWarning("Refusing to render a broken-looking bracket");
+                // return;
             }
 
             leftBar.localScale = new Vector3(leftLength, 1, 1);
