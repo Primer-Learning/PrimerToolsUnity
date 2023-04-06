@@ -11,7 +11,7 @@ namespace Primer.Scene
     {
         [Min(0)] public int xDivisions = 3;
         [Min(0)] public int yDivisions = 3;
-        [Min(1)] public int lineWidth = 5;
+        [Min(1)] public int lineWidth = 2;
 
         private Canvas canvas;
 
