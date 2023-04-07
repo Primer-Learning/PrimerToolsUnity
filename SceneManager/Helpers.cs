@@ -3,7 +3,12 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using Primer;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 /*
 This is where I put code when I don't know where else to put it.
@@ -612,6 +617,14 @@ public static class GameObjectExtension
         return go.AddComponent<PrimerObject>();
     }
 }
+public static class Vector3Utils
+{
+    public static Vector3 Average(params Vector3[] vectors)
+    {
+        var total = vectors.Aggregate((current, vec) => current + vec);
+        return total / vectors.Length;
+    }
+}
 public static class TransformExtension
 {
     //Breadth-first search
@@ -628,7 +641,15 @@ public static class TransformExtension
                 queue.Enqueue(t);
         }
         return null;
-    }    
+    }
+
+    public static void ReleaseAllChildren(this Transform parent)
+    {
+        foreach (var child in parent.GetChildren())
+        {
+            child.SetParent(parent.parent, worldPositionStays: true);
+        }
+    }
 
     public static void CopyTransform(this Transform t, Transform tToCopy) {
         t.parent = tToCopy.parent;
