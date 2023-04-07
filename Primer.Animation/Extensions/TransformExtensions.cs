@@ -30,5 +30,14 @@ namespace Primer.Animation
                 ? Tween.noop
                 : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
         }
+        public static Tween MoveBy(this Transform transform, Vector3 displacement)
+        {
+            var initial = transform.localPosition;
+            var newPosition = initial + displacement; 
+
+            return initial == newPosition
+                ? Tween.noop
+                : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
+        }
     }
 }
