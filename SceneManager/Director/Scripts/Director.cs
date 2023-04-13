@@ -133,16 +133,6 @@ public class Director : SceneManager
         EditorApplication.isPlaying = false;
         #endif
     }
-    public ReferenceScreen MakeReferenceScreen(VideoClip clip = null) {
-        ReferenceScreen rs = Instantiate(Resources.Load<ReferenceScreen>("Reference screen prefab"));
-        if (clip != null) {
-            rs.screen.clip = clip;
-            rs.screen.gameObject.GetComponent<MeshRenderer>().material.SetFloat("_Glossiness", 0);
-        }
-        rs.transform.parent = cameraRenderer.transform;
-        rs.transform.localRotation = Quaternion.identity;
-        return rs;
-    }
     public class SceneBlock {
         //Define delegate type
         public delegate IEnumerator DelegateIEnumerator();
