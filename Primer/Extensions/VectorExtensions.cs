@@ -1,9 +1,22 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Primer
 {
     public static class VectorExtensions
     {
+        public static Vector3 Average(this IEnumerable<Vector3> vectors)
+        {
+            return Average(vectors.ToArray());
+        }
+
+        public static Vector3 Average(params Vector3[] vectors)
+        {
+            var total = vectors.Aggregate((current, vec) => current + vec);
+            return total / vectors.Length;
+        }
+
         public static void SetScale(this Transform transform, Vector3 scale, bool isGlobal = false)
         {
             if (isGlobal)

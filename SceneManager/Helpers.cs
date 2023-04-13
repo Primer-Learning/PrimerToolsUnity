@@ -617,14 +617,6 @@ public static class GameObjectExtension
         return go.AddComponent<PrimerObject>();
     }
 }
-public static class Vector3Utils
-{
-    public static Vector3 Average(params Vector3[] vectors)
-    {
-        var total = vectors.Aggregate((current, vec) => current + vec);
-        return total / vectors.Length;
-    }
-}
 public static class TransformExtension
 {
     //Breadth-first search
