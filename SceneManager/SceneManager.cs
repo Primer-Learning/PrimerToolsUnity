@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Primer.Scene;
+﻿using Primer.Scene;
 using UnityEngine;
-using UnityEngine.Video;
-using UnityEditor;
-using TMPro;
 using UnityEngine.Serialization;
 
 public class SceneManager : PrimerObject 
@@ -23,8 +17,6 @@ public class SceneManager : PrimerObject
     public static System.Random sceneRandom2; //Sometimes it's useful to have separate rng for visual purposes
 
     // Prefab vars, probably not necessary to do this here
-    public PrimerArrow primerArrowPrefab;
-    public PrimerBracket primerBracketPrefab;
     public PrimerText primerTextPrefab;
     public PrimerText primerCheckPrefab;
     public PrimerText primerXPrefab;
@@ -48,8 +40,6 @@ public class SceneManager : PrimerObject
             Debug.Log("Seed: " + seed);
 
             // Load/assign common resources
-            primerArrowPrefab = Resources.Load("arrowPrefab", typeof(PrimerArrow)) as PrimerArrow;
-            primerBracketPrefab = Resources.Load("bracket", typeof(PrimerBracket)) as PrimerBracket;
             primerTextPrefab = Resources.Load("text", typeof(PrimerText)) as PrimerText;
             primerCheckPrefab = Resources.Load<PrimerText>("checkmark");
             primerXPrefab = Resources.Load<PrimerText>("x");
