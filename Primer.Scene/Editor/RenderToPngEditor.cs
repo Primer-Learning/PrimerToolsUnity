@@ -1,14 +1,15 @@
-using Primer.Editor;
 using UnityEditor;
 
 namespace Primer.Scene.Editor
 {
     [CustomEditor(typeof(RenderToPng))]
-    public class RenderToPngEditor : PrimerEditor<RenderToPng>
+    public class RenderToPngEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            var component = (RenderToPng)target;
 
             using (new EditorGUI.DisabledScope(true)) {
                 EditorGUILayout.IntField("Frames saved", component.framesSaved);
