@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Primer.Math
+namespace Primer
 {
     public abstract class ParametricEquation
     {

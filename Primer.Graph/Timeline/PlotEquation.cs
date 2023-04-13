@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Primer.Math;
 using Primer.Timeline;
 using Shapes;
 using UnityEngine;

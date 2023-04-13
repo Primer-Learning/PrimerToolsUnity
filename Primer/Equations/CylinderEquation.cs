@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Primer.Math
+namespace Primer
 {
     [UsedImplicitly]
     public class CylinderEquation : ParametricEquation

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Primer.Math
+namespace Primer
 {
     [Serializable]
     public class ExponentialYEquation : ParametricEquation

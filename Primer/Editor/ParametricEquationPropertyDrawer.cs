@@ -1,9 +1,7 @@
-using Primer.Editor;
-using Primer.Math;
 using UnityEditor;
 using UnityEngine;
 
-namespace Primer.Graph.Editor
+namespace Primer.Editor
 {
     [CustomPropertyDrawer(typeof(ParametricEquation))]
     public class ParametricEquationPropertyDrawer : PropertyDrawer
