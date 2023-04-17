@@ -17,7 +17,7 @@ namespace Primer.Timeline.Editor
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
 
             var undoMessage = $"Add {seconds}s at {time}s";
-            var tracks = timeline.GetAllTracks();
+            var tracks = timeline.GetAllUnlockedTracks();
             var clips = tracks.SelectMany(x => x.GetClips()).ToList();
             var anim = tracks.OfType<AnimationTrack>()
                 .Where(x => x.infiniteClip != null)
@@ -47,7 +47,7 @@ namespace Primer.Timeline.Editor
 
         public static bool HasSomeClipAt(this TimelineAsset timeline, float time)
         {
-            return timeline.GetAllTracks()
+            return timeline.GetAllUnlockedTracks()
                 .SelectMany(track => track.GetClips())
                 .Any(clip => (float)clip.start < time && (float)clip.end > time);
         }
@@ -66,7 +66,7 @@ namespace Primer.Timeline.Editor
             }
 
             var undoMessage = $"Remove {seconds}s at {time}s";
-            var tracks = timeline.GetAllTracks();
+            var tracks = timeline.GetAllUnlockedTracks();
             var clips = tracks.SelectMany(x => x.GetClips()).ToList();
             var anim = tracks.OfType<AnimationTrack>()
                 .Where(x => x.infiniteClip != null)
@@ -110,7 +110,7 @@ namespace Primer.Timeline.Editor
         {
             var max = float.MaxValue;
 
-            foreach (var track in timeline.GetAllTracks()) {
+            foreach (var track in timeline.GetAllUnlockedTracks()) {
                 if (track is AnimationTrack animTrack && animTrack.infiniteClip != null) {
                     // Get the minimum distance between the time we want to remove and the next keyframe
                     max = animTrack.infiniteClip.IterateAllKeyframes()
@@ -134,9 +134,9 @@ namespace Primer.Timeline.Editor
         }
 
 
-        public static List<TrackAsset> GetAllTracks(this TimelineAsset timeline)
+        public static List<TrackAsset> GetAllUnlockedTracks(this TimelineAsset timeline)
         {
-            return GetAllTracksRecursively(timeline.GetRootTracks());
+            return GetAllTracksRecursively(timeline.GetRootTracks()).Where(x => !x.locked).ToList();
         }
 
         private static List<TrackAsset> GetAllTracksRecursively(IEnumerable<TrackAsset> tracks)
