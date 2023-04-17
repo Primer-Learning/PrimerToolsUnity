@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks.Triggers;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using Object = UnityEngine.Object;
 
@@ -43,6 +45,9 @@ namespace Primer.Timeline.Editor
                     return keyframe;
                 });
             }
+            
+            // Refresh the PlayableDirector associated with the TimelineAsset
+            RefreshPlayableDirector(timeline);
         }
 
         public static bool HasSomeClipAt(this TimelineAsset timeline, float time)
@@ -104,6 +109,9 @@ namespace Primer.Timeline.Editor
                     return keyframe;
                 });
             }
+            
+            // Refresh the PlayableDirector associated with the TimelineAsset
+            RefreshPlayableDirector(timeline);
         }
 
         public static float GetMaxRemovableTimeAt(this TimelineAsset timeline, float time)
@@ -151,6 +159,22 @@ namespace Primer.Timeline.Editor
             }
 
             return result;
+        }
+        // Method is from GPT4. Seems to work!
+        private static void RefreshPlayableDirector(TimelineAsset timeline)
+        {
+            // Find and refresh the PlayableDirector component in the scene
+            PlayableDirector[] directors = GameObject.FindObjectsOfType<PlayableDirector>();
+
+            foreach (var director in directors)
+            {
+                if (director.playableAsset == timeline)
+                {
+                    director.RebuildGraph();
+                    director.Evaluate(); // This line may not be necessary but can help to force the timeline evaluation
+                    break;
+                }
+            }
         }
     }
 }
