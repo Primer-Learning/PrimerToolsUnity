@@ -4,6 +4,6 @@ namespace Primer.Timeline
     {
         protected override PrimerPlayable template { get; } = new SequencePlayable();
 
-        public override string clipName => $"Clip {template.clipIndex + 1}";
+        public override string clipName => $"[{template.clipIndex + 1}] {trackTransform?.name ?? "No sequence"}";
     }
 }
