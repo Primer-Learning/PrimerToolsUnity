@@ -39,9 +39,8 @@ namespace Primer.Timeline
                 asset.duration = (float)clip.duration;
                 asset.clipIndex = clipCount++;
 
-                if (clip.displayName == nameof(SequenceClip)
-                    || string.IsNullOrWhiteSpace(asset.clipName)
-                    || clip.displayName[0] != '[') {
+                if (string.IsNullOrWhiteSpace(asset.clipName)
+                    || clip.displayName != nameof(SequenceClip) && clip.displayName[0] != '[') {
                     continue;
                 }
 

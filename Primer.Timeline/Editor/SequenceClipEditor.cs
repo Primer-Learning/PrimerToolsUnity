@@ -44,7 +44,7 @@ namespace Primer.Timeline.Editor
 
             // It can be a MonoBehaviour or a ScriptableObject
             var monoScript = MonoScript.FromMonoBehaviour(GetTrackTarget());
-            EditorGUILayout.ObjectField("Edit sequence", monoScript, typeof(MonoBehaviour), false);
+            EditorGUILayout.ObjectField("Sequence", monoScript, typeof(MonoBehaviour), false);
 
             EditorGUI.EndDisabledGroup();
         }
