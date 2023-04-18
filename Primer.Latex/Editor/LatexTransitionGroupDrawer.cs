@@ -30,10 +30,11 @@ namespace Primer.Latex.Editor
             var from = fromResolver.GetValue();
             var to = toResolver.GetValue();
             var transitions = ValueEntry.SmartValue;
-            var expectedLength = TransitionTypeExtensions.GetTransitionAmountFor(from, to);
 
             if (from == null || to == null || transitions == null)
                 return;
+
+            var expectedLength = TransitionTypeExtensions.GetTransitionAmountFor(from, to);
 
             while (transitions.Count < expectedLength)
                 transitions.Add(TransitionType.Transition);
