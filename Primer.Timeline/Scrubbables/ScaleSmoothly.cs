@@ -7,7 +7,7 @@ using UnityEngine.Timeline;
 namespace Primer.Animation
 {
     [Serializable]
-    public class ScaleSmoothly : Scrubbable, IPropertyModifier
+    public class ScaleSmoothly : Scrubbable
     {
         [EnumToggleButtons]
         public enum Direction { ScaleUp, ScaleDown }
@@ -51,14 +51,14 @@ namespace Primer.Animation
         }
 
 
-        public void RegisterProperties(IPropertyCollector registrar)
-        {
-            registrar.AddProperties(
-                target,
-                "m_LocalScale.x",
-                "m_LocalScale.y",
-                "m_LocalScale.z"
-            );
-        }
+        // public void RegisterProperties(IPropertyCollector registrar)
+        // {
+        //     registrar.AddProperties(
+        //         target,
+        //         "m_LocalScale.x",
+        //         "m_LocalScale.y",
+        //         "m_LocalScale.z"
+        //     );
+        // }
     }
 }

@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Primer.Timeline
 {
-    public class PlayableTimeComparer : IComparer<GenericBehaviour>
+    public class PlayableTimeComparer : IComparer<PrimerPlayable>
     {
-        public int Compare(GenericBehaviour left, GenericBehaviour right)
+        public int Compare(PrimerPlayable left, PrimerPlayable right)
         {
             if (left is null && right is null)
                 return 0;

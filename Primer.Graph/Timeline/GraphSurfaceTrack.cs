@@ -8,9 +8,9 @@ namespace Primer.Graph
     [TrackClipType(typeof(PlottedEquationClip))]
     [TrackClipType(typeof(PlottedDataClip))]
     [TrackBindingType(typeof(MeshFilter))]
-    public class GraphSurfaceTrack : PrimerTrack
+    public class GraphSurfaceTrack : DeprecatedPrimerTrack
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) =>
-            ScriptPlayable<GraphSurfaceMixer>.Create(graph, inputCount);
+            ScriptPlayable<GraphSurfaceMixerWithCollector>.Create(graph, inputCount);
     }
 }

@@ -2,7 +2,7 @@ using System.Threading;
 
 namespace Primer.Timeline
 {
-    internal class SingleExecutionGuarantee
+    public class SingleExecutionGuarantee
     {
         private CancellationTokenSource lastExecution = new();
 

@@ -1,26 +1,82 @@
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Primer.Timeline
 {
-    /// Remember to use [Serializable] attribute when extending this
-    public abstract class PrimerClip<T> : PlayableAsset, ITimelineClipAsset
-        where T : PrimerPlayable, new()
+    public abstract class PrimerClip : PlayableAsset, ITimelineClipAsset
     {
-        public virtual ClipCaps clipCaps => ClipCaps.None;
+        public float? expectedDuration = null;
 
-        [Space]
-        [HideLabel]
-        [InlineProperty]
-        public T template = new();
+        protected abstract PrimerPlayable template { get; }
+        protected PrimerPlayable lastPlayable;
+
+        public ClipCaps clipCaps => ClipCaps.Extrapolation;
+
+        public virtual string clipName => "";
+
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            return template is null
-                ? Playable.Null
-                : ScriptPlayable<T>.Create(graph, template);
+            var playable = ScriptPlayable<PrimerPlayable>.Create(graph, template);
+
+            lastPlayable = playable.GetBehaviour();
+            lastPlayable.onDurationReported = x => expectedDuration = x;
+
+            return playable;
         }
+
+
+        #region Properties propagated to PrimerPlayable
+        public Transform trackTransform {
+            get => template.trackTransform;
+            set {
+                template.trackTransform = value;
+
+                if (lastPlayable is not null)
+                    lastPlayable.trackTransform = value;
+            }
+        }
+
+        public IExposedPropertyTable resolver {
+            get => template.resolver;
+            set {
+                template.resolver = value;
+
+                if (lastPlayable is not null)
+                    lastPlayable.resolver = value;
+            }
+        }
+
+        public int clipIndex {
+            get => template.clipIndex;
+            set {
+                template.clipIndex = value;
+
+                if (lastPlayable is not null)
+                    lastPlayable.clipIndex = value;
+            }
+        }
+
+        public float start {
+            get => template.start;
+            set {
+                template.start = value;
+
+                if (lastPlayable is not null)
+                    lastPlayable.start = value;
+            }
+        }
+
+        public new float duration {
+            get => template.duration;
+            set {
+                template.duration = value;
+
+                if (lastPlayable is not null)
+                    lastPlayable.duration = value;
+            }
+        }
+        #endregion
     }
 }

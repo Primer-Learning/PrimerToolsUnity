@@ -27,6 +27,12 @@ MonoBehaviour:
     - rid: 5481954043140767762
       type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 5
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 5
         duration: 1
@@ -34,23 +40,32 @@ MonoBehaviour:
           rid: -2
         scrubbableMethod:
           methodName: 
+        isPrepared: 0
     - rid: 5481954043140767763
       type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 5
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 5
         duration: 1
+        _triggerable: {}
         triggerMethod:
           methodName: 
+        isExecuted: 0
     - rid: 6955339677101195266
       type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
-        weight: 0
         start: 5
         duration: 1
-        sequenceMethod:
-          methodName: 
-        _clipIndex: 3
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
 --- !u!114 &-8221759976430781531
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -68,7 +83,7 @@ MonoBehaviour:
   emitInEditor: 1
   retroactive: 1
   method: AnotherTrigger
---- !u!114 &-5231615585877679848
+--- !u!114 &-6590732278031391822
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -77,8 +92,189 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95d47dd46ff174178aa57d942f6e67bb, type: 3}
-  m_Name: Generic Track
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip
+  m_EditorClassIdentifier: 
+--- !u!114 &-5995767391732662768
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+--- !u!114 &-3677544403450612293
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+--- !u!114 &-2800359694409568685
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2960327b4aad47a682a9afd0a28bb1f2, type: 3}
+  m_Name: Trigger Marker
+  m_EditorClassIdentifier: 
+  m_Time: 0.5
+  emitOnce: 0
+  emitInEditor: 1
+  retroactive: 1
+  method: MyCustomNamedTrigger
+--- !u!114 &-1154496927423365135
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+--- !u!114 &-672482569217683270
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip(Clone)(Clone)
+  m_EditorClassIdentifier: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: TestTimelineSequence
+  m_EditorClassIdentifier: 
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 7240630378029068107}
+  m_FixedDuration: 4
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &3615011967560732465
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2960327b4aad47a682a9afd0a28bb1f2, type: 3}
+  m_Name: Trigger Marker
+  m_EditorClassIdentifier: 
+  m_Time: 2
+  emitOnce: 0
+  emitInEditor: 1
+  retroactive: 1
+  method: MoveUp
+--- !u!114 &5986868089096668290
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20d75f479224a4bd48cc44c29195bc4f, type: 3}
+  m_Name: GenericClip
+  m_EditorClassIdentifier: 
+  kind: 2
+  scrubbable:
+    rid: 5481954043140767756
+  triggerable:
+    rid: 5481954043140767757
+  sequence:
+    rid: 6955339677101195264
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 5481954043140767756
+      type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        start: 0.71666664
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
+        weight: 0
+        start: 0.71666664
+        duration: 1
+        scrubbable:
+          rid: -2
+        scrubbableMethod:
+          methodName: 
+        isPrepared: 0
+    - rid: 5481954043140767757
+      type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        start: 0
+        duration: 0
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
+        weight: 0
+        start: 0
+        duration: 0
+        _triggerable: {}
+        triggerMethod:
+          methodName: 
+        isExecuted: 0
+    - rid: 6955339677101195264
+      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
+      data:
+        start: 1
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
+--- !u!114 &7240630378029068107
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e714a0483d4a35b6e35d967f474912, type: 3}
+  m_Name: Sequence Track
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
@@ -92,10 +288,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 1
     m_ClipIn: 0
-    m_Asset: {fileID: 5986868089096668290}
-    m_Duration: 1
+    m_Asset: {fileID: -6590732278031391822}
+    m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -5231615585877679848}
+    m_ParentTrack: {fileID: 7240630378029068107}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -155,16 +351,85 @@ MonoBehaviour:
     m_Recordable: 0
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 1
+    m_PostExtrapolationTime: 0.5
     m_PreExtrapolationTime: 1
-    m_DisplayName: "\u2261 [1] TestTimelineSequence.Run()"
+    m_DisplayName: Clip 1
+  - m_Version: 1
+    m_Start: 2
+    m_ClipIn: 0
+    m_Asset: {fileID: -3677544403450612293}
+    m_Duration: 0.5
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7240630378029068107}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0.5
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Clip 2
   - m_Version: 1
     m_Start: 3
     m_ClipIn: 0
-    m_Asset: {fileID: 8488974010620000498}
-    m_Duration: 1
+    m_Asset: {fileID: -5995767391732662768}
+    m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -5231615585877679848}
+    m_ParentTrack: {fileID: 7240630378029068107}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -224,16 +489,85 @@ MonoBehaviour:
     m_Recordable: 0
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 1
+    m_PostExtrapolationTime: 0.5
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u2261 [2] TestTimelineSequence.No method selected"
+    m_DisplayName: Clip 3
   - m_Version: 1
-    m_Start: 5
+    m_Start: 4
     m_ClipIn: 0
-    m_Asset: {fileID: -8380533774660205139}
-    m_Duration: 1
+    m_Asset: {fileID: -672482569217683270}
+    m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -5231615585877679848}
+    m_ParentTrack: {fileID: 7240630378029068107}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0.41666666666666696
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Clip 4
+  - m_Version: 1
+    m_Start: 4.916666666666667
+    m_ClipIn: 0
+    m_Asset: {fileID: -1154496927423365135}
+    m_Duration: 0.5
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7240630378029068107}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -295,116 +629,10 @@ MonoBehaviour:
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: Infinity
     m_PreExtrapolationTime: 0
-    m_DisplayName: "\u2261 [3] TestTimelineSequence.No method selected"
+    m_DisplayName: Clip 5
   m_Markers:
     m_Objects: []
   defaultDuration: 1
---- !u!114 &-2800359694409568685
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2960327b4aad47a682a9afd0a28bb1f2, type: 3}
-  m_Name: Trigger Marker
-  m_EditorClassIdentifier: 
-  m_Time: 0.5
-  emitOnce: 0
-  emitInEditor: 1
-  retroactive: 1
-  method: MyCustomNamedTrigger
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
-  m_Name: TestTimelineSequence
-  m_EditorClassIdentifier: 
-  m_Version: 0
-  m_Tracks:
-  - {fileID: -5231615585877679848}
-  m_FixedDuration: 0
-  m_EditorSettings:
-    m_Framerate: 60
-    m_ScenePreview: 1
-  m_DurationMode: 0
-  m_MarkerTrack: {fileID: 0}
---- !u!114 &3615011967560732465
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2960327b4aad47a682a9afd0a28bb1f2, type: 3}
-  m_Name: Trigger Marker
-  m_EditorClassIdentifier: 
-  m_Time: 2
-  emitOnce: 0
-  emitInEditor: 1
-  retroactive: 1
-  method: MoveUp
---- !u!114 &5986868089096668290
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20d75f479224a4bd48cc44c29195bc4f, type: 3}
-  m_Name: GenericClip
-  m_EditorClassIdentifier: 
-  kind: 2
-  scrubbable:
-    rid: 5481954043140767756
-  triggerable:
-    rid: 5481954043140767757
-  sequence:
-    rid: 6955339677101195264
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 5481954043140767756
-      type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
-      data:
-        weight: 0
-        start: 0.71666664
-        duration: 1
-        scrubbable:
-          rid: -2
-        scrubbableMethod:
-          methodName: 
-    - rid: 5481954043140767757
-      type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
-      data:
-        weight: 0
-        start: 0
-        duration: 0
-        triggerMethod:
-          methodName: 
-    - rid: 6955339677101195264
-      type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
-      data:
-        weight: 0
-        start: 1
-        duration: 1
-        sequenceMethod:
-          methodName: Run
-        _clipIndex: 1
 --- !u!114 &8488974010620000498
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -432,6 +660,12 @@ MonoBehaviour:
     - rid: 5481954043140767759
       type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 3
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 3
         duration: 1
@@ -439,23 +673,32 @@ MonoBehaviour:
           rid: -2
         scrubbableMethod:
           methodName: 
+        isPrepared: 0
     - rid: 5481954043140767760
       type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 0
+        duration: 0
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 0
         duration: 0
+        _triggerable: {}
         triggerMethod:
           methodName: 
+        isExecuted: 0
     - rid: 6955339677101195265
       type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
-        weight: 0
         start: 3
         duration: 1
-        sequenceMethod:
-          methodName: 
-        _clipIndex: 2
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
 --- !u!114 &9117094690620461942
 MonoBehaviour:
   m_ObjectHideFlags: 1

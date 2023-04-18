@@ -7,13 +7,21 @@ namespace Primer.Timeline
     public class PrimerPlayable<TTrackBind> : PrimerPlayable
         where TTrackBind : Component
     {
-        public virtual TTrackBind trackTarget { get; internal set; }
+        private TTrackBind _trackTarget;
+
+        public TTrackBind trackTarget {
+            get => _trackTarget;
+            internal set {
+                _trackTarget = value;
+                trackTransform = value == null ? null : value.transform;
+            }
+        }
+
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            using (lifecycle.PreventInitialization()) {
+            using (lifecycle.PreventInitialization())
                 base.ProcessFrame(playable, info, playerData);
-            }
 
             if (playerData is null)
                 return;

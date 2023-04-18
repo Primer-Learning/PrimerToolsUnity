@@ -1,11 +1,11 @@
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+using System.Collections.Generic;
+using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
 
 namespace Primer.Shapes.Tests
 {
-    public class AnimateArrow : Triggerable
+    public class AnimateArrow : Sequence
     {
         public Vector3 start = Vector3.one;
         public Vector3 end = Vector3.one * 3;
@@ -36,11 +36,9 @@ namespace Primer.Shapes.Tests
             endInitial = arrow.head;
         }
 
-
-        [UsedImplicitly]
-        public async Task Animate()
+        public override async IAsyncEnumerator<Tween> Run()
         {
-            await arrow.Animate(start, end).Play();
+            yield return arrow.Animate(start, end);
         }
     }
 }

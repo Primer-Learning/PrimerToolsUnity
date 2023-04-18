@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8838086179186489079
+--- !u!114 &-8589749853540908928
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,25 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95d47dd46ff174178aa57d942f6e67bb, type: 3}
-  m_Name: Generic Track (1)
+  m_Script: {fileID: 11500000, guid: 17e714a0483d4a35b6e35d967f474912, type: 3}
+  m_Name: Sequence Track (1)
   m_EditorClassIdentifier: 
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
-  m_Muted: 1
+  m_Muted: 0
   m_CustomPlayableFullTypename: 
   m_Curves: {fileID: 0}
   m_Parent: {fileID: 11400000}
   m_Children: []
   m_Clips:
   - m_Version: 1
-    m_Start: 1
+    m_Start: 1.5
     m_ClipIn: 0
-    m_Asset: {fileID: 6359639589694568720}
-    m_Duration: 1
+    m_Asset: {fileID: 8068814385722206320}
+    m_Duration: 0.5
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8838086179186489079}
+    m_ParentTrack: {fileID: -8589749853540908928}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -88,8 +88,8 @@ MonoBehaviour:
     m_PostExtrapolationMode: 1
     m_PreExtrapolationMode: 0
     m_PostExtrapolationTime: Infinity
-    m_PreExtrapolationTime: 1
-    m_DisplayName: "\u256C Transition"
+    m_PreExtrapolationTime: 1.5
+    m_DisplayName: Clip 1
   m_Markers:
     m_Objects: []
   defaultDuration: 1
@@ -109,168 +109,6 @@ MonoBehaviour:
     exposedName: 26c9c32f7b54f4b0187ba6ee4aff28f1
     defaultValue: {fileID: 0}
   transitions: 0000000000000000030000000100000000000000000000000000000000000000010000000000000000000000
---- !u!114 &-7369228860122181430
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95d47dd46ff174178aa57d942f6e67bb, type: 3}
-  m_Name: Generic Track
-  m_EditorClassIdentifier: 
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 1
-    m_ClipIn: 0
-    m_Asset: {fileID: 6638686944565391002}
-    m_Duration: 1
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: -7369228860122181430}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 1
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 1
-    m_PreExtrapolationTime: 1
-    m_DisplayName: "\u2551 LatexScrubbable"
-  - m_Version: 1
-    m_Start: 3
-    m_ClipIn: 0
-    m_Asset: {fileID: -3520881947266141728}
-    m_Duration: 0.9999999999999996
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: -7369228860122181430}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 1
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: Infinity
-    m_PreExtrapolationTime: 0
-    m_DisplayName: "\u2551 LatexScrubbable"
-  m_Markers:
-    m_Objects: []
-  defaultDuration: 1
 --- !u!114 &-3520881947266141728
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -296,6 +134,12 @@ MonoBehaviour:
     - rid: 5481954407885307907
       type: {class: ScrubbablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 3
+        duration: 1
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 3
         duration: 1
@@ -303,28 +147,35 @@ MonoBehaviour:
           rid: 5481954496223379457
         scrubbableMethod:
           methodName: Update
+        isPrepared: 0
     - rid: 5481954407885307908
       type: {class: TriggerablePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
+        start: 1
+        duration: 2
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
         weight: 0
         start: 1
         duration: 2
+        _triggerable: {}
         triggerMethod:
           methodName: Transition
+        isExecuted: 0
     - rid: 5481954496223379457
       type: {class: LatexScrubbable, ns: Primer.Latex, asm: Primer.Latex}
-      data:
-        _from: {fileID: 0}
-        _to: {fileID: 0}
-        _groups: 020000000100000004000000
+      data: {<target>k__BackingField: {fileID: 0}, _from: {fileID: 0}, _to: {fileID: 0}, _groups: 020000000100000004000000, state: 0}
     - rid: 6955339387600109572
       type: {class: SequencePlayable, ns: Primer.Timeline, asm: Primer.Timeline}
       data:
-        weight: 0
         start: 0
         duration: 0
-        sequenceMethod:
-          methodName: 
+        clipIndex: 0
+        weight: 0
+        trackTransform: {fileID: 0}
+        _trackTarget: {fileID: 0}
 --- !u!114 &-2872404345629012489
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -355,8 +206,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Version: 0
   m_Tracks:
-  - {fileID: -7369228860122181430}
-  - {fileID: -8838086179186489079}
+  - {fileID: 7858345580329935221}
+  - {fileID: -8589749853540908928}
   m_FixedDuration: 0
   m_EditorSettings:
     m_Framerate: 60
@@ -554,6 +405,123 @@ MonoBehaviour:
   emitInEditor: 1
   retroactive: 1
   method: MoveUp
+--- !u!114 &7709028687696459177
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip
+  m_EditorClassIdentifier: 
+--- !u!114 &7858345580329935221
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e714a0483d4a35b6e35d967f474912, type: 3}
+  m_Name: Sequence Track
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0.5
+    m_ClipIn: 0
+    m_Asset: {fileID: 7709028687696459177}
+    m_Duration: 0.5
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7858345580329935221}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: Infinity
+    m_PreExtrapolationTime: 0.5
+    m_DisplayName: Clip 1
+  m_Markers:
+    m_Objects: []
+  defaultDuration: 1
+--- !u!114 &8068814385722206320
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51ac2060ac4401e8d0c90927c059408, type: 3}
+  m_Name: SequenceClip
+  m_EditorClassIdentifier: 
 --- !u!114 &8606109985020146649
 MonoBehaviour:
   m_ObjectHideFlags: 1

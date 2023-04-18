@@ -9,7 +9,7 @@ namespace Primer.Graph
     [TrackClipType(typeof(PlottedEquationClip))]
     [TrackClipType(typeof(PlottedDataClip))]
     [TrackBindingType(typeof(GraphPoint))]
-    public class GraphPointTrack : PrimerTrack
+    public class GraphPointTrack : DeprecatedPrimerTrack
     {
         [SerializeReference]
         public PrimerAnimator fadeIn = new ScaleUpAndTweenYAnimator();
@@ -18,7 +18,7 @@ namespace Primer.Graph
         public PrimerAnimator fadeOut = new ScaleUpFromZeroAnimator();
 
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
-            var mixer = ScriptPlayable<GraphPointMixer>.Create(graph, inputCount);
+            var mixer = ScriptPlayable<GraphPointMixerWithCollector>.Create(graph, inputCount);
             mixer.GetBehaviour().getAppearanceAnimator = isFadeOut => isFadeOut ? fadeOut : fadeIn;
             return mixer;
         }
