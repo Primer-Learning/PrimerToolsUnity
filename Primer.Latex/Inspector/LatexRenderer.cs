@@ -89,8 +89,11 @@ namespace Primer.Latex
             if (isExpressionInvalid || transform.gameObject.IsPreset())
                 return;
 
-            var children = new ChildrenDeclaration(transform);
             var zero = expression.center;
+            var children = new ChildrenDeclaration(
+                transform,
+                onRemove: x => x.Dispose(urgent: true)
+            );
 
             foreach (var (start, end) in latexGroups.ranges) {
                 var chunk = expression.Slice(start, end);

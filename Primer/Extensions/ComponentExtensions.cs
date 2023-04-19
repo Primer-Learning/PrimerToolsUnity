@@ -5,10 +5,10 @@ namespace Primer
 {
     public static class ComponentExtensions
     {
-        public static void Dispose(this Component component)
+        public static void Dispose(this Component component, bool urgent = false)
         {
             if (component != null)
-                component.gameObject.Dispose();
+                component.gameObject.Dispose(urgent);
         }
 
         public static T GetOrAddComponent<T>(this Component component) where T : Component
