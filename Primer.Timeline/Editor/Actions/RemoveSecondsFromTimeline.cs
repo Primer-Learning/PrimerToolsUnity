@@ -23,7 +23,8 @@ namespace Primer.Timeline.Editor
             var value = EditTimelineDialog.Show(
                 "Remove time",
                 $"How many seconds to remove from {time}s?",
-                defaultValue
+                defaultValue,
+                time + defaultValue
             );
 
             if (value is null)

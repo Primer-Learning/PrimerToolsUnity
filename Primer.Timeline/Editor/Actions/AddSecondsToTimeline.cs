@@ -21,16 +21,24 @@ namespace Primer.Timeline.Editor
             var value = EditTimelineDialog.Show(
                 "Add time",
                 $"How many seconds to add after {time}s?",
-                DEFAULT_ADD_SECONDS
+                DEFAULT_ADD_SECONDS,
+                time + DEFAULT_ADD_SECONDS
             );
-
+            
             if (value is null)
                 return false;
 
-            if (value.preserveClips && timeline.HasSomeClipAt(time))
+            if (value.preserveClips && timeline.HasUnlockedClipAt(time))
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
 
-            timeline.AddTime(time, value.seconds, value.preserveClips);
+            if (value.useTargetTime && value.targetTime < time)
+                throw new Exception("Target time must be after current play head time");
+            
+            if (value.useTargetTime)
+                timeline.AddTime(time, value.targetTime - time, value.preserveClips);
+            else
+                timeline.AddTime(time, value.seconds, value.preserveClips);
+            
             return true;
         }
     }

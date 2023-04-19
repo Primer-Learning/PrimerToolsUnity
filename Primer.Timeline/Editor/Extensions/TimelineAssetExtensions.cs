@@ -14,7 +14,7 @@ namespace Primer.Timeline.Editor
     {
         public static void AddTime(this TimelineAsset timeline, float time, float seconds, bool preserveClips = false)
         {
-            if (preserveClips && timeline.HasSomeClipAt(time))
+            if (preserveClips && timeline.HasUnlockedClipAt(time))
                 throw new Exception("Cannot add time in the middle of a clip when preserveClips is true");
 
             var undoMessage = $"Add {seconds}s at {time}s";
@@ -49,7 +49,7 @@ namespace Primer.Timeline.Editor
             RefreshPlayableDirector(timeline);
         }
 
-        public static bool HasSomeClipAt(this TimelineAsset timeline, float time)
+        public static bool HasUnlockedClipAt(this TimelineAsset timeline, float time)
         {
             return timeline.GetAllUnlockedTracks()
                 .SelectMany(track => track.GetClips())

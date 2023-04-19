@@ -1,16 +1,17 @@
 using System;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Primer.Timeline.Editor
 {
     public class EditTimelineDialog : EditorWindow
     {
-        public record TimelineEditValues(float seconds, bool preserveClips = true);
+        public record TimelineEditValues(float seconds, float targetTime, bool useTargetTime = false, bool preserveClips = true);
 
-        public static TimelineEditValues Show(string title, string description, float value)
+        public static TimelineEditValues Show(string title, string description, float seconds, float targetTime)
         {
-            return Show(title, description, new TimelineEditValues(value));
+            return Show(title, description, new TimelineEditValues(seconds, targetTime));
         }
 
         private static TimelineEditValues Show(string title, string description, TimelineEditValues input)
@@ -20,6 +21,7 @@ namespace Primer.Timeline.Editor
             window.description = description;
 
             window.seconds = input.seconds;
+            window.targetTime = input.targetTime;
             window.preserveClips = input.preserveClips;
 
             var output = null as TimelineEditValues;
@@ -36,6 +38,8 @@ namespace Primer.Timeline.Editor
         private Action<TimelineEditValues> onComplete;
 
         private float seconds;
+        private float targetTime;
+        private bool useTargetTime;
         private bool preserveClips = true;
 
         private bool initializedPosition;
@@ -49,7 +53,7 @@ namespace Primer.Timeline.Editor
 
         private void Submit()
         {
-            onComplete?.Invoke(new TimelineEditValues(seconds, preserveClips));
+            onComplete?.Invoke(new TimelineEditValues(seconds, targetTime, useTargetTime, preserveClips));
             shouldClose = true;
         }
 
@@ -77,9 +81,13 @@ namespace Primer.Timeline.Editor
             EditorGUILayout.LabelField(description);
 
             EditorGUILayout.Space(8);
-            GUI.SetNextControlName("valueInput");
+            GUI.SetNextControlName("secondsInput");
             seconds = EditorGUILayout.FloatField("Seconds", seconds);
-            GUI.FocusControl("valueInput");
+
+            EditorGUILayout.Space(8);
+            useTargetTime = EditorGUILayout.Toggle("Use target time instead", useTargetTime);
+            GUI.SetNextControlName("targetTimeInput");
+            targetTime = EditorGUILayout.FloatField("Target Time", targetTime);
 
             EditorGUILayout.Space(8);
             preserveClips = EditorGUILayout.Toggle("Preserve clips", preserveClips);
@@ -111,6 +119,7 @@ namespace Primer.Timeline.Editor
             // Set dialog position next to mouse position
             var mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
             position = new Rect(mousePos.x + 32, mousePos.y, position.width, position.height);
+            GUI.FocusControl("secondsInput");
             initializedPosition = true;
         }
         #endregion
