@@ -13,5 +13,16 @@ namespace Primer
                 onRecycle = onRecycle,
             };
         }
+
+        public static IPool<TPooled> Convert<TInternal, TPooled>(
+            this IPool<TInternal> self,
+            Func<TInternal, TPooled> onUse,
+            Func<TPooled, TInternal> onRecycle
+        )
+            where TPooled : Component
+            where TInternal : Component
+        {
+            return new PoolConverter<TInternal, TPooled>(self, onUse, onRecycle);
+        }
     }
 }
