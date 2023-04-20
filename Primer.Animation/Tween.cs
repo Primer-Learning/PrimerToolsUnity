@@ -124,7 +124,6 @@ namespace Primer.Animation
                 isCalculated = true,
             };
         }
-
         public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
         {
             return Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }).ToArray());

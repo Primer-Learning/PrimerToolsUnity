@@ -64,9 +64,9 @@ namespace Primer.Timeline
             parallelQueue.Add(tween);
         }
 
-        public Tween WaitForParallels()
+        public Tween WaitForParallels(float delayBetweenStarts = 0)
         {
-            var result = Parallel(parallelQueue.ToArray());
+            var result = Parallel(delayBetweenStarts, parallelQueue.ToArray());
             parallelQueue.Clear();
             return result;
         }
@@ -96,10 +96,14 @@ namespace Primer.Timeline
             }
         }
 
-        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(tweenList.ToArray());
+        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(0, tweenList.ToArray());
         public static Tween Parallel(params Tween[] tweenList)
         {
             return Tween.Parallel(tweenList);
+        }
+        public static Tween Parallel(float delayBetweenStarts = 0, params Tween[] tweenList)
+        {
+            return Tween.Parallel(delayBetweenStarts, tweenList);
         }
 
         public static Tween Series(IEnumerable<Tween> tweenList) =>Series(tweenList.ToArray());
