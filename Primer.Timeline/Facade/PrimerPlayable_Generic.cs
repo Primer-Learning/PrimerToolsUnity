@@ -10,7 +10,12 @@ namespace Primer.Timeline
         private TTrackBind _trackTarget;
 
         public TTrackBind trackTarget {
-            get => _trackTarget;
+            get {
+                if (_trackTarget == null && trackTransform != null)
+                    _trackTarget = trackTransform.GetComponent<TTrackBind>();
+
+                return _trackTarget;
+            }
             internal set {
                 _trackTarget = value;
                 trackTransform = value == null ? null : value.transform;
