@@ -23,6 +23,7 @@ namespace Primer
             if (!gameObject)
                 return;
 
+            // TODO: invert this boolean, the boolean should be called `delayed` and only run this line if true
             if (!urgent)
                 await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
