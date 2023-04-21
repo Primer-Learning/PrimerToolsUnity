@@ -88,7 +88,8 @@ namespace Primer.Animation
                     t -= 2;
 
                     // Ease out from half to end of overall change
-                    return (endVal - startVal) / 2 * t * t + endVal;
+                    // We need an extra negation here because t^2 is always positiv
+                    return -(endVal - startVal) / 2 * t * t + endVal;
 
                 default:
                     return endVal;
