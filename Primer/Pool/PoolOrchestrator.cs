@@ -27,7 +27,7 @@ namespace Primer
                     return _container;
 
                 if (_container is not null)
-                    Object.Destroy(_container);
+                    _container.Dispose(urgent: true);
 
                 var go = GameObject.Find(POOL_CONTAINER_NAME) ?? new GameObject(POOL_CONTAINER_NAME);
                 // go.hideFlags = HideFlags.DontSave;
