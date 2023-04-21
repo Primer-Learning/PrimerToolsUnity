@@ -5,6 +5,11 @@ namespace Primer
 {
     public static class ComponentExtensions
     {
+        public static bool IsInvalid(this Component component)
+        {
+            return component is not null && component == null;
+        }
+
         public static void Dispose(this Component component, bool urgent = false)
         {
             if (component != null)

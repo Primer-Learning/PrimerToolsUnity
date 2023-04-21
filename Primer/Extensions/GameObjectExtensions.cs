@@ -7,6 +7,11 @@ namespace Primer
 {
     public static class GameObjectExtensions
     {
+        public static bool IsInvalid(this GameObject gameObject)
+        {
+            return gameObject is not null && gameObject == null;
+        }
+
         /// <summary>Will be true if game object is preset.</summary>
         /// <remarks>
         ///     This condition was found through exploration... There is no documented way to determine
