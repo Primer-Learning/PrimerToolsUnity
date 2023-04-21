@@ -114,7 +114,32 @@ namespace Primer.Animation
         private static float EaseOutCubic(float startVal, float endVal, float t)
         {
             // Ease out from endVal
-            return (endVal - startVal) * (t - 1) * t * t + endVal;
+            t -= 1;
+            return (endVal - startVal) * t * t * t + endVal;
+        }
+    }
+    
+    public class QuadraticInEasing : Singleton<QuadraticInEasing>, IEasing
+    {
+        public float Evaluate(float t) => EaseInQuadratic(0, 1, t);
+
+        private static float EaseInQuadratic(float startVal, float endVal, float t)
+        {
+            // Ease in from startVal
+            return (endVal - startVal) * t * t + startVal;
+        }
+    }
+
+    public class QuadraticOutEasing : Singleton<QuadraticOutEasing>, IEasing
+    {
+        public float Evaluate(float t) => EaseOutQuadratic(0, 1, t);
+
+        private static float EaseOutQuadratic(float startVal, float endVal, float t)
+        {
+            // Ease out from endVal
+            t -= 1;
+            // We need an extra negation here because t^2 is always positive
+            return -(endVal - startVal) * t * t + endVal;
         }
     }
 }
