@@ -4,6 +4,14 @@ namespace Primer.Animation
 {
     public static class TransformExtensions
     {
+        public static Tween MoveAndRotate(this Transform transform, Vector3 newPosition, Quaternion newRotation)
+        {
+            return Tween.Parallel(
+                transform.MoveTo(newPosition),
+                transform.RotateTo(newRotation)
+            );
+        }
+
         // Convenience overload method for scaling to multiples of Vector3.one
         public static Tween ScaleTo(this Transform transform, float newScale)
         {
