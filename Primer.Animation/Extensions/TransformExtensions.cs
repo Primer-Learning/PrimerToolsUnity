@@ -22,10 +22,27 @@ namespace Primer.Animation
         {
             var initial = transform.localScale;
 
-            return initial == newScale
-                ? Tween.noop
-                : new Tween(t => transform.localScale = Vector3.Lerp(initial, newScale, t));
+            return new Tween(t => transform.localScale = Vector3.Lerp(initial, newScale, t));
+            
+            // No longer doing it this way, because it breaks the Pulse method, which has Tweens in series that
+            // change and then restore the scale value. I don't understand the internals enough to quite understand why
+            // but it goes something like "the first tween hasn't executed when the second one is defined, so the second
+            // one doesn't realize initial and newScale will actually be different when it's time for it to execute.
+            // return initial == newScale
+            //     ? Tween.noop
+            //     : new Tween(t => transform.localScale = Vector3.Lerp(initial, newScale, t));
         }
+
+        public static Tween Pulse(this Transform transform, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
+        {
+            var localScale = transform.localScale;
+            return Tween.Series(
+                transform.ScaleTo(localScale * sizeFactor) with {duration = attack},
+                Tween.noop with {duration = hold},
+                transform.ScaleTo(localScale) with {duration = decay}
+            );
+        }
+        
 
         public static Tween MoveTo(this Transform transform, Vector3 newPosition)
         {
