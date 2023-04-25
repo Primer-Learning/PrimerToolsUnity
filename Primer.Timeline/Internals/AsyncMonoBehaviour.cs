@@ -66,6 +66,9 @@ namespace Primer.Timeline
 
         public Tween WaitForParallels(float delayBetweenStarts = 0)
         {
+            if (parallelQueue.Count == 0)
+                return Tween.noop;
+
             var result = Parallel(delayBetweenStarts, parallelQueue.ToArray());
             parallelQueue.Clear();
             return result;
