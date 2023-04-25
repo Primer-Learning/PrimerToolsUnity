@@ -16,5 +16,12 @@ namespace Primer.Animation
         {
             return Tween.Parallel(self.Select(x => x.ScaleTo(targetScale)));
         }
+
+        public static void SetScale(this IEnumerable<Transform> self, float scale) => self.SetScale(Vector3.one * scale);
+        public static void SetScale(this IEnumerable<Transform> self, Vector3 targetScale)
+        {
+            foreach (var transform in self)
+                transform.localScale = targetScale;
+        }
     }
 }
