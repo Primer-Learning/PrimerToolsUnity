@@ -1,4 +1,5 @@
 using Primer.Animation;
+using Primer.Latex;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -20,6 +21,8 @@ namespace Primer.Shapes
         private Transform rightBar;
         [SerializeField, PrefabChild]
         private Transform rightTip;
+        [SerializeField, PrefabChild]
+        private LatexComponent latex;
         #endregion
 
         #region public float width;
@@ -111,6 +114,33 @@ namespace Primer.Shapes
         }
         #endregion
 
+        #region public Vector3 label;
+        [Title("Label")]
+        [ShowInInspector]
+        public string label {
+            get => latex?.latex ?? "";
+            set {
+                var isActive = !string.IsNullOrWhiteSpace(value);
+                latex.gameObject.SetActive(isActive);
+                if (isActive) latex.latex = value;
+            }
+        }
+
+        [ShowInInspector]
+        public Vector3 labelOffset {
+            get => latex?.transform.localPosition ?? Vector3.zero;
+            set => latex.transform.localPosition = value;
+        }
+
+        [ShowInInspector]
+        public float labelSize {
+            get => latex?.transform.localScale.x ?? 1;
+            set => latex.transform.localScale = Vector3.one * value;
+        }
+
+        public bool hasLabel => latex.gameObject.activeSelf;
+        #endregion
+
         MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
 
 
@@ -168,21 +198,18 @@ namespace Primer.Shapes
             var leftTween = leftPoint.Tween(leftEnd);
             var rightTween = rightPoint.Tween(rightEnd);
 
-            return new Tween(
-                t =>
-                {
-                    if (anchorTween is not null)
-                        anchorPoint.vector = anchorTween(t);
+            return new Tween(t => {
+                if (anchorTween is not null)
+                    anchorPoint.vector = anchorTween(t);
 
-                    if (leftTween is not null)
-                        leftPoint.vector = leftTween(t);
+                if (leftTween is not null)
+                    leftPoint.vector = leftTween(t);
 
-                    if (rightTween is not null)
-                        rightPoint.vector = rightTween(t);
+                if (rightTween is not null)
+                    rightPoint.vector = rightTween(t);
 
-                    Refresh();
-                }
-            );
+                Refresh();
+            });
         }
 
         public Tween GrowFromAnchor()
