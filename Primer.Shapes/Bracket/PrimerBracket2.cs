@@ -195,8 +195,7 @@ namespace Primer.Shapes
         public Tween Animate(
             Vector3Provider anchorEnd = null,
             Vector3Provider leftEnd = null,
-            Vector3Provider rightEnd = null
-        )
+            Vector3Provider rightEnd = null)
         {
             var anchorTween = anchorPoint.Tween(anchorEnd);
             var leftTween = leftPoint.Tween(leftEnd);
