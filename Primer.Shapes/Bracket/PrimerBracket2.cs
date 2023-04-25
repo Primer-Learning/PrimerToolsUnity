@@ -135,7 +135,10 @@ namespace Primer.Shapes
         [ShowInInspector]
         public float labelSize {
             get => latex?.transform.localScale.x ?? 1;
-            set => latex.transform.localScale = Vector3.one * value;
+            set {
+                latex.transform.localScale = Vector3.one * value;
+                FixLatexScale();
+            }
         }
 
         public bool hasLabel => latex.gameObject.activeSelf;
@@ -174,18 +177,19 @@ namespace Primer.Shapes
         #endregion
 
 
-        public void SetPoints(Vector3? anchor = null, Vector3? left = null, Vector3? right = null, bool? isGlobal = null)
+        public PrimerBracket2 SetPoints(Vector3? anchor = null, Vector3? left = null, Vector3? right = null, bool? isGlobal = null)
         {
             if (anchor.HasValue) this.anchor = anchor.Value;
             if (left.HasValue) this.left = left.Value;
             if (right.HasValue) this.right = right.Value;
 
             if (!isGlobal.HasValue)
-                return;
+                return this;
 
             anchorPoint.isWorldPosition = isGlobal.Value;
             leftPoint.isWorldPosition = isGlobal.Value;
             rightPoint.isWorldPosition = isGlobal.Value;
+            return this;
         }
 
         public Tween Animate(
@@ -223,7 +227,7 @@ namespace Primer.Shapes
         // This method is marked as performance intensive because it logs a warning 🤦
         // ReSharper disable Unity.PerformanceAnalysis
         [Title("Controls", horizontalLine: false)]
-        [Button("Refresh")]
+        [Button("Refresh", ButtonSizes.Large)]
         public void Refresh()
         {
             if (leftTip == null || leftBar == null || rightBar == null || rightTip == null || gameObject.IsPreset())
@@ -249,11 +253,8 @@ namespace Primer.Shapes
             var leftLength = BarLength(toLeft, center);
             var rightLength = BarLength(toRight, center);
 
-            if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude)
-            {
+            if (leftLength < 0.01f || rightLength < 0.01f || Mathf.Abs(leftLength + rightLength) > mouth.magnitude) {
                 Debug.LogWarning("Bracket may look broken");
-                // Debug.LogWarning("Refusing to render a broken-looking bracket");
-                // return;
             }
 
             leftBar.localScale = new Vector3(leftLength, 1, 1);
@@ -265,6 +266,26 @@ namespace Primer.Shapes
             self.position = anchorPoint.GetWorldPosition(parent);
             leftTip.position = leftPoint.GetWorldPosition(parent);
             rightTip.position = rightPoint.GetWorldPosition(parent);
+
+            FixLatexScale();
+        }
+
+        [Button(ButtonSizes.Large)]
+        public void FlipLabel()
+        {
+            latex.transform.Rotate(new Vector3(0, 1, 0), 180);
+        }
+
+        [Button(ButtonSizes.Large)]
+        private void CopyValues()
+        {
+            GUIUtility.systemCopyBuffer = @$"
+.SetPoints(
+    anchor: {anchorPoint.vector.ToCode()},
+    left: {leftPoint.vector.ToCode()},
+    right: {rightPoint.vector.ToCode()}
+)
+            ".Trim();
         }
 
         private float BarLength(Vector3 toSide, Vector3 center)
@@ -273,6 +294,15 @@ namespace Primer.Shapes
             var distance = diff.magnitude;
             var tipsWidth = tipWidth * width * 2;
             return (distance - tipsWidth) / width;
+        }
+
+        private void FixLatexScale()
+        {
+            var parentScale = transform.localScale;
+            var latexTransform = latex.transform;
+            var scale = latexTransform.localScale;
+            var ratio = parentScale.x / parentScale.z;
+            latexTransform.localScale = new Vector3(scale.x, scale.x * ratio, scale.x);
         }
     }
 }

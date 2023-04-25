@@ -36,7 +36,7 @@ namespace Primer
                 : scale.ScaleBy(parentScale.InvertScale());
         }
 
-        public static Vector3 InvertScale(this Vector3 v)
+        public static Vector3 InvertScale(this Vector3 v, float @base = 1)
         {
             return new Vector3(1 / v.x, 1 / v.y, 1 / v.z);
         }
@@ -44,6 +44,11 @@ namespace Primer
         public static Vector3 ScaleBy(this Vector3 v, Vector3 scale)
         {
             return new Vector3(v.x * scale.x, v.y * scale.y, v.z * scale.z);
+        }
+
+        public static string ToCode(this Vector3 vector)
+        {
+            return $"new Vector3({vector.x}f, {vector.y}f, {vector.z}f)";
         }
     }
 }

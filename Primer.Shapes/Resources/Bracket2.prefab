@@ -776,7 +776,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -6092298845959530769, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
       propertyPath: managedReferences[5481954517474869302]._latex
-      value: Label
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
       propertyPath: m_RootOrder
