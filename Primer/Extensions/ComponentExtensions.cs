@@ -10,6 +10,11 @@ namespace Primer
             return component is not null && component == null;
         }
 
+        public static void SetActive(this Component component, bool isActive)
+        {
+            component.gameObject.SetActive(isActive);
+        }
+
         public static void Dispose(this Component component, bool urgent = false)
         {
             if (component != null)
