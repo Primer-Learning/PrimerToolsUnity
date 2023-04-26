@@ -16,6 +16,22 @@ namespace Primer.Latex
 
     public static class TransitionTypeExtensions
     {
+        public static void PrefillFor(this List<TransitionType> transitions, LatexComponent from, LatexComponent to)
+        {
+            var fromCount = from.groupsCount;
+            var toCount = to.groupsCount;
+            var min = Mathf.Min(fromCount, toCount);
+
+            for (var i = transitions.Count; i < min; i++)
+                transitions.Add(TransitionType.Transition);
+
+            for (var i = transitions.Count; i < fromCount; i++)
+                transitions.Add(TransitionType.Remove);
+
+            for (var i = transitions.Count; i < toCount; i++)
+                transitions.Add(TransitionType.Add);
+        }
+
         public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions)
         {
             var array = transitions.ToArray();
@@ -28,7 +44,7 @@ namespace Primer.Latex
 
         public static int GetTransitionAmountFor(LatexComponent from, LatexComponent to)
         {
-            return Mathf.Max(from.transform.childCount, to.transform.childCount);
+            return Mathf.Max(from.groupsCount, to.groupsCount);
         }
 
         public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions, LatexComponent from,

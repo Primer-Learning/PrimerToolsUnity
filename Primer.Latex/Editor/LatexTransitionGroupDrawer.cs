@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using NUnit.Framework;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.OdinInspector.Editor.ValueResolvers;
 using UnityEditor;
@@ -102,6 +101,12 @@ namespace Primer.Latex.Editor
             if (GUILayout.Button("Validate transitions"))
                 newValues.Validate(from, to);
 
+            if (GUILayout.Button("Prefill"))
+                newValues.PrefillFor(from, to);
+
+            if (GUILayout.Button("Copy code"))
+                CopyCode(newValues);
+
             EditorGUILayout.Space(32);
 
             if (newValues.SequenceEqual(transitions))
@@ -109,6 +114,21 @@ namespace Primer.Latex.Editor
 
             ValueEntry.SmartValue = newValues;
             newValues.Validate(from, to);
+        }
+
+        private void CopyCode(List<TransitionType> values)
+        {
+            var list = values.Select(
+                x => x switch {
+                    TransitionType.Transition => "TransitionType.Transition",
+                    TransitionType.Anchor => "TransitionType.Anchor",
+                    TransitionType.Add => "TransitionType.Add",
+                    TransitionType.Remove => "TransitionType.Remove",
+                    TransitionType.Replace => "TransitionType.Replace",
+                }
+            );
+
+            GUIUtility.systemCopyBuffer = @"new List<TransitionType> {" + '\n' + string.Join(",\n", list) + "\n}";
         }
     }
 }
