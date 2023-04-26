@@ -97,6 +97,9 @@ namespace Primer.Latex
         // Transitions
 
         public LatexScrubbable CreateTransition(LatexComponent transitionTo, params TransitionType[] transitions)
+            => CreateTransition(transitionTo, (IEnumerable<TransitionType>)transitions);
+
+        public LatexScrubbable CreateTransition(LatexComponent transitionTo, IEnumerable<TransitionType> transitions)
         {
             gameObject.SetActive(true);
             transitionTo.gameObject.SetActive(true);

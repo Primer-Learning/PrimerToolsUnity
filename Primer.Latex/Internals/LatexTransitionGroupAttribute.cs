@@ -2,7 +2,7 @@ using System;
 
 namespace Primer.Latex
 {
-    internal class LatexTransitionGroupAttribute : Attribute
+    public class LatexTransitionGroupAttribute : Attribute
     {
         public string from;
         public string to;
