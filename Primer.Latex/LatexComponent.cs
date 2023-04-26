@@ -57,14 +57,16 @@ namespace Primer.Latex
 
         public int groupsCount => groups.ranges.Count;
 
-        public void SetGroupIndexes(params int[] indexes)
+        public LatexComponent SetGroupIndexes(params int[] indexes)
         {
             groups.SetGroupIndexes(indexes);
+            return this;
         }
 
-        public void SetGroupLengths(params int[] lengths)
+        public LatexComponent SetGroupLengths(params int[] lengths)
         {
             groups.SetGroupLengths(lengths);
+            return this;
         }
 
         internal IEnumerable<LatexExpression> GetGroups()
@@ -205,6 +207,18 @@ namespace Primer.Latex
 
             ChildrenDeclaration.Clear(transform);
             UpdateChildren();
+        }
+
+        [Button(ButtonSizes.Large)]
+        private void CopyCode()
+        {
+            var code = "";
+
+            if (groups.indexes.Count != 0)
+                code += $".SetGroupIndexes({string.Join(", ", groups.indexes)})\n";
+
+            code += $".Process(@\"{latex}\")";
+            GUIUtility.systemCopyBuffer = code;
         }
         #endregion
     }

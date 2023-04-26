@@ -10,9 +10,10 @@ namespace Primer
             return component is not null && component == null;
         }
 
-        public static void SetActive(this Component component, bool isActive)
+        public static T SetActive<T>(this T component, bool isActive) where T : Component
         {
             component.gameObject.SetActive(isActive);
+            return component;
         }
 
         public static void Dispose(this Component component, bool urgent = false)
