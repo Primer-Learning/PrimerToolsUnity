@@ -22,6 +22,7 @@ namespace Primer.Animation
         {
             var target = self.FindIntrinsicScale();
             self.transform.localScale = Vector3.zero;
+            self.SetActive(true);
             return self.transform.ScaleTo(target);
         }
 
