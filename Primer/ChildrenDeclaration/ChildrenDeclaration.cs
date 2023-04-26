@@ -103,9 +103,12 @@ namespace Primer
             foreach (var remove in remaining)
                 onRemove(remove);
 
-            foreach (var child in after) {
+            for (var i = 0; i < after.Count; i++) {
+                var child = after[i];
                 var pos = child.localPosition;
                 var scale = child.localScale;
+
+                needsReorder |= child.GetSiblingIndex() != i;
 
                 if (child.parent == parent) {
                     if (needsReorder)
