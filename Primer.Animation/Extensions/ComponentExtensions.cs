@@ -3,44 +3,45 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public static class TransformExtensions
+    public static class ComponentExtensions
     {
-        public static Tween MoveAndRotate(this Transform transform, Vector3 newPosition, Quaternion newRotation)
+        public static Tween MoveAndRotate(this Component self, Vector3 newPosition, Quaternion newRotation)
         {
             return Tween.Parallel(
-                transform.MoveTo(newPosition),
-                transform.RotateTo(newRotation)
+                self.MoveTo(newPosition),
+                self.RotateTo(newRotation)
             );
         }
 
-        // Convenience overload method for scaling to multiples of Vector3.one
-        public static Tween ScaleTo(this Transform transform, float newScale)
+        public static Tween ScaleTo(this Component self, float newScale)
         {
-            return transform.ScaleTo(newScale * Vector3.one);
+            return self.ScaleTo(newScale * Vector3.one);
         }
 
-        public static Tween ScaleTo(this Transform transform, Vector3 newScale, Vector3? initialScale = null)
+        public static Tween ScaleTo(this Component self, Vector3 newScale, Vector3? initialScale = null)
         {
-            var initial = transform.localScale;
-            if (initialScale != null) initial = initialScale.Value;
-            
+            var transform = self.transform;
+            var initial = initialScale ?? transform.localScale;
+
             return initial == newScale
                 ? Tween.noop
                 : new Tween(t => transform.localScale = Vector3.Lerp(initial, newScale, t));
         }
 
-        public static Tween Pulse(this Transform transform, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
+        public static Tween Pulse(this Component self, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
         {
+            var transform = self.transform;
             var localScale = transform.localScale;
+
             return Tween.Series(
                 transform.ScaleTo(localScale * sizeFactor) with {duration = attack},
                 Tween.noop with {duration = hold},
                 transform.ScaleTo(localScale, initialScale: localScale * sizeFactor) with {duration = decay}
             );
         }
-        
+
         public static Tween PulseAndWobble(
-            this Transform transform,
+            this Component self,
             float sizeFactor = 1.2f,
             float attack = 0.5f,
             float hold = 0.5f,
@@ -52,19 +53,19 @@ namespace Primer.Animation
             // The defaults lead to two full wobble cycles over the duration of the pulse
             // Quadratic easing is used for the wobbles since that reflects the behavior of simple harmonic oscillators,
             // making it look more natural.
-            
+
+            var transform = self.transform;
             var pulse = transform.Pulse(sizeFactor, attack, hold, decay);
-            
+
             // State tracking vars
             var initialRotation = transform.localRotation;
             var totalDuration = attack + hold + decay;
             // Need to keep track of this and feed to the RotateToCalls as the initial rotation,
             // since the Tweens called in series don't know about each other.
             var currentRotation = initialRotation;
-            
-            
+
             var quarterPeriod = wobbleCyclePeriod / 4; // Easier to work with
-            List<Tween> wobbleTweens = new();
+            var wobbleTweens = new List<Tween>();
             var targetRotation = Quaternion.Euler(0, 0, -wobbleAngle) * initialRotation;
             wobbleTweens.Add(transform.RotateTo(targetRotation) with {duration = quarterPeriod, easeMethod = new QuadraticEasing()});
             totalDuration -= quarterPeriod;
@@ -84,11 +85,12 @@ namespace Primer.Animation
             return Tween.Parallel(
                 Tween.Series(wobbleTweens.ToArray()),
                 pulse
-            ) with {easeMethod = new LinearEasing()};
+            );
         }
 
-        public static Tween MoveTo(this Transform transform, Vector3 newPosition)
+        public static Tween MoveTo(this Component self, Vector3 newPosition)
         {
+            var transform = self.transform;
             var initial = transform.localPosition;
 
             return initial == newPosition
@@ -96,20 +98,21 @@ namespace Primer.Animation
                 : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
         }
 
-        public static Tween MoveBy(this Transform transform, Vector3 displacement)
+        public static Tween MoveBy(this Component self, Vector3 displacement)
         {
+            var transform = self.transform;
             var initial = transform.localPosition;
-            var newPosition = initial + displacement; 
+            var newPosition = initial + displacement;
 
             return initial == newPosition
                 ? Tween.noop
                 : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
         }
 
-        public static Tween RotateTo(this Transform transform, Quaternion newRotation, Quaternion? initialRotation = null)
+        public static Tween RotateTo(this Component self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
-            var initial = transform.localRotation;
-            if (initialRotation != null) initial = initialRotation.Value;
+            var transform = self.transform;
+            var initial = initialRotation ?? transform.localRotation;
             var hasFailed = false;
 
             return new Tween(t => {
