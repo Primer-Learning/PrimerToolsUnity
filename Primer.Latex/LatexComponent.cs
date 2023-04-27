@@ -13,7 +13,9 @@ namespace Primer.Latex
     [AddComponentMenu("Primer / LaTeX")]
     public class LatexComponent : MonoBehaviour, IMeshRendererController, IPoolable
     {
-        public static readonly IPool<LatexComponent> pool = new PrefabPool<LatexComponent>("LaTeX");
+        public const string PREFAB_NAME = "LaTeX";
+
+        public static readonly IPool<LatexComponent> pool = new PrefabPool<LatexComponent>(PREFAB_NAME);
 
         [SerializeReference] private LatexCliIntegration integration = new();
         [SerializeReference] private LatexGroups groups = new();
@@ -212,13 +214,12 @@ namespace Primer.Latex
         [Button(ButtonSizes.Large)]
         private void CopyCode()
         {
-            var code = "";
+            GUIUtility.systemCopyBuffer = $"{GroupIndexesCode()}.Process(@\"{latex}\")";
+        }
 
-            if (groups.indexes.Count != 0)
-                code += $".SetGroupIndexes({string.Join(", ", groups.indexes)})\n";
-
-            code += $".Process(@\"{latex}\")";
-            GUIUtility.systemCopyBuffer = code;
+        internal string GroupIndexesCode()
+        {
+            return $".SetGroupIndexes({string.Join(", ", groups.indexes)})\n";
         }
         #endregion
     }

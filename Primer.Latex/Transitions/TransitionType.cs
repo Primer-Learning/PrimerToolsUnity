@@ -16,25 +16,59 @@ namespace Primer.Latex
 
     public static class TransitionTypeExtensions
     {
-        public static void PrefillFor(this List<TransitionType> transitions, LatexComponent from, LatexComponent to)
+        public static string ToCode(this TransitionType transition)
         {
-            var fromCount = from.groupsCount;
-            var toCount = to.groupsCount;
-            var min = Mathf.Min(fromCount, toCount);
-
-            for (var i = transitions.Count; i < min; i++)
-                transitions.Add(TransitionType.Transition);
-
-            for (var i = transitions.Count; i < fromCount; i++)
-                transitions.Add(TransitionType.Remove);
-
-            for (var i = transitions.Count; i < toCount; i++)
-                transitions.Add(TransitionType.Add);
+            return transition switch {
+                TransitionType.Transition => "TransitionType.Transition",
+                TransitionType.Anchor => "TransitionType.Anchor",
+                TransitionType.Add => "TransitionType.Add",
+                TransitionType.Remove => "TransitionType.Remove",
+                TransitionType.Replace => "TransitionType.Replace",
+                _ => throw new ArgumentOutOfRangeException(nameof(transition), transition, null)
+            };
         }
 
-        public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions)
+        public static void AdjustLength(this List<TransitionType> transitions, LatexComponent from, LatexComponent to)
         {
-            var array = transitions.ToArray();
+            var fromCursor = 0;
+            var toCursor = 0;
+            var fromGroups = from.groupsCount;
+            var toGroups = to.groupsCount;
+
+            foreach (var transition in transitions) {
+                if (transition is not TransitionType.Add)
+                    fromCursor++;
+
+                if (transition is not TransitionType.Remove)
+                    toCursor++;
+            }
+
+            while (fromCursor < fromGroups) {
+                transitions.Add(TransitionType.Remove);
+                fromCursor++;
+            }
+
+            while (fromCursor > fromGroups) {
+                var index = transitions.LastIndexOf(TransitionType.Remove);
+                transitions.RemoveAt(index == -1 ? transitions.Count - 1 : index);
+                fromCursor--;
+            }
+
+            while (toCursor < toGroups) {
+                transitions.Add(TransitionType.Add);
+                toCursor++;
+            }
+
+            while (toCursor > toGroups) {
+                var index = transitions.LastIndexOf(TransitionType.Add);
+                transitions.RemoveAt(index == -1 ? transitions.Count - 1 : index);
+                toCursor--;
+            }
+        }
+
+        public static List<TransitionType> Validate(this IEnumerable<TransitionType> transitions)
+        {
+            var array = new List<TransitionType>(transitions);
 
             if (array.Count(x => x == TransitionType.Anchor) > 1)
                 throw new Exception("Cannot have more than one anchor transition");
@@ -42,39 +76,17 @@ namespace Primer.Latex
             return array;
         }
 
-        public static int GetTransitionAmountFor(LatexComponent from, LatexComponent to)
-        {
-            return Mathf.Max(from.groupsCount, to.groupsCount);
-        }
-
-        public static TransitionType[] Validate(this IEnumerable<TransitionType> transitions, LatexComponent from,
+        public static List<TransitionType> Validate(this IEnumerable<TransitionType> transitions, LatexComponent from,
             LatexComponent to)
         {
-            var array = transitions.Validate();
+            var list = transitions.Validate();
 
             // If either component is processing, we can't validate the transition
             if (from.isProcessing || to.isProcessing)
-                return array;
+                return list;
 
-            var add = array.Count(x => x == TransitionType.Add);
-            var remove = array.Count(x => x == TransitionType.Remove);
-            var common = array.Length - add - remove;
-
-            if (from.transform.childCount < common + remove) {
-                if (from.groupsCount == common + remove)
-                    Debug.LogWarning("LatexComponent didn't have time to update groups, the transition may fail");
-                else
-                    throw new Exception("Source LatexComponent doesn't have enough groups to transition");
-            }
-
-            if (to.transform.childCount < common + add) {
-                if (to.groupsCount == common + add)
-                    Debug.LogWarning("LatexComponent didn't have time to update groups, the transition may fail");
-                else
-                    throw new Exception("Target LatexComponent doesn't have enough groups to transition");
-            }
-
-            return array;
+            AdjustLength(list, from, to);
+            return list;
         }
     }
 }

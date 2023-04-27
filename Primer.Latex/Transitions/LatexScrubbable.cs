@@ -164,11 +164,8 @@ namespace Primer.Latex
 
         private void UpdateGroupsLength()
         {
-            if (from == null || to == null)
-                return;
-
-            var length = Mathf.Max(from.groupsCount, to.groupsCount);
-            _groups.SetLength(length);
+            if (from != null && to != null)
+                _groups.AdjustLength(from, to);
         }
 
         public void Dispose()

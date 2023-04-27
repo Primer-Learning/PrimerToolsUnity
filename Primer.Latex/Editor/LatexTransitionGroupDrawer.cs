@@ -30,19 +30,33 @@ namespace Primer.Latex.Editor
             var to = toResolver.GetValue();
             var transitions = ValueEntry.SmartValue;
 
-            if (from == null || to == null || transitions == null)
+            var newValues = RenderDrawer(from, to, transitions);
+
+            if (newValues == transitions)
                 return;
 
-            var expectedLength = TransitionTypeExtensions.GetTransitionAmountFor(from, to);
+            if (GUILayout.Button("Copy code"))
+                CopyCode(newValues);
 
-            while (transitions.Count < expectedLength)
-                transitions.Add(TransitionType.Transition);
+            EditorGUILayout.Space(32);
 
-            while (transitions.Count > expectedLength)
-                transitions.RemoveAt(transitions.Count - 1);
+            if (newValues.SequenceEqual(transitions))
+                return;
+
+            ValueEntry.SmartValue = newValues;
+            newValues.Validate(from, to);
+        }
+
+        public static List<TransitionType> RenderDrawer(LatexComponent from, LatexComponent to, List<TransitionType> transitions)
+        {
+            if (from == null || to == null || transitions == null) {
+                return transitions;
+            }
 
             from.ConnectParts();
             to.ConnectParts();
+
+            transitions.AdjustLength(from, to);
 
             var fromCursor = 0;
             var toCursor = 0;
@@ -98,36 +112,12 @@ namespace Primer.Latex.Editor
                 }
             }
 
-            if (GUILayout.Button("Validate transitions"))
-                newValues.Validate(from, to);
-
-            if (GUILayout.Button("Prefill"))
-                newValues.PrefillFor(from, to);
-
-            if (GUILayout.Button("Copy code"))
-                CopyCode(newValues);
-
-            EditorGUILayout.Space(32);
-
-            if (newValues.SequenceEqual(transitions))
-                return;
-
-            ValueEntry.SmartValue = newValues;
-            newValues.Validate(from, to);
+            return newValues;
         }
 
-        private void CopyCode(List<TransitionType> values)
+        private static void CopyCode(IEnumerable<TransitionType> values)
         {
-            var list = values.Select(
-                x => x switch {
-                    TransitionType.Transition => "TransitionType.Transition",
-                    TransitionType.Anchor => "TransitionType.Anchor",
-                    TransitionType.Add => "TransitionType.Add",
-                    TransitionType.Remove => "TransitionType.Remove",
-                    TransitionType.Replace => "TransitionType.Replace",
-                }
-            );
-
+            var list = values.Select(x => x.ToCode());
             GUIUtility.systemCopyBuffer = @"new List<TransitionType> {" + '\n' + string.Join(",\n", list) + "\n}";
         }
     }

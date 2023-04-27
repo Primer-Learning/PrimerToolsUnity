@@ -17,7 +17,7 @@ namespace Primer.Latex
 
         private readonly LatexComponent start;
         private readonly LatexComponent end;
-        private readonly TransitionType[] transitions;
+        private readonly List<TransitionType> transitions;
 
         private readonly List<(Transform, Transform)> add = new();
         private readonly List<(Transform, Transform)> remove = new();
@@ -72,7 +72,7 @@ namespace Primer.Latex
             var endCursor = 0;
             var endGroups = end.transform.GetChildren();
 
-            for (var i = 0; i < transitions.Length; i++) {
+            for (var i = 0; i < transitions.Count; i++) {
                 if (transitions[i] is TransitionType.Add or TransitionType.Replace) {
                     if (endGroups.Length > endCursor)
                         yield return endGroups[endCursor];
@@ -88,7 +88,7 @@ namespace Primer.Latex
             var startCursor = 0;
             var startGroups = start.transform.GetChildren();
 
-            for (var i = 0; i < transitions.Length; i++) {
+            for (var i = 0; i < transitions.Count; i++) {
                 if (transitions[i] is TransitionType.Remove or TransitionType.Replace) {
                     if (startGroups.Length > startCursor)
                         yield return startGroups[startCursor];
@@ -106,7 +106,7 @@ namespace Primer.Latex
             var startGroups = start.transform.GetChildren();
             var endGroups = end.transform.GetChildren();
 
-            for (var i = 0; i < transitions.Length; i++) {
+            for (var i = 0; i < transitions.Count; i++) {
                 if (transitions[i] is not TransitionType.Add and not TransitionType.Remove and not TransitionType.Replace) {
                     if (startGroups.Length > startCursor && endGroups.Length > endCursor)
                         yield return (startGroups[startCursor], endGroups[endCursor]);
@@ -120,16 +120,15 @@ namespace Primer.Latex
             }
         }
 
-        public Vector3 GetOffset() => GetOffsetWith(start, end, transitions);
-        public static Vector3 GetOffsetWith(LatexComponent from, LatexComponent to, params TransitionType[] transitions)
+        public Vector3 GetOffset()
         {
             var startCursor = 0;
             var endCursor = 0;
 
-            for (var i = 0; i < transitions.Length; i++) {
+            for (var i = 0; i < transitions.Count; i++) {
                 if (transitions[i] is TransitionType.Anchor) {
-                    var startGroup = from.transform.GetChild(startCursor);
-                    var endGroup = to.transform.GetChild(endCursor);
+                    var startGroup = start.transform.GetChild(startCursor);
+                    var endGroup = end.transform.GetChild(endCursor);
                     return startGroup.localPosition - endGroup.localPosition;
                 }
 

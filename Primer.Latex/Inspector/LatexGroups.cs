@@ -27,6 +27,7 @@ namespace Primer.Latex
 
         public List<(int start, int end)> ranges => expression?.CalculateRanges(indexes) ?? new List<(int, int)>();
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void SetGroupIndexes(params int[] values)
         {
             indexes = values.ToList();
