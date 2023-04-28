@@ -74,7 +74,10 @@ namespace Primer.Latex
                     }
                 }
 
-                var selected = LatexCharEditor.ShowGroup(expression, (start, end));
+                var selected = LatexCharEditor.ShowGroup(
+                    expression.Slice(start, end),
+                    LatexCharEditor.GetDefaultWidth()
+                );
 
                 if (selected == 0)
                     continue;

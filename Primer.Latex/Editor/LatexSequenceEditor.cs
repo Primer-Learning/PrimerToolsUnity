@@ -71,6 +71,8 @@ yield return Transition(
             if (options.Count is 0)
                 return;
 
+            LatexCharEditor.CharPreviewSize();
+
             EditorGUILayout.LabelField($"Select a transition:");
             GUILayout.BeginHorizontal();
             var color = GUI.color;

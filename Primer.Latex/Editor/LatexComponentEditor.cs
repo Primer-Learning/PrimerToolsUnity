@@ -21,13 +21,12 @@ namespace Primer.Latex.Editor
             }
 
             base.OnInspectorGUI();
-
             CacheManagement();
         }
 
         private void ShowPresetWarning()
         {
-            var message = "You are editing a preset and the LaTeX will not be built until "
+            const string message = "You are editing a preset and the LaTeX will not be built until "
                 + "you apply the preset to an actual LatexRenderer component.";
 
             EditorGUILayout.HelpBox(message, MessageType.Warning);

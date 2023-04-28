@@ -63,9 +63,7 @@ namespace Primer.Latex.Editor
             var fromGroups = from.GetGroups().ToList();
             var toGroups = to.GetGroups().ToList();
 
-            var rect = EditorGUILayout.GetControlRect();
-            var width = rect is { x: 0, y: 0 } ? Screen.width : rect.width;
-
+            var width = LatexCharEditor.GetDefaultWidth();
             var newValues = new List<TransitionType>();
             var forceAnchor = -1;
 
