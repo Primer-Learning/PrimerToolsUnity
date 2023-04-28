@@ -43,20 +43,26 @@ namespace Primer.Latex
                     toCursor++;
             }
 
+            while (fromCursor < fromGroups && toCursor < toGroups) {
+                transitions.Add(TransitionType.Transition);
+                fromCursor++;
+                toCursor++;
+            }
+
             while (fromCursor < fromGroups) {
                 transitions.Add(TransitionType.Remove);
                 fromCursor++;
+            }
+
+            while (toCursor < toGroups) {
+                transitions.Add(TransitionType.Add);
+                toCursor++;
             }
 
             while (fromCursor > fromGroups) {
                 var index = transitions.LastIndexOf(TransitionType.Remove);
                 transitions.RemoveAt(index == -1 ? transitions.Count - 1 : index);
                 fromCursor--;
-            }
-
-            while (toCursor < toGroups) {
-                transitions.Add(TransitionType.Add);
-                toCursor++;
             }
 
             while (toCursor > toGroups) {
