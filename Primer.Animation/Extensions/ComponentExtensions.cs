@@ -13,6 +13,11 @@ namespace Primer.Animation
             );
         }
 
+        public static Tween ScaleUpFromZero(this Component self)
+        {
+            return self.GetPrimer().ScaleUpFromZero();
+        }
+
         public static Tween ScaleTo(this Component self, float newScale)
         {
             return self.ScaleTo(newScale * Vector3.one);
