@@ -10,7 +10,7 @@ namespace Primer.Animation
 {
     public record Tween(Action<float> lerp) : IDisposable
     {
-        public static Tween noop = new(_ => { });
+        public static Tween noop = new(_ => {});
 
         public IEasing easeMethod { get; init; } = IEasing.defaultMethod;
         public EaseMode ease {
@@ -26,7 +26,7 @@ namespace Primer.Animation
 
         public int milliseconds {
             get => ms;
-            init  {
+            init {
                 if (isCalculated) {
                     Debug.LogWarning("Forcing the duration of a calculated tween");
                     isCalculated = false;
@@ -38,12 +38,12 @@ namespace Primer.Animation
 
         public float seconds {
             get => milliseconds / 1000f;
-            init => milliseconds = (int) (value * 1000);
+            init => milliseconds = (int)(value * 1000);
         }
 
         public float duration {
             get => milliseconds / 1000f;
-            init => milliseconds = (int) (value * 1000);
+            init => milliseconds = (int)(value * 1000);
         }
         #endregion
 
@@ -97,13 +97,17 @@ namespace Primer.Animation
 
 
         #region static Tween Parallel(params Tween[] tweenList);
+        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
+            => Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }));
+
         public static Tween Parallel(IEnumerable<Tween> tweenList) => Parallel(tweenList.ToArray());
+
         // ReSharper disable Unity.PerformanceAnalysis
         public static Tween Parallel(params Tween[] tweenList)
         {
             if (tweenList.Length == 0)
                 return noop with { milliseconds = 0 };
-            
+
             var fullDuration = tweenList.Max(x => x.totalDuration);
 
             if (fullDuration is 0) {
@@ -124,15 +128,12 @@ namespace Primer.Animation
                 isCalculated = true,
             };
         }
-        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
-        {
-            return Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }).ToArray());
-        }
         #endregion
 
 
         #region static Tween Series(params Tween[] tweenList);
         public static Tween Series(IEnumerable<Tween> tweenList) => Series(tweenList.ToArray());
+
         public static Tween Series(params Tween[] tweenList)
         {
             var fullDuration = tweenList.Sum(x => x.totalDuration);
@@ -168,41 +169,6 @@ namespace Primer.Animation
                 duration = fullDuration,
                 isCalculated = true,
             };
-        }
-        #endregion
-
-
-        #region static Tween GenericTween(...)
-        public static Tween GenericTween<T>(Expression<Func<T>> expression, T to, Func<T, T, float, T> lerp = null)
-        {
-            var accessor = new Accessor<T>(expression);
-            return CreateGenericTween(accessor, to, accessor.Get(), lerp);
-        }
-
-        public static Tween GenericTween<T>(Expression<Func<T>> expression, T to, T from, Func<T, T, float, T> lerp = null)
-        {
-            var accessor = new Accessor<T>(expression);
-            return CreateGenericTween(accessor, to, from, lerp);
-        }
-
-        public static Tween GenericTween<T>(Expression<Func<T>> expression, Func<T, T> to, Func<T, T, float, T> lerp = null)
-        {
-            var accessor = new Accessor<T>(expression);
-            var from = accessor.Get();
-            return CreateGenericTween(accessor, to(from), from, lerp);
-        }
-
-        public static Tween GenericTween<T>(Expression<Func<T>> expression, Func<T, T> to, Func<T, T> from, Func<T, T, float, T> lerp = null)
-        {
-            var accessor = new Accessor<T>(expression);
-            var initial = accessor.Get();
-            return CreateGenericTween(accessor, to(initial), from(initial), lerp);
-        }
-
-        private static Tween CreateGenericTween<T>(Accessor<T> accessor, T to, T from, Func<T, T, float, T> lerp = null)
-        {
-            lerp ??= LerpMethods.GetLerpMethod<T>();
-            return new Tween(t => accessor.Set(lerp(from, to, t)));
         }
         #endregion
     }
