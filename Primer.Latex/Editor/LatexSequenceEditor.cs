@@ -10,7 +10,7 @@ namespace Primer.Latex.Editor
     public class LatexSequenceEditor : OdinEditor
     {
         [SerializeField] private int selectedTab = 0;
-        private readonly Dictionary<int, List<TransitionType>> transitionOverrides = new();
+        private readonly Dictionary<int, List<GroupTransitionType>> transitionOverrides = new();
 
         public override void OnInspectorGUI()
         {
@@ -53,7 +53,7 @@ namespace Primer.Latex.Editor
                 CopyCode(latex, newTransition);
         }
 
-        private static void CopyCode(LatexComponent latex, IEnumerable<TransitionType> transition)
+        private static void CopyCode(LatexComponent latex, IEnumerable<GroupTransitionType> transition)
         {
             GUIUtility.systemCopyBuffer = @$"
 yield return Transition(
@@ -64,7 +64,7 @@ yield return Transition(
             ".Trim();
         }
 
-        private void DrawTabs(List<(LatexComponent latex, TransitionType[] transition)> stages)
+        private void DrawTabs(List<(LatexComponent latex, GroupTransitionType[] transition)> stages)
         {
             var options = stages.Select((x, i) => $"[{i + 1}] => [{i + 2}]").ToList();
 

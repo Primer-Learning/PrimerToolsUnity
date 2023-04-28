@@ -17,7 +17,7 @@ namespace Primer.Latex
 
         private readonly LatexComponent start;
         private readonly LatexComponent end;
-        private readonly List<TransitionType> transitions;
+        private readonly List<GroupTransitionType> transitions;
 
         private readonly List<(Transform, Transform)> add = new();
         private readonly List<(Transform, Transform)> remove = new();
@@ -26,7 +26,7 @@ namespace Primer.Latex
         public Transform transform => gameObject.transform;
 
 
-        public LatexTransition(LatexComponent from, LatexComponent to, IEnumerable<TransitionType> transitions,
+        public LatexTransition(LatexComponent from, LatexComponent to, IEnumerable<GroupTransitionType> transitions,
             EaseMode ease = EaseMode.Cubic)
         {
             if (from == null)
@@ -73,12 +73,12 @@ namespace Primer.Latex
             var endGroups = end.transform.GetChildren();
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is TransitionType.Add or TransitionType.Replace) {
+                if (transitions[i] is GroupTransitionType.Add or GroupTransitionType.Replace) {
                     if (endGroups.Length > endCursor)
                         yield return endGroups[endCursor];
                 }
 
-                if (transitions[i] is not TransitionType.Remove)
+                if (transitions[i] is not GroupTransitionType.Remove)
                     endCursor++;
             }
         }
@@ -89,12 +89,12 @@ namespace Primer.Latex
             var startGroups = start.transform.GetChildren();
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is TransitionType.Remove or TransitionType.Replace) {
+                if (transitions[i] is GroupTransitionType.Remove or GroupTransitionType.Replace) {
                     if (startGroups.Length > startCursor)
                         yield return startGroups[startCursor];
                 }
 
-                if (transitions[i] is not TransitionType.Add)
+                if (transitions[i] is not GroupTransitionType.Add)
                     startCursor++;
             }
         }
@@ -107,15 +107,15 @@ namespace Primer.Latex
             var endGroups = end.transform.GetChildren();
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is not TransitionType.Add and not TransitionType.Remove and not TransitionType.Replace) {
+                if (transitions[i] is not GroupTransitionType.Add and not GroupTransitionType.Remove and not GroupTransitionType.Replace) {
                     if (startGroups.Length > startCursor && endGroups.Length > endCursor)
                         yield return (startGroups[startCursor], endGroups[endCursor]);
                 }
 
-                if (transitions[i] is not TransitionType.Add)
+                if (transitions[i] is not GroupTransitionType.Add)
                     startCursor++;
 
-                if (transitions[i] is not TransitionType.Remove)
+                if (transitions[i] is not GroupTransitionType.Remove)
                     endCursor++;
             }
         }
@@ -126,16 +126,16 @@ namespace Primer.Latex
             var endCursor = 0;
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is TransitionType.Anchor) {
+                if (transitions[i] is GroupTransitionType.Anchor) {
                     var startGroup = start.transform.GetChild(startCursor);
                     var endGroup = end.transform.GetChild(endCursor);
                     return startGroup.localPosition - endGroup.localPosition;
                 }
 
-                if (transitions[i] is not TransitionType.Add)
+                if (transitions[i] is not GroupTransitionType.Add)
                     startCursor++;
 
-                if (transitions[i] is not TransitionType.Remove)
+                if (transitions[i] is not GroupTransitionType.Remove)
                     endCursor++;
             }
 

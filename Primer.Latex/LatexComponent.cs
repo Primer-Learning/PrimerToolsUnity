@@ -100,10 +100,10 @@ namespace Primer.Latex
 
         // Transitions
 
-        public LatexScrubbable CreateTransition(LatexComponent transitionTo, params TransitionType[] transitions)
-            => CreateTransition(transitionTo, (IEnumerable<TransitionType>)transitions);
+        public LatexScrubbable CreateTransition(LatexComponent transitionTo, params GroupTransitionType[] transitions)
+            => CreateTransition(transitionTo, (IEnumerable<GroupTransitionType>)transitions);
 
-        public LatexScrubbable CreateTransition(LatexComponent transitionTo, IEnumerable<TransitionType> transitions)
+        public LatexScrubbable CreateTransition(LatexComponent transitionTo, IEnumerable<GroupTransitionType> transitions)
         {
             gameObject.SetActive(true);
             transitionTo.gameObject.SetActive(true);
@@ -115,7 +115,7 @@ namespace Primer.Latex
             };
         }
 
-        public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<TransitionType> transitions)
+        public async UniTask<LatexScrubbable> TransitionTo(LatexComponent to, IEnumerable<GroupTransitionType> transitions)
         {
             var scrubbable = CreateTransition(to, transitions.ToArray());
             await scrubbable.Play();

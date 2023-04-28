@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Primer.Latex.Editor
 {
     [UsedImplicitly]
-    internal class LatexTransitionGroupDrawer : OdinAttributeDrawer<LatexTransitionGroupAttribute, List<TransitionType>>
+    internal class LatexTransitionGroupDrawer : OdinAttributeDrawer<LatexTransitionGroupAttribute, List<GroupTransitionType>>
     {
         private ValueResolver<LatexComponent> fromResolver;
         private ValueResolver<LatexComponent> toResolver;
@@ -47,7 +47,7 @@ namespace Primer.Latex.Editor
             newValues.Validate(from, to);
         }
 
-        public static List<TransitionType> RenderDrawer(LatexComponent from, LatexComponent to, List<TransitionType> transitions)
+        public static List<GroupTransitionType> RenderDrawer(LatexComponent from, LatexComponent to, List<GroupTransitionType> transitions)
         {
             if (from == null || to == null || transitions == null) {
                 return transitions;
@@ -64,16 +64,16 @@ namespace Primer.Latex.Editor
             var toGroups = to.GetGroups().ToList();
 
             var width = LatexCharEditor.GetDefaultWidth();
-            var newValues = new List<TransitionType>();
+            var newValues = new List<GroupTransitionType>();
             var forceAnchor = -1;
 
             foreach (var transition in transitions) {
                 EditorGUILayout.Space(4);
 
                 var newValue = EditorGUILayout.EnumPopup("", transition);
-                var newTransition = newValue is TransitionType kind ? kind : transition;
+                var newTransition = newValue is GroupTransitionType kind ? kind : transition;
 
-                if (newTransition is TransitionType.Anchor && transition is not TransitionType.Anchor)
+                if (newTransition is GroupTransitionType.Anchor && transition is not GroupTransitionType.Anchor)
                     forceAnchor = newValues.Count;
 
                 newValues.Add(newTransition);
@@ -81,17 +81,17 @@ namespace Primer.Latex.Editor
                 var fromGroup = fromGroups.ElementAtOrDefault(fromCursor);
                 var toGroup = toGroups.ElementAtOrDefault(toCursor);
 
-                if (transition == TransitionType.Add)
+                if (transition == GroupTransitionType.Add)
                     LatexCharEditor.ShowGroup(toGroup, width);
                 else
                     fromCursor++;
 
-                if (transition == TransitionType.Remove)
+                if (transition == GroupTransitionType.Remove)
                     LatexCharEditor.ShowGroup(fromGroup, width);
                 else
                     toCursor++;
 
-                if (transition is TransitionType.Add or TransitionType.Remove)
+                if (transition is GroupTransitionType.Add or GroupTransitionType.Remove)
                     continue;
 
                 if (fromGroup is not null)
@@ -105,15 +105,15 @@ namespace Primer.Latex.Editor
 
             if (forceAnchor is not -1) {
                 for (var i = 0; i < newValues.Count; i++) {
-                    if (newValues[i] is TransitionType.Anchor && i != forceAnchor)
-                        newValues[i] = TransitionType.Transition;
+                    if (newValues[i] is GroupTransitionType.Anchor && i != forceAnchor)
+                        newValues[i] = GroupTransitionType.Transition;
                 }
             }
 
             return newValues;
         }
 
-        private static void CopyCode(IEnumerable<TransitionType> values)
+        private static void CopyCode(IEnumerable<GroupTransitionType> values)
         {
             var list = values.Select(x => x.ToCode());
             GUIUtility.systemCopyBuffer = @"new List<TransitionType> {" + '\n' + string.Join(",\n", list) + "\n}";

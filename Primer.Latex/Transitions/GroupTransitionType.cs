@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    public enum TransitionType
+    public enum GroupTransitionType
     {
         Transition,
         Anchor,
@@ -16,19 +16,19 @@ namespace Primer.Latex
 
     public static class TransitionTypeExtensions
     {
-        public static string ToCode(this TransitionType transition)
+        public static string ToCode(this GroupTransitionType transition)
         {
             return transition switch {
-                TransitionType.Transition => "TransitionType.Transition",
-                TransitionType.Anchor => "TransitionType.Anchor",
-                TransitionType.Add => "TransitionType.Add",
-                TransitionType.Remove => "TransitionType.Remove",
-                TransitionType.Replace => "TransitionType.Replace",
+                GroupTransitionType.Transition => "TransitionType.Transition",
+                GroupTransitionType.Anchor => "TransitionType.Anchor",
+                GroupTransitionType.Add => "TransitionType.Add",
+                GroupTransitionType.Remove => "TransitionType.Remove",
+                GroupTransitionType.Replace => "TransitionType.Replace",
                 _ => throw new ArgumentOutOfRangeException(nameof(transition), transition, null)
             };
         }
 
-        public static void AdjustLength(this List<TransitionType> transitions, LatexComponent from, LatexComponent to)
+        public static void AdjustLength(this List<GroupTransitionType> transitions, LatexComponent from, LatexComponent to)
         {
             var fromCursor = 0;
             var toCursor = 0;
@@ -36,53 +36,53 @@ namespace Primer.Latex
             var toGroups = to.groupsCount;
 
             foreach (var transition in transitions) {
-                if (transition is not TransitionType.Add)
+                if (transition is not GroupTransitionType.Add)
                     fromCursor++;
 
-                if (transition is not TransitionType.Remove)
+                if (transition is not GroupTransitionType.Remove)
                     toCursor++;
             }
 
             while (fromCursor < fromGroups && toCursor < toGroups) {
-                transitions.Add(TransitionType.Transition);
+                transitions.Add(GroupTransitionType.Transition);
                 fromCursor++;
                 toCursor++;
             }
 
             while (fromCursor < fromGroups) {
-                transitions.Add(TransitionType.Remove);
+                transitions.Add(GroupTransitionType.Remove);
                 fromCursor++;
             }
 
             while (toCursor < toGroups) {
-                transitions.Add(TransitionType.Add);
+                transitions.Add(GroupTransitionType.Add);
                 toCursor++;
             }
 
             while (fromCursor > fromGroups) {
-                var index = transitions.LastIndexOf(TransitionType.Remove);
+                var index = transitions.LastIndexOf(GroupTransitionType.Remove);
                 transitions.RemoveAt(index == -1 ? transitions.Count - 1 : index);
                 fromCursor--;
             }
 
             while (toCursor > toGroups) {
-                var index = transitions.LastIndexOf(TransitionType.Add);
+                var index = transitions.LastIndexOf(GroupTransitionType.Add);
                 transitions.RemoveAt(index == -1 ? transitions.Count - 1 : index);
                 toCursor--;
             }
         }
 
-        public static List<TransitionType> Validate(this IEnumerable<TransitionType> transitions)
+        public static List<GroupTransitionType> Validate(this IEnumerable<GroupTransitionType> transitions)
         {
-            var array = new List<TransitionType>(transitions);
+            var array = new List<GroupTransitionType>(transitions);
 
-            if (array.Count(x => x == TransitionType.Anchor) > 1)
+            if (array.Count(x => x == GroupTransitionType.Anchor) > 1)
                 throw new Exception("Cannot have more than one anchor transition");
 
             return array;
         }
 
-        public static List<TransitionType> Validate(this IEnumerable<TransitionType> transitions, LatexComponent from,
+        public static List<GroupTransitionType> Validate(this IEnumerable<GroupTransitionType> transitions, LatexComponent from,
             LatexComponent to)
         {
             var list = transitions.Validate();

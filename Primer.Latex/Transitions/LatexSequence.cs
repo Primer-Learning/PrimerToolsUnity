@@ -24,7 +24,7 @@ namespace Primer.Latex
             return child;
         }
 
-        protected Tween Transition(LatexComponent stage, params TransitionType[] transition)
+        protected Tween Transition(LatexComponent stage, params GroupTransitionType[] transition)
         {
             stages.Add(stage);
             transitions.Add(transition);
@@ -36,7 +36,7 @@ namespace Primer.Latex
 
         protected Tween Transition(string formula)
         {
-            return Transition(Latex(formula), TransitionType.Replace);
+            return Transition(Latex(formula), GroupTransitionType.Replace);
         }
 
         #region Internals
@@ -48,9 +48,9 @@ namespace Primer.Latex
 
         internal LatexComponent initial;
         private readonly List<LatexComponent> stages = new();
-        private readonly List<TransitionType[]> transitions = new();
+        private readonly List<GroupTransitionType[]> transitions = new();
         private readonly List<LatexComponent> allStages = new();
-        private readonly List<TransitionType[]> allTransitions = new();
+        private readonly List<GroupTransitionType[]> allTransitions = new();
 
         public override void Cleanup()
         {
@@ -122,7 +122,7 @@ namespace Primer.Latex
             isInitialized = true;
         }
 
-        internal List<(LatexComponent latex, TransitionType[] transition)> GetStages()
+        internal List<(LatexComponent latex, GroupTransitionType[] transition)> GetStages()
         {
             return allStages.Zip(allTransitions, (latex, transition) => (latex, transition)).ToList();
         }

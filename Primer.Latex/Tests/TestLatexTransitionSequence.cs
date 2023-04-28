@@ -25,9 +25,9 @@ namespace Primer.Latex
 
             scrubbable = target.CreateTransition(
                 transitionTo,
-                TransitionType.Remove,
-                TransitionType.Anchor,
-                TransitionType.Replace
+                GroupTransitionType.Remove,
+                GroupTransitionType.Anchor,
+                GroupTransitionType.Replace
             );
         }
 

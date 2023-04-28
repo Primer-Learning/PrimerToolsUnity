@@ -40,14 +40,14 @@ namespace Primer.Latex
         }
 
         [SerializeReference, HideInInspector]
-        private List<TransitionType> _groups = new();
+        private List<GroupTransitionType> _groups = new();
 
         [ShowInInspector]
         [LatexTransitionGroup(nameof(_from), nameof(_to))]
-        public List<TransitionType> groups {
+        public List<GroupTransitionType> groups {
             get => _groups;
             set {
-                _groups = value?.ToList() ?? new List<TransitionType>();
+                _groups = value?.ToList() ?? new List<GroupTransitionType>();
                 transition = null;
                 UpdateGroupsLength();
             }
