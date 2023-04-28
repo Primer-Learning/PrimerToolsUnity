@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Latex
@@ -33,6 +32,11 @@ namespace Primer.Latex
             var prev = currentLatex ?? initial;
             runningScrubbable = prev.CreateTransition(stage, transition);
             return runningScrubbable.AsTween();
+        }
+
+        protected Tween Transition(string formula)
+        {
+            return Transition(Latex(formula), TransitionType.Replace);
         }
 
         #region Internals
