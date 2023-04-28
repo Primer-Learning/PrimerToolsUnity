@@ -9,7 +9,6 @@ namespace Primer.Latex.Editor
     [CustomEditor(typeof(LatexSequence), editorForChildClasses: true)]
     public class LatexSequenceEditor : OdinEditor
     {
-        private bool isInitialized = false;
         [SerializeField] private int selectedTab = 0;
         private readonly Dictionary<int, List<TransitionType>> transitionOverrides = new();
 
@@ -20,23 +19,24 @@ namespace Primer.Latex.Editor
             if (target is not LatexSequence sequence)
                 return;
 
-            if (!isInitialized) {
-                sequence.RunTrough();
-                isInitialized = true;
-            }
+            sequence.EnsureIsInitialized();
 
             var stages = sequence.GetStages();
-            var initial = sequence.initial;
 
             if (stages.Count == 0) {
-                EditorGUILayout.LabelField("No stages found.");
-                return;
+                sequence.RunTrough();
+                stages = sequence.GetStages();
+
+                if (stages.Count == 0) {
+                    EditorGUILayout.LabelField("No stages found.");
+                    return;
+                }
             }
 
             DrawTabs(stages);
 
             var (latex, transition) = stages[selectedTab];
-            var prev = selectedTab > 0 ? stages[selectedTab - 1].latex : initial;
+            var prev = selectedTab > 0 ? stages[selectedTab - 1].latex : sequence.initial;
             var transitionList = transitionOverrides.ContainsKey(selectedTab)
                 ? transitionOverrides[selectedTab]
                 : transition.ToList();

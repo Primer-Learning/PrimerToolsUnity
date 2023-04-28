@@ -44,6 +44,7 @@ namespace Primer.Latex
         private LatexComponent lastCreatedLatex;
         private LatexComponent currentLatex;
         private LatexScrubbable runningScrubbable;
+        private bool isInitialized = false;
 
         internal LatexComponent initial;
         private readonly List<LatexComponent> stages = new();
@@ -54,9 +55,7 @@ namespace Primer.Latex
         public override void Cleanup()
         {
             base.Cleanup();
-
-            if (initial == null)
-                RunTrough();
+            EnsureIsInitialized();
 
             if (runningScrubbable is not null) {
                 runningScrubbable.Dispose();
@@ -68,6 +67,8 @@ namespace Primer.Latex
 
         public override async IAsyncEnumerator<Tween> Run()
         {
+            EnsureIsInitialized();
+
             stages.Clear();
             transitions.Clear();
             initial = null;
@@ -95,6 +96,15 @@ namespace Primer.Latex
                 stage.SetActive(false);
         }
 
+        internal void EnsureIsInitialized()
+        {
+            if (isInitialized)
+                return;
+
+            isInitialized = true;
+            RunTrough();
+        }
+
         internal async void RunTrough()
         {
             var enumerator = Run();
@@ -107,11 +117,9 @@ namespace Primer.Latex
             allTransitions.AddRange(transitions);
 
             DisableObjects();
+            isInitialized = true;
         }
-        #endregion
 
-
-        #region Editor
         internal List<(LatexComponent latex, TransitionType[] transition)> GetStages()
         {
             return allStages.Zip(allTransitions, (latex, transition) => (latex, transition)).ToList();
