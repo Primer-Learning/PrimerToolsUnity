@@ -7,7 +7,7 @@ namespace Primer.Scene
     public class CameraRig : MonoBehaviour
     {
         private Camera cameraCache;
-        internal Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
+        public Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
 
 
         public float distance = 10;
