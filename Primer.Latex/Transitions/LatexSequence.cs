@@ -86,6 +86,8 @@ namespace Primer.Latex
             } while (enumerator.MoveNext());
 
             children.Apply();
+
+            yield return currentLatex.ScaleTo(0);
         }
 
         private void DisableObjects()
