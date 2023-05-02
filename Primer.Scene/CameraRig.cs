@@ -24,6 +24,13 @@ namespace Primer.Scene
         private void OnValidate() => Validate();
         private void OnDrawGizmos() => Gizmos.DrawSphere(swivelOrigin, 0.1f);
 
+        private void Awake()
+        {
+            if (cam != null && backgroundColor != cam.backgroundColor) {
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = backgroundColor;
+            }
+        }
 
         // TODO: using properties with getter / setter we can get rid of the old* variables
         private Vector3? oldSwivelOrigin;
@@ -39,11 +46,6 @@ namespace Primer.Scene
                 lastFaceSwivel = faceSwivel;
                 oldSwivelOrigin = swivelOrigin;
                 oldSwivel = swivel;
-            }
-
-            if (cam != null && backgroundColor != cam.backgroundColor) {
-                cam.clearFlags = CameraClearFlags.SolidColor;
-                cam.backgroundColor = backgroundColor;
             }
         }
 

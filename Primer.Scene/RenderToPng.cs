@@ -10,6 +10,7 @@ namespace Primer.Scene
         private Camera cameraCache;
         internal Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
 
+        public bool transparentBackground = true; 
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
@@ -41,6 +42,12 @@ namespace Primer.Scene
         {
             Time.captureFramerate = frameRate;
             destinationDirectory = GetContainerDirectory();
+
+            if (transparentBackground)
+            {
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = new Color(0, 0, 0, 0);
+            }
         }
 
 
