@@ -52,11 +52,19 @@ namespace Primer
             target.localScale = source.localScale;
         }
 
-        public static void SetDefaults(this Transform transform)
+        public static void SetDefaultsNoScale(this Transform transform, bool saveIntrinsicScale = false)
         {
+            SetDefaults(transform, Vector3.one, saveIntrinsicScale);
+        }
+
+        public static void SetDefaults(this Transform transform, Vector3? scale = null, bool saveIntrinsicScale = false)
+        {
+            if (saveIntrinsicScale)
+                transform.GetPrimer().FindIntrinsicScale();
+
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
-            transform.localScale = Vector3.one;
+            transform.localScale = scale ?? Vector3.one;
         }
     }
 }
