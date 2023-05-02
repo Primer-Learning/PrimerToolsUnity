@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -11,31 +12,33 @@ namespace Primer.Timeline.Editor
     {
         static AutomaticTimelineSelection()
         {
-            var timeline = GameObject.Find("Timeline");
-            var director = timeline?.GetComponent<PlayableDirector>();
+            EditorSceneManager.sceneOpened += async (_, _) => {
+                await Task.Delay(100);
+                SelectTimeline();
+            };
 
-            if (director is null)
-                return;
-
-            Lock(director);
+            SelectTimeline();
         }
 
-        private static async void Lock(PlayableDirector director)
+        private static async void SelectTimeline()
         {
             for (var i = 0; i < 100; i++) {
                 var window = TimelineEditor.GetWindow();
 
                 if (window is null) {
-                    await Task.Delay(250);
+                    await Task.Delay(100);
                     continue;
                 }
 
-                if (!window.locked) {
-                    window.SetTimeline(director);
-                    window.locked = true;
-                }
+                if (window.locked)
+                    return;
 
-                break;
+                var director = GameObject.FindObjectOfType<PlayableDirector>();
+                if (director == null) return;
+
+                window.SetTimeline(director);
+                window.locked = true;
+                return;
             }
         }
     }
