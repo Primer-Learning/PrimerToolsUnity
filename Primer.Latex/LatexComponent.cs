@@ -58,6 +58,7 @@ namespace Primer.Latex
         // Groups
 
         public int groupsCount => groups.ranges.Count;
+        public List<int> groupIndexes => groups.indexes;
 
         public LatexComponent SetGroupIndexes(params int[] indexes)
         {

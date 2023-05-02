@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
@@ -8,7 +10,7 @@ namespace Primer.Latex
 {
     public abstract class LatexSequence : Sequence
     {
-        protected abstract IEnumerator<Tween> LatexStages();
+        protected abstract IEnumerator<TweenProvider> LatexStages();
 
         protected LatexComponent Latex(string formula, string name = null)
         {
@@ -24,22 +26,51 @@ namespace Primer.Latex
             return child;
         }
 
-        protected Tween Transition(LatexComponent stage, params GroupTransitionType[] transition)
+        protected TweenProvider Transition(string formula)
+            => Transition(Latex(formula), GroupTransitionType.Replace);
+
+        protected TweenProvider Transition(LatexComponent stage, params GroupTransitionType[] transition)
+            => Transition(null, stage, null, transition);
+
+        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, params GroupTransitionType[] transition)
+            => Transition(groupIndexesBefore, stage, null, transition);
+
+        protected TweenProvider Transition(LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
+            => Transition(null, stage, groupIndexesAfter, transition);
+
+        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
         {
-            stages.Add(stage);
-            transitions.Add(transition);
+            stages.Add(new Stage(
+                latex: stage,
+                transition,
+                groupIndexesBefore,
+                groupIndexesAfter
+            ));
 
             var prev = currentLatex ?? initial;
-            runningScrubbable = prev.CreateTransition(stage, transition);
-            return runningScrubbable.AsTween();
+
+            return new TweenProvider(() => {
+                if (groupIndexesBefore is not null)
+                    prev.SetGroupIndexes(groupIndexesBefore);
+
+                if (groupIndexesAfter is not null)
+                    stage.SetGroupIndexes(groupIndexesAfter);
+
+                runningScrubbable = prev.CreateTransition(stage, transition);
+                return runningScrubbable.AsTween();
+            });
         }
 
-        protected Tween Transition(string formula)
-        {
-            return Transition(Latex(formula), GroupTransitionType.Replace);
-        }
 
         #region Internals
+        [Serializable]
+        public record Stage(
+            LatexComponent latex,
+            GroupTransitionType[] transition,
+            [CanBeNull] int[] groupIndexesBefore = null,
+            [CanBeNull] int[] groupIndexesAfter = null
+        );
+
         private ChildrenDeclaration children;
         private LatexComponent lastCreatedLatex;
         private LatexComponent currentLatex;
@@ -47,10 +78,8 @@ namespace Primer.Latex
         private bool isInitialized = false;
 
         internal LatexComponent initial;
-        private readonly List<LatexComponent> stages = new();
-        private readonly List<GroupTransitionType[]> transitions = new();
-        private readonly List<LatexComponent> allStages = new();
-        private readonly List<GroupTransitionType[]> allTransitions = new();
+        private readonly List<Stage> stages = new();
+        private readonly List<Stage> allStages = new();
 
         public override void Cleanup()
         {
@@ -70,7 +99,6 @@ namespace Primer.Latex
             EnsureIsInitialized();
 
             stages.Clear();
-            transitions.Clear();
             initial = null;
 
             children = new ChildrenDeclaration(transform);
@@ -95,7 +123,7 @@ namespace Primer.Latex
             initial.SetActive(false);
 
             foreach (var stage in stages)
-                stage.SetActive(false);
+                stage.latex.SetActive(false);
         }
 
         internal void EnsureIsInitialized()
@@ -115,16 +143,17 @@ namespace Primer.Latex
             allStages.Clear();
             allStages.AddRange(stages);
 
-            allTransitions.Clear();
-            allTransitions.AddRange(transitions);
-
             DisableObjects();
             isInitialized = true;
         }
 
-        internal List<(LatexComponent latex, GroupTransitionType[] transition)> GetStages()
+        internal List<Stage> GetStages()
         {
-            return allStages.Zip(allTransitions, (latex, transition) => (latex, transition)).ToList();
+            if (allStages.Count is not 0)
+                return allStages;
+
+            RunTrough();
+            return allStages;
         }
         #endregion
     }

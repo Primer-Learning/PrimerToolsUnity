@@ -164,8 +164,8 @@ namespace Primer.Latex
 
         private void UpdateGroupsLength()
         {
-            if (from != null && to != null)
-                _groups.AdjustLength(from, to);
+            // if (from != null && to != null)
+            //     _groups.AdjustLength(from, to);
         }
 
         public void Dispose()
