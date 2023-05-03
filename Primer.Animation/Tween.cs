@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public record Tween(Action<float> lerp) : IDisposable
+    public partial record Tween(Action<float> lerp) : IDisposable
     {
         public static Tween noop = new(_ => {});
 
@@ -94,82 +94,5 @@ namespace Primer.Animation
         {
             return new Tween(value);
         }
-
-
-        #region static Tween Parallel(params Tween[] tweenList);
-        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
-            => Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }));
-
-        public static Tween Parallel(IEnumerable<Tween> tweenList) => Parallel(tweenList.ToArray());
-
-        // ReSharper disable Unity.PerformanceAnalysis
-        public static Tween Parallel(params Tween[] tweenList)
-        {
-            if (tweenList.Length == 0)
-                return noop with { milliseconds = 0 };
-
-            var fullDuration = tweenList.Max(x => x.totalDuration);
-
-            if (fullDuration is 0) {
-                Debug.LogWarning("Parallel tween list is empty");
-                return noop with { milliseconds = 0 };
-            }
-
-            return new Tween(
-                t => {
-                    for (var i = 0; i < tweenList.Length; i++) {
-                        var tween = tweenList[i];
-                        tween.Evaluate(Mathf.Clamp01(t / tween.totalDuration * fullDuration));
-                    }
-                }
-            ) {
-                easeMethod = LinearEasing.instance,
-                duration = fullDuration,
-                isCalculated = true,
-            };
-        }
-        #endregion
-
-
-        #region static Tween Series(params Tween[] tweenList);
-        public static Tween Series(IEnumerable<Tween> tweenList) => Series(tweenList.ToArray());
-
-        public static Tween Series(params Tween[] tweenList)
-        {
-            var fullDuration = tweenList.Sum(x => x.totalDuration);
-
-            if (fullDuration is 0) {
-                Debug.LogWarning("Series tween list is empty");
-                return noop with { milliseconds = 0 };
-            }
-
-            var cursor = 0;
-            var cursorEnd = tweenList[0].duration;
-            var cursorStartT = 0f;
-            var cursorEndT = cursorEnd / fullDuration;
-
-            return new Tween(
-                t => {
-                    while (t > cursorEndT) {
-                        tweenList[cursor].Evaluate(1);
-                        cursor++;
-                        tweenList[cursor].Evaluate(0);
-
-                        var cursorStart = cursorEnd;
-                        cursorEnd += tweenList[cursor].duration;
-                        cursorStartT = cursorStart / fullDuration;
-                        cursorEndT = cursorEnd / fullDuration;
-                    }
-
-                    var tweenT = PrimerMath.Remap(cursorStartT, cursorEndT, 0, 1, t);
-                    tweenList[cursor].Evaluate(tweenT);
-                }
-            ) {
-                easeMethod = LinearEasing.instance,
-                duration = fullDuration,
-                isCalculated = true,
-            };
-        }
-        #endregion
     }
 }
