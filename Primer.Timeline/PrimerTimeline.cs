@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -32,14 +33,19 @@ namespace Primer.Timeline
 
         private static void CollectAndDisposeEphemerals()
         {
+            var disposed = new List<string>();
+
             IterateAllObjects(transform => {
                 if (!transform.gameObject.CompareTag(COLLECTABLE_OBJECT_TAG))
                     return false;
 
-                Debug.Log("DisposeEphemeralObject: " + transform.gameObject.name);
+                disposed.Add(transform.gameObject.name);
                 transform.gameObject.Dispose();
                 return true;
             });
+
+            if (disposed.Count is not 0)
+                Debug.Log($"Disposed {disposed.Count} ephemeral objects:\n\t{string.Join("\n\t", disposed)}");
         }
 
 
