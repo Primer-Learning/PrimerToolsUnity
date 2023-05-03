@@ -137,11 +137,11 @@ namespace Primer.Latex
         }
 
         // Character access
-        
-        public List<Transform> GetCharacterTransforms()
+        public List<Transform> GetCharacterTransforms(int? startIndex = null, int? endIndex = null)
         {
             List<Transform> characterTransforms = new List<Transform>();
             Transform parentTransform = renderer.transform;
+            int characterCount = 0;
 
             for (int groupIndex = 0; groupIndex < parentTransform.childCount; groupIndex++)
             {
@@ -149,7 +149,15 @@ namespace Primer.Latex
 
                 for (int charIndex = 0; charIndex < groupTransform.childCount; charIndex++)
                 {
-                    characterTransforms.Add(groupTransform.GetChild(charIndex));
+                    Transform charTransform = groupTransform.GetChild(charIndex);
+
+                    if ((!startIndex.HasValue || characterCount >= startIndex.Value) &&
+                        (!endIndex.HasValue || characterCount <= endIndex.Value))
+                    {
+                        characterTransforms.Add(charTransform);
+                    }
+
+                    characterCount++;
                 }
             }
 
