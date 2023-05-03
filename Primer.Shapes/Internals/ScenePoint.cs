@@ -72,7 +72,7 @@ namespace Primer.Shapes
         }
         #endregion
 
-        #region Vector3 value;
+        #region Vector3 vector;
         [FormerlySerializedAs("_value")]
         [SerializeField, HideInInspector]
         private Vector3 _vector;
@@ -177,11 +177,25 @@ namespace Primer.Shapes
                 : value;
         }
 
+        public void SetLocalPosition(Transform parent, Vector3 position)
+        {
+            vector = isWorldPosition && parent is not null
+                ? parent.TransformPoint(position)
+                : position;
+        }
+
         public Vector3 GetWorldPosition(Transform parent)
         {
             return isWorldPosition || parent is null
                 ? value
                 : parent.TransformPoint(value);
+        }
+
+        public void SetWorldPosition(Transform parent, Vector3 position)
+        {
+            vector = isWorldPosition || parent is null
+                ? position
+                : parent.TransformPoint(position);
         }
 
         private void Changed()

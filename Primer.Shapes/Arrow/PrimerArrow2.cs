@@ -76,8 +76,16 @@ namespace Primer.Shapes
         }
 
 
-        public Vector3 tail => tailPoint.GetWorldPosition(transform.parent);
-        public Vector3 head => headPoint.GetWorldPosition(transform.parent);
+        public Vector3 tail {
+            get => tailPoint.GetWorldPosition(transform.parent);
+            set => tailPoint.SetWorldPosition(transform.parent, value);
+        }
+
+        public Vector3 head {
+            get => headPoint.GetWorldPosition(transform.parent);
+            set => headPoint.SetWorldPosition(transform.parent, value);
+        }
+
         private float realArrowLength => arrowLength * thickness;
 
 
