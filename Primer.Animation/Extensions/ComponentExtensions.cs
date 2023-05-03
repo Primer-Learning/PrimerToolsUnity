@@ -95,12 +95,26 @@ namespace Primer.Animation
 
         public static Tween MoveTo(this Component self, Vector3 newPosition)
         {
+            return self.MoveTo(newPosition, null, false);
+        }
+
+        public static Tween MoveTo(this Component self, Vector3 newPosition, Vector3? initialPosition = null, bool useGlobalPosition = false)
+        {
             var transform = self.transform;
-            var initial = transform.localPosition;
+            var initial = initialPosition ?? (useGlobalPosition ? transform.position : transform.localPosition);
 
             return initial == newPosition
                 ? Tween.noop
-                : new Tween(t => transform.localPosition = Vector3.Lerp(initial, newPosition, t));
+                : new Tween(t => {
+                    if (useGlobalPosition)
+                    {
+                        transform.position = Vector3.Lerp(initial, newPosition, t);
+                    }
+                    else
+                    {
+                        transform.localPosition = Vector3.Lerp(initial, newPosition, t);
+                    }
+                });
         }
 
         public static Tween MoveBy(this Component self, Vector3 displacement)
