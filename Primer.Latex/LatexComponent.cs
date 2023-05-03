@@ -136,6 +136,25 @@ namespace Primer.Latex
             ConnectParts();
         }
 
+        // Character access
+        
+        public List<Transform> GetCharacterTransforms()
+        {
+            List<Transform> characterTransforms = new List<Transform>();
+            Transform parentTransform = renderer.transform;
+
+            for (int groupIndex = 0; groupIndex < parentTransform.childCount; groupIndex++)
+            {
+                Transform groupTransform = parentTransform.GetChild(groupIndex);
+
+                for (int charIndex = 0; charIndex < groupTransform.childCount; charIndex++)
+                {
+                    characterTransforms.Add(groupTransform.GetChild(charIndex));
+                }
+            }
+
+            return characterTransforms;
+        }
 
         #region Unity events
         private void Reset()
