@@ -18,52 +18,6 @@ namespace Primer.Timeline
             parallelQueue.Add(tween);
         }
 
-        public Tween WaitForParallels()
-        {
-            var result = Parallel(parallelQueue.ToArray());
-            parallelQueue.Clear();
-            return result;
-        }
-
-        protected static async UniTask Milliseconds(int milliseconds)
-        {
-            if (Application.isPlaying)
-                await UniTask.Delay(milliseconds);
-        }
-
-        protected static async UniTask Seconds(float seconds)
-        {
-            if (Application.isPlaying)
-                await UniTask.Delay(Mathf.RoundToInt(seconds * 1000));
-        }
-
-        protected static async UniTask Parallel(params UniTask[] processes)
-        {
-            await UniTask.WhenAll(processes);
-        }
-
-        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(tweenList.ToArray());
-        public static Tween Parallel(params Tween[] tweenList)
-        {
-            return Tween.Parallel(tweenList);
-        }
-
-        public static Tween Series(IEnumerable<Tween> tweenList) =>Series(tweenList.ToArray());
-        public static Tween Series(params Tween[] tweenList)
-        {
-            return Tween.Series(tweenList);
-        }
-    }
-
-    public class AsyncMonoBehaviour : MonoBehaviour
-    {
-        private readonly List<Tween> parallelQueue = new();
-
-        public void AddToParallel(Tween tween)
-        {
-            parallelQueue.Add(tween);
-        }
-
         public Tween WaitForParallels(float delayBetweenStarts = 0)
         {
             if (parallelQueue.Count == 0)
@@ -71,48 +25,104 @@ namespace Primer.Timeline
 
             var result = Parallel(delayBetweenStarts, parallelQueue.ToArray());
             parallelQueue.Clear();
-            return result;
-        }
+            return result;        }
 
-        protected static async UniTask Milliseconds(int milliseconds)
+        public static async UniTask Milliseconds(int milliseconds)
         {
             if (Application.isPlaying)
                 await UniTask.Delay(milliseconds);
         }
 
-        protected static async UniTask Seconds(float seconds)
+        public static async UniTask Seconds(float seconds)
         {
             if (Application.isPlaying)
                 await UniTask.Delay(Mathf.RoundToInt(seconds * 1000));
         }
 
-        public static async UniTask Parallel(params UniTask[] processes)
+        public static Tween Parallel(float delayBetweenStarts, IEnumerable<Tween> tweenList)
         {
-            await UniTask.WhenAll(processes);
+            return Tween.Parallel(delayBetweenStarts, tweenList.ToArray());
         }
 
-        public static async UniTask Series(params Func<UniTask>[] processes)
-        {
-            foreach (var process in processes)
-            {
-                await process();
-            }
-        }
-
-        public static Tween Parallel(IEnumerable<Tween> tweenList) =>Parallel(0, tweenList.ToArray());
-        public static Tween Parallel(params Tween[] tweenList)
-        {
-            return Tween.Parallel(tweenList);
-        }
         public static Tween Parallel(float delayBetweenStarts = 0, params Tween[] tweenList)
         {
             return Tween.Parallel(delayBetweenStarts, tweenList);
         }
 
-        public static Tween Series(IEnumerable<Tween> tweenList) =>Series(tweenList.ToArray());
+        public static Tween Parallel(IEnumerable<Tween> tweenList) => Parallel(tweenList.ToArray());
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Tween.Parallel(tweenList);
+        }
+
+        public static Tween Series(IEnumerable<Tween> tweenList) => Series(tweenList.ToArray());
         public static Tween Series(params Tween[] tweenList)
         {
             return Tween.Series(tweenList);
+        }
+
+        public static Tween PlayModeOnly(Action playModeAction, Func<Tween> fallback = null)
+        {
+            return Application.isPlaying
+                ? Tween.noop.Observe(beforePlay: playModeAction)
+                : fallback?.Invoke() ?? Tween.noop;
+        }
+    }
+
+    public class AsyncMonoBehaviour : MonoBehaviour
+    {
+        private readonly Async internalAsync = new();
+
+        protected void AddToParallel(Tween tween) => internalAsync.AddToParallel(tween);
+
+        protected Tween WaitForParallels(float delayBetweenStarts = 0)
+        {
+            return internalAsync.WaitForParallels(delayBetweenStarts);
+        }
+
+        protected static UniTask Milliseconds(int milliseconds)
+        {
+            return Async.Milliseconds(milliseconds);
+        }
+
+        protected static UniTask Seconds(float seconds)
+        {
+            return Async.Seconds(seconds);
+        }
+
+        protected static Tween Parallel(IEnumerable<Tween> tweenList)
+        {
+            return Async.Parallel(tweenList);
+        }
+
+        protected static Tween Parallel(params Tween[] tweenList)
+        {
+            return Async.Parallel(tweenList);
+        }
+
+        protected static Tween Parallel(float delayBetweenStarts, IEnumerable<Tween> tweenList)
+        {
+            return Async.Parallel(delayBetweenStarts, tweenList);
+        }
+
+        protected static Tween Parallel(float delayBetweenStarts = 0, params Tween[] tweenList)
+        {
+            return Async.Parallel(delayBetweenStarts, tweenList);
+        }
+
+        protected static Tween Series(IEnumerable<Tween> tweenList)
+        {
+            return Async.Series(tweenList);
+        }
+
+        protected static Tween Series(params Tween[] tweenList)
+        {
+            return Async.Series(tweenList);
+        }
+
+        protected static Tween PlayModeOnly(Action playModeAction, Func<Tween> fallback = null)
+        {
+            return Async.PlayModeOnly(playModeAction, fallback);
         }
     }
 }

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -49,7 +46,6 @@ namespace Primer.Animation
 
         public float totalDuration => duration + delay;
         internal float tStart => 1 / totalDuration * delay;
-
 
         public virtual void Evaluate(float t)
         {
