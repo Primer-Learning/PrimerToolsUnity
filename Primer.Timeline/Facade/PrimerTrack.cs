@@ -39,12 +39,12 @@ namespace Primer.Timeline
                 asset.duration = (float)clip.duration;
                 asset.clipIndex = clipCount++;
 
-                if (string.IsNullOrWhiteSpace(asset.clipName)
-                    || clip.displayName != nameof(SequenceClip) && clip.displayName[0] != '[') {
-                    continue;
-                }
+                var canReplaceClipName = string.IsNullOrWhiteSpace(clip.displayName)
+                    || clip.displayName == nameof(SequenceClip)
+                    || clip.displayName[0] != '[';
 
-                clip.displayName = asset.clipName;
+                if (canReplaceClipName && !string.IsNullOrWhiteSpace(asset.clipName))
+                    clip.displayName = asset.clipName;
             }
 
             var mixer = (ScriptPlayable<PrimerMixer>)CreateMixer(graph, inputCount);
