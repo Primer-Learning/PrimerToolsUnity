@@ -134,34 +134,23 @@ namespace Primer.Latex
             renderer = new LatexRenderer();
             onChange = new UnityEvent<LatexExpression>();
             ConnectParts();
+
+            GetCharacterTransforms(0, 0);
         }
 
         // Character access
         public List<Transform> GetCharacterTransforms(int? startIndex = null, int? endIndex = null)
         {
-            List<Transform> characterTransforms = new List<Transform>();
-            Transform parentTransform = renderer.transform;
-            int characterCount = 0;
+            var skipCount = startIndex ?? 0;
+            var allChildren = renderer.transform
+                .GetChildren()
+                .SelectMany(x => x.GetChildren());
 
-            for (int groupIndex = 0; groupIndex < parentTransform.childCount; groupIndex++)
-            {
-                Transform groupTransform = parentTransform.GetChild(groupIndex);
-
-                for (int charIndex = 0; charIndex < groupTransform.childCount; charIndex++)
-                {
-                    Transform charTransform = groupTransform.GetChild(charIndex);
-
-                    if ((!startIndex.HasValue || characterCount >= startIndex.Value) &&
-                        (!endIndex.HasValue || characterCount <= endIndex.Value))
-                    {
-                        characterTransforms.Add(charTransform);
-                    }
-
-                    characterCount++;
-                }
+            if (endIndex.HasValue) {
+                allChildren = allChildren.Take(endIndex.Value + 1);
             }
 
-            return characterTransforms;
+            return allChildren.Skip(skipCount).ToList();
         }
 
         #region Unity events
