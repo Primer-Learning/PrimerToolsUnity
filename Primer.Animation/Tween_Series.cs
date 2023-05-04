@@ -42,7 +42,7 @@ namespace Primer.Animation
                     tweenList[cursor].Evaluate(tweenT);
                 }
             ) {
-                easeMethod = LinearEasing.instance,
+                easing = LinearEasing.instance,
                 duration = fullDuration,
                 isCalculated = true,
             };

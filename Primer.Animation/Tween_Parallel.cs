@@ -37,7 +37,7 @@ namespace Primer.Animation
                     }
                 }
             ) {
-                easeMethod = LinearEasing.instance,
+                easing = LinearEasing.instance,
                 duration = fullDuration,
                 isCalculated = true,
             };

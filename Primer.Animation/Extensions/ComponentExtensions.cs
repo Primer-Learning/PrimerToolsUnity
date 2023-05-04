@@ -72,7 +72,7 @@ namespace Primer.Animation
             var quarterPeriod = wobbleCyclePeriod / 4; // Easier to work with
             var wobbleTweens = new List<Tween>();
             var targetRotation = Quaternion.Euler(0, 0, -wobbleAngle) * initialRotation;
-            wobbleTweens.Add(transform.RotateTo(targetRotation) with {duration = quarterPeriod, easeMethod = new QuadraticEasing()});
+            wobbleTweens.Add(transform.RotateTo(targetRotation) with {duration = quarterPeriod, easing = new QuadraticEasing()});
             totalDuration -= quarterPeriod;
             currentRotation = targetRotation;
 
@@ -80,12 +80,12 @@ namespace Primer.Animation
             while (totalDuration >= 3 * quarterPeriod)
             {
                 targetRotation = Quaternion.Euler(0, 0, wobbleAngle * angleMultiplier) * initialRotation;
-                wobbleTweens.Add(transform.RotateTo(targetRotation, initialRotation: currentRotation) with {duration = 2 * quarterPeriod, easeMethod = new QuadraticEasing()});
+                wobbleTweens.Add(transform.RotateTo(targetRotation, initialRotation: currentRotation) with {duration = 2 * quarterPeriod, easing = new QuadraticEasing()});
                 currentRotation = targetRotation;
                 totalDuration -= 2 * quarterPeriod;
                 angleMultiplier *= -1;
             }
-            wobbleTweens.Add(transform.RotateTo(initialRotation, initialRotation: currentRotation) with {duration = quarterPeriod, easeMethod = new QuadraticEasing()});
+            wobbleTweens.Add(transform.RotateTo(initialRotation, initialRotation: currentRotation) with {duration = quarterPeriod, easing = new QuadraticEasing()});
 
             return Tween.Parallel(
                 Tween.Series(wobbleTweens.ToArray()),

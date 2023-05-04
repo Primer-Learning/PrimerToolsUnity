@@ -9,10 +9,10 @@ namespace Primer.Animation
     {
         public static Tween noop = new(_ => {});
 
-        public IEasing easeMethod { get; init; } = IEasing.defaultMethod;
-        public EaseMode ease {
-            get => EaseModeExtensions.GetModeFor(easeMethod);
-            init => easeMethod = value.GetMethod();
+        public IEasing easing { get; init; } = IEasing.defaultMethod;
+        public EaseMode easeMode {
+            get => EaseModeExtensions.GetModeFor(easing);
+            init => easing = value.GetMethod();
         }
 
         public float delay = 0f;
@@ -52,7 +52,7 @@ namespace Primer.Animation
             if (delay is not 0)
                 t = Mathf.Clamp01(PrimerMath.Remap(tStart, 1, 0, 1, t));
 
-            lerp(easeMethod.Evaluate(t));
+            lerp(easing.Evaluate(t));
         }
 
         #region public void Play();

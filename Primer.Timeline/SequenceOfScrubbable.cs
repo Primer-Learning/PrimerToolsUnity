@@ -32,7 +32,7 @@ namespace Primer.Timeline
             yield return scrubbable.AsTween() with {
                 delay = delay,
                 duration = duration,
-                ease = ease,
+                easeMode = ease,
             };
         }
     }

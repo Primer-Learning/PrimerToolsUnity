@@ -41,7 +41,7 @@ namespace Primer.Animation
         ) {
             return new ObservableTween(tween.lerp) {
                 // all of Tween fields should be copied here
-                easeMethod = tween.easeMethod,
+                easing = tween.easing,
                 delay = tween.delay,
                 isCalculated = tween.isCalculated,
                 ms = tween.ms,
