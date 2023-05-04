@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 namespace Primer.Timeline.Editor
 {
@@ -12,16 +13,14 @@ namespace Primer.Timeline.Editor
     {
         static AutomaticTimelineSelection()
         {
-            EditorSceneManager.sceneOpened += async (_, _) => {
-                await Task.Delay(100);
-                SelectTimeline();
-            };
-
-            SelectTimeline();
+            EditorSceneManager.sceneOpened += (_, _) => StartProcess();
+            StartProcess();
         }
 
-        private static async void SelectTimeline()
+        private static async void StartProcess()
         {
+            await Task.Delay(100);
+
             for (var i = 0; i < 100; i++) {
                 var window = TimelineEditor.GetWindow();
 
@@ -31,15 +30,33 @@ namespace Primer.Timeline.Editor
                 }
 
                 if (window.locked)
-                    return;
+                    EnsureTimelineIsUpdated();
+                else
+                    SelectFirstDirector(window);
 
-                var director = GameObject.FindObjectOfType<PlayableDirector>();
-                if (director == null) return;
-
-                window.SetTimeline(director);
-                window.locked = true;
                 return;
             }
+        }
+
+        private static async void EnsureTimelineIsUpdated()
+        {
+            var director = TimelineEditor.inspectedDirector;
+
+            if (director != null && director.time is not 0)
+                return;
+
+            // Unity destroys the timeline before 2s for some reason
+            await Task.Delay(2000);
+            TimelineEditor.Refresh(RefreshReason.SceneNeedsUpdate);
+        }
+
+        private static void SelectFirstDirector(TimelineEditorWindow window)
+        {
+            var director = Object.FindObjectOfType<PlayableDirector>();
+            if (director == null) return;
+
+            window.SetTimeline(director);
+            window.locked = true;
         }
     }
 }

@@ -16,12 +16,11 @@ namespace Primer.Timeline
 
         public override void OnPlayableDestroy(Playable playable)
         {
-            base.OnPlayableDestroy(playable);
-
             foreach (var player in players.Values)
                 player.Clean();
 
             players.Clear();
+            base.OnPlayableDestroy(playable);
         }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
