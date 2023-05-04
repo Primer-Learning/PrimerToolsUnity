@@ -1,11 +1,11 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Primer.Animation
 {
-    public static class SpecializedTweens
+    public static class TransformListExtensions
     {
-        public static Tween PulseGroup(List<Transform> objectsToPulse, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
+        public static Tween PulseGroup(this List<Transform> objectsToPulse, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
         {
             // Calculate the center of the group in world/global space
             Vector3 center = CalculateGroupCenter(objectsToPulse);
