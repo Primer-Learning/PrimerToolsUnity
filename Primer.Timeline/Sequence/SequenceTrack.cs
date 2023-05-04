@@ -11,6 +11,7 @@ namespace Primer.Timeline.FakeUnityEngine
     [TrackBindingType(typeof(Sequence))]
     public class SequenceTrack : PrimerTrack
     {
+        public override float defaultDuration { get; } = 0.5f;
         protected override Playable CreateMixer(PlayableGraph graph, int inputCount)
         {
             return ScriptPlayable<SequenceMixer>.Create(graph, inputCount);
