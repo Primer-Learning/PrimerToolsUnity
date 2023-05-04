@@ -22,6 +22,8 @@ namespace Primer.Shapes
         [SerializeField, PrefabChild]
         private Transform rightTip;
         [SerializeField, PrefabChild]
+        private Transform latexContainer;
+        [SerializeField, PrefabChild]
         private LatexComponent latex;
         #endregion
 
@@ -128,17 +130,19 @@ namespace Primer.Shapes
 
         [ShowInInspector]
         public Vector3 labelOffset {
-            get => latex?.transform.localPosition ?? Vector3.zero;
-            set => latex.transform.localPosition = value;
+            get => latexContainer?.transform.localPosition ?? Vector3.zero;
+            set => latexContainer.transform.localPosition = value;
+        }
+        [ShowInInspector]
+        public Quaternion labelRotation {
+            get => latex?.transform.localRotation ?? Quaternion.identity;
+            set => latex.transform.localRotation = value;
         }
 
         [ShowInInspector]
         public float labelSize {
             get => latex?.transform.localScale.x ?? 1;
-            set {
-                latex.transform.localScale = Vector3.one * value;
-                FixLatexScale();
-            }
+            set => latex.transform.localScale = Vector3.one * value;
         }
 
         public bool hasLabel => latex.gameObject.activeSelf;
@@ -298,10 +302,11 @@ namespace Primer.Shapes
         private void FixLatexScale()
         {
             var parentScale = transform.localScale;
-            var latexTransform = latex.transform;
-            var scale = latexTransform.localScale;
-            var ratio = parentScale.x / parentScale.z;
-            latexTransform.localScale = new Vector3(scale.x, scale.x * ratio, scale.x);
+            latexContainer.localScale = new Vector3(
+                1 / parentScale.x,
+                1 / parentScale.y,
+                1 / parentScale.z
+            );
         }
     }
 }
