@@ -11,7 +11,7 @@ namespace Primer.Timeline
     {
         private Playable lastPlayable;
         public SingleExecutionGuarantee executionGuarantee = new();
-        public readonly Dictionary<Sequence, SequencePlayer> players = new();
+        public static readonly Dictionary<Sequence, SequencePlayer> players = new();
 
 
         public override void OnPlayableDestroy(Playable playable)
@@ -60,7 +60,7 @@ namespace Primer.Timeline
             }
         }
 
-        private SequencePlayer GetPlayerFor(Sequence sequence)
+        public static SequencePlayer GetPlayerFor(Sequence sequence)
         {
             if (players.TryGetValue(sequence, out var player))
                 return player;

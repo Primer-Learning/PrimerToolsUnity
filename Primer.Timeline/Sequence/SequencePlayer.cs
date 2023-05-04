@@ -54,7 +54,7 @@ namespace Primer.Timeline
         }
 
         /// <summary>Rolls back the sequence execution to the beginning</summary>
-        private async UniTask Reset()
+        public async UniTask Reset()
         {
             Log("Reset");
             completedClips.Clear();
