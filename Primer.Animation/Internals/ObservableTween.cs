@@ -37,8 +37,11 @@ namespace Primer.Animation
             Action beforePlay = null,
             Action onComplete = null,
             // Action<float> beforeUpdate = null,
-            Action<float> afterUpdate = null
-        ) {
+            Action<float> afterUpdate = null)
+        {
+            if (tween is ObservableTween observableTween)
+                return ExtendObservable(observableTween, beforePlay, onComplete, afterUpdate);
+
             return new ObservableTween(tween.lerp) {
                 // all of Tween fields should be copied here
                 easing = tween.easing,
@@ -52,5 +55,41 @@ namespace Primer.Animation
                 afterUpdate = afterUpdate,
             };
         }
+
+        private static ObservableTween ExtendObservable(
+            ObservableTween tween,
+            Action beforePlay,
+            Action onComplete,
+            Action<float> afterUpdate)
+        {
+            return tween with {
+                beforePlay = Merge(tween.beforePlay, beforePlay),
+                onComplete = Merge(tween.onComplete, onComplete),
+                afterUpdate = Merge(tween.afterUpdate, afterUpdate),
+            };
+        }
+
+        private static Action Merge(Action a, Action b)
+        {
+            if (a is null || b is null)
+                return a ?? b;
+
+            return () => {
+                a.Invoke();
+                b.Invoke();
+            };
+        }
+
+        private static Action<T> Merge<T>(Action<T> a, Action<T> b)
+        {
+            if (a is null || b is null)
+                return a ?? b;
+
+            return x => {
+                a.Invoke(x);
+                b.Invoke(x);
+            };
+        }
+
     }
 }
