@@ -14,7 +14,10 @@ namespace Primer.Animation
 
         public override void Evaluate(float t)
         {
-            if (state != State.Playing && t > tStart) {
+            if (delay is not 0 && t < tStart)
+                return;
+
+            if (state != State.Playing) {
                 beforePlay?.Invoke();
                 state = State.Playing;
             }

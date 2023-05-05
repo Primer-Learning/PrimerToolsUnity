@@ -49,8 +49,12 @@ namespace Primer.Animation
 
         public virtual void Evaluate(float t)
         {
-            if (delay is not 0)
+            if (delay is not 0) {
+                if (t < tStart)
+                    return;
+
                 t = Mathf.Clamp01(PrimerMath.Remap(tStart, 1, 0, 1, t));
+            }
 
             lerp(easing.Evaluate(t));
         }
