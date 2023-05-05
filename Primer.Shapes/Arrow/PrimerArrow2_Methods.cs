@@ -53,20 +53,7 @@ namespace Primer.Shapes
                 .Observe(onComplete: () => originalHeadPosition.ApplyTo(headPoint));
 
             return requiresAdjustmentTweening
-                ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, originalHeadAdjustment))
-                    .Observe(afterUpdate: t => {
-                            if (t is 0 or 1)
-                                return;
-
-                            PrimerLogger.Log(
-                                $"Arrow [{name}]:",
-                                t,
-                                headPoint.vector,
-                                headPoint.adjustment,
-                                originalHeadAdjustment
-                            );
-                        }
-                    )
+                ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, tailPoint.adjustment, originalHeadAdjustment))
                 : growTween;
         }
 
