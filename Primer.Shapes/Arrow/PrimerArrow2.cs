@@ -22,7 +22,7 @@ namespace Primer.Shapes
         private Transform tailObject;
 
         [FormerlySerializedAs("startPoint")]
-        [Title("Start")]
+        [Title("Tail")]
         public ScenePoint tailPoint = Vector3.zero;
         [FormerlySerializedAs("startSpace")]
         [LabelText("Space")]
@@ -34,7 +34,7 @@ namespace Primer.Shapes
         public bool tailPointer = false;
 
         [FormerlySerializedAs("endPoint")]
-        [Title("End")]
+        [Title("Head")]
         public ScenePoint headPoint = Vector3.one;
         [FormerlySerializedAs("endSpace")]
         [LabelText("Space")]
