@@ -43,14 +43,31 @@ namespace Primer.Shapes
         #region Animations
         public Tween GrowFromStart()
         {
-            var growTween = Animate(headStart: tailPoint);
+            var requiresAdjustmentTweening = tailPoint.adjustment != headPoint.adjustment;
+            var originalHeadPosition = (Vector3Provider)headPoint;
+            var originalHeadAdjustment = headPoint.adjustment;
 
-            return tailPoint.adjustment == headPoint.adjustment
-                ? growTween
-                : Tween.Parallel(
-                    growTween,
-                    headPoint.Tween("adjustment", headPoint.adjustment, tailPoint.adjustment)
-                );
+            tailPoint.CopyTo(headPoint);
+
+            var growTween = Animate(headEnd: originalHeadPosition)
+                .Observe(onComplete: () => originalHeadPosition.ApplyTo(headPoint));
+
+            return requiresAdjustmentTweening
+                ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, originalHeadAdjustment))
+                    .Observe(afterUpdate: t => {
+                            if (t is 0 or 1)
+                                return;
+
+                            PrimerLogger.Log(
+                                $"Arrow [{name}]:",
+                                t,
+                                headPoint.vector,
+                                headPoint.adjustment,
+                                originalHeadAdjustment
+                            );
+                        }
+                    )
+                : growTween;
         }
 
         public Tween ShrinkToEnd()
@@ -59,43 +76,31 @@ namespace Primer.Shapes
 
             return tailPoint.adjustment == headPoint.adjustment
                 ? shrinkTween
-                : Tween.Parallel(
-                    shrinkTween,
-                    tailPoint.Tween("adjustment", headPoint.adjustment, tailPoint.adjustment)
-                );
+                : Tween.Parallel( shrinkTween, Tween.Value(() => tailPoint.adjustment, headPoint.adjustment));
         }
 
         public Tween Animate(
             Vector3Provider headEnd = null,
             Vector3Provider tailEnd = null,
             Vector3Provider headStart = null,
-            Vector3Provider tailStart = null
-        )
+            Vector3Provider tailStart = null)
         {
             var tailTracking = tailPoint.isTracking ? (Vector3Provider)tailPoint : null;
             var headTracking = headPoint.isTracking ? (Vector3Provider)headPoint : null;
             var tailTween = tailPoint.Tween(tailEnd, tailStart);
             var headTween = headPoint.Tween(headEnd, headStart);
 
-            var tween = new Tween(
-                t =>
-                {
-                    if (tailTween is not null)
-                        tailPoint.vector = tailTween(t);
-
-                    if (headTween is not null)
-                        headPoint.vector = headTween(t);
-
-                    Recalculate();
-                }
-            );
+            var tween = new Tween(t => {
+                tailPoint.vector = tailTween(t);
+                headPoint.vector = headTween(t);
+                Recalculate();
+            });
 
             if (tailTracking is null && headTracking is null)
                 return tween;
 
             return tween.Observe(
-                onComplete: () =>
-                {
+                onComplete: () => {
                     tailTracking?.ApplyTo(tailPoint);
                     headTracking?.ApplyTo(headPoint);
                 }
