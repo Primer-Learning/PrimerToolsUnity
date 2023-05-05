@@ -1,5 +1,8 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace Primer
 {
@@ -24,16 +27,19 @@ namespace Primer
             return lambda.Compile();
         }
 
-
+        private readonly string sourceFile;
+        private readonly int lineNumber;
         private readonly MemberExpression memberExpression;
         private readonly Func<T> getter;
         private Action<T> setter;
 
-        public Accessor(Expression<Func<T>> expression)
+        public Accessor(Expression<Func<T>> expression, string sourceFile = "Unknown", int lineNumber = 0)
         {
             if (expression.Body is not MemberExpression member)
                 throw new ArgumentException("expression must return a field or property");
 
+            this.sourceFile = sourceFile;
+            this.lineNumber = lineNumber;
             getter = expression.Compile();
             memberExpression = member;
         }
@@ -48,13 +54,32 @@ namespace Primer
 
         public T Get()
         {
-            return getter();
+            try {
+                return getter();
+            }
+            catch (Exception ex) {
+                LogError("getting", ex);
+                throw;
+            }
         }
 
         public void Set(T value)
         {
             setter ??= CreateSetter();
-            setter(value);
+            try {
+                setter(value);
+            }
+            catch (Exception ex) {
+                LogError("setting", ex);
+                throw;
+            }
+        }
+
+        private void LogError(string method, Exception ex)
+        {
+            var filename = sourceFile.Split(Path.PathSeparator).Last();
+            var link = $"<a href=\"{sourceFile}\" line=\"{lineNumber}\">{filename}:{lineNumber}</a>";
+            Debug.LogError($"Error {method} value at {link}\n\nInternal error below\n\n{ex.Message}");
         }
     }
 }
