@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -97,6 +98,11 @@ namespace Primer.Latex
         public Tween TweenColorInGroups(Color groupColor, IEnumerable<int> groupIndexes)
         {
             return renderer.TweenColorInGroups(groupColor, groupIndexes);
+        }
+
+        public Tween TweenColorByCharacterRange(Color targetColor, int startIndex, int endIndex)
+        {
+            return renderer.TweenColorByCharacterRange(targetColor, startIndex, endIndex);
         }
 
         // Transitions

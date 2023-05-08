@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -80,6 +81,26 @@ namespace Primer.Latex
                 foreach (var child in children)
                     child.SetColor(lerpedColor);
             });
+        }
+        
+        public Tween TweenColorByCharacterRange(Color targetColor, int startIndex, int endIndex)
+        {
+            var targetChildren = transform
+                .GetChildren()
+                .SelectMany(x => x.GetChildren()).Take(endIndex + 1).Skip(startIndex)
+                .Select(x => x.GetComponent<MeshRenderer>())
+                .ToArray();
+
+            var initial = targetChildren[0].GetColor();
+
+            if (initial == targetColor)
+                return Tween.noop;
+
+            // This is the memory-leak-producing way to tween a color, but I wanted to use Tween.Value so 
+            // the initial values are correct even when in the same clip as another tween that affects the same value.
+            return Tween.Parallel(
+                targetChildren.Select(r => Tween.Value(() => r.material.color, targetColor))
+            );
         }
 
         public void UpdateChildren()
