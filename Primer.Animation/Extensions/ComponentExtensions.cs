@@ -52,8 +52,7 @@ namespace Primer.Animation
             float hold = 0.5f,
             float decay = 0.5f,
             float wobbleAngle = 5,
-            float wobbleCyclePeriod = 0.75f
-            )
+            float wobbleCyclePeriod = 0.75f)
         {
             // The defaults lead to two full wobble cycles over the duration of the pulse
             // Quadratic easing is used for the wobbles since that reflects the behavior of simple harmonic oscillators,
