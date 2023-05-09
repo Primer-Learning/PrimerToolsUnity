@@ -17,6 +17,8 @@ namespace Primer
             return total / vectors.Length;
         }
 
+        public static void SetScale(this Transform transform, float value) => transform.SetScale(Vector3.one * value);
+
         public static void SetScale(this Transform transform, Vector3 scale, bool isGlobal = false)
         {
             if (isGlobal)
