@@ -54,20 +54,37 @@ namespace Primer.Latex.Editor
 
         public void AddGroupBefore(int index, int splitIndex)
         {
-            var (_, from, _) = GetIndexesAt(index);
+            var (i, from, _) = GetIndexesAt(index);
             if (from == null) return;
-            transitions.Insert(index + 1, GroupTransitionType.Remove);
+
             fromGroups ??= before.groupIndexes.ToList();
             fromGroups.Insert(from.Value , splitIndex);
+
+            var newTransition = GetTransitionAfter(i) == GroupTransitionType.Add
+                ? GroupTransitionType.Transition
+                : GroupTransitionType.Remove;
+
+            transitions.Insert(index + 1, newTransition);
         }
 
         public void AddGroupAfter(int index, int splitIndex)
         {
-            var (_, _, to) = GetIndexesAt(index);
+            var (i, _, to) = GetIndexesAt(index);
             if (to == null) return;
-            transitions.Insert(index + 1, GroupTransitionType.Add);
+
             toGroups ??= after.groupIndexes.ToList();
             toGroups.Insert(to.Value , splitIndex);
+
+            var newTransition = GetTransitionAfter(i) == GroupTransitionType.Remove
+                ? GroupTransitionType.Transition
+                : GroupTransitionType.Add;
+
+            transitions.Insert(index + 1, newTransition);
+        }
+
+        private GroupTransitionType? GetTransitionAfter(int index)
+        {
+            return transitions.Count <= index + 1 ? null : transitions[index + 1];
         }
 
         public void RemoveGroup(int index)
