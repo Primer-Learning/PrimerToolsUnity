@@ -97,8 +97,7 @@ namespace Primer.Timeline
                 var root = graph.GetRootPlayable(rootIndex);
 
                 for (var inputIndex = 0; inputIndex < root.GetInputCount(); inputIndex++) {
-                    try
-                    {
+                    try {
                         var playable = (ScriptPlayable<SequenceMixer>)root.GetInput(inputIndex);
                         var behaviour = playable.GetBehaviour();
 

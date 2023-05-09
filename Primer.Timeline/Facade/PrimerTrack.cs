@@ -41,7 +41,7 @@ namespace Primer.Timeline
 
                 var canReplaceClipName = string.IsNullOrWhiteSpace(clip.displayName)
                     || clip.displayName == nameof(SequenceClip)
-                    || clip.displayName[0] != '[';
+                    || clip.displayName[0] == '[';
 
                 if (canReplaceClipName && !string.IsNullOrWhiteSpace(asset.clipName))
                     clip.displayName = asset.clipName;
