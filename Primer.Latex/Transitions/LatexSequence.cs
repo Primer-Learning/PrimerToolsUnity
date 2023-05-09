@@ -47,7 +47,7 @@ namespace Primer.Latex
                 groupIndexesAfter
             ));
 
-            var prev = currentLatex ?? initial;
+            var prev = currentStage ?? initial;
 
             return new TweenProvider(() => {
                 if (groupIndexesBefore is not null)
@@ -73,7 +73,7 @@ namespace Primer.Latex
 
         private ChildrenDeclaration children;
         private LatexComponent lastCreatedLatex;
-        private LatexComponent currentLatex;
+        protected LatexComponent currentStage;
         private LatexScrubbable runningScrubbable;
         private bool isInitialized = false;
 
@@ -109,13 +109,13 @@ namespace Primer.Latex
             initial = lastCreatedLatex;
 
             do {
-                currentLatex = lastCreatedLatex;
+                currentStage = lastCreatedLatex;
                 yield return enumerator.Current;
             } while (enumerator.MoveNext());
 
             children.Apply();
 
-            yield return currentLatex.ScaleTo(0);
+            yield return currentStage.ScaleTo(0);
         }
 
         private void DisableObjects()
