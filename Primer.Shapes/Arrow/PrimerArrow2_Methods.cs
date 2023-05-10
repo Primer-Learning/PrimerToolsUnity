@@ -65,18 +65,20 @@ namespace Primer.Shapes
 
         public Tween ShrinkToEnd()
         {
-            var shrinkTween = Animate(tailEnd: head);
+            var shrinkTween = Animate(tailEnd: head, preventRestoreTracking: true)
+                .Observe(beforePlay: StopFollowing);
 
             return tailPoint.adjustment == headPoint.adjustment
                 ? shrinkTween
-                : Tween.Parallel( shrinkTween, Tween.Value(() => tailPoint.adjustment, headPoint.adjustment));
+                : Tween.Parallel(shrinkTween, Tween.Value(() => tailPoint.adjustment, headPoint.adjustment));
         }
 
         public Tween Animate(
             Vector3Provider headEnd = null,
             Vector3Provider tailEnd = null,
             Vector3Provider headStart = null,
-            Vector3Provider tailStart = null)
+            Vector3Provider tailStart = null,
+            bool preventRestoreTracking = true)
         {
             var tailTracking = tailPoint.isTracking ? (Vector3Provider)tailPoint : null;
             var headTracking = headPoint.isTracking ? (Vector3Provider)headPoint : null;
@@ -89,7 +91,7 @@ namespace Primer.Shapes
                 Recalculate();
             });
 
-            if (tailTracking is null && headTracking is null)
+            if (preventRestoreTracking || (tailTracking is null && headTracking is null))
                 return tween;
 
             return tween.Observe(
