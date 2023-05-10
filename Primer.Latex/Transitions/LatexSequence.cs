@@ -73,7 +73,7 @@ namespace Primer.Latex
 
         private ChildrenDeclaration children;
         private LatexComponent lastCreatedLatex;
-        protected LatexComponent currentStage;
+        public LatexComponent currentStage { get; private set; }
         private LatexScrubbable runningScrubbable;
         private bool isInitialized = false;
 
