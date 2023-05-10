@@ -16,6 +16,12 @@ namespace Primer.Shapes
             return this;
         }
 
+        public void StopFollowing()
+        {
+            tailPoint.StopTracking();
+            headPoint.StopTracking();
+        }
+
         public void SetFromTo(Vector3 from, Vector3 to, bool global)
         {
             globalPositioning = global;
