@@ -47,10 +47,5 @@ namespace Primer
                 Recycle(target);
             }
         }
-
-        public void Fill(int amount)
-        {
-            basePool.Fill(amount);
-        }
     }
 }

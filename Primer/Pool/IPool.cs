@@ -9,7 +9,5 @@ namespace Primer
         public void Recycle(T target);
 
         public void RecycleAll();
-
-        public void Fill(int amount);
     }
 }
