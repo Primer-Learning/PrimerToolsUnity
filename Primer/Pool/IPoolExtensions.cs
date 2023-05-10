@@ -5,6 +5,13 @@ namespace Primer
 {
     public static class IPoolExtensions
     {
+        public static T Get<T>(this IPool<T> self, string name) where T : Component
+        {
+            var target = self.Get();
+            target.name = name;
+            return target;
+        }
+
         public static IPool<T> Specialize<T>(this IPool<T> self, Action<T> onUse = null, Action<T> onRecycle = null)
             where T : Component
         {
