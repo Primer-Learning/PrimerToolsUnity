@@ -8,7 +8,6 @@ namespace Primer
     {
         private static void DefaultOnRemove(Transform x) => x.Dispose();
 
-
         private bool recreateNextChild;
         private readonly Transform parent;
 
@@ -20,7 +19,9 @@ namespace Primer
 
         /// <summary>For internal use only, when extending this class</summary>
         public T UseCache<T>(T component) where T : Component
-            => recreateNextChild || component == null ? null : Add(component);
+        {
+            return recreateNextChild || component == null ? null : Add(component);
+        }
 
         private void Initialize<T>(T transform, string name, Action<T> init = null) where T : Component
         {

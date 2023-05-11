@@ -15,7 +15,9 @@ namespace Primer
         /// <param name="init">Initializer function, will be invoked only when the child is created</param>
         /// <returns>The GameObject's Transform component</returns>
         public Transform Next(ref Transform cache, string name = null, Action<Transform> init = null)
-            => UseCache(cache) ?? (cache = Next(name, init));
+        {
+            return UseCache(cache) ?? (cache = Next(name, init));
+        }
 
         /// <summary>Next child is a simple GameObject</summary>
         /// <param name="name">GameObject's name</param>
@@ -44,7 +46,9 @@ namespace Primer
         /// <typeparam name="T">The component to add to the child</typeparam>
         /// <returns>The component of type <typeparamref>T</typeparamref> added to the child</returns>
         public T Next<T>(ref T cache, string name = null, Action<T> init = null) where T : Component
-            => UseCache(cache) ?? (cache = Next(name, init));
+        {
+            return UseCache(cache) ?? (cache = Next(name, init));
+        }
 
         /// <summary>Next child is a GameObject with <typeparamref>T</typeparamref> component</summary>
         /// <param name="name">GameObject's name</param>

@@ -18,7 +18,9 @@ namespace Primer
         /// <returns>The copy created from the prefab</returns>
         public T NextIsInstanceOf<T>(T prefab, ref T cache, string name = null, Action<T> init = null)
             where T : Component
-            => UseCache(cache) ?? (cache = NextIsInstanceOf(prefab, name, init));
+        {
+            return UseCache(cache) ?? (cache = NextIsInstanceOf(prefab, name, init));
+        }
 
         /// <summary>Next child is instantiated from <pre>prefab</pre></summary>
         /// <param name="prefab">Prefab to instantiate</param>
@@ -60,7 +62,9 @@ namespace Primer
             string name = null)
             where TPrefab : Component
             where TCached : Component
-            => UseCache(cache) ?? (cache = NextIsInstanceOf(prefab, init, name));
+        {
+            return UseCache(cache) ?? (cache = NextIsInstanceOf(prefab, init, name));
+        }
 
         /// <summary>
         ///     Next child is instantiated from <pre>prefab</pre> and the initializer converts it to type <pre>TCached</pre>

@@ -12,7 +12,9 @@ namespace Primer
         /// <param name="parent">Transform to leave without children</param>
         /// <param name="onRemove">Callback to be executed for every removed child</param>
         public static void Clear(Component parent, Action<Transform> onRemove = null)
-            => Clear(parent.transform, onRemove);
+        {
+            Clear(parent.transform, onRemove);
+        }
 
         /// <summary>
         ///     Removes all children from <pre>parent</pre>

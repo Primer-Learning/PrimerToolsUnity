@@ -26,7 +26,9 @@ namespace Primer
         }
 
         protected void CancelCurrentUpdate()
-            => isUpdateCancelled = true;
+        {
+            isUpdateCancelled = true;
+        }
 
 
         [PropertyOrder(100)]
