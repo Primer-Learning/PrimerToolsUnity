@@ -18,7 +18,8 @@ namespace Primer
         private readonly Action<Component> onCreate;
         private readonly Action<Transform> onRemove;
 
-        private T UseCache<T>(T component) where T : Component
+        /// <summary>For internal use only, when extending this class</summary>
+        public T UseCache<T>(T component) where T : Component
             => recreateNextChild || component == null ? null : Add(component);
 
         private void Initialize<T>(T transform, string name, Action<T> init = null) where T : Component
