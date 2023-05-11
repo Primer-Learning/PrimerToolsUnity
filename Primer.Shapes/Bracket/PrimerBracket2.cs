@@ -302,6 +302,10 @@ namespace Primer.Shapes
         private void FixLatexScale()
         {
             var parentScale = transform.localScale;
+
+            if (parentScale.x is 0 || parentScale.y is 0 || parentScale.z is 0)
+                return;
+
             latexContainer.localScale = new Vector3(
                 1 / parentScale.x,
                 1 / parentScale.y,
