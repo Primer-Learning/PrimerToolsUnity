@@ -26,7 +26,7 @@ namespace Primer.Scene
         [ShowInInspector, ReadOnly]
         private int framesSaved = 0;
 
-        private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
+        private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
         private string destinationDirectory;
         private byte[] lastFrame;
 
