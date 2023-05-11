@@ -1,6 +1,11 @@
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
+using Debug = UnityEngine.Debug;
 
 namespace Primer.Scene
 {
@@ -8,18 +13,28 @@ namespace Primer.Scene
     public class RenderToPng : MonoBehaviour
     {
         private Camera cameraCache;
-        internal Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
+        internal Camera cam => cameraCache ??= GetComponent<Camera>();
 
+        [FormerlySerializedAs("avoidDuplicatedFrames")] public bool omitRepeatingFrames = false;
         public bool transparentBackground = true; 
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         public int frameRate = 60;
         public int maxFrames = 0;
-        internal int framesSaved = 0;
 
-        internal static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
+        [ShowInInspector, ReadOnly]
+        private int framesSaved = 0;
+
+        private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..\\..");
         private string destinationDirectory;
+        private byte[] lastFrame;
+
+        [Button(ButtonSizes.Large)]
+        public void OpenDestinationDirectory()
+        {
+            Process.Start(GetScenePath());
+        }
 
         private void Update()
         {
@@ -34,6 +49,7 @@ namespace Primer.Scene
             RenderToPNG(path, resolutionWidth, resolutionHeight);
             if (maxFrames > 0 && framesSaved >= maxFrames)
             {
+                Debug.Log("Reached max frames. Exiting play mode.");
                 UnityEditor.EditorApplication.ExitPlaymode();
             }
         }
@@ -54,12 +70,7 @@ namespace Primer.Scene
         // private readonly List<string> createdDirs = new();
         private string GetContainerDirectory()
         {
-            var outDir = string.IsNullOrWhiteSpace(frameOutDir)
-                ? defaultOutDir
-                : frameOutDir;
-
-            var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
-            var scenePath = Path.Combine(outDir, "png", dirname);
+            var scenePath = GetScenePath();
 
             // Make a folder specifically for this take
             var takeCount = 0;
@@ -74,6 +85,17 @@ namespace Primer.Scene
             Directory.CreateDirectory(takePath);
 
             return takePath;
+        }
+
+        private string GetScenePath()
+        {
+            var outDir = string.IsNullOrWhiteSpace(frameOutDir)
+                ? defaultOutDir
+                : frameOutDir;
+
+            var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
+            var scenePath = Path.Combine(outDir, "png", dirname);
+            return scenePath;
         }
 
         internal void RenderToPNG(string path, int resWidth, int resHeight)
@@ -91,7 +113,11 @@ namespace Primer.Scene
 
             // Save png
             var bytes = image.EncodeToPNG();
-            File.WriteAllBytes(path, bytes);
+
+            if (omitRepeatingFrames && (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
+                lastFrame = bytes;
+                File.WriteAllBytes(path, bytes);
+            }
 
             // Clean up
             cam.targetTexture = null;
