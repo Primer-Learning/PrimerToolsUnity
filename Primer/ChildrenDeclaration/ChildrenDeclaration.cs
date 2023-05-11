@@ -30,6 +30,7 @@ namespace Primer
     public partial class ChildrenDeclaration : IChildrenDeclaration
     {
         public int count => after.Count;
+        public Transform target => parent;
 
         /// <summary>Start a new child declaration</summary>
         /// <param name="parent">Transform to contain the children</param>
@@ -121,6 +122,10 @@ namespace Primer
                 child.localPosition = pos;
                 child.localScale = scale;
                 needsReorder = true;
+            }
+
+            foreach (var grandchildren in nested) {
+                grandchildren.Apply();
             }
         }
     }

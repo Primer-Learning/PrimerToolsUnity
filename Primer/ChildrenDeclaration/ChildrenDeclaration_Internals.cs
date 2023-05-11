@@ -10,6 +10,7 @@ namespace Primer
 
         private bool recreateNextChild;
         private readonly Transform parent;
+        private readonly List<ChildrenDeclaration> nested = new();
 
         private readonly List<Transform> remaining = new();
         private readonly List<Transform> after = new();

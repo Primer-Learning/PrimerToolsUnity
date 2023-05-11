@@ -7,6 +7,8 @@ namespace Primer.Shapes
     [ExecuteAlways]
     public partial class PrimerArrow2 : MonoBehaviour
     {
+        public const string PREFAB_NAME = "Arrow";
+
         private float shaftLength;
         private float startArrowLength;
         private float endArrowLength;
