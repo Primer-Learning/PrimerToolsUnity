@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Primer.Animation;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Scene
@@ -62,6 +65,36 @@ namespace Primer.Scene
             if (swivel.z != 0) {
                 transform.Rotate(0, 0, swivel.z);
             }
+        }
+
+        public Tween Travel(Vector3? swivelOrigin = null, Vector3? swivel = null) => Travel(null, swivelOrigin, swivel);
+        public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null)
+        {
+            var tween = new List<Tween>();
+
+            if (distance.HasValue)
+                tween.Add(Tween.Value(() => this.distance, distance.Value));
+
+            if (swivelOrigin.HasValue)
+                tween.Add(Tween.Value(() => this.swivelOrigin, swivelOrigin.Value));
+
+            if (swivel.HasValue)
+                tween.Add(Tween.Value(() => this.swivel, swivel.Value));
+
+            return tween.RunInParallel();
+        }
+
+        [PropertySpace]
+        [Button(ButtonSizes.Large)]
+        private void CopyCode()
+        {
+            GUIUtility.systemCopyBuffer = $@"
+.Travel(
+    distance: {distance}f,
+    swivelOrigin: {swivelOrigin.ToCode()},
+    swivel: {swivel.ToCode()}
+)
+            ".Trim();
         }
     }
 }
