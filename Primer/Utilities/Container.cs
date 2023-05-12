@@ -8,6 +8,7 @@ namespace Primer
 {
     public class Container : Container<Transform>
     {
+        public Container(string name) : base(name) {}
         public Container(Transform t) : base(t) {}
     }
 
