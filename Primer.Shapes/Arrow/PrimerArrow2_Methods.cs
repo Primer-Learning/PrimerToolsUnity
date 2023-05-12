@@ -65,7 +65,7 @@ namespace Primer.Shapes
 
         public Tween ShrinkToEnd()
         {
-            var shrinkTween = Animate(tailEnd: head, preventRestoreTracking: true)
+            var shrinkTween = Animate(tailEnd: headPoint, preventRestoreTracking: true)
                 .Observe(beforePlay: StopFollowing);
 
             return tailPoint.adjustment == headPoint.adjustment
