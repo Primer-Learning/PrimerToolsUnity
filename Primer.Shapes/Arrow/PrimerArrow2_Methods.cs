@@ -78,7 +78,7 @@ namespace Primer.Shapes
             Vector3Provider tailEnd = null,
             Vector3Provider headStart = null,
             Vector3Provider tailStart = null,
-            bool preventRestoreTracking = true)
+            bool preventRestoreTracking = false)
         {
             var tailTracking = tailPoint.isTracking ? (Vector3Provider)tailPoint : null;
             var headTracking = headPoint.isTracking ? (Vector3Provider)headPoint : null;
