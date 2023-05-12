@@ -114,7 +114,7 @@ namespace Primer.Scene
             // Save png
             var bytes = image.EncodeToPNG();
 
-            if (omitRepeatingFrames && (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
+            if (!omitRepeatingFrames || (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
                 lastFrame = bytes;
                 File.WriteAllBytes(path, bytes);
             }
