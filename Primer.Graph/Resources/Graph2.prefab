@@ -313,6 +313,10 @@ PrefabInstance:
       propertyPath: domain.scale
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: ticks.prefab.stored
+      value: 
+      objectReference: {fileID: 9045329591203473548, guid: aed2a79473b7bc742b56fb42e8e29ce1, type: 3}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
       value: Y

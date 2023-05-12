@@ -245,6 +245,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8603906643652811505, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
+      propertyPath: forceOrientation
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
 --- !u!224 &2089235263015663195 stripped

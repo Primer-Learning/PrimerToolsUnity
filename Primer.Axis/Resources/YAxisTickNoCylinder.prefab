@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8357812543909439236}
   - component: {fileID: 9045329591203473548}
   m_Layer: 0
-  m_Name: AxisTickNoCylinder
+  m_Name: YAxisTickNoCylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,19 +123,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -151,11 +151,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 6466392689627964500, guid: c44177f8bc62d4710abf27fc0fdb7207, type: 3}
       propertyPath: m_ConstrainProportionsScale

@@ -311,6 +311,7 @@ namespace Primer.Graph
                 barsContainer.parent = graph.domain;
 
             barsContainer.localScale = Vector3.one;
+            barsContainer.localPosition = Vector3.zero;
             PrimerTimeline.MarkAsEphemeral(barsContainer);
             return barsContainer;
         }
