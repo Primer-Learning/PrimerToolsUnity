@@ -16,8 +16,10 @@ namespace Primer.Timeline
 
         public override void OnPlayableDestroy(Playable playable)
         {
-            foreach (var player in players.Values)
+            foreach (var player in players.Values) {
+                player.Reset().Forget();
                 player.Clean();
+            }
 
             players.Clear();
             base.OnPlayableDestroy(playable);
