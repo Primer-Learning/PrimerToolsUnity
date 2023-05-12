@@ -14,10 +14,6 @@ namespace Primer
     public class Container<TComponent> : IDisposable
         where TComponent : Component
     {
-        private readonly List<Transform> usedChildren = new();
-        private readonly List<Transform> unusedChildren;
-        private readonly List<Action> onPurge = new();
-
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
@@ -41,7 +37,8 @@ namespace Primer
             transform.SetActive(true);
         }
 
-        public void Insert<TChild>(TChild child, bool worldPositionStays = false, int? index = null) where TChild : Component
+        public void Insert<TChild>(TChild child, bool worldPositionStays = false, int? index = null)
+            where TChild : Component
         {
             var position = index ?? childCount;
             var t = child.transform;
@@ -127,6 +124,10 @@ namespace Primer
 
 
         #region Internals
+        private readonly List<Transform> usedChildren = new();
+        private readonly List<Transform> unusedChildren;
+        private readonly List<Action> onPurge = new();
+
         private TChild FindChild<TChild>(string childName) where TChild : Component
         {
             var hasName = !string.IsNullOrWhiteSpace(childName);
@@ -173,7 +174,7 @@ namespace Primer
             var obj = SceneManager.GetActiveScene()
                     .GetRootGameObjects()
                     .FirstOrDefault(x => x.name == name)
-                    ?? new GameObject(name);
+                ?? new GameObject(name);
 
             return obj.transform;
         }
@@ -181,7 +182,9 @@ namespace Primer
         private static Transform GetDirectChild(Transform parent, string name)
         {
             var found = parent.Find(name);
-            if (found) return found;
+
+            if (found)
+                return found;
 
             var child = new GameObject(name).transform;
             child.SetParent(parent, false);
