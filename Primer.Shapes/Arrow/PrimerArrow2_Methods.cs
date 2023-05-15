@@ -63,14 +63,23 @@ namespace Primer.Shapes
                 : growTween;
         }
 
-        public Tween ShrinkToEnd()
+        public Tween ShrinkToEnd(bool restoreTracking = false)
         {
-            var shrinkTween = Animate(tailEnd: headPoint, preventRestoreTracking: true)
-                .Observe(beforePlay: StopFollowing);
+            var shrinkTween = Animate(tailEnd: headPoint, preventRestoreTracking: !restoreTracking).Observe(
+                beforePlay: StopFollowing,
+                onComplete: () => this.SetActive(false)
+            );
 
-            return tailPoint.adjustment == headPoint.adjustment
-                ? shrinkTween
-                : Tween.Parallel(shrinkTween, Tween.Value(() => tailPoint.adjustment, headPoint.adjustment));
+            if (tailPoint.adjustment == headPoint.adjustment)
+                return shrinkTween;
+
+            var originalTailAdjustment = tailPoint.adjustment;
+
+            return Tween.Parallel(
+                shrinkTween,
+                Tween.Value(() => tailPoint.adjustment, headPoint.adjustment)
+                    .Observe(onComplete: () => tailPoint.adjustment = originalTailAdjustment)
+            );
         }
 
         public Tween Animate(
