@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Primer;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -466,12 +467,23 @@ public class PrimerBlob : PrimerCharacter {
         return accessory;
     }
 
+    public bool HasAccessory(params AccessoryType[] types)
+    {
+        return transform
+            .GetComponentsInChildren<BlobAccessory>()
+            .Any(accessory => types.Contains(accessory.accessoryType));
+    }
+
     public void DestoyAccessories()
     {
-        foreach (var accessory in accessories)
-        {
+        foreach (var accessory in accessories) {
             DestroyImmediate(accessory.gameObject);
         }
+
+        foreach (var accessory in transform.GetComponentsInChildren<BlobAccessory>()) {
+            DestroyImmediate(accessory.gameObject);
+        }
+
         accessories.Clear();
     }
 
