@@ -14,6 +14,7 @@ namespace Primer.Latex
         {
             var child = container.Add(prefab, name ?? LatexComponent.PREFAB_NAME, worldPositionStays);
             child.Process(formula);
+            child.transform.SetScale(0);
             return child;
         }
     }
