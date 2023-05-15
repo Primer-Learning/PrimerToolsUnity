@@ -1,7 +1,14 @@
+using System.Collections.Generic;
+
 namespace Primer
 {
     public static class StringExtensions
     {
+        public static string Join(this IEnumerable<string> strings, string separator)
+        {
+            return string.Join(separator, strings);
+        }
+
         // Copied from
         // https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/
         public static int GetDeterministicHashCode(this string str)
