@@ -8,6 +8,8 @@ namespace Primer.Shapes
     [ExecuteAlways]
     public class PrimerBracket2 : MonoBehaviour, IMeshRendererController
     {
+        public const string PREFAB_NAME = "Bracket2";
+
         #region Children objects
         [SerializeField, PrefabChild]
         private Transform leftTip;
