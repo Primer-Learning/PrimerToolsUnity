@@ -44,6 +44,8 @@ namespace Primer
             var position = index ?? childCount;
             var t = child.transform;
 
+            t.SetActive(true);
+
             if (t.parent != transform)
                 t.SetParent(transform, worldPositionStays);
 
