@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Axis
 {
@@ -32,11 +33,14 @@ namespace Primer.Axis
         [EnableIf("showTicks")]
         public int maxDecimals = 2;
 
-        [EnableIf("showTicks")]
-        public float offset = 0;
+        [FormerlySerializedAs("offset")] [EnableIf("showTicks")]
+        public float verticalOffset = 0;
 
         [EnableIf("showTicks")]
         public int labelNumberOffset = 0;
+        
+        [EnableIf("showTicks")]
+        public float valuePositionOffset = 0;
         
         [EnableIf("showTicks")]
         public List<TicData> manualTicks = new();
@@ -58,7 +62,7 @@ namespace Primer.Axis
             foreach (var data in CropTicksCount(expectedTicks)) {
                 var tick = modifier.NextIsInstanceOf(prefab, $"Tick {data.label}");
                 tick.label = data.label;
-                tick.transform.localPosition = new Vector3(data.value * domain.scale, offset, 0);
+                tick.transform.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
             }
         }
 

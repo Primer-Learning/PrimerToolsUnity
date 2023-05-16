@@ -91,7 +91,7 @@ namespace Primer.Axis
             tickSteps = axes[0].ticks.step;
             maxTicks = axes[0].ticks.maxTicks;
             maxDecimals = axes[0].ticks.maxDecimals;
-            offset = axes[0].ticks.offset;
+            offset = axes[0].ticks.verticalOffset;
             manualTicks = axes[0].ticks.manualTicks.ToArray().ToList();
 
             onDomainChange?.Invoke();
@@ -132,7 +132,7 @@ namespace Primer.Axis
         private void UpdateTickSteps() => UpdateAxes(tickSteps, x => x.ticks, x => x.step);
         private void UpdateMaxTicks() => UpdateAxes(maxTicks, x => x.ticks, x => x.maxTicks);
         private void UpdateMaxDecimals() => UpdateAxes(maxDecimals, x => x.ticks, x => x.maxDecimals);
-        private void UpdateTickOffset() => UpdateAxes(offset, x => x.ticks, x => x.offset);
+        private void UpdateTickOffset() => UpdateAxes(offset, x => x.ticks, x => x.verticalOffset);
         private void UpdateManualTicks() => UpdateAxes(manualTicks, x => x.ticks, x => x.manualTicks);
 
 
