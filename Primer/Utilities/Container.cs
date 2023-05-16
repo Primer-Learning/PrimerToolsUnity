@@ -10,6 +10,8 @@ namespace Primer
     {
         public Container(string name) : base(name) {}
         public Container(Transform t) : base(t) {}
+
+        public static implicit operator Transform(Container container) => container.transform;
     }
 
     public class Container<TComponent> : IDisposable
@@ -226,5 +228,10 @@ namespace Primer
                 ?? source.gameObject.AddComponent<TResult>();
         }
         #endregion
+
+        // Automatic conversion to TComponent, Component and Transform
+        public static implicit operator TComponent(Container<TComponent> container) => container.component;
+        public static implicit operator Component(Container<TComponent> container) => container.component;
+        public static implicit operator Transform(Container<TComponent> container) => container.transform;
     }
 }
