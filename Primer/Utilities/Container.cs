@@ -15,6 +15,19 @@ namespace Primer
     public class Container<TComponent> : IDisposable
         where TComponent : Component
     {
+        public static Container<T> Clone<T>(Container<T> template, string name) where T : Component
+        {
+            var rootObject = GetRootCloneOf(template.component, name);
+            return new Container<T>(rootObject);
+        }
+
+        public static T Clone<T>(T template, string name) where T : Component
+        {
+            var rootObject = GetRootCloneOf(template, name);
+            rootObject.SetActive(true);
+            return rootObject;
+        }
+
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
@@ -179,6 +192,18 @@ namespace Primer
             var found = rootGameObjects.FirstOrDefault(x => x.name == name);
             var obj = found != null ? found : new GameObject(name);
             return obj.transform;
+        }
+
+        private static T GetRootCloneOf<T>(T template, string name) where T : Component
+        {
+            var scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+
+            var found = rootGameObjects
+                .FirstOrDefault(x => x.name == name && InstantiationTracker.IsInstanceOf(x, template))
+                ?.GetComponent<T>();
+
+            return found != null ? found : InstantiationTracker.InstantiateAndRegister(template, name);
         }
 
         private static Transform GetDirectChild(Transform parent, string name)

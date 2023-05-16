@@ -5,6 +5,11 @@ namespace Primer
     [DisallowMultipleComponent]
     internal class InstantiationTracker : MonoBehaviour
     {
+        public static bool IsInstanceOf(GameObject target, Component prefab)
+        {
+            return IsInstanceOf(target.transform, prefab);
+        }
+
         public static bool IsInstanceOf(Component target, Component prefab)
         {
             var tracker = target.GetComponent<InstantiationTracker>();
