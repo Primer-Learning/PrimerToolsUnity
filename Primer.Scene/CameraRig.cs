@@ -66,8 +66,7 @@ namespace Primer.Scene
                 transform.Rotate(0, 0, swivel.z);
             }
         }
-
-        public Tween Travel(Vector3? swivelOrigin = null, Vector3? swivel = null) => Travel(null, swivelOrigin, swivel);
+        
         public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null)
         {
             var tween = new List<Tween>();
