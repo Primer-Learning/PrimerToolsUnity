@@ -172,11 +172,10 @@ namespace Primer
 
         private static Transform GetRootTransform(string name)
         {
-            var obj = SceneManager.GetActiveScene()
-                    .GetRootGameObjects()
-                    .FirstOrDefault(x => x.name == name)
-                ?? new GameObject(name);
-
+            var scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+            var found = rootGameObjects.FirstOrDefault(x => x.name == name);
+            var obj = found != null ? found : new GameObject(name);
             return obj.transform;
         }
 
