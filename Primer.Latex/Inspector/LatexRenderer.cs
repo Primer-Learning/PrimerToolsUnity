@@ -6,6 +6,7 @@ using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Primer.Latex
 {
@@ -82,7 +83,7 @@ namespace Primer.Latex
                     child.SetColor(lerpedColor);
             });
         }
-        
+
         public Tween TweenColorByCharacterRange(Color targetColor, int startIndex, int endIndex)
         {
             var targetChildren = transform
@@ -101,6 +102,20 @@ namespace Primer.Latex
             return Tween.Parallel(
                 targetChildren.Select(r => Tween.Value(() => r.material.color, targetColor))
             );
+        }
+        
+        public void SetCastShadows(bool castShadows)
+        {
+            var targetChildren = transform
+                .GetChildren()
+                .SelectMany(x => x.GetChildren())
+                .Select(x => x.GetComponent<MeshRenderer>())
+                .ToArray();
+
+            foreach (var child in targetChildren)
+            {
+                child.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+            }
         }
 
         public void UpdateChildren()
@@ -144,6 +159,9 @@ namespace Primer.Latex
             }
 
             children.Apply();
+            
+            // Just make sure all shadows are off for now. Could make this an option in the future if needed.
+            SetCastShadows(false);
         }
 
         public void DrawGizmos()
