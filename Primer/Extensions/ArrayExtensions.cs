@@ -32,6 +32,11 @@ namespace Primer
             }
         }
 
+        public static IEnumerable<(int index, T value)> WithIndex<T>(this IEnumerable<T> items)
+        {
+            return items.Select((value, i) => (i, value));
+        }
+
         private static float GetEvenlySpacedFloatGivenStep(int objectIndex, int totalObjects, float distanceBetweenObjects)
         {
             var totalSpace = distanceBetweenObjects * (totalObjects - 1);
