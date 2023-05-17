@@ -467,6 +467,13 @@ public class PrimerBlob : PrimerCharacter {
         return accessory;
     }
 
+    public BlobAccessory GetAccessory(params AccessoryType[] types)
+    {
+        return transform
+            .GetComponentsInChildren<BlobAccessory>()
+            .FirstOrDefault(accessory => types.Contains(accessory.accessoryType));
+    }
+
     public bool HasAccessory(params AccessoryType[] types)
     {
         return transform
