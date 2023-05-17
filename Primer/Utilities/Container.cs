@@ -134,10 +134,18 @@ namespace Primer
             unusedChildren.Clear();
         }
 
+        public void OnCleanup(Action action)
+        {
+            onCleanup.Add(action);
+        }
+
         public void Dispose()
         {
             if (transform != null)
                 transform.SetActive(false);
+
+            foreach (var broomUp in onCleanup)
+                broomUp();
         }
 
 
@@ -145,6 +153,7 @@ namespace Primer
         private readonly List<Transform> usedChildren = new();
         private readonly List<Transform> unusedChildren;
         private readonly List<Action> onPurge = new();
+        private readonly List<Action> onCleanup = new();
 
         private TChild FindChild<TChild>(string childName) where TChild : Component
         {
