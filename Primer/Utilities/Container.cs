@@ -8,6 +8,10 @@ namespace Primer
 {
     public class Container : Container<Transform>
     {
+        // These static methods simplify the creation of a container from a component
+        public static Container From(Transform component) => new(component);
+        public static Container<T> From<T>(T component) where T : Component => new(component);
+
         public Container(string name) : base(name) {}
         public Container(Transform t) : base(t) {}
 
@@ -17,6 +21,7 @@ namespace Primer
     public class Container<TComponent> : IDisposable
         where TComponent : Component
     {
+
         public static Container<T> Clone<T>(Container<T> template, string name) where T : Component
         {
             var rootObject = GetRootCloneOf(template.component, name);
