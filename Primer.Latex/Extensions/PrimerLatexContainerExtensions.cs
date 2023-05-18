@@ -9,7 +9,7 @@ namespace Primer.Latex
         {
             var child = container.AddPrefab<T, LatexComponent>(
                 LatexComponent.PREFAB_NAME,
-                name ?? LatexComponent.PREFAB_NAME,
+                name ?? formula,
                 worldPositionStays
             );
 

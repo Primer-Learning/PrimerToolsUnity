@@ -4,7 +4,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Primer.Animation;
 using Primer.Timeline;
-using UnityEngine;
 
 namespace Primer.Latex
 {
@@ -14,12 +13,8 @@ namespace Primer.Latex
 
         protected LatexComponent Latex(string formula, string name = null)
         {
-            var prefab = Resources.Load<LatexComponent>(LatexComponent.PREFAB_NAME);
-            var childName = name ?? (initial ? $"Stage {stages.Count}" : "Initial");
-
-            var child = children.NextIsInstanceOf(prefab, childName);
+            var child = container.AddLatex(formula);
             child.transform.SetDefaults();
-            child.Process(formula);
             child.SetActive(false);
 
             lastCreatedLatex = child;
@@ -27,16 +22,16 @@ namespace Primer.Latex
         }
 
         protected TweenProvider Transition(string formula)
-            => Transition(Latex(formula), GroupTransitionType.Replace);
+            => Transition(null, Latex(formula), null, GroupTransitionType.Replace);
 
         protected TweenProvider Transition(LatexComponent stage, params GroupTransitionType[] transition)
             => Transition(null, stage, null, transition);
 
-        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, params GroupTransitionType[] transition)
-            => Transition(groupIndexesBefore, stage, null, transition);
+        // protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, params GroupTransitionType[] transition)
+        //     => Transition(groupIndexesBefore, stage, null, transition);
 
-        protected TweenProvider Transition(LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
-            => Transition(null, stage, groupIndexesAfter, transition);
+        // protected TweenProvider Transition(LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
+        //     => Transition(null, stage, groupIndexesAfter, transition);
 
         protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
         {
@@ -71,11 +66,11 @@ namespace Primer.Latex
             [CanBeNull] int[] groupIndexesAfter = null
         );
 
-        private ChildrenDeclaration children;
+        private Container container;
         private LatexComponent lastCreatedLatex;
         public LatexComponent currentStage { get; private set; }
         private LatexScrubbable runningScrubbable;
-        private bool isInitialized = false;
+        internal bool isInitialized = false;
 
         internal LatexComponent initial;
         private readonly List<Stage> stages = new();
@@ -101,7 +96,7 @@ namespace Primer.Latex
             stages.Clear();
             initial = null;
 
-            children = new ChildrenDeclaration(transform);
+            container = new Container(transform);
 
             var enumerator = LatexStages();
             enumerator.MoveNext();
@@ -113,7 +108,7 @@ namespace Primer.Latex
                 yield return enumerator.Current;
             } while (enumerator.MoveNext());
 
-            children.Apply();
+            container.Purge();
 
             yield return currentStage.ScaleTo(0);
         }
@@ -149,10 +144,10 @@ namespace Primer.Latex
 
         internal List<Stage> GetStages()
         {
-            if (allStages.Count is not 0)
-                return allStages;
+            if (allStages.Count is 0 || initial == null || stages.Any(x => x.latex == null)) {
+                RunTrough();
+            }
 
-            RunTrough();
             return allStages;
         }
         #endregion
