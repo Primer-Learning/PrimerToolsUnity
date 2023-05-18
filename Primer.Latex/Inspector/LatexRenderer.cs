@@ -126,25 +126,21 @@ namespace Primer.Latex
                 return;
 
             var zero = expression.center;
-            var children = new ChildrenDeclaration(
-                transform,
-                onRemove: x => x.Dispose(urgent: true)
-            );
+            var container = new Container(transform);
 
             foreach (var (start, end) in latexGroups.ranges) {
                 var chunk = expression.Slice(start, end);
-                var group = children.Next($"Group (chars {start} to {end - 1})");
+                var group = container.AddContainer($"Group (chars {start} to {end - 1})");
                 var center = chunk.center;
-                var grandChildren = new ChildrenDeclaration(group);
 
-                group.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
-                group.localScale = Vector3.one;
-                group.localRotation = Quaternion.identity;
+                group.transform.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
+                group.transform.localScale = Vector3.one;
+                group.transform.localRotation = Quaternion.identity;
 
                 foreach (var character in chunk) {
-                    var charTransform = grandChildren.Next($"LatexChar {character.position}");
+                    var charTransform = group.Add($"LatexChar {character.position}");
                     charTransform.localScale = Vector3.one;
-                    charTransform.localPosition = character.position - group.localPosition;
+                    charTransform.localPosition = character.position - group.transform.localPosition;
                     charTransform.localRotation = Quaternion.identity;
 
                     var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
@@ -155,10 +151,10 @@ namespace Primer.Latex
                     meshRenderer.SetColor(color);
                 }
 
-                grandChildren.Apply();
+                group.Purge();
             }
 
-            children.Apply();
+            container.Purge();
             
             // Just make sure all shadows are off for now. Could make this an option in the future if needed.
             SetCastShadows(false);
