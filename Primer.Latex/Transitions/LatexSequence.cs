@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using Primer.Animation;
 using Primer.Timeline;
@@ -70,7 +71,7 @@ namespace Primer.Latex
         private LatexComponent lastCreatedLatex;
         public LatexComponent currentStage { get; private set; }
         private LatexScrubbable runningScrubbable;
-        internal bool isInitialized = false;
+        private bool isInitialized = false;
 
         internal LatexComponent initial;
         private readonly List<Stage> stages = new();
@@ -79,7 +80,12 @@ namespace Primer.Latex
         public override void Cleanup()
         {
             base.Cleanup();
-            EnsureIsInitialized();
+            CleanupAsync();
+        }
+
+        private async void CleanupAsync()
+        {
+            await EnsureIsInitialized();
 
             if (runningScrubbable is not null) {
                 runningScrubbable.Dispose();
@@ -91,7 +97,7 @@ namespace Primer.Latex
 
         public override async IAsyncEnumerator<Tween> Run()
         {
-            EnsureIsInitialized();
+            await EnsureIsInitialized();
 
             stages.Clear();
             initial = null;
@@ -121,18 +127,19 @@ namespace Primer.Latex
                 stage.latex.SetActive(false);
         }
 
-        internal void EnsureIsInitialized()
+        internal async UniTask EnsureIsInitialized()
         {
             if (isInitialized)
                 return;
 
             isInitialized = true;
-            RunTrough();
+            await RunTrough();
         }
 
-        internal async void RunTrough()
+        internal async UniTask RunTrough()
         {
             var enumerator = Run();
+
             while (await enumerator.MoveNextAsync()) {}
 
             allStages.Clear();
@@ -145,7 +152,7 @@ namespace Primer.Latex
         internal List<Stage> GetStages()
         {
             if (allStages.Count is 0 || initial == null || stages.Any(x => x.latex == null)) {
-                RunTrough();
+                RunTrough().Forget();
             }
 
             return allStages;
