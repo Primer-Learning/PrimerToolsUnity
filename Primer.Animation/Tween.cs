@@ -72,19 +72,35 @@ namespace Primer.Animation
             var startTime = Time.time;
             var delayAndDuration = totalDuration;
 
-            Evaluate(0);
+            if (TryEvaluate(0))
+                return;
 
             while (!ct.IsCancellationRequested && Time.time < startTime + delayAndDuration) {
                 var t = (Time.time - startTime) / delayAndDuration;
 
-                Evaluate(t);
+                if (TryEvaluate(t))
+                    return;
+
                 await UniTask.DelayFrame(1, cancellationToken: ct);
 
                 if (ct.IsCancellationRequested)
                     return;
             }
 
-            Evaluate(1);
+            TryEvaluate(1);
+        }
+
+        private bool TryEvaluate(float t)
+        {
+            try {
+                Evaluate(t);
+            }
+            catch (MissingReferenceException) {
+                // The object we're tweening has been destroyed
+                return true;
+            }
+
+            return false;
         }
         #endregion
 
