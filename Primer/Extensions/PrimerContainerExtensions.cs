@@ -14,7 +14,15 @@ namespace Primer
 
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
 
-        public static TResult AddPrefab<TContainer, TResult>(this Container<TContainer> container, string prefabName, string name, bool worldPositionStays = false)
+        public static T AddPrefab<T>(this Container container, string prefabName, string name,
+            bool worldPositionStays = false)
+            where T : Component
+        {
+            return container.AddPrefab<Transform, T>(prefabName, name, worldPositionStays);
+        }
+
+        public static TResult AddPrefab<TContainer, TResult>(this Container<TContainer> container, string prefabName,
+            string name, bool worldPositionStays = false)
             where TContainer : Component
             where TResult : Component
         {
