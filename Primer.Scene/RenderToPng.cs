@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace Primer.Scene
     public class RenderToPng : MonoBehaviour
     {
         private Camera cameraCache;
+        public AudioClip endSound;
         internal Camera cam => cameraCache ??= GetComponent<Camera>();
 
         [FormerlySerializedAs("avoidDuplicatedFrames")] public bool omitRepeatingFrames = false;
-        public bool transparentBackground = true; 
+        public bool transparentBackground = true;
+        public bool fillGapsInPreviousTake = false;
         public string frameOutDir;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
@@ -25,6 +28,8 @@ namespace Primer.Scene
 
         [ShowInInspector, ReadOnly]
         private int framesSaved = 0;
+
+        private bool waitingForEndProcess = false;
 
         private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
         private string destinationDirectory;
@@ -38,19 +43,22 @@ namespace Primer.Scene
 
         private void Update()
         {
+            if (waitingForEndProcess) return;
+            
             if (Time.frameCount > 999999) {
                 Debug.LogWarning("y tho");
                 return;
             }
 
-            framesSaved++;
             var path = Path.Combine(destinationDirectory, $"{framesSaved:000000}.png");
 
             RenderToPNG(path, resolutionWidth, resolutionHeight);
+            framesSaved++;
+            
             if (maxFrames > 0 && framesSaved >= maxFrames)
             {
-                Debug.Log("Reached max frames. Exiting play mode.");
-                UnityEditor.EditorApplication.ExitPlaymode();
+                waitingForEndProcess = true;
+                StartCoroutine(EndRecording());
             }
         }
 
@@ -65,6 +73,24 @@ namespace Primer.Scene
                 cam.backgroundColor = new Color(0, 0, 0, 0);
             }
         }
+
+        IEnumerator EndRecording()
+        {
+            if (endSound is not null)
+            {
+                var source = gameObject.AddComponent<AudioSource>();
+                source.clip = endSound;
+                source.Play();
+                while (source.isPlaying)
+                {
+                    yield return null;
+                }
+            }
+
+            Debug.Log("Reached max frames. Exiting play mode.");
+            UnityEditor.EditorApplication.ExitPlaymode();
+        }
+
 
 
         // private readonly List<string> createdDirs = new();
@@ -82,7 +108,16 @@ namespace Primer.Scene
                 takesString = $"take {takeCount + 1}";
                 takePath = Path.Combine(scenePath, takesString);
             }
-            Directory.CreateDirectory(takePath);
+
+            if (!fillGapsInPreviousTake)
+            {
+                Directory.CreateDirectory(takePath);
+            }
+            else
+            {
+                takesString = $"take {takeCount}";
+                takePath = Path.Combine(scenePath, takesString);
+            }
 
             return takePath;
         }
@@ -100,6 +135,9 @@ namespace Primer.Scene
 
         internal void RenderToPNG(string path, int resWidth, int resHeight)
         {
+            // If it's not new take, and the png exists already, skip
+            if (File.Exists(path) && fillGapsInPreviousTake) return;
+            
             // Set up camera
             var image = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);
             var rt = new RenderTexture(resWidth, resHeight, 24);
