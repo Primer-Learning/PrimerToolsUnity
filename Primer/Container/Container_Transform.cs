@@ -54,5 +54,10 @@ namespace Primer
 
             return transform.GetComponent<T>() ?? transform.gameObject.AddComponent<T>();
         }
+
+        public T[] GetChildComponents<T>() where T : Component
+        {
+            return transform.GetComponentsInChildren<T>();
+        }
     }
 }
