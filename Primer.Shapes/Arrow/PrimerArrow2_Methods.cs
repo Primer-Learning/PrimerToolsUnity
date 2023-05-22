@@ -55,8 +55,10 @@ namespace Primer.Shapes
 
             tailPoint.CopyTo(headPoint);
 
-            var growTween = Animate(headEnd: originalHeadPosition)
-                .Observe(onComplete: () => originalHeadPosition.ApplyTo(headPoint));
+            var growTween = Animate(headEnd: originalHeadPosition).Observe(
+                beforePlay: () => gameObject.SetActive(true),
+                onComplete: () => originalHeadPosition.ApplyTo(headPoint)
+            );
 
             return requiresAdjustmentTweening
                 ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, tailPoint.adjustment, originalHeadAdjustment))
