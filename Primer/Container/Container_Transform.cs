@@ -42,10 +42,10 @@ namespace Primer
 
         public IEnumerable<Transform> children => usedChildren;
 
-        public IEnumerable<Transform> GetChildren()
-        {
-            return usedChildren;
-        }
+        public void SetScale(float value) => SetScale(Vector3.one * value);
+        public void SetScale(Vector3 value) => transform.localScale = value;
+
+        public IEnumerable<Transform> GetChildren() => usedChildren;
 
         public T GetComponent<T>(bool forceCreate = false) where T : Component
         {
