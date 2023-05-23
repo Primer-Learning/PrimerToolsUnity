@@ -35,7 +35,7 @@ namespace Primer
         [ButtonGroup("Generator group")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
         [ContextMenu("PRIMER > Update children")]
-        protected void UpdateChildren()
+        public void UpdateChildren()
         {
             if (this == null || gameObject.IsPreset())
                 return;
