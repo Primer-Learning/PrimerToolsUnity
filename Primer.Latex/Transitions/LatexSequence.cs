@@ -121,10 +121,8 @@ namespace Primer.Latex
 
         private void DisableObjects()
         {
-            initial.SetActive(false);
-
-            foreach (var stage in stages)
-                stage.latex.SetActive(false);
+            foreach (var child in transform.GetChildren())
+                child.SetActive(false);
         }
 
         internal async UniTask EnsureIsInitialized()
