@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Playables;
 
 namespace Primer.Timeline
@@ -9,20 +9,25 @@ namespace Primer.Timeline
     //  because this is a special case where we want to execute past clips and explore future ones.
     internal class SequenceMixer : PrimerMixer
     {
+        private static int instances = 0;
         private Playable lastPlayable;
-        public SingleExecutionGuarantee executionGuarantee = new();
-        public static readonly Dictionary<Sequence, SequencePlayer> players = new();
 
-
-        public override void OnPlayableDestroy(Playable playable)
+        public SequenceMixer()
         {
-            foreach (var player in players.Values) {
-                player.Reset().Forget();
-                player.Clean();
-            }
+            if (instances is 0)
+                Debug.Log("SequenceMixer initiated");
 
-            players.Clear();
-            base.OnPlayableDestroy(playable);
+            instances++;
+        }
+
+        ~SequenceMixer()
+        {
+            instances--;
+
+            if (instances is 0) {
+                SequenceOrchestrator.Clear();
+                Debug.Log("SequenceMixer cleared");
+            }
         }
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
@@ -33,45 +38,12 @@ namespace Primer.Timeline
             var isLast = mixers.Last() == this;
             if (!isLast) return;
 
-            var time = (float)playable.GetTime();
-
             var allBehaviours = mixers
                 .SelectMany(mixer => CollectBehaviours(mixer.lastPlayable))
                 .ToArray();
 
-            PlayBehaviours(allBehaviours, time);
-
-            if (allBehaviours.Count(x => x.start <= time) == 0)
-                PrimerTimeline.DisposeEphemeralObjects();
+            SequenceOrchestrator.PlayTo(allBehaviours, (float)playable.GetTime());
         }
-
-
-        private void PlayBehaviours(IEnumerable<SequencePlayable> allBehaviours, float time)
-        {
-            var ct = executionGuarantee.NewExecution();
-
-            var bySequence = allBehaviours
-                .Where(x => x.trackTarget is not null)
-                .GroupBy(x => x.trackTarget)
-                .ToDictionary(x => x.Key, x => x.ToList());
-
-            foreach (var (sequence, behaviours) in bySequence) {
-                GetPlayerFor(sequence)
-                    .PlayTo(time, behaviours, ct)
-                    .Forget();
-            }
-        }
-
-        public static SequencePlayer GetPlayerFor(Sequence sequence)
-        {
-            if (players.TryGetValue(sequence, out var player))
-                return player;
-
-            player = new SequencePlayer(sequence);
-            players.Add(sequence, player);
-            return player;
-        }
-
 
         private static IEnumerable<SequencePlayable> CollectBehaviours(Playable playable)
         {

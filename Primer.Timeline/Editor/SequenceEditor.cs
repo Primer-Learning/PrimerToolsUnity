@@ -22,7 +22,7 @@ namespace Primer.Timeline.Editor
             var director = TimelineEditor.inspectedDirector;
             if (director == null) return;
 
-            var player = SequenceMixer.GetPlayerFor((Sequence)target);
+            var player = SequenceOrchestrator.GetPlayerFor((Sequence)target);
             await player.Reset();
             director.Evaluate();
         }

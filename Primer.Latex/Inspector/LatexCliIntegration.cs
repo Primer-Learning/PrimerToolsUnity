@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -80,7 +81,11 @@ namespace Primer.Latex
         {
             _latex = input.code;
             _headers = input.headers;
-            var newExpression = await Evaluate(input);
+
+            var request = Evaluate(input);
+            PrimerTimeline.RegisterOperation(request);
+
+            var newExpression = await request;
             ApplyExpression(newExpression);
         }
 

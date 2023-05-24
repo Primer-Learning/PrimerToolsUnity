@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,25 @@ namespace Primer.Timeline
 {
     public static class PrimerTimeline
     {
+        private static readonly List<UniTask> operations = new();
+
+        public static void RegisterOperation(UniTask request)
+        {
+            operations.Add(request);
+
+            request.GetAwaiter()
+                .OnCompleted(() => operations.Remove(request));
+        }
+
+        internal static async UniTask AllAsynchronyFinished()
+        {
+            await UniTask.WhenAll(operations);
+            operations.Clear();
+        }
+
+
+        // TODO: Ephemeral objects was a good idea but Container fill the same propose in a better way, remove it
+        #region Ephemeral objects
         private const string COLLECTABLE_OBJECT_TAG = "EphemeralTimelineObject";
         private static bool haveEphemeralObjectsBeenCollected = false;
 
@@ -75,5 +95,6 @@ namespace Primer.Timeline
             for (var i = 0; i < transform.childCount; i++)
                 IterateChildren(transform.GetChild(i), iterator);
         }
+        #endregion
     }
 }

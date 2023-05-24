@@ -17,8 +17,18 @@ namespace Primer.Timeline.Editor
             clipAsset.resolver ??= TimelineEditor.inspectedDirector;
             base.OnInspectorGUI();
             CodeEditorLink();
+            // ShowInPlayMode();
             ExpectedDuration();
         }
+
+        // private void ShowInPlayMode(float secondsBefore = 1)
+        // {
+        //     EditorGUI.BeginDisabledGroup(Application.isPlaying);
+        //     EditorGUILayout.Space();
+        //
+        //     if (GUILayout.Button("View in play mode (experimental)", GUILayout.Height(32)))
+        //         PlayModeControl.RunAt(clipAsset.start - secondsBefore);
+        // }
 
         private void CodeEditorLink()
         {
