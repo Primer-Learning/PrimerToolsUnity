@@ -1,5 +1,4 @@
 using System;
-using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
@@ -16,11 +15,24 @@ namespace Primer.Timeline.Editor
         public override void OnInspectorGUI()
         {
             clipAsset.resolver ??= TimelineEditor.inspectedDirector;
-
             base.OnInspectorGUI();
+            CodeEditorLink();
+            ExpectedDuration();
+        }
 
-            ShowCodeEditorLink();
+        private void CodeEditorLink()
+        {
+            EditorGUI.BeginDisabledGroup(true);
 
+            // It can be a MonoBehaviour or a ScriptableObject
+            var monoScript = MonoScript.FromMonoBehaviour(GetTrackTarget());
+            EditorGUILayout.ObjectField("Sequence", monoScript, typeof(MonoBehaviour), false);
+
+            EditorGUI.EndDisabledGroup();
+        }
+
+        private void ExpectedDuration()
+        {
             if (clipAsset.expectedDuration is null)
                 return;
 
@@ -34,19 +46,10 @@ namespace Primer.Timeline.Editor
 
             EditorGUILayout.HelpBox($"Clip duration doesn't match tween duration", MessageType.Warning);
 
-            if (GUILayout.Button($"Change clip duration to {clipAsset.expectedDuration}", GUILayout.Height(32)))
+            if (GUILayout.Button($"Change clip duration to {clipAsset.expectedDuration}", GUILayout.Height(32))) {
                 clipAsset.SetClipDuration(clipAsset.expectedDuration.Value);
-        }
-
-        private void ShowCodeEditorLink()
-        {
-            EditorGUI.BeginDisabledGroup(true);
-
-            // It can be a MonoBehaviour or a ScriptableObject
-            var monoScript = MonoScript.FromMonoBehaviour(GetTrackTarget());
-            EditorGUILayout.ObjectField("Sequence", monoScript, typeof(MonoBehaviour), false);
-
-            EditorGUI.EndDisabledGroup();
+                TimelineEditor.Refresh(RefreshReason.ContentsModified);
+            }
         }
 
         private Sequence GetTrackTarget()
@@ -62,7 +65,6 @@ namespace Primer.Timeline.Editor
 
             return sequence;
         }
-
 
         private static TimelineClip FindClipFor(SequenceClip asset)
         {
