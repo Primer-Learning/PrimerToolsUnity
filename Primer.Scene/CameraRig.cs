@@ -67,18 +67,30 @@ namespace Primer.Scene
             }
         }
         
-        public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null)
+        public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null, IEasing easing = null)
         {
             var tween = new List<Tween>();
 
             if (distance.HasValue)
-                tween.Add(Tween.Value(() => this.distance, distance.Value));
+            {
+                var tweenDistance = Tween.Value(() => this.distance, distance.Value);
+                if (easing != null) tweenDistance = tweenDistance with { easing = easing };
+                tween.Add(tweenDistance);
+            }
 
             if (swivelOrigin.HasValue)
-                tween.Add(Tween.Value(() => this.swivelOrigin, swivelOrigin.Value));
+            {
+                var tweenSwivelOrigin = Tween.Value(() => this.swivelOrigin, swivelOrigin.Value);
+                if (easing != null) tweenSwivelOrigin = tweenSwivelOrigin with { easing = easing };
+                tween.Add(tweenSwivelOrigin);
+            }
 
             if (swivel.HasValue)
-                tween.Add(Tween.Value(() => this.swivel, swivel.Value));
+            {
+                var tweenSwivel = Tween.Value(() => this.swivel, swivel.Value);
+                if (easing != null) tweenSwivel = tweenSwivel with { easing = easing };
+                tween.Add(tweenSwivel);
+            }
 
             return tween.RunInParallel();
         }
