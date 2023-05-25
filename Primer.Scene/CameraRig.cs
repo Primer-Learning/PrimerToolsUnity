@@ -66,33 +66,26 @@ namespace Primer.Scene
                 transform.Rotate(0, 0, swivel.z);
             }
         }
-        
-        public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null, IEasing easing = null)
+
+        public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null)
         {
             var tween = new List<Tween>();
+            var linear = LinearEasing.instance;
 
-            if (distance.HasValue)
-            {
-                var tweenDistance = Tween.Value(() => this.distance, distance.Value);
-                if (easing != null) tweenDistance = tweenDistance with { easing = easing };
-                tween.Add(tweenDistance);
+            if (distance.HasValue) {
+                tween.Add(Tween.Value(() => this.distance, distance.Value) with { easing = linear });
             }
 
-            if (swivelOrigin.HasValue)
-            {
-                var tweenSwivelOrigin = Tween.Value(() => this.swivelOrigin, swivelOrigin.Value);
-                if (easing != null) tweenSwivelOrigin = tweenSwivelOrigin with { easing = easing };
-                tween.Add(tweenSwivelOrigin);
+            if (swivelOrigin.HasValue) {
+                tween.Add(Tween.Value(() => this.swivelOrigin, swivelOrigin.Value) with { easing = linear });
             }
 
-            if (swivel.HasValue)
-            {
-                var tweenSwivel = Tween.Value(() => this.swivel, swivel.Value);
-                if (easing != null) tweenSwivel = tweenSwivel with { easing = easing };
-                tween.Add(tweenSwivel);
+            if (swivel.HasValue) {
+                tween.Add(Tween.Value(() => this.swivel, swivel.Value) with { easing = linear });
             }
 
-            return tween.RunInParallel();
+            // or use tween.RunInBatch() to merge all tweens into one with unified easing
+            return tween.RunInParallel() with { easing = IEasing.defaultMethod };
         }
 
         [PropertySpace]
