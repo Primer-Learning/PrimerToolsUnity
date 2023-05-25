@@ -22,7 +22,7 @@ namespace Primer.Animation
             var linear = LinearEasing.instance;
             var list = tweens.ToList();
 
-            if (list.Any(x => x.easing != defaultEasing))
+            if (list.Any(x => x.easing != defaultEasing && x.easing != linear))
                 Debug.LogWarning("Merging tweens with different easing methods. This is not recommended.");
 
             return list
