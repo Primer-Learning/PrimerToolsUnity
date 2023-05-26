@@ -10,12 +10,19 @@ namespace Primer.Timeline
     {
         private static readonly List<UniTask> operations = new();
 
-        public static void RegisterOperation(UniTask request)
+        public static UniTask<T> RegisterOperation<T>(UniTask<T> request)
         {
-            operations.Add(request);
+            var copy = request.Preserve();
 
-            request.GetAwaiter()
-                .OnCompleted(() => operations.Remove(request));
+            operations.Add(copy);
+
+            async void RemoveWhenReady()
+            {
+                await copy;
+                operations.Remove(request);
+            }
+
+            return copy;
         }
 
         internal static async UniTask AllAsynchronyFinished()

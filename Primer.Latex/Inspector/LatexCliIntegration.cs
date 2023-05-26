@@ -82,9 +82,7 @@ namespace Primer.Latex
             _latex = input.code;
             _headers = input.headers;
 
-            var request = Evaluate(input);
-            PrimerTimeline.RegisterOperation(request);
-
+            var request = PrimerTimeline.RegisterOperation(Evaluate(input));
             var newExpression = await request;
             ApplyExpression(newExpression);
         }
