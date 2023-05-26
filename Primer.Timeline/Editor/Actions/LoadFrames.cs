@@ -26,12 +26,38 @@ namespace Primer.Timeline.Editor
             return true;
         }
 
-        private static async void StartPlaying(PlayableDirector playableDirector)
+        public static async void StartPlaying(PlayableDirector playableDirector, float? from = null)
         {
-            while (isPlaying && playableDirector.time < playableDirector.duration) {
-                await PlayModeControl.PlayDirectorAt(playableDirector, (float)playableDirector.time + STEP);
-                await UniTask.Delay(1);
+            isPlaying = true;
+
+            if (from.HasValue)
+                await PlayModeControl.PlayDirectorAt(playableDirector, from.Value);
+
+            try {
+                while (isPlaying && playableDirector.time < playableDirector.duration) {
+                    await PlayModeControl.PlayDirectorAt(playableDirector, (float)playableDirector.time + STEP);
+                    await UniTask.Delay(1);
+                }
+            } finally {
+                isPlaying = false;
             }
+        }
+    }
+
+    [UsedImplicitly]
+    [MenuEntry("Load frames from start", priority: 9005)]
+    public class LoadFramesFromStart : TimelineAction
+    {
+        public override ActionValidity Validate(ActionContext context)
+        {
+            return !LoadFrames.isPlaying ? ActionValidity.Valid : ActionValidity.NotApplicable;
+        }
+
+        public override bool Execute(ActionContext context)
+        {
+            var director = TimelineEditor.inspectedDirector;
+            LoadFrames.StartPlaying(director, 0);
+            return true;
         }
     }
 
