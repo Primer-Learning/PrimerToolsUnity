@@ -31,11 +31,11 @@ namespace Primer.Timeline.Editor
             isPlaying = true;
 
             if (from.HasValue)
-                await PlayModeControl.PlayDirectorAt(playableDirector, from.Value);
+                await PlayControl.PlayDirectorAt(playableDirector, from.Value);
 
             try {
                 while (isPlaying && playableDirector.time < playableDirector.duration) {
-                    await PlayModeControl.PlayDirectorAt(playableDirector, (float)playableDirector.time + STEP);
+                    await PlayControl.PlayDirectorAt(playableDirector, (float)playableDirector.time + STEP);
                     await UniTask.Delay(1);
                 }
             } finally {
