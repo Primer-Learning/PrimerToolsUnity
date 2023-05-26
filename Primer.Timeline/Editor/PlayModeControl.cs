@@ -48,11 +48,11 @@ namespace Primer.Timeline.Editor
 
             await PlayDirectorAt(director, 0);
 
-            director.Play();
+            // director.Play();
             // EditorApplication.isPaused = true;
         }
 
-        private static async UniTask PlayDirectorAt(PlayableDirector director, float time)
+        public static async UniTask PlayDirectorAt(PlayableDirector director, float time)
         {
             director.time = time;
             director.Evaluate();

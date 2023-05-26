@@ -6,7 +6,7 @@ using UnityEditor.Timeline.Actions;
 namespace Primer.Timeline.Editor
 {
     [UsedImplicitly]
-    [MenuEntry("Add seconds...", priority: 9000)]
+    [MenuEntry("Add seconds...", priority: 9010)]
     public class AddSecondsToTimeline : TimelineAction
     {
         private const float DEFAULT_ADD_SECONDS = 1;

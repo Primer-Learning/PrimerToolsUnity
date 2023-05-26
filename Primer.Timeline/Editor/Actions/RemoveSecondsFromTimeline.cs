@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Primer.Timeline.Editor
 {
     [UsedImplicitly]
-    [MenuEntry("Remove seconds...", priority: 9000)]
+    [MenuEntry("Remove seconds...", priority: 9010)]
     public class RemoveSecondsFromTimeline : TimelineAction
     {
         private const float DEFAULT_REMOVE_SECONDS = 1;
