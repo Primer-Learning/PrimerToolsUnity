@@ -16,20 +16,14 @@ namespace Primer.Graph
     {
         public static Color defaultColor = new Vector4(62, 126, 160, 255) / 255;
 
+        private Graph graphCache;
+        private Graph graph => graphCache ??= GetComponent<Graph>();
+
         private Container _barsContainer;
         private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph.domain);
 
         private Container _labelsContainer;
-        private Container labelsContainer {
-            get {
-                _labelsContainer ??= new Container("Plotted bars labels", graph);
-                _labelsContainer.SetScale(0.1f);
-                return _labelsContainer;
-            }
-        }
-
-        private Graph graphCache;
-        private Graph graph => graphCache ??= GetComponent<Graph>();
+        private Container labelsContainer => _labelsContainer ??= new Container("Plotted bars labels", graph);
 
         public BarData this[int index] => GetBar(index);
         public BarData this[string name] => GetBar(name);
@@ -75,6 +69,17 @@ namespace Primer.Graph
             set => Meta.ReactiveProp(ref _labelOffset, value, UpdateBars);
         }
         #endregion
+
+        #region Vector3 labelScale;
+        [SerializeField, HideInInspector]
+        private Vector3 _labelScale = Vector3.one;
+        [ShowInInspector]
+        public Vector3 labelScale {
+            get => _labelScale;
+            set => Meta.ReactiveProp(ref _labelScale, value, UpdateBars);
+        }
+        #endregion
+
 
         #region List<BarData> bars;
         [SerializeField, HideInInspector]
@@ -322,7 +327,8 @@ namespace Primer.Graph
             };
 
             var label = follower.AddLatex(barLabels(data), $"{bar.name} label");
-            label.transform.SetDefaults();
+            label.transform.localPosition = Vector3.zero;
+            label.transform.localScale = labelScale;
             return label;
         }
 
