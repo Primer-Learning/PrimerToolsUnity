@@ -48,7 +48,7 @@ namespace Primer.Timeline.Editor
 
             await PlayDirectorAt(director, 0);
 
-            // director.Play();
+            director.Play();
             // EditorApplication.isPaused = true;
         }
 
