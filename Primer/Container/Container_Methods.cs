@@ -5,7 +5,6 @@ namespace Primer
 {
     public partial class Container<TComponent>
     {
-
         public void Insert<TChild>(TChild child, bool worldPositionStays = false, int? index = null)
             where TChild : Component
         {
@@ -85,6 +84,13 @@ namespace Primer
                 listener();
 
             unusedChildren.Clear();
+        }
+
+        public void Reset()
+        {
+            usedChildren.Clear();
+            unusedChildren.Clear();
+            unusedChildren.AddRange(transform.GetChildren());
         }
 
         public void OnCleanup(Action action)
