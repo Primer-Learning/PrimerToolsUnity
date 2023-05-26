@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Primer
 {
@@ -11,7 +9,7 @@ namespace Primer
         // These static methods simplify the creation of a container from a component
         public static Container From(Transform component) => new(component);
 
-        public Container(string name) : base(name) {}
+        public Container(string name, Component parent = null) : base(name, parent) {}
         public Container(Transform t) : base(t) {}
 
         public static implicit operator Transform(Container container) => container.transform;
