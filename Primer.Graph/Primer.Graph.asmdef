@@ -9,8 +9,9 @@
     "Primer",
     "Primer.Math",
     "Primer.Animation",
-    "Primer.Shapes",
     "Primer.Timeline",
+    "Primer.Latex",
+    "Primer.Shapes",
     "Primer.Axis"
   ]
 }
