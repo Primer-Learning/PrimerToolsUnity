@@ -122,7 +122,7 @@ namespace Primer.Latex
         {
             var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
 
-            if (isExpressionInvalid || transform.gameObject.IsPreset())
+            if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
                 return;
 
             var zero = expression.center;
