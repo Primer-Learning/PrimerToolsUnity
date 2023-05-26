@@ -9,19 +9,11 @@ namespace Primer.Timeline
         private static readonly SingleExecutionGuarantee executionGuarantee = new();
         private static readonly Dictionary<Sequence, SequencePlayer> players = new();
         private static readonly List<UniTask> tasks = new();
-        private static float lastSecond = 0;
-
-        public static float end => lastSecond;
 
         public static UniTask AllSequencesFinished() => UniTask.WhenAll(tasks);
 
         public static void PlayTo(SequencePlayable[] behaviours, float time)
         {
-            var lastTime = behaviours.Max(x => x.end) + 1;
-
-            if (lastTime > lastSecond)
-                lastSecond = lastTime;
-
             PlayBehaviours(behaviours, time);
 
             if (behaviours.Count(x => x.start <= time) == 0)

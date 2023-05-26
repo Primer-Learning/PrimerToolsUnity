@@ -36,7 +36,7 @@ namespace Primer.Timeline.Editor
             var director = Object.FindObjectOfType<PlayableDirector>();
             director.Pause();
 
-            await PlayDirectorAt(director, SequenceOrchestrator.end);
+            await PlayDirectorAt(director, director.duration);
 
             // for (var i = 0f; i < startAt; i += 0.1f) {
             //     await PlayDirectorAt(director, i);
@@ -52,7 +52,7 @@ namespace Primer.Timeline.Editor
             // EditorApplication.isPaused = true;
         }
 
-        public static async UniTask PlayDirectorAt(PlayableDirector director, float time)
+        public static async UniTask PlayDirectorAt(PlayableDirector director, double time)
         {
             director.time = time;
             director.Evaluate();
