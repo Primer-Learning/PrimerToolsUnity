@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,26 +9,30 @@ namespace Primer.Timeline
 {
     public static class PrimerTimeline
     {
-        private static readonly List<UniTask> operations = new();
+        private static readonly List<Func<UniTask>> operations = new();
 
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)
         {
-            var copy = request.Preserve();
+            var source = request.ToSource();
+            UniTask Item() => source.Task;
+            operations.Add(Item);
+            RemoveWhenCompleted(source.Task, Item);
+            return source.Task;
+        }
 
-            operations.Add(copy);
-
-            async void RemoveWhenReady()
-            {
-                await copy;
-                operations.Remove(request);
+        private static async void RemoveWhenCompleted<T>(UniTask<T> awaitable, Func<UniTask> item)
+        {
+            try {
+                await awaitable;
             }
-
-            return copy;
+            finally {
+                operations.Remove(item);
+            }
         }
 
         internal static async UniTask AllAsynchronyFinished()
         {
-            await UniTask.WhenAll(operations);
+            await UniTask.WhenAll(operations.Select(x => x()));
             operations.Clear();
         }
 
