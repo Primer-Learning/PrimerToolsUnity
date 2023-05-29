@@ -27,13 +27,16 @@ namespace Primer.Timeline.Editor
 
         private static async void OnPlayModeStateChange(PlayModeStateChange state)
         {
-            if (state == PlayModeStateChange.EnteredPlayMode)
-                await FixTimelineInPlayMode();
+            if (state != PlayModeStateChange.EnteredPlayMode)
+                return;
+
+            var director = Object.FindObjectOfType<PlayableDirector>();
+            if (!director) return;
+            await FixTimelineInPlayMode(director);
         }
 
-        private static async Task FixTimelineInPlayMode()
+        private static async Task FixTimelineInPlayMode(PlayableDirector director)
         {
-            var director = Object.FindObjectOfType<PlayableDirector>();
             director.Pause();
 
             await PlayDirectorAt(director, director.duration);
