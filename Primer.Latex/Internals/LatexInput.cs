@@ -53,7 +53,8 @@ namespace Primer.Latex
             @"\usepackage{microtype}",
             @"\usepackage{pifont}",
             @"\linespread{1}",
-            @"\usepackage{concmath-otf}"
+            @"\usepackage{concmath-otf}",
+            @"\usepackage{enumitem}"
         };
     }
 }
