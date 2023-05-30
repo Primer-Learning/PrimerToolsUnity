@@ -33,13 +33,13 @@ namespace Primer.Timeline.Editor
             isPlaying = true;
 
             if (from.HasValue)
-                await PlayControl.PlayDirectorAt(playableDirector, from.Value);
+                await PrimerTimeline.ScrubTo(playableDirector, from.Value);
 
             RequestConstantUpdates();
 
             try {
                 while (isPlaying) {
-                    await PlayControl.PlayDirectorAt(playableDirector, playableDirector.time + STEP);
+                    await PrimerTimeline.ScrubTo(playableDirector, playableDirector.time + STEP);
                     await UniTask.Delay(1);
 
                     if (playableDirector.time < playableDirector.duration)
