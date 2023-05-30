@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 
 namespace Primer.Timeline
@@ -14,23 +15,31 @@ namespace Primer.Timeline
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)
         {
             var source = request.ToSource();
-            UniTask Item() => source.Task;
-            operations.Add(Item);
-            RemoveWhenCompleted(source.Task, Item);
+
+            // We create a function that returns a new task each time
+            UniTask Operation() => source.Task;
+
+            // and add it to the list if things that need to finish
+            // before we can consider the timeline scrubbed
+            operations.Add(Operation);
+
+            // the function should be removed when the task done
+            RemoveWhenCompleted(Operation);
+
             return source.Task;
         }
 
-        private static async void RemoveWhenCompleted<T>(UniTask<T> awaitable, Func<UniTask> item)
+        private static async void RemoveWhenCompleted(Func<UniTask> operation)
         {
             try {
-                await awaitable;
+                await operation();
             }
             finally {
-                operations.Remove(item);
+                operations.Remove(operation);
             }
         }
 
-        internal static async UniTask AllAsynchronyFinished()
+        private static async UniTask AllAsynchronyFinished()
         {
             await UniTask.WhenAll(operations.Select(x => x()));
             operations.Clear();
