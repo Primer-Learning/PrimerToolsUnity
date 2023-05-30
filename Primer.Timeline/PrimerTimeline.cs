@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
@@ -9,6 +10,13 @@ namespace Primer.Timeline
 {
     public static class PrimerTimeline
     {
+        public static bool isPlaying => FixTimelineInPlayMode.isPlaying;
+
+        static PrimerTimeline()
+        {
+            UnityTagManager.CreateTag(COLLECTABLE_OBJECT_TAG);
+        }
+
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)
         {
             return TimelineAsynchrony.RegisterOperation(request);
@@ -28,11 +36,6 @@ namespace Primer.Timeline
         #region Ephemeral objects
         private const string COLLECTABLE_OBJECT_TAG = "EphemeralTimelineObject";
         private static bool haveEphemeralObjectsBeenCollected = false;
-
-        static PrimerTimeline()
-        {
-            UnityTagManager.CreateTag(COLLECTABLE_OBJECT_TAG);
-        }
 
         public static void MarkAsEphemeral(Component component) => MarkAsEphemeral(component.gameObject);
         public static void MarkAsEphemeral(GameObject gameObject)

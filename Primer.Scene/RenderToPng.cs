@@ -2,6 +2,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -43,8 +44,9 @@ namespace Primer.Scene
 
         private void Update()
         {
-            if (waitingForEndProcess) return;
-            
+            if (waitingForEndProcess || !PrimerTimeline.isPlaying)
+                return;
+
             if (Time.frameCount > 999999) {
                 Debug.LogWarning("y tho");
                 return;
@@ -90,7 +92,6 @@ namespace Primer.Scene
             Debug.Log("Reached max frames. Exiting play mode.");
             UnityEditor.EditorApplication.ExitPlaymode();
         }
-
 
 
         // private readonly List<string> createdDirs = new();
@@ -154,6 +155,7 @@ namespace Primer.Scene
 
             if (!omitRepeatingFrames || (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
                 lastFrame = bytes;
+                Debug.Log("Saving frame to " + path);
                 File.WriteAllBytes(path, bytes);
             }
 
