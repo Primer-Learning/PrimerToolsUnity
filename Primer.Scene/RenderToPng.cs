@@ -155,7 +155,6 @@ namespace Primer.Scene
 
             if (!omitRepeatingFrames || (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
                 lastFrame = bytes;
-                Debug.Log("Saving frame to " + path);
                 File.WriteAllBytes(path, bytes);
             }
 

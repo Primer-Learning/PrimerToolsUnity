@@ -25,18 +25,15 @@ namespace Primer.Timeline
         private static async void OnPlayModeStateChange(PlayModeStateChange state)
         {
             if (state != PlayModeStateChange.EnteredPlayMode) {
-                Debug.Log($"Not entering play mode {Enum.GetName(typeof(PlayModeStateChange), state)}");
                 isPlaying = false;
                 return;
             }
 
-            Debug.Log("Entering play mode");
             var director = Object.FindObjectOfType<PlayableDirector>();
             if (director) {
                 await HandlePlayMode(director);
             }
 
-            Debug.Log("Ready");
             await UniTask.Delay(INITIAL_DELAY);
             isPlaying = true;
         }
