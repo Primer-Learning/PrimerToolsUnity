@@ -5,6 +5,7 @@ using System.Linq;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
@@ -25,7 +26,7 @@ namespace Primer.Scene
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         public int frameRate = 60;
-        public int maxFrames = 0;
+        public float maxTime = 0;
 
         [ShowInInspector, ReadOnly]
         private int framesSaved = 0;
@@ -47,17 +48,12 @@ namespace Primer.Scene
             if (waitingForEndProcess || !PrimerTimeline.isPlaying)
                 return;
 
-            if (Time.frameCount > 999999) {
-                Debug.LogWarning("y tho");
-                return;
-            }
-
             var path = Path.Combine(destinationDirectory, $"{framesSaved:000000}.png");
 
             RenderToPNG(path, resolutionWidth, resolutionHeight);
             framesSaved++;
             
-            if (maxFrames > 0 && framesSaved >= maxFrames)
+            if (ShouldEnd())
             {
                 waitingForEndProcess = true;
                 StartCoroutine(EndRecording());
@@ -89,7 +85,6 @@ namespace Primer.Scene
                 }
             }
 
-            Debug.Log("Reached max frames. Exiting play mode.");
             UnityEditor.EditorApplication.ExitPlaymode();
         }
 
@@ -163,6 +158,33 @@ namespace Primer.Scene
             RenderTexture.active = null;
             Destroy(rt);
             Destroy(image);
+        }
+
+        private bool ShouldEnd()
+        {
+            // If maxTime is set, and we're past maxTime 
+            if (maxTime > 0 && framesSaved >= maxTime * frameRate)
+            {
+                Debug.Log("Reached max frames. Exiting play mode.");
+                return true;
+            }
+            
+            // If maxTime is not set, and
+            // If PlayableDirector is done (and exists)
+            // +1 second of frames as a just-in-case buffer
+            var director = FindObjectOfType<PlayableDirector>();
+            if (maxTime <= 0 && director is not null && (float) framesSaved / frameRate > director.duration + 1)
+            {
+                Debug.Log("Reached end of playable director. Exiting play mode.");
+                return true;
+            }
+
+            if (framesSaved > 999999) {
+                Debug.Log("Reached 1M frames. Probably an error, but congrats to your hard drive on being big!");
+                return true;
+            }
+
+            return false;
         }
     }
 }
