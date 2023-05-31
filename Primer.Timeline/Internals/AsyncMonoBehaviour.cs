@@ -63,7 +63,7 @@ namespace Primer.Timeline
 
         public static Tween PlayModeOnly(Action playModeAction, Func<Tween> fallback = null)
         {
-            return Application.isPlaying
+            return Application.isPlaying && PrimerTimeline.isPlaying
                 ? Tween.noop.Observe(beforePlay: playModeAction)
                 : fallback?.Invoke() ?? Tween.noop;
         }
