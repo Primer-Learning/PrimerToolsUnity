@@ -14,7 +14,6 @@ namespace Primer.Timeline
     [InitializeOnLoad]
     internal static class FixTimelineInPlayMode
     {
-        private const int INITIAL_DELAY = 100;
         public static bool isPlaying = false;
 
         static FixTimelineInPlayMode()
@@ -34,7 +33,6 @@ namespace Primer.Timeline
                 await HandlePlayMode(director);
             }
 
-            await UniTask.Delay(INITIAL_DELAY);
             isPlaying = true;
         }
 
@@ -43,6 +41,7 @@ namespace Primer.Timeline
             director.Pause();
             await PrimerTimeline.ScrubTo(director, director.duration);
             await PrimerTimeline.ScrubTo(director, 0);
+            await UniTask.Delay(100); // A little more time to let things settle before playing.
             director.Play();
         }
     }
