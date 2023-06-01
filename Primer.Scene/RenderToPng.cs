@@ -25,9 +25,9 @@ namespace Primer.Scene
         public bool fillGapsInPreviousTake = false;
         public string frameOutDir;
         public QualityPreset qualityPreset;
-        public int resolutionWidth = 1920;
-        public int resolutionHeight = 1080;
-        public int frameRate = 60;
+        [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
+        [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
+        [ShowInInspector, ReadOnly] private int frameRate = 60;
         [FormerlySerializedAs("maxTime")] public float maxSeconds = 0;
 
         [ShowInInspector, ReadOnly]
@@ -95,15 +95,16 @@ namespace Primer.Scene
         private string GetContainerDirectory()
         {
             var scenePath = GetScenePath();
+            var presetName = qualityPreset.ToString();
 
             // Make a folder specifically for this take
             var takeCount = 0;
-            var takesString = "take 1";
+            var takesString = $"{presetName} take 1";
             var takePath = Path.Combine(scenePath, takesString);
             // Increment the folder number until one doesn't exist, 
             while (Directory.Exists(takePath)) {
                 takeCount++;
-                takesString = $"take {takeCount + 1}";
+                takesString = $"{presetName} take {takeCount + 1}";
                 takePath = Path.Combine(scenePath, takesString);
             }
 
