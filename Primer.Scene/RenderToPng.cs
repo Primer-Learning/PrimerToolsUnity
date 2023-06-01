@@ -25,8 +25,8 @@ namespace Primer.Scene
         [OnValueChanged(nameof(ApplyPreset))]
         public bool transparentBackground = true;
         public QualityPreset qualityPreset;
-        [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
         [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
+        [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
         [ShowInInspector, ReadOnly] private int frameRate = 60;
         
         [Title("End handling")]
