@@ -17,25 +17,29 @@ namespace Primer.Scene
     {
         private Camera cameraCache = null;
         internal Camera cam => cameraCache != null ? cameraCache : cameraCache = GetComponent<Camera>();
+        
+        [ShowInInspector, ReadOnly]
+        private int framesSaved = 0;
 
-        public AudioClip endSound;
-        [FormerlySerializedAs("avoidDuplicatedFrames")]
-        public bool omitRepeatingFrames = false;
-        public bool transparentBackground = true;
-        public bool fillGapsInPreviousTake = false;
-        public string frameOutDir;
+        [Title("Output quality settings")]
         [OnValueChanged(nameof(ApplyPreset))]
+        public bool transparentBackground = true;
         public QualityPreset qualityPreset;
         [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
         [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
         [ShowInInspector, ReadOnly] private int frameRate = 60;
+        
+        [Title("End handling")]
         [FormerlySerializedAs("maxTime")] public float maxSeconds = 0;
-
-        [ShowInInspector, ReadOnly]
-        private int framesSaved = 0;
+        public AudioClip endSound;
+        
+        [Title("Saving options")]
+        [FormerlySerializedAs("avoidDuplicatedFrames")]
+        public bool omitRepeatingFrames = false;
+        public bool fillGapsInPreviousTake = false;
+        public string frameOutDir;
 
         private bool waitingForEndProcess = false;
-
         private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
         private string destinationDirectory;
         private byte[] lastFrame;
