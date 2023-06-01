@@ -22,8 +22,8 @@ namespace Primer.Scene
         private int framesSaved = 0;
 
         [Title("Output quality settings")]
-        [OnValueChanged(nameof(ApplyPreset))]
         public bool transparentBackground = true;
+        [OnValueChanged(nameof(ApplyPreset))]
         public QualityPreset qualityPreset;
         [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
         [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
