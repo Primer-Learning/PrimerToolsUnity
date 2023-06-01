@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Playables;
 using Object = UnityEngine.Object;
 
@@ -15,10 +14,15 @@ namespace Primer.Timeline
     internal static class FixTimelineInPlayMode
     {
         public static bool isPlaying = false;
+        private static Action whenReady;
 
         static FixTimelineInPlayMode()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChange;
+        }
+
+        public static void OnEnterPlayMode(Action listener) {
+            whenReady += listener;
         }
 
         private static async void OnPlayModeStateChange(PlayModeStateChange state)
@@ -34,14 +38,20 @@ namespace Primer.Timeline
             }
 
             isPlaying = true;
+            whenReady?.Invoke();
+            whenReady = null;
         }
 
         private static async Task HandlePlayMode(PlayableDirector director)
         {
             director.Pause();
+
             await PrimerTimeline.ScrubTo(director, director.duration);
             await PrimerTimeline.ScrubTo(director, 0);
-            await UniTask.Delay(100); // A little more time to let things settle before playing.
+
+            // A little more time to let things settle before playing.
+            await UniTask.Delay(100);
+
             director.Play();
         }
     }

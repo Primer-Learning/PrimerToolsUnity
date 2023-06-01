@@ -22,9 +22,20 @@ namespace Primer.Timeline
             return TimelineAsynchrony.RegisterOperation(request);
         }
 
+        public static UniTask EnterPlayMode()
+        {
+            if (Application.isPlaying)
+                throw new InvalidOperationException("PrimerTimeline.EnterPlayMode() can only be called in Edit Mode.");
+
+            var tcs = new UniTaskCompletionSource();
+            FixTimelineInPlayMode.OnEnterPlayMode(() => tcs.TrySetResult());
+            EditorApplication.EnterPlaymode();
+            return tcs.Task;
+        }
+
         public static async UniTask ScrubTo(PlayableDirector director, double time)
         {
-            director.time = time;
+            director.time = time < 0 ? 0 : time;
             director.Evaluate();
 
             await SequenceOrchestrator.AllSequencesFinished();

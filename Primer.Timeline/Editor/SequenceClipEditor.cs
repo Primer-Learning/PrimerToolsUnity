@@ -15,20 +15,10 @@ namespace Primer.Timeline.Editor
         public override void OnInspectorGUI()
         {
             clipAsset.resolver ??= TimelineEditor.inspectedDirector;
-            base.OnInspectorGUI();
             CodeEditorLink();
-            // ShowInPlayMode();
             ExpectedDuration();
+            base.OnInspectorGUI();
         }
-
-        // private void ShowInPlayMode(float secondsBefore = 1)
-        // {
-        //     EditorGUI.BeginDisabledGroup(Application.isPlaying);
-        //     EditorGUILayout.Space();
-        //
-        //     if (GUILayout.Button("View in play mode (experimental)", GUILayout.Height(32)))
-        //         PlayModeControl.RunAt(clipAsset.start - secondsBefore);
-        // }
 
         private void CodeEditorLink()
         {

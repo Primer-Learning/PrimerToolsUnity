@@ -15,11 +15,12 @@ namespace Primer.Scene
     [RequireComponent(typeof(Camera))]
     public class RenderToPng : MonoBehaviour
     {
-        private Camera cameraCache;
-        public AudioClip endSound;
-        internal Camera cam => cameraCache ??= GetComponent<Camera>();
+        private Camera cameraCache = null;
+        internal Camera cam => cameraCache != null ? cameraCache : cameraCache = GetComponent<Camera>();
 
-        [FormerlySerializedAs("avoidDuplicatedFrames")] public bool omitRepeatingFrames = false;
+        public AudioClip endSound;
+        [FormerlySerializedAs("avoidDuplicatedFrames")]
+        public bool omitRepeatingFrames = false;
         public bool transparentBackground = true;
         public bool fillGapsInPreviousTake = false;
         public string frameOutDir;
