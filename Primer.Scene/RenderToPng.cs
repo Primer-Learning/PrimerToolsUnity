@@ -27,7 +27,7 @@ namespace Primer.Scene
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         public int frameRate = 60;
-        public float maxTime = 0;
+        [FormerlySerializedAs("maxTime")] public float maxSeconds = 0;
 
         [ShowInInspector, ReadOnly]
         private int framesSaved = 0;
@@ -163,25 +163,27 @@ namespace Primer.Scene
 
         private bool ShouldEnd()
         {
-            // If maxTime is set, and we're past maxTime 
-            if (maxTime > 0 && framesSaved >= maxTime * frameRate)
+            // If maxSeconds is set, and we're past maxSeconds 
+            if (maxSeconds > 0 && framesSaved > maxSeconds * frameRate)
             {
                 Debug.Log("Reached max frames. Exiting play mode.");
                 return true;
             }
             
-            // If maxTime is not set, and
+            var director = FindObjectOfType<PlayableDirector>();
+            // If maxSeconds is not set, and
             // If PlayableDirector is done (and exists)
             // +1 second of frames as a just-in-case buffer
-            var director = FindObjectOfType<PlayableDirector>();
-            if (maxTime <= 0 && director is not null && (float) framesSaved / frameRate > director.duration + 1)
+            if (maxSeconds <= 0 && director is not null && framesSaved > (director.duration + 1) * frameRate)
             {
                 Debug.Log("Reached end of playable director. Exiting play mode.");
                 return true;
             }
 
-            if (framesSaved > 999999) {
-                Debug.Log("Reached 1M frames. Probably an error, but congrats to your hard drive on being big!");
+            // If > 1hr has been recorded
+            // And maxSeconds is not set ( to something > 1hr, for example )
+            if (maxSeconds <= 0 && framesSaved > frameRate * 60 * 60) {
+                Debug.Log("Reached 1hr recorded. Probably an error, but congrats to your hard drive on being big!");
                 return true;
             }
 
