@@ -146,7 +146,6 @@ namespace Primer.Latex
         // Character access
         public List<Transform> GetCharacterTransforms(int? startIndex = null, int? endIndex = null)
         {
-            var skipCount = startIndex ?? 0;
             var allChildren = transform
                 .GetChildren()
                 .SelectMany(x => x.GetChildren());
@@ -155,6 +154,7 @@ namespace Primer.Latex
                 allChildren = allChildren.Take(endIndex.Value + 1);
             }
 
+            var skipCount = startIndex ?? 0;
             return allChildren.Skip(skipCount).ToList();
         }
 
