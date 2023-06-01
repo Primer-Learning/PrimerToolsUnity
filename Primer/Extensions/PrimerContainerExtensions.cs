@@ -5,7 +5,8 @@ namespace Primer
 {
     public static class PrimerContainerExtensions
     {
-        public static void DisableChildren<T>(this Container<T> container) where T : Component {
+        public static void DisableChildren<T>(this Container<T> container) where T : Component
+        {
             foreach (var child in container.transform.GetChildren()) {
                 child.SetScale(0);
                 child.SetActive(false);
@@ -14,7 +15,14 @@ namespace Primer
 
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
 
-        public static T AddPrefab<T>(this Container container, string prefabName, string name,
+        public static Transform AddPrefab<T>(this Container<T> container, string prefabName, string name = null,
+            bool worldPositionStays = false)
+            where T : Component
+        {
+            return container.AddPrefab<T, Transform>(prefabName, name, worldPositionStays);
+        }
+
+        public static T AddPrefab<T>(this Container container, string prefabName, string name = null,
             bool worldPositionStays = false)
             where T : Component
         {
@@ -22,7 +30,7 @@ namespace Primer
         }
 
         public static TResult AddPrefab<TContainer, TResult>(this Container<TContainer> container, string prefabName,
-            string name, bool worldPositionStays = false)
+            string name = null, bool worldPositionStays = false)
             where TContainer : Component
             where TResult : Component
         {
