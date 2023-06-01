@@ -121,6 +121,9 @@ namespace Primer.Latex
 
         private void DisableObjects()
         {
+            if (transform == null)
+                return;
+
             foreach (var child in transform.GetChildren())
                 child.SetActive(false);
         }
