@@ -24,6 +24,7 @@ namespace Primer.Scene
         public bool transparentBackground = true;
         public bool fillGapsInPreviousTake = false;
         public string frameOutDir;
+        [OnValueChanged(nameof(ApplyPreset))]
         public QualityPreset qualityPreset;
         [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
         [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
@@ -192,7 +193,7 @@ namespace Primer.Scene
             return false;
         }
         
-        private void OnValidate()
+        private void ApplyPreset()
         {
             switch (qualityPreset)
             {
