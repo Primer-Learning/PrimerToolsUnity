@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Primer.Animation
 {
+    [Obsolete("Use Tween.Value instead")]
     public static class GenericTweenExtensionMethod
     {
         #region target.Tween("member", to: 10)
