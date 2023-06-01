@@ -24,6 +24,7 @@ namespace Primer.Scene
         public bool transparentBackground = true;
         public bool fillGapsInPreviousTake = false;
         public string frameOutDir;
+        public QualityPreset qualityPreset;
         public int resolutionWidth = 1920;
         public int resolutionHeight = 1080;
         public int frameRate = 60;
@@ -189,5 +190,39 @@ namespace Primer.Scene
 
             return false;
         }
+        
+        private void OnValidate()
+        {
+            switch (qualityPreset)
+            {
+                case QualityPreset.Minimal:
+                    resolutionWidth = 854;
+                    resolutionHeight = 480;
+                    frameRate = 30;
+                    break;
+                case QualityPreset.Low:
+                    resolutionWidth = 1280;
+                    resolutionHeight = 720;
+                    frameRate = 30;
+                    break;
+                case QualityPreset.High:
+                    resolutionWidth = 1920;
+                    resolutionHeight = 1080;
+                    frameRate = 60;
+                    break;
+                case QualityPreset.Publish:
+                    resolutionWidth = 3840;
+                    resolutionHeight = 2160;
+                    frameRate = 60;
+                    break;
+            }
+        }
+    }
+    public enum QualityPreset
+    {
+        Minimal,  // 480p, 30 fps
+        Low,      // 720p, 30 fps
+        High,     // 1080p, 60 fps
+        Publish   // 4k, 60 fps
     }
 }
