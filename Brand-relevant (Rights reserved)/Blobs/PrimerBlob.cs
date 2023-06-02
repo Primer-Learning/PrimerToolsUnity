@@ -485,7 +485,7 @@ public class PrimerBlob : PrimerCharacter {
     {
         foreach (var accessory in accessories)
         {
-            DestroyImmediate(accessory.gameObject);
+            if (accessory is not null) DestroyImmediate(accessory.gameObject);
         }
 
         foreach (var accessory in transform.GetComponentsInChildren<BlobAccessory>()) {
