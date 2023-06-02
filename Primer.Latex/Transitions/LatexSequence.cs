@@ -97,7 +97,8 @@ namespace Primer.Latex
 
         public override async IAsyncEnumerator<Tween> Run()
         {
-            await EnsureIsInitialized();
+            if (!PrimerTimeline.isPreloading)
+                await EnsureIsInitialized();
 
             stages.Clear();
             initial = null;
@@ -121,7 +122,7 @@ namespace Primer.Latex
 
         private void DisableObjects()
         {
-            if (transform == null)
+            if (this == null)
                 return;
 
             foreach (var child in transform.GetChildren())

@@ -100,9 +100,6 @@ namespace Primer
 
         public void Dispose()
         {
-            if (transform != null)
-                transform.SetActive(false);
-
             foreach (var broomUp in onCleanup)
                 broomUp();
         }

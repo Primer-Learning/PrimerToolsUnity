@@ -11,6 +11,7 @@ namespace Primer.Timeline
     public static class PrimerTimeline
     {
         public static bool isPlaying => FixTimelineInPlayMode.isPlaying;
+        public static bool isPreloading => FixTimelineInPlayMode.isPreloading;
 
         static PrimerTimeline()
         {
