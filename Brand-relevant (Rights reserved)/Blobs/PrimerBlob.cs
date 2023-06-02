@@ -59,6 +59,7 @@ public class PrimerBlob : PrimerCharacter {
     private float releaseDuration;
     private float releaseStartTime;
     private bool releasing;
+    private static Random classRng;
     private Random rng;
     private IEnumerator tiltFB;
 
@@ -95,11 +96,18 @@ public class PrimerBlob : PrimerCharacter {
 
     protected virtual void Start()
     {
-        if (SceneManager.instance != null)
-            rng = SceneManager
-                .sceneRandom2; // Makes it so the constant rng calls don't disrupt the sim's rng
-        else
-            rng = new Random(Environment.TickCount);
+        // Every blob should different rng, so we have a static rng object that generates seeds for the individual
+        // blob rng objects.
+        // Its seed is based on time so the default idle movements will always be different
+        if (classRng is null)
+        {
+            classRng = new Random(Environment.TickCount);
+        }
+        
+        if (rng is null)
+        {
+            rng = new Random(classRng.Next());
+        }
 
         SetColor(color);
     }
