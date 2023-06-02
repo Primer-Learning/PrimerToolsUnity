@@ -319,6 +319,11 @@ namespace Primer.Graph
             follower.component.useGlobalSpace = true;
 
             follower.component.getter = () => {
+                if (bar == null) {
+                    follower.component.Dispose();
+                    return Vector3.zero;
+                }
+
                 var barMiddleTop = new Vector3(barWidth / 2, data.value);
                 var domainPosition = bar.transform.localPosition + barMiddleTop;
                 // return domain.TransformPoint(domainPosition);
