@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -5,6 +6,10 @@ namespace Primer.Axis
 {
     public class AxisTick : MonoBehaviour
     {
+        internal float value;
+        [NonSerialized]
+        internal bool isRemoving = false;
+
         [HideInInspector]
         public PrimerText2 text;
 
