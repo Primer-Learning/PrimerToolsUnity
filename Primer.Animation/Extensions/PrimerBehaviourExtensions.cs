@@ -32,13 +32,15 @@ namespace Primer.Animation
             return self.transform.MoveTo(target);
         }
 
-        public static async UniTask ShrinkAndDispose(this PrimerBehaviour self, CancellationToken ct = default)
+        public static async UniTask ShrinkAndDispose(this PrimerBehaviour self, float duration = 0.5f, CancellationToken ct = default)
         {
             if (!self)
                 return;
 
-            if (Application.isPlaying)
-                await self.ScaleDownToZero().Play(ct);
+            if (Application.isPlaying) {
+                var tween = self.ScaleDownToZero() with { duration = duration };
+                await tween.Play(ct);
+            }
 
             // This is false if the element has already been destroyed
             if (self)
