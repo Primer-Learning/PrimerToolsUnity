@@ -20,7 +20,7 @@ namespace Primer.Timeline
 
         [Button]
         [DetailedInfoBox("Slow and reliable", "Enter play mode at regular speed and pause before this clip starts.")]
-        private async void AndPauseBefore(float secondsBefore = 2)
+        private async void AndPauseBefore(float secondsBefore = 1)
         {
             var director = await EnterPlayMode();
 
@@ -28,8 +28,10 @@ namespace Primer.Timeline
                 return;
 
             var pauseAfter = start - secondsBefore;
+            FixTimelineInPlayMode.isPlaying = false;
             await UniTask.WaitWhile(() => director.time < pauseAfter);
             EditorApplication.isPaused = true;
+            FixTimelineInPlayMode.isPlaying = true;
         }
 
         [Button]
@@ -54,6 +56,7 @@ namespace Primer.Timeline
             var pauseAfter = start - secondsBefore;
 
             director.Pause();
+            FixTimelineInPlayMode.isPlaying = false;
 
             while (director.time < pauseAfter) {
                 await PrimerTimeline.ScrubTo(director, director.time + secondsPerFrame);
@@ -61,6 +64,8 @@ namespace Primer.Timeline
 
             // cautionary wait to let the director catch up
             await UniTask.Delay(100);
+
+            FixTimelineInPlayMode.isPlaying = true;
             director.Play();
         }
 
