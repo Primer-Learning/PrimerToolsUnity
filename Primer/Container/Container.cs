@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace Primer
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
+        public IEnumerable<Transform> extraChildren => new List<Transform>(unusedChildren);
 
         public Container(string name, Component parent = null)
         {
