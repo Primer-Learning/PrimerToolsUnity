@@ -13,12 +13,14 @@ namespace Primer.Timeline
         private bool isRunning = false;
 
         public readonly Transform transform;
+        public readonly Sequence sequence;
         public bool hasMoreClips => hasMore;
 
         public SequenceRunner(Sequence sequence)
         {
             transform = sequence.transform;
             enumerator = sequence.Run();
+            this.sequence = sequence;
 
             sequence.Cleanup();
         }
