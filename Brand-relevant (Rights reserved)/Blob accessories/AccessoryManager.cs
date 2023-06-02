@@ -12,7 +12,7 @@ public class AccessoryManager : MonoBehaviour
 
     private void OnValidate()
     {
-        Blob.DestoyAccessories();
+        Blob.DestroyAccessories();
         Blob.AddAccessory(accessoryType, colorMatch: colorMatch);
     }
 }

@@ -481,9 +481,10 @@ public class PrimerBlob : PrimerCharacter {
             .Any(accessory => types.Contains(accessory.accessoryType));
     }
 
-    public void DestoyAccessories()
+    public void DestroyAccessories()
     {
-        foreach (var accessory in accessories) {
+        foreach (var accessory in accessories)
+        {
             DestroyImmediate(accessory.gameObject);
         }
 
@@ -497,7 +498,7 @@ public class PrimerBlob : PrimerCharacter {
     public void RandomizeColorAndAccessory(System.Random rand, double accessoryChance = 0.7,
         double complementaryChance = 0.5f, List<AccessoryType> options = null)
     {
-        DestoyAccessories();
+        DestroyAccessories();
         
         if (rand == null) { rand = SceneManager.sceneRandom2; }
         if (options == null) options = AccessoryOptions;
