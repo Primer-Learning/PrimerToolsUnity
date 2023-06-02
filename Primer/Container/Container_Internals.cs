@@ -94,5 +94,11 @@ namespace Primer
                 : source.GetComponent<TResult>()
                 ?? source.gameObject.AddComponent<TResult>();
         }
+
+        private TChild OnCreate<TChild>(TChild child) where TChild : Component
+        {
+            onCreate?.Invoke(child.transform);
+            return child;
+        }
     }
 }

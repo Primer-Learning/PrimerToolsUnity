@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Primer
@@ -29,14 +30,14 @@ namespace Primer
 
         public Transform Add(string name = null, bool worldPositionStays = false)
         {
-            var child = FindChild<Transform>(name) ?? new GameObject(name).transform;
+            var child = FindChild<Transform>(name) ?? OnCreate(new GameObject(name).transform);
             Insert(child, worldPositionStays);
             return child;
         }
 
         public TChild Add<TChild>(string name = null, bool worldPositionStays = false) where TChild : Component
         {
-            var child = FindChild<TChild>(name) ?? new GameObject(name).AddComponent<TChild>();
+            var child = FindChild<TChild>(name) ?? OnCreate(new GameObject(name).AddComponent<TChild>());
             Insert(child, worldPositionStays);
             return child;
         }
@@ -44,7 +45,7 @@ namespace Primer
         public TChild Add<TChild>(TChild template, string name = null, bool worldPositionStays = false)
             where TChild : Component
         {
-            var child = FindInstanceOf(template, name) ?? InstantiationTracker.InstantiateAndRegister(template, name);
+            var child = FindInstanceOf(template, name) ?? OnCreate(InstantiationTracker.InstantiateAndRegister(template, name));
             Insert(child, worldPositionStays);
             return child;
         }

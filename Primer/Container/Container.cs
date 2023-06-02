@@ -21,6 +21,7 @@ namespace Primer
     {
         public static Container<T> From<T>(T component) where T : Component => new(component);
 
+        public Action<Transform> onCreate;
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
