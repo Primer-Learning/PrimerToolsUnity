@@ -80,7 +80,6 @@ public class PrimerBlob : PrimerCharacter {
         neckBone = transform.FindDeepChild("bone_neck").transform;
         //Undo whole blob rotation, then rotate to wherever the neck is in world space
         baseNeckRot = Quaternion.Inverse(transform.rotation) * neckBone.rotation;
-        animator = GetComponent<Animator>();
 
         lEye = transform.FindDeepChild("eye_l").GetComponent<PrimerObject>();
         rEye = transform.FindDeepChild("eye_r").GetComponent<PrimerObject>();
