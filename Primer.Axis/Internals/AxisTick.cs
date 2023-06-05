@@ -6,7 +6,8 @@ namespace Primer.Axis
 {
     public class AxisTick : MonoBehaviour
     {
-        internal float value;
+        public float value;
+
         [NonSerialized]
         internal bool isRemoving = false;
 
