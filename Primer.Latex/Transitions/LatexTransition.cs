@@ -22,6 +22,7 @@ namespace Primer.Latex
         private readonly List<(Transform, Transform)> add = new();
         private readonly List<(Transform, Transform)> remove = new();
         private readonly List<(Transform, Transform from, Transform to)> transition = new();
+        private readonly List<(Transform, Transform from, Transform to)> replace = new();
 
         public Transform transform => gameObject.transform;
 
@@ -65,6 +66,21 @@ namespace Primer.Latex
                 groupTransform.localScale = Vector3.Lerp(before.localScale, after.localScale, eased);
                 groupTransform.localPosition = Vector3.Lerp(before.localPosition, after.localPosition + offset, eased);
             }
+
+            foreach (var (groupTransform, before, after) in replace) {
+                var isFirstHalf = easeIn <= 0;
+                var first = groupTransform.GetChild(0);
+                var second = groupTransform.GetChild(1);
+
+                first.SetActive(isFirstHalf);
+                second.SetActive(!isFirstHalf);
+
+                groupTransform.localPosition = Vector3.Lerp(before.localPosition, after.localPosition + offset, eased);
+
+                groupTransform.localScale = isFirstHalf
+                    ? before.localScale * easeOut
+                    : after.localScale * easeIn;
+            }
         }
 
         private IEnumerable<Transform> GroupsToAdd()
@@ -73,7 +89,7 @@ namespace Primer.Latex
             var endGroups = end.transform.GetChildren();
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is GroupTransitionType.Add or GroupTransitionType.Replace) {
+                if (transitions[i] is GroupTransitionType.Add) {
                     if (endGroups.Length > endCursor)
                         yield return endGroups[endCursor];
                 }
@@ -89,13 +105,34 @@ namespace Primer.Latex
             var startGroups = start.transform.GetChildren();
 
             for (var i = 0; i < transitions.Count; i++) {
-                if (transitions[i] is GroupTransitionType.Remove or GroupTransitionType.Replace) {
+                if (transitions[i] is GroupTransitionType.Remove) {
                     if (startGroups.Length > startCursor)
                         yield return startGroups[startCursor];
                 }
 
                 if (transitions[i] is not GroupTransitionType.Add)
                     startCursor++;
+            }
+        }
+
+        private IEnumerable<(Transform, Transform)> GroupToReplace()
+        {
+            var startCursor = 0;
+            var endCursor = 0;
+            var startGroups = start.transform.GetChildren();
+            var endGroups = end.transform.GetChildren();
+
+            for (var i = 0; i < transitions.Count; i++) {
+                if (transitions[i] is GroupTransitionType.Replace) {
+                    if (startGroups.Length > startCursor && endGroups.Length > endCursor)
+                        yield return (startGroups[startCursor], endGroups[endCursor]);
+                }
+
+                if (transitions[i] is not GroupTransitionType.Add)
+                    startCursor++;
+
+                if (transitions[i] is not GroupTransitionType.Remove)
+                    endCursor++;
             }
         }
 
@@ -160,6 +197,17 @@ namespace Primer.Latex
                 var groupTransform = Object.Instantiate(before, parent);
                 groupTransform.localPosition += offset;
                 transition.Add((groupTransform, before, after));
+            }
+
+            foreach (var (before, after) in GroupToReplace()) {
+                var groupTransform = new GameObject().transform;
+                groupTransform.SetParent(parent, false);
+                groupTransform.localPosition += before.localPosition + offset;
+
+                Object.Instantiate(before, groupTransform).localPosition = Vector3.zero;
+                Object.Instantiate(after, groupTransform).localPosition = Vector3.zero;;
+
+                replace.Add((groupTransform, before, after));
             }
 
             foreach (var group in GroupsToRemove()) {
