@@ -50,7 +50,7 @@ namespace Primer.Scene
             Process.Start(GetScenePath());
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (waitingForEndProcess || !PrimerTimeline.isPlaying)
                 return;
