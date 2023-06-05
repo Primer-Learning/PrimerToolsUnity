@@ -4,7 +4,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Latex
@@ -64,7 +63,7 @@ namespace Primer.Latex
 
         private LatexTransition EnsureTransitionExists()
         {
-            if (_transition is not null)
+            if (_transition != null)
                 return _transition;
 
             _transition = new LatexTransition(from, to, groups);
@@ -147,6 +146,7 @@ namespace Primer.Latex
             if (state == State.Ended)
                 return;
 
+            EnsureTransitionExists();
             var offset = transition.GetOffset();
 
             state = State.Ended;
