@@ -6,9 +6,7 @@ namespace Primer
     {
         public static void RemoveAllChildren(this Transform transform)
         {
-            var children = GetChildren(transform);
-
-            foreach (var child in children)
+            foreach (var child in GetChildren(transform))
                 child.Dispose();
         }
 

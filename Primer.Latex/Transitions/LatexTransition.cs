@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
@@ -47,6 +48,21 @@ namespace Primer.Latex
         public void Dispose()
         {
             gameObject.Dispose(urgent: true);
+        }
+
+        public bool IsGoingToFail()
+        {
+            foreach (var (groupTransform, group) in remove.Concat(add)) {
+                if (groupTransform == null || group == null)
+                    return true;
+            }
+
+            foreach (var (groupTransform, before, after) in transition.Concat(replace)) {
+                if (groupTransform == null || before == null || after == null)
+                    return true;
+            }
+
+            return false;
         }
 
 

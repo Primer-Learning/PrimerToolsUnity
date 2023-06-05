@@ -63,7 +63,7 @@ namespace Primer.Latex
 
         private LatexTransition EnsureTransitionExists()
         {
-            if (_transition != null)
+            if (_transition is not null)
                 return _transition;
 
             _transition = new LatexTransition(from, to, groups);
@@ -159,6 +159,11 @@ namespace Primer.Latex
 
         private void SetTransitionState(float time)
         {
+            if (transition.IsGoingToFail())
+                transition = null;
+
+            // transition is a getter that ensures the it's created if it's null
+            // ReSharper disable once PossibleNullReferenceException
             transition.Apply(time);
         }
 
