@@ -1,7 +1,0 @@
-{
-  "name": "Primer.Math",
-  "rootNamespace": "Primer.Math",
-  "references": [
-    "Primer"
-  ]
-}
