@@ -116,5 +116,37 @@ namespace Primer.Graph
 
             mesh.RecalculateNormals();
         }
+
+        // GPT-4 suggestion for rounded corners
+        // public int CornerVertices = 10; // number of vertices to use to draw the rounded corner
+        // public float CornerRadius = 0.1f; // radius of the rounded corner
+
+        // Vector3[] vertices = new Vector3[4 + CornerVertices];
+        // int[] triangles = new int[6 + (CornerVertices - 1) * 3];
+        //
+        // // Rectangle vertices
+        // vertices[0] = new Vector3(-Width / 2, -Height / 2);
+        // vertices[1] = new Vector3(Width / 2 - CornerRadius, -Height / 2);
+        // vertices[2] = new Vector3(-Width / 2, Height / 2);
+        // vertices[3] = new Vector3(Width / 2 - CornerRadius, Height / 2);
+        //
+        // // Rectangle triangles
+        // triangles[0] = 0; triangles[1] = 2; triangles[2] = 1;
+        // triangles[3] = 2; triangles[4] = 3; triangles[5] = 1;
+        //
+        // // Top right corner vertices
+        // for (int i = 0; i < CornerVertices; i++)
+        // {
+        //     float angle = Mathf.PI / 2 * i / (CornerVertices - 1);
+        //     vertices[4 + i] = new Vector3(Width / 2 - CornerRadius + CornerRadius * Mathf.Cos(angle), Height / 2 - CornerRadius * Mathf.Sin(angle));
+        // }
+        //
+        // // Top right corner triangles
+        // for (int i = 0; i < CornerVertices - 1; i++)
+        // {
+        //     triangles[6 + i * 3] = 3;
+        //     triangles[6 + i * 3 + 1] = 4 + i;
+        //     triangles[6 + i * 3 + 2] = 4 + i + 1;
+        // }
     }
 }
