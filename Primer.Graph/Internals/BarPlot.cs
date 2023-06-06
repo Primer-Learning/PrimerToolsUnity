@@ -5,7 +5,6 @@ using Primer.Animation;
 using Primer.Latex;
 using Primer.Shapes;
 using Primer.Timeline;
-using Shapes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -300,9 +299,9 @@ namespace Primer.Graph
                 var label = barLabels is null ? null : CreateBarLabel(bar, data);
 
                 data.onNameChange = UpdateIfError<string>(newName => bar.gameObject.name = newName);
-                data.onColorChange = UpdateIfError<Color>(newColor => bar.Color = newColor);
+                data.onColorChange = UpdateIfError<Color>(newColor => bar.color = newColor);
                 data.onValueChange = UpdateIfError<float>(newValue => {
-                    bar.Height = newValue;
+                    bar.height = newValue;
                     label?.Process(barLabels(data));
                 });
             }
@@ -342,16 +341,13 @@ namespace Primer.Graph
             var bar = container.Add<Rectangle>(data.name ?? $"Bar {i}");
             PrimerTimeline.MarkAsEphemeral(bar);
 
-            bar.Type = Rectangle.RectangleType.RoundedSolid;
-            bar.CornerRadiusMode = Rectangle.RectangleCornerRadiusMode.PerCorner;
-            bar.Pivot = RectPivot.Corner;
-            bar.Color = data.color;
-            bar.Width = barWidth;
-            bar.Height = data.value;
+            bar.transform.localPosition = new Vector3(i, 0, 0) + offset;
 
-            bar.transform.localPosition = new Vector3(i + (1 - barWidth) / 2, 0, 0) + offset;
-            bar.transform.localScale = Vector3.one;
-            bar.CornerRadii = new Vector4(0, cornerRadius, cornerRadius, 0);
+            bar.pivot = RectPivot.BottomLeft;
+            bar.color = data.color;
+            bar.width = barWidth;
+            bar.height = data.value;
+
             return bar;
         }
 
