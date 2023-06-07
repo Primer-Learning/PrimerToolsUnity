@@ -50,8 +50,12 @@ namespace Primer.Timeline
 
         internal static SequencePlayer GetPlayerFor(Sequence sequence)
         {
-            if (players.TryGetValue(sequence, out var player))
-                return player;
+            if (players.TryGetValue(sequence, out var player)) {
+                if (player.isInvalid)
+                    players.Remove(sequence);
+                else
+                    return player;
+            }
 
             player = new SequencePlayer(sequence);
             players.Add(sequence, player);

@@ -25,6 +25,8 @@ namespace Primer.Timeline
         private Tween currentTween;
         private bool isDone = false;
 
+        public bool isInvalid => sequence == null;
+
         public SequencePlayer(Sequence sequence)
         {
             this.sequence = sequence;
