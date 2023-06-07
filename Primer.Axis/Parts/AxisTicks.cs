@@ -75,6 +75,7 @@ namespace Primer.Axis
 
             foreach (var data in CropTicksCount(expectedTicks)) {
                 var tick = container.Add(prefab.value, $"Tick {data.label}");
+                prefab.Initialize(tick);
                 tick.value = data.value;
                 tick.label = data.label;
                 tick.transform.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
