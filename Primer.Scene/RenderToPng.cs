@@ -69,6 +69,8 @@ namespace Primer.Scene
 
         private void Start()
         {
+            ApplyPreset();
+            
             Time.captureFramerate = frameRate;
             destinationDirectory = GetContainerDirectory();
 
