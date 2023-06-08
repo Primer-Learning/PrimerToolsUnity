@@ -16,7 +16,8 @@ namespace Primer.Animation
         #region Overloads
         // These methods just adds different ways to call IPrimer.RotateTo()
 
-        public static Tween RotateBy(this IPrimer self, float x = 0, float y = 0, float z = 0, Quaternion? initialRotation = null)
+        public static Tween RotateBy(this IPrimer self, float x = 0, float y = 0, float z = 0,
+            Quaternion? initialRotation = null)
         {
             var transform = self.component.transform;
             var initial = initialRotation ?? transform.rotation;
@@ -81,7 +82,8 @@ namespace Primer.Animation
         // - Component instead of IPrimer
         // - self.transform instead of self.component.transform
 
-        public static Tween RotateBy(this Component self, float x = 0, float y = 0, float z = 0, Quaternion? initialRotation = null)
+        public static Tween RotateBy(this Component self, float x = 0, float y = 0, float z = 0,
+            Quaternion? initialRotation = null)
         {
             var transform = self.transform;
             var initial = initialRotation ?? transform.rotation;
