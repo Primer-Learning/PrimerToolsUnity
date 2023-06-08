@@ -7,7 +7,7 @@ namespace Primer.Animation
     ///   Only a small amount of methods are required to be implemented and will be enforced by the compiler
     /// </summary>
     public interface IPrimer
-        : IPrimerMoveTo, IPrimerRotateTo, IPrimerScaleTo
+        : IPrimerMoveTo, IPrimerRotateTo, IPrimerScaleTo, IPrimerPulse
     {
     }
 
@@ -109,6 +109,18 @@ namespace Primer.Animation
 
                 // This is a generic extension method
                 return transform.ScaleTo(to, initial);
+            }
+
+            public Tween Pulse(float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f)
+            {
+                // Sh  resharper... there will be implementations of this interface
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (component is IPrimerPulse custom)
+                    // This is a specific method implemented in-class
+                    return custom.Pulse(sizeFactor, attack, hold, decay);
+
+                // This is a generic extension method
+                return transform.Pulse(sizeFactor, attack, hold, decay);
             }
         }
     }

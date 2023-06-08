@@ -3,13 +3,25 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public interface IPrimerPulse
+    public interface IPrimerPulse : ITransformHolder
     {
         Tween Pulse(float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f);
     }
 
     public static class CustomPrimerPulseExtensions
     {
+        public static Tween PulseAndWobble(
+            this IPrimerPulse self,
+            float sizeFactor = 1.2f,
+            float attack = 0.5f,
+            float hold = 0.5f,
+            float decay = 0.5f,
+            float wobbleAngle = 5,
+            float wobbleCyclePeriod = 0.75f)
+        {
+            return self.transform.PulseAndWobble(sizeFactor, attack, hold, decay, wobbleAngle, wobbleCyclePeriod);
+        }
+
         public static Tween Pulse(this Component self, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f,
             float decay = 0.5f)
         {
@@ -60,12 +72,15 @@ namespace Primer.Animation
 
             var angleMultiplier = 1;
 
-            while (totalDuration >= 3 * quarterPeriod) {
+            while (totalDuration >= 3 * quarterPeriod)
+            {
                 targetRotation = Quaternion.Euler(0, 0, wobbleAngle * angleMultiplier) * initialRotation;
 
                 wobbleTweens.Add(
-                    transform.RotateTo(targetRotation, initialRotation: currentRotation) with {
-                        duration = 2 * quarterPeriod, easing = new QuadraticEasing()
+                    transform.RotateTo(targetRotation, initialRotation: currentRotation) with
+                    {
+                        duration = 2 * quarterPeriod,
+                        easing = new QuadraticEasing()
                     }
                 );
 
@@ -75,8 +90,10 @@ namespace Primer.Animation
             }
 
             wobbleTweens.Add(
-                transform.RotateTo(initialRotation, initialRotation: currentRotation) with {
-                    duration = quarterPeriod, easing = new QuadraticEasing()
+                transform.RotateTo(initialRotation, initialRotation: currentRotation) with
+                {
+                    duration = quarterPeriod,
+                    easing = new QuadraticEasing()
                 }
             );
 
