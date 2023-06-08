@@ -16,7 +16,6 @@ namespace Primer.Latex
         {
             var child = container.AddLatex(formula);
             child.transform.SetDefaults();
-            child.SetActive(false);
 
             lastCreatedLatex = child;
             return child;
