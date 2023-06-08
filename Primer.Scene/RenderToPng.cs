@@ -17,9 +17,9 @@ namespace Primer.Scene
     {
         private Camera cameraCache = null;
         internal Camera cam => cameraCache != null ? cameraCache : cameraCache = GetComponent<Camera>();
-        
-        [ShowInInspector, ReadOnly]
-        private int framesSaved = 0;
+
+        [ShowInInspector, ReadOnly] private int framesWatched = 0;
+        [ShowInInspector, ReadOnly] private int framesSaved = 0;
 
         [Title("Output quality settings")]
         public bool transparentBackground = true;
@@ -28,9 +28,11 @@ namespace Primer.Scene
         [ShowInInspector, ReadOnly] private int resolutionHeight = 1080;
         [ShowInInspector, ReadOnly] private int resolutionWidth = 1920;
         [ShowInInspector, ReadOnly] private int frameRate = 60;
-        
-        [Title("End handling")]
-        [FormerlySerializedAs("maxTime")] public float maxSeconds = 0;
+
+        [Title("Start and end handling")]
+        public float recordingStartTimeInSeconds = 0;
+        [FormerlySerializedAs("maxSeconds")]
+        [FormerlySerializedAs("maxTime")] public float endTimeInSeconds = 0;
         public AudioClip endSound;
         
         [Title("Saving options")]
@@ -55,8 +57,13 @@ namespace Primer.Scene
             if (waitingForEndProcess || !PrimerTimeline.isPlaying)
                 return;
 
-            var path = Path.Combine(destinationDirectory, $"{framesSaved:000000}.png");
+            framesWatched++;
 
+            if (framesWatched < recordingStartTimeInSeconds * frameRate)
+                return;
+
+            
+            var path = Path.Combine(destinationDirectory, $"{framesWatched:000000}.png");
             RenderToPNG(path, resolutionWidth, resolutionHeight);
             framesSaved++;
             
@@ -172,26 +179,26 @@ namespace Primer.Scene
 
         private bool ShouldEnd()
         {
-            // If maxSeconds is set, and we're past maxSeconds 
-            if (maxSeconds > 0 && framesSaved > maxSeconds * frameRate)
+            // If endTimeInSeconds is set, and we're past endTimeInSeconds 
+            if (endTimeInSeconds > recordingStartTimeInSeconds && framesWatched > endTimeInSeconds * frameRate)
             {
                 Debug.Log("Reached max frames. Exiting play mode.");
                 return true;
             }
             
             var director = FindObjectOfType<PlayableDirector>();
-            // If maxSeconds is not set, and
+            // If endTimeInSeconds is not set, and
             // If PlayableDirector is done (and exists)
             // +1 second of frames as a just-in-case buffer
-            if (maxSeconds <= 0 && director is not null && framesSaved > (director.duration + 1) * frameRate)
+            if (endTimeInSeconds <= recordingStartTimeInSeconds && director is not null && framesWatched > (director.duration + 1) * frameRate)
             {
                 Debug.Log("Reached end of playable director. Exiting play mode.");
                 return true;
             }
 
             // If > 1hr has been recorded
-            // And maxSeconds is not set ( to something > 1hr, for example )
-            if (maxSeconds <= 0 && framesSaved > frameRate * 60 * 60) {
+            // And endTimeInSeconds is not set ( to something > 1hr, for example )
+            if (endTimeInSeconds <= recordingStartTimeInSeconds && framesWatched > frameRate * 60 * 60) {
                 Debug.Log("Reached 1hr recorded. Probably an error, but congrats to your hard drive on being big!");
                 return true;
             }
