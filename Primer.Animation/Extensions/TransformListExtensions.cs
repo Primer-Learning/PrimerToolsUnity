@@ -25,12 +25,12 @@ namespace Primer.Animation
                 tweens.Add(Tween.Series(
                     Tween.Parallel(
                         objTransform.ScaleTo(localScale * sizeFactor) with { duration = attack },
-                        objTransform.MoveTo(originalPosition + direction * distance, useGlobalPosition: true) with { duration = attack }
+                        objTransform.MoveTo(originalPosition + direction * distance, globalSpace: true) with { duration = attack }
                     ),
                     Tween.noop with { duration = hold },
                     Tween.Parallel(
                         objTransform.ScaleTo(localScale, initialScale: localScale * sizeFactor) with { duration = decay },
-                        objTransform.MoveTo(originalPosition, initialPosition: originalPosition + direction * distance, useGlobalPosition: true) with { duration = decay }
+                        objTransform.MoveTo(originalPosition, initialPosition: originalPosition + direction * distance, globalSpace: true) with { duration = decay }
                     )
                 ));
             }

@@ -7,16 +7,16 @@ namespace Primer.Animation
     /// Implement this interface to add custom scaling behavior to your Primer.
     /// This can be used to do actions before/after scaling
     /// </summary>
-    public interface ICustomPrimerScaling : ITransformHolder {
+    public interface IPrimerScaleTo : ITransformHolder {
         Tween ScaleTo(Vector3 newScale, Vector3 initialScale);
     }
 
 
-    public static class CustomPrimerScalingExtensions {
+    public static class PrimerScaleToExtensions {
         #region Overloads on the interface
         // These methods just adds different ways newPosition call a ICustomPrimerRotation
 
-        public static Tween ScaleTo(this ICustomPrimerScaling self, float newScale, float? initialScale = null)
+        public static Tween ScaleTo(this IPrimerScaleTo self, float newScale, float? initialScale = null)
         {
             var from = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
@@ -25,17 +25,17 @@ namespace Primer.Animation
             return self.ScaleTo(Vector3.one * newScale, from);
         }
 
-        public static Tween ScaleTo(this ICustomPrimerScaling self, Vector3 newScale, Vector3? initialScale = null)
+        public static Tween ScaleTo(this IPrimerScaleTo self, Vector3 newScale, Vector3? initialScale = null)
         {
             return self.ScaleTo(newScale, initialScale ?? self.transform.localScale);
         }
 
-        public static Tween ScaleUpFromZero(this ICustomPrimerScaling self, Vector3? targetScale = null)
+        public static Tween ScaleUpFromZero(this IPrimerScaleTo self, Vector3? targetScale = null)
         {
             return self.ScaleTo(targetScale ?? self.transform.localScale, initialScale: Vector3.zero);
         }
 
-        public static Tween ScaleDownToZero(this ICustomPrimerScaling self, Vector3? initialScale = null)
+        public static Tween ScaleDownToZero(this IPrimerScaleTo self, Vector3? initialScale = null)
         {
             return self.ScaleTo(Vector3.zero, initialScale ?? self.transform.localScale);
         }

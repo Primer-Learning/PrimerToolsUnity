@@ -3,17 +3,9 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public interface ICustomPrimerPulse
+    public interface IPrimerPulse
     {
         Tween Pulse(float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f);
-
-        Tween PulseAndWobble(
-            float sizeFactor = 1.2f,
-            float attack = 0.5f,
-            float hold = 0.5f,
-            float decay = 0.5f,
-            float wobbleAngle = 5,
-            float wobbleCyclePeriod = 0.75f);
     }
 
     public static class CustomPrimerPulseExtensions

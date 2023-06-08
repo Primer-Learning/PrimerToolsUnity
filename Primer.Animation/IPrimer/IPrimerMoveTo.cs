@@ -6,22 +6,21 @@ namespace Primer.Animation
     /// Implement this interface newPosition add custom moving behavior to your Primer.
     /// This can be used newPosition do actions before/after moving
     /// </summary>
-    public interface ICustomPrimerMoving : ITransformHolder
+    public interface IPrimerMoveTo : ITransformHolder
     {
-        // TODO: rename useGlobalPosition newPosition globalSpace
-        Tween MoveTo(Vector3 newPosition, Vector3 initialPosition, bool useGlobalPosition = false);
+        Tween MoveTo(Vector3 newPosition, Vector3 initialPosition, bool globalSpace = false);
     }
 
 
-    public static class CustomPrimerMovingExtensions
+    public static class PrimerMoveToExtensions
     {
         #region Overloads on the interface
         // These methods just adds different ways newPosition call a ICustomPrimerMoving
 
-        public static Tween MoveBy(this ICustomPrimerMoving self, float? x = null, float? y = null, float? z = null,
-            bool useGlobalPosition = false)
+        public static Tween MoveBy(this IPrimerMoveTo self, float? x = null, float? y = null, float? z = null,
+            bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.MoveTo(
                 new Vector3(
@@ -30,42 +29,42 @@ namespace Primer.Animation
                     z.HasValue ? currentPosition.z + z.Value : currentPosition.z
                 ),
                 currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
-        public static Tween MoveBy(this ICustomPrimerMoving self, Vector3 displacement, bool useGlobalPosition = false)
+        public static Tween MoveBy(this IPrimerMoveTo self, Vector3 displacement, bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
-            return self.MoveTo(currentPosition + displacement, currentPosition, useGlobalPosition);
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
+            return self.MoveTo(currentPosition + displacement, currentPosition, globalSpace);
         }
 
-        public static Tween MoveTo(this ICustomPrimerMoving self, float? x = null, float? y = null, float? z = null,
-            Vector3? initialPosition = null, bool useGlobalPosition = false)
+        public static Tween MoveTo(this IPrimerMoveTo self, float? x = null, float? y = null, float? z = null,
+            Vector3? initialPosition = null, bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.MoveTo(
                 new Vector3(x ?? currentPosition.x, y ?? currentPosition.y, z ?? currentPosition.z),
                 initialPosition ?? currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
-        public static Tween MoveTo(this ICustomPrimerMoving self, Vector3 newPosition, Vector3? initialPosition = null,
-            bool useGlobalPosition = false)
+        public static Tween MoveTo(this IPrimerMoveTo self, Vector3 newPosition, Vector3? initialPosition = null,
+            bool globalSpace = false)
         {
-            var initial = initialPosition ?? (useGlobalPosition ? self.transform.position : self.transform.localPosition);
-            return self.MoveTo(newPosition, initial, useGlobalPosition);
+            var initial = initialPosition ?? (globalSpace ? self.transform.position : self.transform.localPosition);
+            return self.MoveTo(newPosition, initial, globalSpace);
         }
         #endregion
 
 
         #region Default implementation for Component: redirect to Transform
         public static Tween MoveBy(this Component self, float? x = null, float? y = null, float? z = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.transform.MoveTo(
                 new Vector3(
@@ -74,41 +73,41 @@ namespace Primer.Animation
                     z.HasValue ? currentPosition.z + z.Value : currentPosition.z
                 ),
                 currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
-        public static Tween MoveBy(this Component self, Vector3 displacement, bool useGlobalPosition = false)
+        public static Tween MoveBy(this Component self, Vector3 displacement, bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
-            return self.transform.MoveTo(currentPosition + displacement, currentPosition, useGlobalPosition);
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
+            return self.transform.MoveTo(currentPosition + displacement, currentPosition, globalSpace);
         }
 
         public static Tween MoveTo(this Component self, float? x = null, float? y = null, float? z = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.transform.MoveTo(
                 new Vector3(x ?? currentPosition.x, y ?? currentPosition.y, z ?? currentPosition.z),
                 currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
         public static Tween MoveTo(this Component self, Vector3 newPosition, Vector3? initialPosition = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            return self.transform.MoveTo(newPosition, initialPosition, useGlobalPosition);
+            return self.transform.MoveTo(newPosition, initialPosition, globalSpace);
         }
         #endregion
 
 
         #region Actual implementation in Transform
         public static Tween MoveBy(this Transform self, float? x = null, float? y = null, float? z = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.MoveTo(
                 new Vector3(
@@ -117,38 +116,38 @@ namespace Primer.Animation
                     z.HasValue ? currentPosition.z + z.Value : currentPosition.z
                 ),
                 currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
-        public static Tween MoveBy(this Transform self, Vector3 displacement, bool useGlobalPosition = false)
+        public static Tween MoveBy(this Transform self, Vector3 displacement, bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
-            return self.MoveTo(currentPosition + displacement, currentPosition, useGlobalPosition);
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
+            return self.MoveTo(currentPosition + displacement, currentPosition, globalSpace);
         }
 
         public static Tween MoveTo(this Transform self, float? x = null, float? y = null, float? z = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            var currentPosition = useGlobalPosition ? self.transform.position : self.transform.localPosition;
+            var currentPosition = globalSpace ? self.transform.position : self.transform.localPosition;
 
             return self.MoveTo(
                 new Vector3(x ?? currentPosition.x, y ?? currentPosition.y, z ?? currentPosition.z),
                 currentPosition,
-                useGlobalPosition
+                globalSpace
             );
         }
 
         public static Tween MoveTo(this Transform self, Vector3 newPosition, Vector3? initialPosition = null,
-            bool useGlobalPosition = false)
+            bool globalSpace = false)
         {
-            var initial = initialPosition ?? (useGlobalPosition ? self.position : self.localPosition);
+            var initial = initialPosition ?? (globalSpace ? self.position : self.localPosition);
 
             if (initial == newPosition)
                 return Tween.noop;
 
             return new Tween(
-                useGlobalPosition
+                globalSpace
                     ? t => self.position = Vector3.Lerp(initial, newPosition, t)
                     : t => self.localPosition = Vector3.Lerp(initial, newPosition, t)
             );
