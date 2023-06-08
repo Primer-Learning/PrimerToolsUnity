@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -15,6 +17,33 @@ namespace Primer.Animation
 
     public static class IPrimer_ScaleToExtensions
     {
+        #region Overloads for IEnumerable<IPrimer>
+        public static IEnumerable<Tween> ScaleUpFromZero(this IEnumerable<IPrimer> self, Vector3? targetScale = null)
+            => self.Select(x => x.ScaleUpFromZero(targetScale));
+
+        public static IEnumerable<Tween> ScaleDownToZero(this IEnumerable<IPrimer> self, Vector3? initialScale = null)
+            => self.Select(x => x.ScaleDownToZero(initialScale));
+
+        public static IEnumerable<Tween> ScaleTo(this IEnumerable<IPrimer> self, float newScale,
+            float? initialScale = null) => self.Select(x => x.ScaleTo(newScale, initialScale));
+
+        public static IEnumerable<Tween> ScaleTo(this IEnumerable<IPrimer> self, Vector3 newScale,
+            Vector3? initialScale = null) => self.Select(x => x.ScaleTo(newScale, initialScale));
+
+        public static IEnumerable<Tween> ScaleUpFromZero(this IEnumerable<Transform> self, Vector3? targetScale = null)
+            => self.Select(x => x.ScaleUpFromZero(targetScale));
+
+        public static IEnumerable<Tween> ScaleDownToZero(this IEnumerable<Transform> self, Vector3? initialScale = null)
+            => self.Select(x => x.ScaleDownToZero(initialScale));
+
+        public static IEnumerable<Tween> ScaleTo(this IEnumerable<Transform> self, float newScale,
+            float? initialScale = null) => self.Select(x => x.ScaleTo(newScale, initialScale));
+
+        public static IEnumerable<Tween> ScaleTo(this IEnumerable<Transform> self, Vector3 newScale,
+            Vector3? initialScale = null) => self.Select(x => x.ScaleTo(newScale, initialScale));
+        #endregion
+
+
         #region Overloads
         // These methods just adds different ways to call IPrimer.ScaleTo()
 
@@ -41,6 +70,7 @@ namespace Primer.Animation
         public static Tween ScaleTo(this IPrimer self, float newScale, float? initialScale = null)
         {
             var transform = self.component.transform;
+
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
                 : transform.localScale;
@@ -90,6 +120,7 @@ namespace Primer.Animation
         public static Tween ScaleTo(this Component self, float newScale, float? initialScale = null)
         {
             var transform = self.transform;
+
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
                 : transform.localScale;

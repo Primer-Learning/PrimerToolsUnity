@@ -52,6 +52,18 @@ namespace Primer
             foreach (var item in self)
                 item.transform.SetScale(scale, isGlobal);
         }
+
+        public static void SetScale(this IEnumerable<Transform> self, float scale, bool isGlobal = false)
+        {
+            foreach (var item in self)
+                item.SetScale(Vector3.one * scale, isGlobal);
+        }
+
+        public static void SetScale(this IEnumerable<Transform> self, Vector3 scale, bool isGlobal = false)
+        {
+            foreach (var item in self)
+                item.SetScale(scale, isGlobal);
+        }
         #endregion
 
 
