@@ -15,13 +15,6 @@ namespace Primer.Animation
             return CreateTween(accessors, to, accessors.get(), lerp);
         }
 
-        [Obsolete("Use Tween.Value(() => target.member, from, to) instead")]
-        public static Tween Tween<T>(this object target, string member, T to, T from, Func<T, T, float, T> lerp = null)
-        {
-            var accessors = GetAccessors<T>(target, member);
-            return CreateTween(accessors, to, from, lerp);
-        }
-
         [Obsolete("Use Tween.Value(() => target.member, from, value => value * 2) instead")]
         public static Tween Tween<T>(this object target, string member, Func<T, T> to, Func<T, T, float, T> lerp = null)
         {
@@ -48,15 +41,6 @@ namespace Primer.Animation
             var accessors = GetAccessors(target, member);
             var from = accessors.get();
             return CreateTween(accessors, to(from), from, lerp);
-        }
-
-        [Obsolete("Use Tween.Value(() => target.member, from, value => value * 2) instead")]
-        public static Tween Tween<TContainer, TValue>(this TContainer target,
-            Expression<Func<TContainer, TValue>> member, TValue to, TValue from,
-            Func<TValue, TValue, float, TValue> lerp = null)
-        {
-            var accessors = GetAccessors(target, member);
-            return CreateTween(accessors, to, from, lerp);
         }
         #endregion
 

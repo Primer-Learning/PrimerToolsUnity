@@ -10,10 +10,6 @@ namespace Primer.Animation
         public static Tween noop = new(_ => {});
 
         public IEasing easing { get; init; } = IEasing.defaultMethod;
-        public EaseMode easeMode {
-            get => EaseModeExtensions.GetModeFor(easing);
-            init => easing = value.GetMethod();
-        }
 
         public float delay = 0f;
 
