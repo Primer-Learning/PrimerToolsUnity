@@ -59,7 +59,7 @@ public class PrimerBlob : PrimerCharacter {
     private float releaseDuration;
     private float releaseStartTime;
     private bool releasing;
-    private static Random classRng;
+    public static Random classRng;
     private Random rng;
     private IEnumerator tiltFB;
 
@@ -103,10 +103,9 @@ public class PrimerBlob : PrimerCharacter {
             classRng = new Random(Environment.TickCount);
         }
         
-        if (rng is null)
-        {
-            rng = new Random(classRng.Next());
-        }
+        // Setting the seed based on classRng every time here, since I'm paranoid that blobs that already exist
+        // in a scene might not have their rng updated.
+        rng = new Random(classRng.Next());
 
         SetColor(color);
     }
