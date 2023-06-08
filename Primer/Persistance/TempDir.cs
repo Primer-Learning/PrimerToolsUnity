@@ -6,14 +6,15 @@ namespace Primer
 {
     public class TempDir : IDisposable
     {
-        readonly DirectoryInfo info;
-        int childrenCount = 0;
-        readonly bool isRoot;
-        bool exists = false;
+        private readonly DirectoryInfo info;
+        private int childrenCount = 0;
+        private readonly bool isRoot;
+        private bool exists = false;
 
         public string FullPath => info.FullName;
 
-        public TempDir() {
+        public TempDir()
+        {
             var tempPath = Path.GetTempPath();
             var tmpDir = Path.Combine(tempPath, $"unity-primer-{Guid.NewGuid()}");
             info = Directory.CreateDirectory(tmpDir);
@@ -21,28 +22,33 @@ namespace Primer
             exists = true;
         }
 
-        TempDir(DirectoryInfo info) {
+        private TempDir(DirectoryInfo info)
+        {
             this.info = info;
             isRoot = false;
             exists = true;
         }
 
         ~TempDir() => CleanUpResources();
+
         public void Dispose() => CleanUpResources();
 
-        public void Open() =>
+        public void Open()
+        {
             Process.Start($"{FullPath}{Path.DirectorySeparatorChar}");
+        }
 
-        public string GetChildPath(string filename) =>
-            Path.Combine(info.FullName, filename);
+        public string GetChildPath(string filename)
+        {
+            return Path.Combine(info.FullName, filename);
+        }
 
-        public TempDir CreateChild(string name, bool autoIncrement = false) {
-            if (autoIncrement) {
+        public TempDir CreateChild(string name, bool autoIncrement = false)
+        {
+            if (autoIncrement)
                 name += childrenCount++;
-            }
-            else if (string.IsNullOrWhiteSpace(name)) {
+            else if (string.IsNullOrWhiteSpace(name))
                 name = $"{childrenCount++}";
-            }
 
             var child = info.CreateSubdirectory(name);
             return new TempDir(child);
@@ -50,12 +56,16 @@ namespace Primer
 
         public override string ToString() => info.FullName;
 
-        void CleanUpResources() {
-            if (!exists || !isRoot) return;
+        private void CleanUpResources()
+        {
+            if (!exists || !isRoot)
+                return;
 
-            void DeleteRecursively(DirectoryInfo directory) {
+            void DeleteRecursively(DirectoryInfo directory)
+            {
                 foreach (var subDirectory in directory.EnumerateDirectories())
                     DeleteRecursively(subDirectory);
+
                 directory.Delete(true);
             }
 

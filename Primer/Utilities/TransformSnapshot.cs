@@ -4,17 +4,15 @@ namespace Primer
 {
     public class TransformSnapshot
     {
-        private readonly Transform target;
         private readonly Transform parent;
 
-        public Vector3 position { init; get; }
-        public Quaternion rotation { init; get; }
-        public Vector3 scale { init; get; }
+        public Vector3 position { get; }
+        public Quaternion rotation { get; }
+        public Vector3 scale { get; }
 
 
         public TransformSnapshot(Transform target)
         {
-            this.target = target;
             parent = target.parent;
             position = target.localPosition;
             rotation = target.localRotation;
@@ -22,12 +20,10 @@ namespace Primer
         }
 
 
-        public void Restore() => ApplyTo(target);
-
         public void ApplyTo(Transform other, Vector3? offsetPosition = null)
         {
             if (other.parent != parent)
-                other.parent = parent;
+                other.SetParent(parent, worldPositionStays: false);
 
             other.localPosition = offsetPosition is null
                 ? position
@@ -36,7 +32,6 @@ namespace Primer
             other.localRotation = rotation;
             other.localScale = scale;
         }
-
 
         public override string ToString()
         {

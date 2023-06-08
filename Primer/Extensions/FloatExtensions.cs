@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Primer
 {
@@ -15,10 +14,8 @@ namespace Primer
 
 
         public static float Remap(this float value, float aLow, float aHigh, float bLow, float bHigh) {
-            var normal = Mathf.InverseLerp(aLow, aHigh, value);
-            return Mathf.Lerp(bLow, bHigh, normal);
+            return PrimerMath.Remap(aLow, aHigh, bLow, bHigh, value);
         }
-
 
         public static IEnumerable<float> ToFloats(this IEnumerable<int> self)
         {

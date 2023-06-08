@@ -27,6 +27,7 @@ namespace Primer
     ///         children.Apply();
     ///     </code>
     /// </example>
+    [Obsolete("Use Primer.Container instead")]
     public partial class ChildrenDeclaration : IChildrenDeclaration
     {
         public int count => after.Count;

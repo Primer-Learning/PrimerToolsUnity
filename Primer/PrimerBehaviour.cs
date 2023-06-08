@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    [Obsolete("Use PrimerComponent instead")]
     [AddComponentMenu("Primer / Primer Behaviour")]
     public class PrimerBehaviour : MonoBehaviour
     {

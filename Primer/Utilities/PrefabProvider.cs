@@ -7,12 +7,6 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace Primer
 {
-    public interface IPrefabProvider<out T> where T : Component
-    {
-        bool hasChanges { get; set; }
-        T value { get; }
-    }
-
     [Serializable]
     [InlineProperty]
     public class PrefabProvider : PrefabProvider<Transform> {}
@@ -20,7 +14,7 @@ namespace Primer
 
     [Serializable]
     [InlineProperty]
-    public class PrefabProvider<T> : IPrefabProvider<T> where T : Component
+    public class PrefabProvider<T> where T : Component
     {
         private Transform target;
         public bool hasChanges { get; set; }

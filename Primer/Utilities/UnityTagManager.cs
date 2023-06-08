@@ -8,11 +8,11 @@ namespace Primer
         // from
         // https://bladecast.pro/unity-tutorial/create-tags-by-script
 
-        static Object tagManagerAsset;
-        static Object TagManagerAsset => tagManagerAsset ??= AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
+        private static Object tagManagerAssetCache;
+        private static Object tagManagerAsset => tagManagerAssetCache ??= AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
 
         public static void CreateTag(string tag) {
-            var asset = TagManagerAsset;
+            var asset = tagManagerAsset;
             if (asset == null) return;
 
             var so = new SerializedObject(asset);
