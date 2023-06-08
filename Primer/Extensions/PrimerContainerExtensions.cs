@@ -5,14 +5,6 @@ namespace Primer
 {
     public static class PrimerContainerExtensions
     {
-        public static void DisableChildren<T>(this Container<T> container) where T : Component
-        {
-            foreach (var child in container.transform.GetChildren()) {
-                child.SetScale(0);
-                child.SetActive(false);
-            }
-        }
-
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
 
         public static Transform AddPrefab<T>(this Container<T> container, string prefabName, string name = null,

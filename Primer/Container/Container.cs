@@ -16,7 +16,7 @@ namespace Primer
         public static implicit operator Transform(Container container) => container.transform;
     }
 
-    public partial class Container<TComponent> : IDisposable
+    public partial class Container<TComponent> : IPrimer, IDisposable
         where TComponent : Component
     {
         public static Container<T> From<T>(T component) where T : Component => new(component);
@@ -25,6 +25,10 @@ namespace Primer
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
+
+        // When .component is used from the interface cast it to Component
+        Component IPrimer.component => (Component)component;
+
         public IEnumerable<Transform> extraChildren => new List<Transform>(unusedChildren);
 
         public Container(string name, Component parent = null)

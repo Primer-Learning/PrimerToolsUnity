@@ -12,14 +12,9 @@ namespace Primer
             return result;
         }
 
-        public static IEnumerable<float> ToFloats(this IEnumerable<int> self)
+        public static IEnumerable<(int index, T value)> WithIndex<T>(this IEnumerable<T> items)
         {
-            return self.Select<int, float>(i => i);
-        }
-
-        public static IEnumerable<float> ToFloatArray(this IEnumerable<int> self)
-        {
-            return self.ToFloats().ToArray();
+            return items.Select((value, i) => (i, value));
         }
 
         public static IEnumerable<(T, float)> SpaceEvenly<T>(this IEnumerable<T> items, float distanceBetweenChildren)
@@ -30,11 +25,6 @@ namespace Primer
                 var y = GetEvenlySpacedFloatGivenStep(i, children.Length, distanceBetweenChildren);
                 yield return (children[i], y);
             }
-        }
-
-        public static IEnumerable<(int index, T value)> WithIndex<T>(this IEnumerable<T> items)
-        {
-            return items.Select((value, i) => (i, value));
         }
 
         private static float GetEvenlySpacedFloatGivenStep(int objectIndex, int totalObjects, float distanceBetweenObjects)

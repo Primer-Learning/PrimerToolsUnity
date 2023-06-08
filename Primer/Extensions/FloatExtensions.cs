@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Primer
@@ -15,6 +17,17 @@ namespace Primer
         public static float Remap(this float value, float aLow, float aHigh, float bLow, float bHigh) {
             var normal = Mathf.InverseLerp(aLow, aHigh, value);
             return Mathf.Lerp(bLow, bHigh, normal);
+        }
+
+
+        public static IEnumerable<float> ToFloats(this IEnumerable<int> self)
+        {
+            return self.Select<int, float>(i => i);
+        }
+
+        public static float[] ToFloatArray(this IEnumerable<int> self)
+        {
+            return self.ToFloats().ToArray();
         }
     }
 }

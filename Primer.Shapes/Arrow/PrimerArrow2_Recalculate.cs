@@ -30,7 +30,7 @@ namespace Primer.Shapes
             var arrow = transform;
             var diff = head - tail;
 
-            arrow.SetGlobalScale(Vector3.one);
+            arrow.SetScale(Vector3.one, isGlobal: true);
             arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
             arrow.position = diff / 2 + tail;
         }
