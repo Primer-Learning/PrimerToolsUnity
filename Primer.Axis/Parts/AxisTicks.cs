@@ -108,7 +108,7 @@ namespace Primer.Axis
                 RemoveTick(toRemove);
             }
 
-            container.Purge();
+            // container.Purge();
         }
 
         private List<TicData> CropTicksCount(List<TicData> ticks)

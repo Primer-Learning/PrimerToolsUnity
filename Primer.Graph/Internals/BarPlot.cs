@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Latex;
 using Primer.Shapes;
@@ -14,7 +15,7 @@ namespace Primer.Graph
     public class BarPlot : MonoBehaviour
     {
         public static Color defaultColor = new Vector4(62, 126, 160, 255) / 255;
-
+        private int barCountForHax;
         private Graph graphCache;
         private Graph graph => graphCache ??= GetComponent<Graph>();
 
@@ -22,7 +23,7 @@ namespace Primer.Graph
         private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph.domain);
 
         private Container _labelsContainer;
-        private Container labelsContainer => _labelsContainer ??= new Container("Plotted bars labels", graph);
+        public Container labelsContainer => _labelsContainer ??= new Container("Plotted bars labels", graph);
 
         public BarData this[int index] => GetBar(index);
         public BarData this[string name] => GetBar(name);
@@ -209,10 +210,24 @@ namespace Primer.Graph
             var to = EnsureBarCount(values);
             var from = to.Select((x, i) => bars[i].value).ToArray();
 
-            return new Tween(t => {
-                for (var i = 0; i < to.Length; i++)
-                    bars[i].value = Mathf.Lerp(from[i], to[i], t);
-            });
+
+            var labelScaleTweens = new List<Tween>();
+            for (var i = 0; i < to.Length; i++)
+            {
+                labelScaleTweens.Add(labelsContainer.children.ToList()[i].ScaleTo(1));
+            }
+
+            return Tween.Parallel(
+                labelScaleTweens.RunInParallel(),
+                new Tween(t =>
+                    {
+                        for (var i = 0; i < to.Length; i++)
+                        {
+                            bars[i].value = Mathf.Lerp(from[i], to[i], t);
+                        }
+                    }
+                )
+            );
         }
 
         public void SetColors(IEnumerable<Color> colors) => SetColors(colors.ToArray());
@@ -296,7 +311,7 @@ namespace Primer.Graph
             for (var i = 0; i < bars.Count; i++) {
                 var data = bars[i];
                 var bar = CreateBar(container, data, i);
-                var label = barLabels is null ? null : CreateBarLabel(bar, data);
+                var label = barLabels is null ? null : CreateBarLabel(bar, data, i > barCountForHax || barCountForHax == 0);
 
                 data.onNameChange = UpdateIfError<string>(newName => bar.gameObject.name = newName);
                 data.onColorChange = UpdateIfError<Color>(newColor => bar.color = newColor);
@@ -306,16 +321,22 @@ namespace Primer.Graph
                 });
             }
 
+            barCountForHax = bars.Count;
+            
             labelsContainer.Purge();
             container.Purge();
         }
 
-        private LatexComponent CreateBarLabel(Rectangle bar, BarData data)
+        private LatexComponent CreateBarLabel(Rectangle bar, BarData data, bool isNew = false)
         {
             var domain = graph.domain;
-
+            
             var follower = labelsContainer.AddFollower(bar);
             follower.component.useGlobalSpace = true;
+            if (isNew)
+            {
+                follower.localScale = Vector3.zero;
+            }
 
             follower.component.getter = () => {
                 if (bar == null) {
@@ -333,6 +354,8 @@ namespace Primer.Graph
             var label = follower.AddLatex(barLabels(data), $"{bar.name} label");
             label.transform.localPosition = Vector3.zero;
             label.transform.localScale = labelScale;
+            // Puts the label in the right place on the first frame, rather than at the origin
+            follower.transform.position = follower.component.getter();
             return label;
         }
 
