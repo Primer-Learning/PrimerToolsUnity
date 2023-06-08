@@ -11,13 +11,7 @@ namespace Primer.Animation
             self.FindIntrinsicScale();
             return self.transform.ScaleTo(Vector3.zero);
         }
-        
-        public static Tween ScaleTo(this PrimerBehaviour self, Vector3 newScale)
-        {
-            self.FindIntrinsicScale();
-            return self.transform.ScaleTo(newScale);
-        }
-        
+
         public static Tween ScaleUpFromZero(this PrimerBehaviour self)
         {
             var target = self.FindIntrinsicScale();
