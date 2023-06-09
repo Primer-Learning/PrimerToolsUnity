@@ -218,7 +218,7 @@ namespace Primer.Scene
                 case QualityPreset.Low:
                     resolutionWidth = 1280;
                     resolutionHeight = 720;
-                    frameRate = 30;
+                    frameRate = 60;
                     break;
                 case QualityPreset.High:
                     resolutionWidth = 1920;
@@ -236,7 +236,7 @@ namespace Primer.Scene
     public enum QualityPreset
     {
         Minimal,  // 480p, 30 fps
-        Low,      // 720p, 30 fps
+        Low,      // 720p, 60 fps
         High,     // 1080p, 60 fps
         Publish   // 4k, 60 fps
     }
