@@ -32,11 +32,15 @@ namespace Primer.Animation
         {
             var transform = self.transform;
             var localScale = transform.localScale;
+            var pulseSize = localScale * sizeFactor;
 
             return Tween.Series(
-                self.ScaleTo(localScale * sizeFactor) with { duration = attack },
+                self.ScaleTo(pulseSize) with { duration = attack },
                 Tween.noop with { duration = hold },
-                self.ScaleTo(localScale) with { duration = decay }
+
+                // If we don't set initialScale, the initial value will be the scale now
+                // before the previous scaling is actually applied
+                self.ScaleTo(localScale, initialScale: pulseSize) with { duration = decay }
             );
         }
 
