@@ -63,7 +63,7 @@ namespace Primer.Axis
             container.onCreate = tick => {
                 if (Application.isPlaying) {
                     tick.GetChildren()
-                        .Select(x => x.ScaleUpFromZero() with { duration = 0.1f })
+                        .Select(x => x.ScaleTo(0.1f, initialScale:0) with { duration = 0.5f })
                         .RunInParallel()
                         .PlayAndForget();
                 }
