@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Primer.Animation;
 using UnityEngine;
 
@@ -60,9 +61,14 @@ namespace Primer.Shapes
                 onComplete: () => originalHeadPosition.ApplyTo(headPoint)
             );
 
-            return requiresAdjustmentTweening
+            var extensionTween = requiresAdjustmentTweening
                 ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, tailPoint.adjustment, originalHeadAdjustment))
                 : growTween;
+
+            return Tween.Parallel(
+                extensionTween,
+                headObject.ScaleTo(thickness, 0)
+            );
         }
 
         public Tween ShrinkToEnd(bool restoreTracking = false)
