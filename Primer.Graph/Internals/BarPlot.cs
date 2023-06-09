@@ -311,7 +311,7 @@ namespace Primer.Graph
             for (var i = 0; i < bars.Count; i++) {
                 var data = bars[i];
                 var bar = CreateBar(container, data, i);
-                var label = barLabels is null ? null : CreateBarLabel(bar, data, i > barCountForHax || barCountForHax == 0);
+                var label = barLabels is null ? null : CreateBarLabel(bar, data, i >= barCountForHax || barCountForHax == 0);
 
                 data.onNameChange = UpdateIfError<string>(newName => bar.gameObject.name = newName);
                 data.onColorChange = UpdateIfError<Color>(newColor => bar.color = newColor);
