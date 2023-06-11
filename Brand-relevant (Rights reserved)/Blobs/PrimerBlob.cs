@@ -505,8 +505,8 @@ public class PrimerBlob : PrimerCharacter {
         double complementaryChance = 0.5f, List<AccessoryType> options = null)
     {
         DestroyAccessories();
-        
-        if (rand == null) { rand = SceneManager.sceneRandom2; }
+
+        if (rand == null) rand = rng;
         if (options == null) options = AccessoryOptions;
         SetColor(PrimerColor.BlobColors[
             rand.Next(PrimerColor.BlobColors.Count)]);
