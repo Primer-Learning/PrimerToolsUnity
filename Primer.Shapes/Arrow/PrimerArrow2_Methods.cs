@@ -67,7 +67,8 @@ namespace Primer.Shapes
 
             return Tween.Parallel(
                 extensionTween,
-                headObject.ScaleTo(thickness, 0)
+                headObject.GetChild(0).MoveTo(Vector3.right * 0.05f, Vector3.zero),
+                headObject.GetChild(0).ScaleTo(50, 0)
             );
         }
 
