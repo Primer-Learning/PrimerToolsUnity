@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -45,6 +47,17 @@ namespace Primer.Scene
         private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
         private string destinationDirectory;
         private byte[] lastFrame;
+        
+        // Speed tracking
+        private System.Diagnostics.Stopwatch renderIntervalStopwatch = new();
+        private long lastElapsedTime = 0;
+        private List<long> renderIntervals = new();
+        private List<long> readPixelsTimes = new();
+        private List<long> renderTimes = new();
+        private List<long> encodeToPNGTimes = new();
+        private List<long> writeAllBytesTimes = new();
+        private List<long> textureCreationTimes = new();
+        private List<long> renderTextureCreationTimes = new();
 
         [Button(ButtonSizes.Large)]
         public void OpenDestinationDirectory()
@@ -100,10 +113,48 @@ namespace Primer.Scene
                     yield return null;
                 }
             }
+            
+            PrintTimeLogs();
 
             UnityEditor.EditorApplication.ExitPlaymode();
         }
 
+        [Button]
+        public void PrintTimeLogs()
+        {
+            double avgRenderInterval = renderIntervals.Average();
+            double stdDevRenderInterval = Math.Sqrt(renderIntervals.Average(v => Math.Pow(v - avgRenderInterval, 2)));
+
+            
+
+            double avgTextureCreationTime = textureCreationTimes.Average();
+            double stdDevTextureCreationTime = Math.Sqrt(textureCreationTimes.Average(v => Math.Pow(v - avgTextureCreationTime, 2)));
+
+            double avgRenderTextureCreationTime = renderTextureCreationTimes.Average();
+            double stdDevRenderTextureCreationTime = Math.Sqrt(renderTextureCreationTimes.Average(v => Math.Pow(v - avgRenderTextureCreationTime, 2)));
+
+            double avgRenderTime = renderTimes.Average();
+            double stdDevRenderTime = Math.Sqrt(renderTimes.Average(v => Math.Pow(v - avgRenderTime, 2)));
+
+            double avgReadPixelsTime = readPixelsTimes.Average();
+            double stdDevReadPixelsTime = Math.Sqrt(readPixelsTimes.Average(v => Math.Pow(v - avgReadPixelsTime, 2)));
+            
+            double avgEncodeTime = encodeToPNGTimes.Average();
+            double stdDevEncodeTime = Math.Sqrt(encodeToPNGTimes.Average(v => Math.Pow(v - avgEncodeTime, 2)));
+        
+            double avgWriteTime = writeAllBytesTimes.Average();
+            double stdDevWriteTime = Math.Sqrt(writeAllBytesTimes.Average(v => Math.Pow(v - avgWriteTime, 2)));
+            
+            var toPrint = $"Average Time between RenderToPNG calls: {avgRenderInterval}ms,\nStandard Deviation: {stdDevRenderInterval}ms\n\n";
+            toPrint += $"Average Texture Creation time: {avgTextureCreationTime}ms,\nStandard Deviation: {stdDevTextureCreationTime}ms\n\n";
+            toPrint += $"Average RenderTexture Creation time: {avgRenderTextureCreationTime}ms,\nStandard Deviation: {stdDevRenderTextureCreationTime}ms\n\n";
+            toPrint += $"Average Render time: {avgRenderTime}ms,\nStandard Deviation: {stdDevRenderTime}ms\n\n";
+            toPrint += $"Average ReadPixels time: {avgReadPixelsTime}ms,\nStandard Deviation: {stdDevReadPixelsTime}ms\n\n";
+            toPrint += $"Average EncodeToPNG time: {avgEncodeTime}ms,\nStandard Deviation: {stdDevEncodeTime}ms\n\n";
+            toPrint += $"Average WriteAllBytes time: {avgWriteTime}ms,\nStandard Deviation: {stdDevWriteTime}ms";
+            
+            Debug.Log(toPrint);
+        }
 
         // private readonly List<string> createdDirs = new();
         private string GetContainerDirectory()
@@ -148,26 +199,60 @@ namespace Primer.Scene
 
         internal void RenderToPNG(string path, int resWidth, int resHeight)
         {
+            if (renderIntervalStopwatch.IsRunning)
+            {
+                long currentElapsedTime = renderIntervalStopwatch.ElapsedMilliseconds;
+                long interval = currentElapsedTime - lastElapsedTime;
+                renderIntervals.Add(interval);
+                lastElapsedTime = currentElapsedTime;
+            }
+            else
+            {
+                renderIntervalStopwatch.Start();
+            }
+            
+            
             // If it's not new take, and the png exists already, skip
             if (File.Exists(path) && fillGapsInPreviousTake) return;
             
             // Set up camera
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var image = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);
+            stopwatch.Stop();
+            textureCreationTimes.Add(stopwatch.ElapsedMilliseconds);
+            
+            stopwatch.Restart();
             var rt = new RenderTexture(resWidth, resHeight, 24);
+            stopwatch.Stop();
+            renderTextureCreationTimes.Add(stopwatch.ElapsedMilliseconds);
 
             cam.targetTexture = rt;
             RenderTexture.active = rt;
 
             // Render to image texture
+            stopwatch.Restart();
             cam.Render();
+            stopwatch.Stop();
+            renderTimes.Add(stopwatch.ElapsedMilliseconds);
+            
+            stopwatch.Restart();
             image.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
+            stopwatch.Stop();
+            readPixelsTimes.Add(stopwatch.ElapsedMilliseconds);
 
             // Save png
+            stopwatch.Restart();
             var bytes = image.EncodeToPNG();
+            stopwatch.Stop();
+            encodeToPNGTimes.Add(stopwatch.ElapsedMilliseconds);
 
             if (!omitRepeatingFrames || (lastFrame is null || !bytes.SequenceEqual(lastFrame))) {
                 lastFrame = bytes;
+                
+                stopwatch.Restart();
                 File.WriteAllBytes(path, bytes);
+                stopwatch.Stop();
+                writeAllBytesTimes.Add(stopwatch.ElapsedMilliseconds);
             }
 
             // Clean up
