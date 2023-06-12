@@ -10,6 +10,8 @@ namespace Primer.Graph
         Center,
     }
 
+    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshRenderer))]
     [ExecuteAlways]
     public class Rectangle : MonoBehaviour
     {
@@ -57,18 +59,31 @@ namespace Primer.Graph
         }
         #endregion
 
-        private Mesh mesh;
-        private Material material;
+        private Mesh _mesh;
+        private Mesh mesh {
+            get => _mesh;
+            set {
+                _mesh = value;
+                GetComponent<MeshFilter>().mesh = value;
+            }
+        }
 
-        private void Update()
+        private Material _material;
+        private Material material {
+            get => _material;
+            set {
+                _material = value;
+                GetComponent<MeshRenderer>().material = value;
+            }
+        }
+
+        private void Awake()
         {
             if (material is null)
                 OnMaterialChange();
 
             if (mesh is null)
                 OnMeshChange();
-
-            Graphics.DrawMesh(mesh, transform.localToWorldMatrix, material, 0);
         }
 
         private void OnMaterialChange()
@@ -105,8 +120,8 @@ namespace Primer.Graph
                 mesh = new Mesh {
                     vertices = vertices,
                     triangles = new [] {
-                        0, 2, 1, // First triangle
-                        2, 3, 1, // Second triangle
+                        0, 1, 2, // First triangle
+                        1, 3, 2, // Second triangle
                     },
                 };
             }
