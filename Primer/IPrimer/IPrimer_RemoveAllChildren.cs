@@ -27,9 +27,9 @@ namespace Primer
             self.transform.RemoveAllChildren();
         }
 
-        public static void RemoveAllChildren(this Transform transform)
+        public static void RemoveAllChildren(this Transform self)
         {
-            foreach (var child in transform.GetChildren())
+            foreach (var child in self.GetChildren())
                 child.Dispose();
         }
     }
