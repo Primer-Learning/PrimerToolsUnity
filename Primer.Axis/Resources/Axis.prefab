@@ -165,25 +165,40 @@ MonoBehaviour:
       min: 0
       max: 10
     scale: 1
-    paddingFraction: 0.05
+    padding: {x: 0, y: 0}
   rod:
     transform: {fileID: 8141656979287870989}
     thickness: 1
   label:
     text: x
-    fontSize: 2
     offset: {x: 0, y: 0, z: 0}
+    rotate: {x: 0, y: 0, z: 0, w: 1}
     position: 1
   arrows:
     presence: 2
     prefab:
       stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      hasPosition: 0
+      _rotation: {x: 0, y: 0, z: 0, w: 0}
+      hasRotation: 0
+      _scale: {x: 1, y: 1, z: 1}
+      hasScale: 0
   ticks:
     showTicks: 1
     showZero: 0
     step: 2
     maxTicks: 50
     maxDecimals: 2
+    verticalOffset: 0
+    labelNumberOffset: 0
+    valuePositionOffset: 0
     manualTicks: []
     prefab:
       stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+      _position: {x: 0, y: 0, z: 0}
+      hasPosition: 0
+      _rotation: {x: 0, y: 0, z: 0, w: 0}
+      hasRotation: 0
+      _scale: {x: 1, y: 1, z: 1}
+      hasScale: 0

@@ -1,4 +1,4 @@
-using System;
+using Primer.Latex;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,13 +8,14 @@ namespace Primer.Axis
     {
         public float value;
 
-        [HideInInspector]
-        public PrimerText2 text;
+        private LatexComponent latexCache;
+        private LatexComponent latex
+            => latexCache != null ? latexCache : latexCache = GetComponentInChildren<LatexComponent>();
 
         [ShowInInspector]
         public string label {
-            get => text.text;
-            set => text.text = value;
+            get => latex.latex;
+            set => latex.latex = value;
         }
     }
 }
