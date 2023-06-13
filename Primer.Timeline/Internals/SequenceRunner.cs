@@ -6,22 +6,22 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
-    public class SequenceRunner : IDisposable
+    public class SequenceRunner : IPrimer, IDisposable
     {
         private readonly IAsyncEnumerator<Tween> enumerator;
-        private bool hasMore = true;
         private bool isRunning = false;
 
         public readonly Transform transform;
         public readonly Sequence sequence;
-        public bool hasMoreClips => hasMore;
+        public Component component => sequence;
+
+        public bool hasMoreClips { get; private set; } = true;
 
         public SequenceRunner(Sequence sequence)
         {
             transform = sequence.transform;
             enumerator = sequence.Define();
             this.sequence = sequence;
-
             sequence.Cleanup();
         }
 
@@ -34,7 +34,7 @@ namespace Primer.Timeline
                 throw new Exception("SequenceRunner has no more clips");
 
             isRunning = true;
-            hasMore = await enumerator.MoveNextAsync();
+            hasMoreClips = await enumerator.MoveNextAsync();
             isRunning = false;
             return enumerator.Current;
         }
