@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class PrimerContainerExtensions
+    public static class Container_AddPrefabExtensions
     {
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
 
