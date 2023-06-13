@@ -22,7 +22,7 @@ namespace Primer.Timeline.Tests
             primer.ApplyIntrinsicPosition();
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             this.Log("ScaleUpFromZero");
             yield return primer.ScaleUpFromZero();

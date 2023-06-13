@@ -36,7 +36,7 @@ namespace Primer.Shapes.Tests
             endInitial = arrow.head;
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             yield return arrow.Animate(start, end);
         }

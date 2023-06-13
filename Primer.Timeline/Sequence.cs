@@ -11,6 +11,6 @@ namespace Primer.Timeline
 
         public virtual void Cleanup() {}
 
-        public abstract IAsyncEnumerator<Tween> Run();
+        public abstract IAsyncEnumerator<Tween> Define();
     }
 }

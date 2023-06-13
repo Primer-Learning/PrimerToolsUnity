@@ -31,7 +31,7 @@ namespace Primer.Latex
             );
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             yield return scrubbable.AsTween();
         }

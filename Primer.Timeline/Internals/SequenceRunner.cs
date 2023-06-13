@@ -19,7 +19,7 @@ namespace Primer.Timeline
         public SequenceRunner(Sequence sequence)
         {
             transform = sequence.transform;
-            enumerator = sequence.Run();
+            enumerator = sequence.Define();
             this.sequence = sequence;
 
             sequence.Cleanup();

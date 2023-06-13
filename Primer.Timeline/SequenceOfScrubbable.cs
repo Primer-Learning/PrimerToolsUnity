@@ -27,7 +27,7 @@ namespace Primer.Timeline
             scrubbable.Prepare();
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             yield return scrubbable.AsTween() with {
                 delay = delay,

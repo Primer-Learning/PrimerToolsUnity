@@ -94,7 +94,7 @@ namespace Primer.Latex
             DisableObjects();
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             if (!PrimerTimeline.isPreloading)
                 await EnsureIsInitialized();
@@ -139,7 +139,7 @@ namespace Primer.Latex
 
         internal async UniTask RunTrough()
         {
-            var enumerator = Run();
+            var enumerator = Define();
 
             while (await enumerator.MoveNextAsync()) {}
 

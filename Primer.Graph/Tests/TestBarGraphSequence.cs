@@ -33,7 +33,7 @@ namespace Primer.Graph.Tests
             // barPlot.AddBar("Third", 0, Color.magenta);
         }
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             yield return barPlot.TweenValues(1, 2, 3);
 

@@ -9,7 +9,7 @@ namespace Primer.Shapes.Tests
     {
         public PrimerBracket2 bracket;
 
-        public override async IAsyncEnumerator<Tween> Run()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             bracket.width = 1;
             bracket.anchor = new Vector3(0, 1, 0);

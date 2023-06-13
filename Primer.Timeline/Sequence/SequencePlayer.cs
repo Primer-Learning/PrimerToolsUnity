@@ -182,7 +182,7 @@ namespace Primer.Timeline
 
             Prepare();
 
-            enumerator ??= sequence.Run();
+            enumerator ??= sequence.Define();
             var hasMore = await enumerator.MoveNextAsync();
 
             if (ct.IsCancellationRequested)
