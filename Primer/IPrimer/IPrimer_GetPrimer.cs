@@ -5,24 +5,24 @@ namespace Primer
 {
     public static class IPrimer_GetPrimerExtensions
     {
-        public static IEnumerable<PrimerBehaviour> GetPrimer(this IEnumerable<IPrimer> self)
+        public static IEnumerable<PrimerComponent> GetPrimer(this IEnumerable<IPrimer> self)
         {
-            return self.GetOrAddComponent<PrimerBehaviour>();
+            return self.GetOrAddComponent<PrimerComponent>();
         }
 
-        public static IEnumerable<PrimerBehaviour> GetPrimer(this IEnumerable<Component> self)
+        public static IEnumerable<PrimerComponent> GetPrimer(this IEnumerable<Component> self)
         {
-            return self.GetOrAddComponent<PrimerBehaviour>();
+            return self.GetOrAddComponent<PrimerComponent>();
         }
 
-        public static PrimerBehaviour GetPrimer(this IPrimer self)
+        public static PrimerComponent GetPrimer(this IPrimer self)
         {
-            return self.GetOrAddComponent<PrimerBehaviour>();
+            return self.GetOrAddComponent<PrimerComponent>();
         }
 
-        public static PrimerBehaviour GetPrimer(this Component self)
+        public static PrimerComponent GetPrimer(this Component self)
         {
-            return self.GetOrAddComponent<PrimerBehaviour>();
+            return self.GetOrAddComponent<PrimerComponent>();
         }
     }
 }

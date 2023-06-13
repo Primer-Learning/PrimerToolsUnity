@@ -15,9 +15,9 @@ namespace Primer
             return gameObject.scene.handle == 0 || gameObject.scene.path == "";
         }
 
-        public static PrimerBehaviour GetPrimer(this GameObject gameObject)
+        public static PrimerComponent GetPrimer(this GameObject gameObject)
         {
-            return gameObject.GetOrAddComponent<PrimerBehaviour>();
+            return gameObject.GetOrAddComponent<PrimerComponent>();
         }
     }
 }

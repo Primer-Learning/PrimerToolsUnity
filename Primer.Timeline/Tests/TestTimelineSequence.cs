@@ -7,7 +7,7 @@ namespace Primer.Timeline.Tests
     public class TestTimelineSequence : Sequence
     {
         public float seconds = 1;
-        private PrimerBehaviour primer;
+        private PrimerComponent primer;
 
         public override void Cleanup()
         {
