@@ -13,8 +13,7 @@ namespace Primer.Graph
         private float fadeModifier;
         private bool isFadeOut;
 
-        protected override void Stop()
-            => ChildrenDeclaration.Clear(trackTarget.transform);
+        protected override void Stop() => trackTarget.RemoveAllChildren();
 
         protected override IMixerCollector<ILine> CreateCollector()
         {
@@ -70,16 +69,12 @@ namespace Primer.Graph
             var positionMultiplier = trackTarget.GetPositionMultiplier();
             var scale = trackTarget.GetScaleNeutralizer();
 
-            var children = new ChildrenDeclaration(trackTarget.transform);
+            var children = new Container(trackTarget.transform);
 
             var points = input.Points.Select(
                     (position, i) => {
-                        var point = children.NextIsInstanceOf(
-                            trackTarget.prefab,
-                            $"Point {i}",
-                            init: x => x.hideFlags = HideFlags.DontSave
-                        );
-
+                        var point = children.Add(trackTarget.prefab, $"Point {i}");
+                        point.hideFlags = HideFlags.DontSave;
                         point.localPosition = Vector3.Scale(position, positionMultiplier);
                         point.localScale = scale;
                         return point;
@@ -87,7 +82,7 @@ namespace Primer.Graph
                 )
                 .ToList();
 
-            children.Apply();
+            children.Purge();
 
             if (fadeModifier < 0)
                 return;

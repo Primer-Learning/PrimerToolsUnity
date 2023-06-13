@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -52,22 +53,15 @@ namespace Primer.Axis
         public PrefabProvider<AxisTick> prefab;
 
 
-        public void Update(ChildrenDeclaration modifier, AxisDomain domain)
+        public void Update(Container parentContainer, AxisDomain domain)
         {
             if (!showTicks || step <= 0 || prefab.isEmpty)
                 return;
 
-            var container = new Container(modifier.Next("Ticks container"));
-            container.transform.SetDefaults();
-
-            container.onCreate = tick => {
-                if (Application.isPlaying) {
-                    tick.GetChildren()
-                        .Select(x => x.ScaleTo(0.1f, initialScale:0) with { duration = 0.5f })
-                        .RunInParallel()
-                        .PlayAndForget();
-                }
-            };
+            var container = parentContainer.AddContainer("Ticks container");
+            container.SetDefaults();
+            container.onCreate = OnCreateTick;
+            container.onRemove = OnRemoveTick;
 
             var expectedTicks = manualTicks.Count != 0
                 ? manualTicks
@@ -81,34 +75,33 @@ namespace Primer.Axis
                 tick.transform.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
             }
 
-            // HACK: The ticks we don't need anymore have to be scaled down and only removed after that
-            async void RemoveTick(Transform tick)
-            {
-                var childrenRemoval = tick
-                    .GetChildren()
-                    .Select(x => x.GetPrimer().ShrinkAndDispose(0.1f));
-
-                await UniTask.WhenAll(childrenRemoval);
-                tick.Dispose();
+            foreach (var removing in container.removing) {
+                var data = removing.GetComponent<AxisTick>();
+                removing.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
             }
+        }
 
-            foreach (var toRemove in container.extraChildren) {
-                // Keep it
-                container.Insert(toRemove);
+        private void OnCreateTick(Transform tick)
+        {
+            if (!PrimerTimeline.isPlaying)
+                return;
 
-                // Place it where it should be now
-                var data = toRemove.GetComponent<AxisTick>();
-                toRemove.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
+            tick.GetChildren()
+                .Select(x => x.ScaleUpFromZero() with { duration = 0.5f })
+                .RunInParallel()
+                .PlayAndForget();
+        }
 
-                if (data.isRemoving)
-                    continue;
+        private async void OnRemoveTick(Transform tick)
+        {
+            if (!PrimerTimeline.isPlaying)
+                return;
 
-                // Scale down and automatically remove it
-                data.isRemoving = true;
-                RemoveTick(toRemove);
-            }
+            var childrenRemoval = tick.GetChildren()
+                .Select(x => x.GetPrimer().ShrinkAndDispose(0.1f));
 
-            // container.Purge();
+            await UniTask.WhenAll(childrenRemoval);
+            tick.Dispose();
         }
 
         private List<TicData> CropTicksCount(List<TicData> ticks)

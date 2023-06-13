@@ -22,6 +22,8 @@ namespace Primer
         public static Container<T> From<T>(T component) where T : Component => new(component);
 
         public Action<Transform> onCreate;
+        public Action<Transform> onRemove;
+
         public int childCount => usedChildren.Count;
         public Transform transform { get; }
         public TComponent component { get; }
@@ -29,7 +31,8 @@ namespace Primer
         // When .component is used from the interface cast it to Component
         Component IPrimer.component => (Component)component;
 
-        public IEnumerable<Transform> extraChildren => new List<Transform>(unusedChildren);
+        // public IEnumerable<Transform> extraChildren => new List<Transform>(unusedChildren);
+        public IEnumerable<Transform> removing => transform.GetChildren().Where(x => x.HasComponent<IsRemoving>());
 
         public Container(string name, Component parent = null)
         {
@@ -38,15 +41,15 @@ namespace Primer
                 : GetDirectChild(parent.transform, name);
 
             component = GetComponent<TComponent>(transform);
-            unusedChildren = transform.GetChildren().ToList();
+            unusedChildren = ReadExistingChildren(transform);
             transform.SetActive(true);
         }
 
-        public Container(TComponent component)
+        protected Container(TComponent component)
         {
             this.component = component;
             transform = component.transform;
-            unusedChildren = transform.GetChildren().ToList();
+            unusedChildren = ReadExistingChildren(transform);
             transform.SetActive(true);
         }
 

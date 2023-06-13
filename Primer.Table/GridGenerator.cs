@@ -5,11 +5,8 @@ namespace Primer.Table
 {
     [ExecuteAlways]
     [DisallowMultipleComponent]
-    public class GridGenerator : GeneratorBehaviour
+    public class GridGenerator : MonoBehaviour
     {
-        // TODO: Accepts a Vector3 o Func<Vector3> or something that contains a Func<Vector3>
-        // public Vector3Provider cellSize;
-
         public Vector3Int length = new(3, 3, 1);
         public Vector3 cellSize = new(1, 1, 0);
 
@@ -17,36 +14,32 @@ namespace Primer.Table
         public PrefabProvider prefab;
 
 
-        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
+        [Button(ButtonSizes.Large)]
+        public void UpdateChildren()
         {
+            var container = new Container(transform);
+
             for (var k = 0; k < length.z; k++)
             for (var j = 0; j < length.y; j++)
             for (var i = 0; i < length.x; i++) {
                 var coordinates = new Vector3Int(i, j, k);
-                var cellName = $"Cell {coordinates}";
 
-                void Init(Cell cell)
-                {
-                    cell.coordinates = coordinates;
-                    // cell.unitCoordinates = new Vector3(i / cols, j / rows, k / layers);
-                }
-
-                var child = prefab is null || prefab.isEmpty
-                    ? children.Next<Cell>(cellName, Init)
-                    : children.NextIsInstanceOf(
-                        provider: prefab,
-                        name: cellName,
-                        init: instance => {
-                            var cell = instance.gameObject.AddComponent<Cell>();
-                            Init(cell);
-                            return cell;
-                        }
-                    );
+                var child = CreateCell(container, $"Cell {coordinates}");
+                child.coordinates = coordinates;
 
                 var position = Vector3.Scale(coordinates, cellSize);
                 position.y *= -1;
                 child.transform.localPosition = position;
             }
+        }
+
+        private Cell CreateCell(Container container, string cellName)
+        {
+            if (prefab is null || prefab.isEmpty)
+                return container.Add<Cell>(cellName);
+
+            var child = container.Add(prefab, cellName);
+            return child.GetOrAddComponent<Cell>();
         }
 
         public class Cell : MonoBehaviour

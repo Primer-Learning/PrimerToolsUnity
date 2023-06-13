@@ -8,9 +8,6 @@ namespace Primer.Axis
     {
         public float value;
 
-        [NonSerialized]
-        internal bool isRemoving = false;
-
         [HideInInspector]
         public PrimerText2 text;
 

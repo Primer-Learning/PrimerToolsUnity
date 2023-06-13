@@ -212,7 +212,7 @@ namespace Primer.Latex
             if (gameObject.IsPreset())
                 return;
 
-            ChildrenDeclaration.Clear(transform);
+            transform.RemoveAllChildren();
             UpdateChildren();
         }
 

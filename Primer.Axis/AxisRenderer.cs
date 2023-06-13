@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Primer.Axis
 {
     [ExecuteAlways]
-    public class AxisRenderer : GeneratorBehaviour
+    public class AxisRenderer : MonoBehaviour
     {
         [SerializeField]
         public AxisDomain domain = new();
@@ -42,9 +42,6 @@ namespace Primer.Axis
         public float DomainToPosition(float domainValue) => domainValue * domain.scale;
 
 
-        internal new void OnValidate() => base.OnValidate();
-
-
         internal bool ListenDomainChange(Action onDomainChange)
         {
             if (domain.onChange == onDomainChange)
@@ -54,38 +51,31 @@ namespace Primer.Axis
             return true;
         }
 
-
-        protected override ChildrenDeclaration CreateChildrenDeclaration() => new(
-            transform,
-            onCreate: x => x.GetPrimer().ScaleUpFromZero().PlayAndForget(),
-            onRemove: x => x.GetPrimer().ShrinkAndDispose().Forget()
-        );
-
-        protected override void UpdateChildren(bool isEnabled, ChildrenDeclaration children)
+        public void OnValidate()
         {
-            // Rod is not a generated object so we keep it as child even if disabled
-            rod.AddTo(children);
-
-            if (!isEnabled)
-                return;
-
-            rod.Update(domain);
-            label.Update(children, domain, 0.25f);
-            arrows.Update(children, domain);
-            ticks.Update(children, domain);
+            UpdateChildren();
         }
 
-        [PropertyOrder(100)]
-        [ButtonGroup("Generator group")]
-        [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
-        [ContextMenu("PRIMER > Regenerate children")]
-        protected override void RegenerateChildren()
-        {
-            if (gameObject.IsPreset())
-                return;
 
-            ChildrenDeclaration.Clear(transform, skip: new []{ rod.transform });
-            UpdateChildren();
+        [Button(ButtonSizes.Large)]
+        public void UpdateChildren()
+        {
+            var container = new Container(transform) {
+                onCreate = x => x.ScaleUpFromZero().PlayAndForget(),
+                onRemove = x => x.ShrinkAndDispose().Forget(),
+            };
+
+            // Rod is not a generated object so we keep it as child even if disabled
+            container.Insert(rod.transform);
+
+            if (enabled && isActiveAndEnabled) {
+                rod.Update(domain);
+                label.Update(container, domain, 0.25f);
+                arrows.Update(container, domain);
+                ticks.Update(container, domain);
+            }
+
+            container.Purge();
         }
     }
 }

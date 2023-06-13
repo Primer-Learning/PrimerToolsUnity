@@ -17,10 +17,6 @@ namespace Primer.Axis
 
         public float thickness = 1;
 
-
-        public void AddTo(ChildrenDeclaration declaration)
-            => declaration.NextIs(transform);
-
         public void Update(AxisDomain domain)
         {
             transform.localPosition = new Vector3(domain.rodStart, 0f, 0f);

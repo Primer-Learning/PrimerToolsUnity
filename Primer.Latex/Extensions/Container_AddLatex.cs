@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    public static class PrimerLatexContainerExtensions
+    public static class Container_AddLatexExtensions
     {
         public static LatexComponent AddLatex<T>(this Container<T> container, string formula, string name = null,
             bool worldPositionStays = false) where T : Component

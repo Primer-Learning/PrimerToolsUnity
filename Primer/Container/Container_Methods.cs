@@ -27,58 +27,10 @@ namespace Primer
             unusedChildren.Remove(t);
         }
 
-        public Transform Add(string name = null, bool worldPositionStays = false)
-        {
-            var child = FindChild<Transform>(name) ?? OnCreate(new GameObject(name).transform);
-            Insert(child, worldPositionStays);
-            return child;
-        }
-
-        public TChild Add<TChild>(string name = null, bool worldPositionStays = false) where TChild : Component
-        {
-            var child = FindChild<TChild>(name) ?? OnCreate(new GameObject(name).AddComponent<TChild>());
-            Insert(child, worldPositionStays);
-            return child;
-        }
-
-        public TChild Add<TChild>(TChild template, string name = null, bool worldPositionStays = false)
-            where TChild : Component
-        {
-            var child = FindInstanceOf(template, name) ?? OnCreate(InstantiationTracker.InstantiateAndRegister(template, name));
-            Insert(child, worldPositionStays);
-            return child;
-        }
-
-        public Container AddContainer(string name, bool worldPositionStays = false)
-        {
-            var child = Add(name, worldPositionStays);
-            var childContainer = new Container(child);
-            onPurge.Add(() => childContainer.Purge());
-            return childContainer;
-        }
-
-        public Container<TChild> AddContainer<TChild>(string name, bool worldPositionStays = false)
-            where TChild : Component
-        {
-            var child = Add<TChild>(name, worldPositionStays);
-            var childContainer = new Container<TChild>(child);
-            onPurge.Add(() => childContainer.Purge());
-            return childContainer;
-        }
-
-        public Container<TChild> AddContainer<TChild>(TChild template, string name, bool worldPositionStays = false)
-            where TChild : Component
-        {
-            var child = Add(template, name, worldPositionStays);
-            var childContainer = new Container<TChild>(child);
-            onPurge.Add(() => childContainer.Purge());
-            return childContainer;
-        }
-
         public void Purge()
         {
             foreach (var child in unusedChildren)
-                child.Dispose();
+                onRemove(child);
 
             foreach (var listener in onPurge)
                 listener();

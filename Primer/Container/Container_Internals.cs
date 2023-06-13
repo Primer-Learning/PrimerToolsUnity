@@ -100,5 +100,24 @@ namespace Primer
             onCreate?.Invoke(child.transform);
             return child;
         }
+
+        private static Action<Transform> defaultOnRemove = x => x.Dispose();
+        private void OnRemove(Component child)
+        {
+            child.GetOrAddComponent<IsRemoving>();
+            (onRemove ?? defaultOnRemove).Invoke(child.transform);
+        }
+
+        private static List<Transform> ReadExistingChildren(Transform transform)
+        {
+            return transform.GetChildren()
+                .Where(x => !x.HasComponent<IsRemoving>())
+                .ToList();
+        }
+
+        /// <summary>
+        ///   This component is added to a child when it is being removed from the container.
+        /// </summary>
+        private class IsRemoving : MonoBehaviour { }
     }
 }
