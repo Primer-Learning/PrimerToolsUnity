@@ -39,6 +39,14 @@ namespace Primer.Timeline
             return enumerator.Current;
         }
 
+        public async UniTask PlayNextClip()
+        {
+            var tween = await NextClip();
+
+            if (tween is not null)
+                await tween.Play();
+        }
+
         public void Dispose()
         {
             enumerator.DisposeAsync();
