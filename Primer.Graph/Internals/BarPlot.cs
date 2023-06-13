@@ -333,7 +333,6 @@ namespace Primer.Graph
         private Rectangle CreateBar(Container container, BarData data, int i)
         {
             var bar = container.Add<Rectangle>(data.name ?? $"Bar {i}");
-            PrimerTimeline.MarkAsEphemeral(bar);
 
             bar.transform.localPosition = new Vector3(i, 0, 0) + offset;
 

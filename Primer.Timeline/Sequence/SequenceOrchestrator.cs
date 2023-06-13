@@ -12,15 +12,7 @@ namespace Primer.Timeline
 
         public static UniTask AllSequencesFinished() => UniTask.WhenAll(tasks);
 
-        public static void PlayTo(SequencePlayable[] behaviours, float time)
-        {
-            PlayBehaviours(behaviours, time);
-
-            if (behaviours.Count(x => x.start <= time) == 0)
-                PrimerTimeline.DisposeEphemeralObjects();
-        }
-
-        private static void PlayBehaviours(IEnumerable<SequencePlayable> allBehaviours, float time)
+        public static void PlayTo(SequencePlayable[] allBehaviours, float time)
         {
             var ct = executionGuarantee.NewExecution();
 

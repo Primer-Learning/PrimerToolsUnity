@@ -202,7 +202,6 @@ namespace Primer.Latex
                 hideFlags = HideFlags.DontSave,
             };
 
-            PrimerTimeline.MarkAsEphemeral(container);
             CreateTransforms(container.transform);
             return container;
         }
