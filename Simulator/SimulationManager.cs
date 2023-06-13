@@ -83,12 +83,7 @@ public class SimulationManager : MonoBehaviour
         while (aCoroutine.MoveNext()) {
             var c = aCoroutine.Current;
             var conditional = c as ConditionalYield;
-            if (conditional != null && SceneManager.instance is Director && ((Director)SceneManager.instance).animating) {
-                yield return conditional.yieldValue;
-            }
-            else if (conditional == null) {
-                yield return c;
-            }
+            yield return conditional?.yieldValue ?? c;
         }
     }
     public class ConditionalYield {

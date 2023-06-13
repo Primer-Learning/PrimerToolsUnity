@@ -98,8 +98,7 @@ public static class Helpers
     }
     public static float[] PartitionFloat(float toPartion, int numPartitions) {
         System.Random rand = new System.Random();
-        if (Director.instance != null) {rand = Director.sceneRandom;}
-        else {Debug.LogError("No Random object provided, and no Director is present for a default.");}
+        Debug.LogError("No Random object provided, and no Director is present for a default.");
         return PartitionFloat(toPartion, numPartitions, rand);
     }
     public static float[] PartitionFloat(float toPartion, int numPartitions, System.Random rand) {
@@ -127,23 +126,12 @@ public static class Helpers
     }
     public static void Shuffle<T>(this IList<T> list) {  
         int n = list.Count;  
-        if (Director.sceneRandom != null) {
-            while (n > 1) {  
-                n--;
-                int k = Director.sceneRandom.Next(n + 1);  
-                T value = list[k];  
-                list[k] = list[n];  
-                list[n] = value;  
-            }  
-        }
-        else {
-            while (n > 1) {  
-                n--;
-                int k = UnityEngine.Random.Range(0, n + 1);  
-                T value = list[k];  
-                list[k] = list[n];  
-                list[n] = value;  
-            }  
+        while (n > 1) {
+            n--;
+            int k = UnityEngine.Random.Range(0, n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
         }
     }
     public static void RotateRight(IList sequence, int count)
@@ -169,7 +157,6 @@ public static class Helpers
 
     public static double BoxMuller(double mean, double stdDev) {
         System.Random rand = new System.Random();
-        if (Director.instance != null) {rand = Director.sceneRandom;}
         double u1 = 1.0-rand.NextDouble(); //uniform(0,1] random doubles
         double u2 = 1.0-rand.NextDouble();
         double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
