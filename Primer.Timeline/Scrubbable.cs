@@ -5,7 +5,9 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
+    // TODO: Remove
     [Serializable]
+    [Obsolete("Use Primer.Animation.ObservableTween instead")]
     public abstract class Scrubbable
     {
         public Transform target { get; set; }

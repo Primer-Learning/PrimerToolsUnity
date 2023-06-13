@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -45,6 +46,8 @@ namespace Primer.Timeline
         }
 
         /// <summary>Executed immediately before any clip is executed</summary>
+        // TODO: Remove
+        [Obsolete("Code that used to be in Prepare() can be added at the beginning of Define(), before the first yield return, instead.")]
         public void Prepare()
         {
             if (status == Status.Playing)

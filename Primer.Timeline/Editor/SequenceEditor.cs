@@ -17,7 +17,7 @@ namespace Primer.Timeline.Editor
                 Reevaluate();
         }
 
-        private async Task Reevaluate()
+        private async void Reevaluate()
         {
             var director = TimelineEditor.inspectedDirector;
             if (director == null) return;

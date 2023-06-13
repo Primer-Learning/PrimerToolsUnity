@@ -10,8 +10,8 @@ namespace Primer.Timeline
 {
     public static class PrimerTimeline
     {
-        public static bool isPlaying => FixTimelineInPlayMode.isPlaying;
-        public static bool isPreloading => FixTimelineInPlayMode.isPreloading;
+        public static bool isPlaying => PatchPlayMode.isPlaying;
+        public static bool isPreloading => PatchPlayMode.isPreloading;
 
         static PrimerTimeline()
         {
@@ -29,7 +29,7 @@ namespace Primer.Timeline
                 throw new InvalidOperationException("PrimerTimeline.EnterPlayMode() can only be called in Edit Mode.");
 
             var tcs = new UniTaskCompletionSource();
-            FixTimelineInPlayMode.OnEnterPlayMode(() => tcs.TrySetResult());
+            PatchPlayMode.OnEnterPlayMode(() => tcs.TrySetResult());
             EditorApplication.EnterPlaymode();
             return tcs.Task;
         }

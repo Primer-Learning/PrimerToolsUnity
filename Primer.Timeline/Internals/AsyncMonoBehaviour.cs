@@ -13,10 +13,7 @@ namespace Primer.Timeline
     {
         private readonly List<Tween> parallelQueue = new();
 
-        public void AddToParallel(Tween tween)
-        {
-            parallelQueue.Add(tween);
-        }
+        public void AddToParallel(Tween tween) => parallelQueue.Add(tween);
 
         public Tween WaitForParallels(float delayBetweenStarts = 0)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -5,6 +6,8 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
+    // TODO: Remove
+    [Obsolete("Use Primer.Animation.ObservableTween instead")]
     public abstract class SequenceOfScrubbable<T> : Sequence
         where T : Scrubbable, new()
     {

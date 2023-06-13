@@ -6,17 +6,12 @@ namespace Primer.Timeline
     {
         public int Compare(PrimerPlayable left, PrimerPlayable right)
         {
-            if (left is null && right is null)
-                return 0;
-
-            if (left is null)
-                return 1;
-
-            if (right is null)
-                return -1;
-
-            var delta = left.start - right.start;
-            return (int) (delta * 10000);
+            return (left, right) switch {
+                (null, null) => 0,
+                (null, _) => 1,
+                (_, null) => -1,
+                _ => (int) (left.start - right.start * 10000),
+            };
         }
     }
 }

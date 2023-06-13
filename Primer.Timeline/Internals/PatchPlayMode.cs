@@ -11,13 +11,13 @@ namespace Primer.Timeline
     /// This class exists because the timeline doesn't render the objects properly on the first run
     /// </summary>
     [InitializeOnLoad]
-    internal static class FixTimelineInPlayMode
+    internal static class PatchPlayMode
     {
         public static bool isPreloading = false;
         public static bool isPlaying = false;
         private static Action whenReady;
 
-        static FixTimelineInPlayMode()
+        static PatchPlayMode()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChange;
         }

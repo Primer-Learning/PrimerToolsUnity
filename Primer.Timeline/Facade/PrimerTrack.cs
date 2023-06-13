@@ -8,7 +8,7 @@ namespace Primer.Timeline
 {
     public abstract class PrimerTrack : TrackAsset
     {
-        public virtual float defaultDuration { get; } = 1;
+        protected virtual float defaultDuration => 1;
 
         protected override Playable CreatePlayable(PlayableGraph graph, GameObject gameObject, TimelineClip clip)
         {

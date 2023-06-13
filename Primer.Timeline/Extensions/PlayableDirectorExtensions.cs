@@ -19,12 +19,6 @@ namespace Primer.Timeline
             return track;
         }
 
-        public static object GetGenericBindingForClip(this PlayableDirector director, PlayableAsset clip)
-        {
-            var track = director.GetTrackOfClip(clip);
-            return track is null ? null : director.GetGenericBinding(track);
-        }
-
         public static T GetOrCreateTrack<T>(this PlayableDirector director, Object boundTo) where T : TrackAsset, new()
         {
             var found = director.FindTrack(
@@ -66,11 +60,6 @@ namespace Primer.Timeline
             }
 
             return null;
-        }
-
-        public static List<TrackAsset> GetAllTracks(this PlayableDirector director)
-        {
-            return GetAllTracksRecursively(director.GetTimeline().GetRootTracks());
         }
 
         public static List<TrackAsset> GetAllTracksRecursively(IEnumerable<TrackAsset> tracks)

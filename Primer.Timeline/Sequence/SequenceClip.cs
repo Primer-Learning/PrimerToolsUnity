@@ -13,6 +13,7 @@ namespace Primer.Timeline
 
         public override string clipName => $"[{template.clipIndex + 1}] {trackTransform?.name ?? "No sequence"}";
 
+
         #region Editor buttons
 #if UNITY_EDITOR
         [Title("View in play mode...")]
@@ -28,10 +29,10 @@ namespace Primer.Timeline
                 return;
 
             var pauseAfter = start - secondsBefore;
-            FixTimelineInPlayMode.isPlaying = false;
+            PatchPlayMode.isPlaying = false;
             await UniTask.WaitWhile(() => director.time < pauseAfter);
             EditorApplication.isPaused = true;
-            FixTimelineInPlayMode.isPlaying = true;
+            PatchPlayMode.isPlaying = true;
         }
 
         [Button]
@@ -56,7 +57,7 @@ namespace Primer.Timeline
             var pauseAfter = start - secondsBefore;
 
             director.Pause();
-            FixTimelineInPlayMode.isPlaying = false;
+            PatchPlayMode.isPlaying = false;
 
             while (director.time < pauseAfter) {
                 await PrimerTimeline.ScrubTo(director, director.time + secondsPerFrame);
@@ -65,7 +66,7 @@ namespace Primer.Timeline
             // cautionary wait to let the director catch up
             await UniTask.Delay(100);
 
-            FixTimelineInPlayMode.isPlaying = true;
+            PatchPlayMode.isPlaying = true;
             director.Play();
         }
 
