@@ -9,8 +9,6 @@ using UnityEngine;
 using Random = System.Random;
 
 public class PrimerBlob : PrimerCharacter {
-    public static readonly IPool<PrimerBlob> pool = new PrefabPool<PrimerBlob>("blob_skinned");
-
     public enum MeshType
     {
         HighPolySkinned,

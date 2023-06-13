@@ -269,35 +269,6 @@ namespace Primer.Graph
         #endregion
 
 
-        #region Line helpers
-        public PrimerLine VerticalLine(IPool<PrimerLine> pool = null)
-        {
-            var line = (pool ?? PrimerLine.pool).Get();
-            line.transform.SetParent(graph.domain, true);
-            line.transform.localScale = Vector3.one;
-            line.start = Vector3.zero;
-            line.end = Vector3.up * graph.enabledYAxis.max;
-            return line;
-        }
-
-        public float GetPointBefore(int index) => GetPointBefore(GetBar(index));
-        public float GetPointBefore(string name) => GetPointBefore(GetBar(name));
-        public float GetPointBefore(BarData bar)
-        {
-            var index = bars.IndexOf(bar);
-            return index + offset.x;
-        }
-
-        public float GetPointAfter(int index) => GetPointAfter(GetBar(index));
-        public float GetPointAfter(string name) => GetPointAfter(GetBar(name));
-        public float GetPointAfter(BarData bar)
-        {
-            var index = bars.IndexOf(bar);
-            return index + offset.x + 1;
-        }
-        #endregion
-
-
         [Button]
         public void UpdateBars()
         {

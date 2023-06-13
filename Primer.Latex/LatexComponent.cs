@@ -11,11 +11,9 @@ namespace Primer.Latex
 {
     [ExecuteAlways]
     [AddComponentMenu("Primer / LaTeX")]
-    public class LatexComponent : MonoBehaviour, IMeshRendererController, IPoolable
+    public class LatexComponent : MonoBehaviour, IMeshRendererController
     {
         public const string PREFAB_NAME = "LaTeX";
-
-        public static readonly IPool<LatexComponent> pool = new PrefabPool<LatexComponent>(PREFAB_NAME);
 
         [SerializeReference] private LatexCliIntegration integration = new();
         [SerializeReference] private LatexGroups groups = new();
@@ -126,21 +124,6 @@ namespace Primer.Latex
             var scrubbable = CreateTransition(to, transitions.ToArray());
             await scrubbable.Play();
             return scrubbable;
-        }
-
-        // Pool
-
-        public void OnReuse() { }
-
-        public void OnRecycle()
-        {
-            integration = new LatexCliIntegration();
-            groups = new LatexGroups();
-            renderer = new LatexRenderer();
-            onChange = new UnityEvent<LatexExpression>();
-            ConnectParts();
-
-            GetCharacterTransforms(0, 0);
         }
 
         // Character access

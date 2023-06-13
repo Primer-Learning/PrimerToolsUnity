@@ -56,5 +56,11 @@ namespace Primer
         {
             return transform.GetComponentsInChildren<T>();
         }
+
+        public Container<TComponent> SetDefaults()
+        {
+            transform.SetDefaults();
+            return this;
+        }
     }
 }

@@ -5,11 +5,10 @@ using Shapes;
 namespace Primer.Shapes
 {
     [RequireComponent(typeof(Line))]
-    public class PrimerLine : MonoBehaviour, IPoolable
+    public class PrimerLine : MonoBehaviour
     {
         private const float DEFAULT_DASH_SIZE = 5f;
         private const float DEFAULT_DASH_SPEED = 0.1f;
-        public static readonly IPool<PrimerLine> pool = new PrefabPool<PrimerLine>("PrimerLine");
 
         private Line lineCache;
         private Line line => lineCache ??= GetComponent<Line>();
@@ -102,12 +101,5 @@ namespace Primer.Shapes
                 end = Vector3.Lerp(fromEnd, toEnd, t);
             });
         }
-
-        public void OnReuse()
-        {
-            SetDefaults();
-        }
-
-        public void OnRecycle() {}
     }
 }
