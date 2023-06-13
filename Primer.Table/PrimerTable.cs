@@ -1,9 +1,13 @@
+using System;
 using Primer.Axis;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Table
 {
+    // When this is moved we should rename Primer.Graph to Primer.Dataviz
+    [Obsolete("This should be moved to Primer.Graph")]
+
     [RequireComponent(typeof(MultipleAxesController))]
     public class PrimerTable : MonoBehaviour
     {
