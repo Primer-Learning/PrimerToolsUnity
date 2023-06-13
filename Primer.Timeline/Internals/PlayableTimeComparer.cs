@@ -10,7 +10,7 @@ namespace Primer.Timeline
                 (null, null) => 0,
                 (null, _) => 1,
                 (_, null) => -1,
-                _ => (int) (left.start - right.start * 10000),
+                _ => (int) ((left.start - right.start) * 10000),
             };
         }
     }
