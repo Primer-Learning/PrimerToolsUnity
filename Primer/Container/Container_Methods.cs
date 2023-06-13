@@ -30,7 +30,7 @@ namespace Primer
         public void Purge()
         {
             foreach (var child in unusedChildren)
-                onRemove(child);
+                OnRemove(child);
 
             foreach (var listener in onPurge)
                 listener();

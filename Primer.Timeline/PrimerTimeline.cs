@@ -16,6 +16,7 @@ namespace Primer.Timeline
         static PrimerTimeline()
         {
             UnityTagManager.CreateTag(COLLECTABLE_OBJECT_TAG);
+            ContainerEvents.deactivateEventsIf = () => isPlaying;
         }
 
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)

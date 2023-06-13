@@ -8,6 +8,9 @@ namespace Primer
 {
     public partial class Container<TComponent>
     {
+        // When .component is used from the interface cast it to Component
+        Component IPrimer.component => (Component)component;
+
         private readonly List<Transform> usedChildren = new();
         private readonly List<Transform> unusedChildren;
         private readonly List<Action> onPurge = new();
@@ -94,30 +97,5 @@ namespace Primer
                 : source.GetComponent<TResult>()
                 ?? source.gameObject.AddComponent<TResult>();
         }
-
-        private TChild OnCreate<TChild>(TChild child) where TChild : Component
-        {
-            onCreate?.Invoke(child.transform);
-            return child;
-        }
-
-        private static Action<Transform> defaultOnRemove = x => x.Dispose();
-        private void OnRemove(Component child)
-        {
-            child.GetOrAddComponent<IsRemoving>();
-            (onRemove ?? defaultOnRemove).Invoke(child.transform);
-        }
-
-        private static List<Transform> ReadExistingChildren(Transform transform)
-        {
-            return transform.GetChildren()
-                .Where(x => !x.HasComponent<IsRemoving>())
-                .ToList();
-        }
-
-        /// <summary>
-        ///   This component is added to a child when it is being removed from the container.
-        /// </summary>
-        private class IsRemoving : MonoBehaviour { }
     }
 }
