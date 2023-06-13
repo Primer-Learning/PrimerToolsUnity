@@ -261,11 +261,11 @@ namespace Primer.Graph
 
         // /* can be done with */ barPlot[index].Tween("color", color);
         [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void TweenColor(int index, Color color) => this[index].Tween("color", color);
+        public void TweenColor(int index, Color color) => Tween.Value(() => this[index].color, color);
 
         // /* can be done with */ barPlot[name].Tween("color", color);
         [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void TweenColor(string name, Color color) => this[name].Tween("color", color);
+        public void TweenColor(string name, Color color) => Tween.Value(() => this[name].color, color);
         #endregion
 
 
