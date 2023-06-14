@@ -15,7 +15,7 @@ namespace Primer.Timeline
 
         static PrimerTimeline()
         {
-            ContainerEvents.deactivateEventsIf = () => isPlaying;
+            ContainerEvents.deactivateEventsIf = () => !isPlaying;
         }
 
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)

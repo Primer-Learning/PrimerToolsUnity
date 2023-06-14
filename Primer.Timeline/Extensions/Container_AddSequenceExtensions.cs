@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
-    public static class ContainerExtensions
+    public static class Container_AddSequenceExtensions
     {
         public static SequenceRunner AddSequence<TSequence>(this Container container, string name = null,
             bool worldPositionStays = false)

@@ -5,9 +5,7 @@ namespace Primer
 {
     public class PrimerComponent : MonoBehaviour
     {
-        private Container containerCache;
-        public Container container => containerCache ??= new Container(transform);
-
+        internal Container<Component> parentContainer;
 
         #region Vector3? intrinsicScale
         [SerializeField]
@@ -59,7 +57,6 @@ namespace Primer
             return scale;
         }
         #endregion
-
 
         #region Vector3? intrinsicPosition
         [SerializeField]

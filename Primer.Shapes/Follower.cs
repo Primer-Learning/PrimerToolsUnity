@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Primer.Shapes
 {
     [ExecuteAlways]
-    public class Follower : MonoBehaviour
+    public class Follower : PrimerComponent
     {
         public bool useGlobalSpace = false;
         public Func<Vector3> getter;

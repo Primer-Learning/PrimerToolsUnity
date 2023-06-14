@@ -38,10 +38,6 @@ namespace Primer
         public Vector3 lossyScale => transform.lossyScale;
 
 
-        public PrimerComponent primerCache;
-        public PrimerComponent primer => primerCache != null ? primerCache : primerCache = transform.GetPrimer();
-
-
         public IEnumerable<Transform> children => usedChildren;
 
         public IEnumerable<Transform> GetChildren() => usedChildren;

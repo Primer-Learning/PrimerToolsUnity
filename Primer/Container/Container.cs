@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Primer
 {
@@ -21,30 +23,8 @@ namespace Primer
     {
         public static Container<T> From<T>(T component) where T : Component => new(component);
 
-        public int childCount => usedChildren.Count;
-        public Transform transform { get; }
-        public TComponent component { get; }
-
-        public IEnumerable<Transform> removing => GetChildrenBeingRemoved(transform);
-
-        public Container(string name, Component parent = null)
-        {
-            transform = parent is null
-                ? GetRootTransform(name)
-                : GetDirectChild(parent.transform, name);
-
-            component = GetComponent<TComponent>(transform);
-            unusedChildren = ReadExistingChildren(transform);
-            transform.SetActive(true);
-        }
-
-        protected Container(TComponent component)
-        {
-            this.component = component;
-            transform = component.transform;
-            unusedChildren = ReadExistingChildren(transform);
-            transform.SetActive(true);
-        }
+        // When .component is used from the interface cast it to Component
+        Component IPrimer.component => (Component)component;
 
         // Automatic conversion to TComponent, Component and Transform
         public static implicit operator TComponent(Container<TComponent> container) => container.component;

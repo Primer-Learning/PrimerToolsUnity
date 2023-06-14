@@ -1,4 +1,6 @@
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Primer
 {
@@ -15,6 +17,18 @@ namespace Primer
             var rootObject = GetRootCloneOf(template, name);
             rootObject.SetActive(true);
             return rootObject;
+        }
+
+        private static T GetRootCloneOf<T>(T template, string name) where T : Component
+        {
+            var scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+
+            var found = rootGameObjects
+                .FirstOrDefault(x => x.name == name && InstantiationTracker.IsInstanceOf(x, template))
+                ?.GetComponent<T>();
+
+            return found != null ? found : InstantiationTracker.InstantiateAndRegister(template, name);
         }
     }
 }

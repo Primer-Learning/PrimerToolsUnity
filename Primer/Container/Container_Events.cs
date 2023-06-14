@@ -29,6 +29,8 @@ namespace Primer
         public Action<Transform> onCreate;
         public Action<Transform> onRemove;
 
+        public IEnumerable<Transform> removing => GetChildrenBeingRemoved(transform);
+
         private TChild OnCreate<TChild>(TChild child) where TChild : Component
         {
             if (onCreate is null || areEventsDeactivated)
