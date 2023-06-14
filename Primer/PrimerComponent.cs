@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    [DisallowMultipleComponent]
     public class PrimerComponent : MonoBehaviour
     {
         internal Container<Component> parentContainer;
