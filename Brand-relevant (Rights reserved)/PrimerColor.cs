@@ -76,12 +76,14 @@ public static class PrimerColor
         {White, Gray}
     };
     public static List<Color> BlobColors = new List<Color>() {
-        PrimerColor.Blue,
-        PrimerColor.Green,
-        PrimerColor.Yellow,
-        PrimerColor.Orange,
-        PrimerColor.Red,
-        PrimerColor.Purple
+        Blue,
+        Green,
+        Yellow,
+        Orange,
+        Red,
+        Purple,
+        Gray,
+        White
     };
 
     public static Color UnityColorFromVector4(Vector4 sc) {
