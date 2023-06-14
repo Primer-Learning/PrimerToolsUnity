@@ -1,5 +1,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Primer.Timeline;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -12,7 +13,7 @@ namespace Primer.Animation
             if (self == null)
                 return;
 
-            if (Application.isPlaying) {
+            if (PrimerTimeline.isPlaying) {
                 var tween = self.ScaleDownToZero() with { duration = duration };
                 await tween.Play(ct);
             }
@@ -20,7 +21,7 @@ namespace Primer.Animation
             // This is false if the element has already been destroyed while we were scaling down
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (self != null)
-                self.component.gameObject.Dispose();
+                self.transform.gameObject.Dispose();
         }
 
         public static UniTask ShrinkAndDispose(this Component self, float duration = 0.5f,

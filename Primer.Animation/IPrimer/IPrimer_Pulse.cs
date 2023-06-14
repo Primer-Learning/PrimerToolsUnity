@@ -14,7 +14,7 @@ namespace Primer.Animation
         public static Tween Pulse(this IPrimer self, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f,
             float decay = 0.5f)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var localScale = transform.localScale;
 
             return Tween.Series(
@@ -26,7 +26,6 @@ namespace Primer.Animation
 
         // This is a copy of the method above with
         // - Component instead of IPrimer
-        // - self.transform instead of self.component.transform
         public static Tween Pulse(this Component self, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f,
             float decay = 0.5f)
         {
@@ -50,11 +49,11 @@ namespace Primer.Animation
             var list = objectsToPulse.ToList();
 
             // Calculate the center of the group in world/global space
-            var center = list.Select(x => x.component.transform.position).Average();
+            var center = list.Select(x => x.transform.position).Average();
 
             return list.Select(
                     primer => {
-                        var transform = primer.component.transform;
+                        var transform = primer.transform;
                         var localScale = transform.localScale;
                         var originalPosition = transform.position;
                         var direction = (transform.position - center).normalized;

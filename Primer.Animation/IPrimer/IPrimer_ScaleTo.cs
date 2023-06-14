@@ -50,26 +50,26 @@ namespace Primer.Animation
         public static Tween ScaleUpFromZero(this IPrimer self, Vector3? targetScale = null)
         {
             var initial = Vector3.zero;
-            var target = targetScale ?? self.component.transform.localScale;
+            var target = targetScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.component.transform.ScaleTo(target, initial);
+                : self.transform.ScaleTo(target, initial);
         }
 
         public static Tween ScaleDownToZero(this IPrimer self, Vector3? initialScale = null)
         {
-            var initial = initialScale ?? self.component.transform.localScale;
+            var initial = initialScale ?? self.transform.localScale;
             var target = Vector3.zero;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.component.transform.ScaleTo(target, initial);
+                : self.transform.ScaleTo(target, initial);
         }
 
         public static Tween ScaleTo(this IPrimer self, float newScale, float? initialScale = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
 
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
@@ -82,7 +82,7 @@ namespace Primer.Animation
 
         public static Tween ScaleTo(this IPrimer self, Vector3 newScale, Vector3? initialScale = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialScale ?? transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
@@ -95,7 +95,6 @@ namespace Primer.Animation
         #region Polyfill Component.ScaleTo()
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
-        // - self.transform instead of self.component.transform
 
         public static Tween ScaleUpFromZero(this Component self, Vector3? targetScale = null)
         {

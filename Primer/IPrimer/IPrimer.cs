@@ -10,7 +10,7 @@ namespace Primer
     /// </summary>
     public interface IPrimer
     {
-        public Component component { get; }
+        public Transform transform { get; }
     }
 
 
@@ -28,7 +28,7 @@ namespace Primer
 
         public static IPrimer ToPrimer(this Component self)
         {
-            return self as IPrimer ?? new PrimerWrapper(self);
+            return self as IPrimer ?? new PrimerWrapper(self.transform);
         }
 
 
@@ -42,11 +42,11 @@ namespace Primer
         /// </example>
         private readonly struct PrimerWrapper : IPrimer
         {
-            public Component component { get; }
+            public Transform transform { get; }
 
-            public PrimerWrapper(Component component)
+            public PrimerWrapper(Transform transform)
             {
-                this.component = component;
+                this.transform = transform;
             }
         }
     }

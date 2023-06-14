@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Container
     {
         private readonly List<Transform> usedChildren = new();
         private readonly List<Transform> unusedChildren = new();

@@ -19,7 +19,7 @@ namespace Primer.Animation
         public static Tween RotateBy(this IPrimer self, float x = 0, float y = 0, float z = 0,
             Quaternion? initialRotation = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialRotation ?? transform.rotation;
             var target = Quaternion.Euler(x, y, z) * initial;
 
@@ -30,7 +30,7 @@ namespace Primer.Animation
 
         public static Tween RotateBy(this IPrimer self, Vector3 degrees, Quaternion? initialRotation = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialRotation ?? transform.rotation;
             var target = Quaternion.Euler(degrees) * initial;
 
@@ -41,7 +41,7 @@ namespace Primer.Animation
 
         public static Tween RotateBy(this IPrimer self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialRotation ?? transform.rotation;
             var target = newRotation * initial;
 
@@ -52,7 +52,7 @@ namespace Primer.Animation
 
         public static Tween RotateTo(this IPrimer self, Vector3 newRotation, Vector3? initialRotation = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
 
             var initial = initialRotation.HasValue
                 ? Quaternion.Euler(initialRotation.Value)
@@ -67,7 +67,7 @@ namespace Primer.Animation
 
         public static Tween RotateTo(this IPrimer self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialRotation ?? transform.rotation;
 
             return self is IPrimer_CustomRotateTo custom
@@ -80,7 +80,6 @@ namespace Primer.Animation
         #region Polyfill Component.RotateTo()
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
-        // - self.transform instead of self.component.transform
 
         public static Tween RotateBy(this Component self, float x = 0, float y = 0, float z = 0,
             Quaternion? initialRotation = null)

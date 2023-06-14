@@ -8,12 +8,12 @@ namespace Primer
     {
         public static void Log(this IPrimer self, params object[] data)
         {
-            PrimerLogger.Log(self.component, data);
+            PrimerLogger.Log(self.transform, data);
         }
 
         public static void Error(this IPrimer self, Exception exception)
         {
-            PrimerLogger.Error(self.component, exception);
+            PrimerLogger.Error(self.transform, exception);
         }
 
         public static void Log(this Component self, params object[] data)

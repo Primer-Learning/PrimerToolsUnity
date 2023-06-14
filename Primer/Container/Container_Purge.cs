@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Container
     {
         private readonly List<Action> onCleanup = new();
         private readonly List<Action> onPurge = new();
@@ -31,7 +31,7 @@ namespace Primer
                 broomUp();
         }
 
-        internal void RegisterChildContainer<T>(Container<T> container) where T : Component
+        internal void RegisterChildContainer(Container container)
         {
             onPurge.Add(container.Purge);
         }

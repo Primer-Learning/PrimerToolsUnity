@@ -8,7 +8,7 @@ namespace Primer
         public static void DisableChildren(this IEnumerable<IPrimer> self)
         {
             foreach (var item in self)
-                item.component.transform.DisableChildren();
+                item.transform.DisableChildren();
         }
 
         public static void DisableChildren(this IEnumerable<Component> self)
@@ -19,7 +19,7 @@ namespace Primer
 
         public static void DisableChildren(this IPrimer self)
         {
-            self.component.transform.DisableChildren();
+            self.transform.DisableChildren();
         }
 
         public static void DisableChildren(this Component self)

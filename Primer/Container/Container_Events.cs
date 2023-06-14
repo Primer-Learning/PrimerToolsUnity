@@ -22,7 +22,7 @@ namespace Primer
         internal class IsRemoving : MonoBehaviour {}
     }
 
-    public partial class Container<TComponent>
+    public partial class Container
     {
         private static bool areEventsDeactivated => ContainerEvents.deactivateEventsIf?.Invoke() ?? false;
 

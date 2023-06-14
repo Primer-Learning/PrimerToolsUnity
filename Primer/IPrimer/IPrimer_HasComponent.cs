@@ -6,7 +6,7 @@ namespace Primer
     {
         public static bool HasComponent<T>(this IPrimer self) where T : Component
         {
-            return self.component.gameObject.HasComponent<T>();
+            return self.transform.gameObject.HasComponent<T>();
         }
 
         public static bool HasComponent<T>(this Component self) where T : Component

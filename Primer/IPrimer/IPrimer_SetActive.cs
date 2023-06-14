@@ -8,7 +8,7 @@ namespace Primer
         public static void SetActive(this IEnumerable<IPrimer> self, bool isActive)
         {
             foreach (var item in self)
-                item.component.gameObject.SetActive(isActive);
+                item.transform.gameObject.SetActive(isActive);
         }
 
         public static void SetActive(this IEnumerable<Component> self, bool isActive)
@@ -19,7 +19,7 @@ namespace Primer
 
         public static void SetActive(this IPrimer self, bool isActive)
         {
-            self.component.gameObject.SetActive(isActive);
+            self.transform.gameObject.SetActive(isActive);
         }
 
         public static void SetActive(this Component self, bool isActive)

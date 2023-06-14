@@ -8,7 +8,7 @@ namespace Primer
         public static void RemoveAllChildren(this IEnumerable<IPrimer> self)
         {
             foreach (var item in self)
-                item.component.transform.RemoveAllChildren();
+                item.transform.transform.RemoveAllChildren();
         }
 
         public static void RemoveAllChildren(this IEnumerable<Component> self)
@@ -19,7 +19,7 @@ namespace Primer
 
         public static void RemoveAllChildren(this IPrimer self)
         {
-            self.component.transform.RemoveAllChildren();
+            self.transform.transform.RemoveAllChildren();
         }
 
         public static void RemoveAllChildren(this Component self)

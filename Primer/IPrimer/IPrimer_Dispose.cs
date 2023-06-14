@@ -9,7 +9,7 @@ namespace Primer
         public static void Dispose(this IEnumerable<IPrimer> self, bool urgent = false)
         {
             foreach (var item in self)
-                item.component.gameObject.Dispose(urgent);
+                item.transform.gameObject.Dispose(urgent);
         }
 
         public static void Dispose(this IEnumerable<Component> self, bool urgent = false)
@@ -21,7 +21,7 @@ namespace Primer
         public static void Dispose(this IPrimer self, bool urgent = false)
         {
             if (self != null)
-                self.component.gameObject.Dispose(urgent);
+                self.transform.gameObject.Dispose(urgent);
         }
 
         public static void Dispose(this Component self, bool urgent = false)

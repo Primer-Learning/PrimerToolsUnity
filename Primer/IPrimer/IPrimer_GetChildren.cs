@@ -8,7 +8,7 @@ namespace Primer
     {
         public static IEnumerable<Transform[]> GetChildren(this IEnumerable<IPrimer> self)
         {
-            return self.Select(x => x.component.transform.GetChildren());
+            return self.Select(x => x.transform.transform.GetChildren());
         }
 
         public static IEnumerable<Transform[]> GetChildren(this IEnumerable<Component> self)
@@ -18,7 +18,7 @@ namespace Primer
 
         public static Transform[] GetChildren(this IPrimer self)
         {
-            return self.component.transform.GetChildren();
+            return self.transform.transform.GetChildren();
         }
 
         public static Transform[] GetChildren(this Component self)

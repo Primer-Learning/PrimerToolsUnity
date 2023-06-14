@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Container
     {
         public Transform Add(string name = null, bool worldPositionStays = false)
         {

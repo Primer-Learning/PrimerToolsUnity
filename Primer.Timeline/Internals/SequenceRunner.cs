@@ -11,9 +11,8 @@ namespace Primer.Timeline
         private readonly IAsyncEnumerator<Tween> enumerator;
         private bool isRunning = false;
 
-        public readonly Transform transform;
+        public Transform transform { get;  }
         public readonly Sequence sequence;
-        public Component component => sequence;
 
         public bool hasMoreClips { get; private set; } = true;
 

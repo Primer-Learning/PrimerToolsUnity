@@ -4,14 +4,14 @@ namespace Primer.Shapes
 {
     public static class ContainerExtensions
     {
-        public static PrimerArrow2 AddArrow<T>(this Container<T> children, string name = null) where T : Component
+        public static PrimerArrow2 AddArrow(this Container children, string name = null)
         {
-            return children.AddPrefab<T, PrimerArrow2>(PrimerArrow2.PREFAB_NAME, name);
+            return children.AddPrefab<PrimerArrow2>(PrimerArrow2.PREFAB_NAME, name);
         }
 
-        public static PrimerBracket2 AddBracket<T>(this Container<T> children, string name = null) where T : Component
+        public static PrimerBracket2 AddBracket(this Container children, string name = null)
         {
-            return children.AddPrefab<T, PrimerBracket2>(PrimerBracket2.PREFAB_NAME, name);
+            return children.AddPrefab<PrimerBracket2>(PrimerBracket2.PREFAB_NAME, name);
         }
 
         public static Container<Follower> AddFollower<T>(this Container container, T follow, string name = null)

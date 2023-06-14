@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Container
     {
         public Vector3 position {
             get => transform.position;
@@ -58,7 +58,7 @@ namespace Primer
             return transform.GetComponentsInChildren<T>();
         }
 
-        public Container<TComponent> SetDefaults()
+        public Container SetDefaults()
         {
             transform.SetDefaults();
             return this;

@@ -6,7 +6,7 @@ namespace Primer
     [DisallowMultipleComponent]
     public class PrimerComponent : MonoBehaviour
     {
-        internal Container<Component> parentContainer;
+        internal Container parentContainer;
 
         #region Vector3? intrinsicScale
         [SerializeField]

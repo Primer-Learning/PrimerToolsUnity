@@ -6,7 +6,7 @@ namespace Primer
     {
         public static Container ToContainer(this IPrimer self)
         {
-            return self.component.transform.ToContainer();
+            return self.transform.ToContainer();
         }
 
         // ReSharper disable Unity.PerformanceAnalysis

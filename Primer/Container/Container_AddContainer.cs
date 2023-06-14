@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Container
     {
         public Container AddContainer(string name)
         {

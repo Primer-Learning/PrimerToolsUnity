@@ -18,7 +18,7 @@ namespace Primer.Animation
             // Quadratic easing is used for the wobbles since that reflects the behavior of simple harmonic oscillators,
             // making it look more natural.
 
-            var transform = self.component.transform;
+            var transform = self.transform;
             var pulse = transform.Pulse(sizeFactor, attack, hold, decay);
 
             // State tracking vars

@@ -20,7 +20,7 @@ namespace Primer.Animation
         public static Tween MoveBy(this IPrimer self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
 
             var target = new Vector3(
@@ -37,7 +37,7 @@ namespace Primer.Animation
         public static Tween MoveBy(this IPrimer self, Vector3 displacement, Vector3? initialPosition = null,
             bool globalSpace = false)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
             var target = initial + displacement;
 
@@ -49,7 +49,7 @@ namespace Primer.Animation
         public static Tween MoveTo(this IPrimer self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
 
             var target = new Vector3(
@@ -66,7 +66,7 @@ namespace Primer.Animation
         public static Tween MoveTo(this IPrimer self, Vector3 newPosition, Vector3? initialPosition = null,
             bool globalSpace = false)
         {
-            var transform = self.component.transform;
+            var transform = self.transform;
             var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
 
             return self is IPrimer_CustomMoveTo custom
@@ -79,7 +79,6 @@ namespace Primer.Animation
         #region Polyfill Component.MoveTo()
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
-        // - self.transform instead of self.component.transform
 
         public static Tween MoveBy(this Component self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
