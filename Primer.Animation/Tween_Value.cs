@@ -35,6 +35,11 @@ namespace Primer.Animation
             return CreateTween(accessor.Set, () => from, () => to(accessor.Get()), lerp);
         }
 
+        public static Tween Value<T>(Action<T> set, Func<T> from, Func<T> to, Func<T, T, float, T> lerp = null)
+        {
+            return CreateTween(set, from, to, lerp);
+        }
+
         /// <summary>The actual implementation of the tween operation</summary>
         private static Tween CreateTween<T>(Action<T> set, Func<T> getFrom, Func<T> getTo, Func<T, T, float, T> lerp)
         {
