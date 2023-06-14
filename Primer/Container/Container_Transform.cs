@@ -40,7 +40,10 @@ namespace Primer
 
         public IEnumerable<Transform> children => usedChildren;
 
-        public IEnumerable<Transform> GetChildren() => usedChildren;
+        public IEnumerable<Transform> GetChildren()
+        {
+            return usedChildren;
+        }
 
         public T GetComponent<T>(bool forceCreate = false) where T : Component
         {

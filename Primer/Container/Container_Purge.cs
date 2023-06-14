@@ -7,6 +7,7 @@ namespace Primer
     public partial class Container<TComponent>
     {
         private readonly List<Action> onCleanup = new();
+        private readonly List<Action> onPurge = new();
 
         public void Purge()
         {
@@ -28,6 +29,11 @@ namespace Primer
         {
             foreach (var broomUp in onCleanup)
                 broomUp();
+        }
+
+        internal void RegisterChildContainer<T>(Container<T> container) where T : Component
+        {
+            onPurge.Add(container.Purge);
         }
     }
 }

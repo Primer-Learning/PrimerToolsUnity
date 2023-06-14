@@ -7,27 +7,25 @@ namespace Primer
     {
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
 
-        public static Transform AddPrefab<T>(this Container<T> container, string prefabName, string name = null,
-            bool worldPositionStays = false)
+        public static Transform AddPrefab<T>(this Container<T> container, string prefabName, string name = null)
             where T : Component
         {
-            return container.AddPrefab<T, Transform>(prefabName, name, worldPositionStays);
+            return container.AddPrefab<T, Transform>(prefabName, name);
         }
 
-        public static T AddPrefab<T>(this Container container, string prefabName, string name = null,
-            bool worldPositionStays = false)
+        public static T AddPrefab<T>(this Container container, string prefabName, string name = null)
             where T : Component
         {
-            return container.AddPrefab<Transform, T>(prefabName, name, worldPositionStays);
+            return container.AddPrefab<Transform, T>(prefabName, name);
         }
 
         public static TResult AddPrefab<TContainer, TResult>(this Container<TContainer> container, string prefabName,
-            string name = null, bool worldPositionStays = false)
+            string name = null)
             where TContainer : Component
             where TResult : Component
         {
             var prefab = GetPrefabByName<TResult>(prefabName);
-            return container.Add(prefab, name, worldPositionStays);
+            return container.Add(prefab, name);
         }
 
         private static T GetPrefabByName<T>(string prefabName) where T : Component

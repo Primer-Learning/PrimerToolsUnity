@@ -2,25 +2,35 @@ using UnityEngine;
 
 namespace Primer
 {
-    public class IPrimer_ToContainerExtensions
+    public static class IPrimer_ToContainerExtensions
     {
-        public static Container ToContainer(IPrimer self)
+        public static Container ToContainer(this IPrimer self)
         {
-            var transform = self.component.transform;
-            var parent = self.GetPrimer().parentContainer;
-
-            return parent is not null
-                ? parent.WrapChild(transform)
-                : new Container(transform);
+            return self.component.transform.ToContainer();
         }
 
-        public static Container<T> ToContainer<T>(T self) where T : Component
+        // ReSharper disable Unity.PerformanceAnalysis
+        public static Container ToContainer(this Transform self)
         {
+            var container = new Container(self);
             var parent = self.GetPrimer().parentContainer;
 
-            return parent is not null
-                ? parent.WrapChild(self)
-                : new Container<T>(self);
+            if (parent is not null)
+                parent.RegisterChildContainer(container);
+
+            return container;
+        }
+
+        // ReSharper disable Unity.PerformanceAnalysis
+        public static Container<T> ToContainer<T>(this T self) where T : Component
+        {
+            var container = new Container<T>(self);
+            var parent = self.GetPrimer().parentContainer;
+
+            if (parent is not null)
+                parent.RegisterChildContainer(container);
+
+            return container;
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Primer
 
         public IEnumerable<Transform> removing => GetChildrenBeingRemoved(transform);
 
+        // ReSharper disable Unity.PerformanceAnalysis
         private TChild OnCreate<TChild>(TChild child) where TChild : Component
         {
             if (onCreate is null || areEventsDeactivated)
