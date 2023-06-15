@@ -54,8 +54,6 @@ namespace Primer.Scene
 
         private void UpdateSwivel()
         {
-            var transform = this.transform;
-
             var direction = faceSwivel ? Vector3.back : Vector3.forward;
             transform.position = Quaternion.Euler(swivel) * direction * distance + swivelOrigin;
 

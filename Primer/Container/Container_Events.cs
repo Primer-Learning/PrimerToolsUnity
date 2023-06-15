@@ -43,7 +43,7 @@ namespace Primer
 
         private void OnRemove(Component child)
         {
-            if (onRemove is null ||areEventsDeactivated) {
+            if (onRemove is null || areEventsDeactivated) {
                 ContainerEvents.defaultOnRemove.Invoke(child.transform);
                 return;
             }
