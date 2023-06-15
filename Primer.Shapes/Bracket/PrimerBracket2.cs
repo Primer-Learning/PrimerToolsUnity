@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Primer.Shapes
 {
     [ExecuteAlways]
-    public class PrimerBracket2 : MonoBehaviour, IMeshRendererController
+    public class PrimerBracket2 : MonoBehaviour, IMeshController
     {
         public const string PREFAB_NAME = "Bracket2";
 
@@ -48,36 +48,20 @@ namespace Primer.Shapes
         #endregion
 
         #region public Color color;
-        [SerializeField, HideInInspector]
-        private Color _color = Color.white;
-
         [ShowInInspector]
         [PropertyOrder(-1)]
-        public Color color
-        {
-            get => _color;
-            set
-            {
-                _color = value;
-                this.SetColor(value);
-            }
+        public Color color {
+            get => this.GetColor();
+            set => this.SetColor(value);
         }
         #endregion
 
         #region public Material material;
-        [SerializeField, HideInInspector]
-        private Material _material;
-
         [ShowInInspector]
         [PropertyOrder(-1)]
-        public Material material
-        {
-            get => _material ??= IMeshRendererController.defaultMaterial;
-            set
-            {
-                _material = value;
-                this.SetMaterial(value);
-            }
+        public Material material {
+            get => this.GetMaterial();
+            set => this.SetMaterial(value);
         }
         #endregion
 
@@ -149,8 +133,6 @@ namespace Primer.Shapes
 
         public bool hasLabel => latex.gameObject.activeSelf;
         #endregion
-
-        MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
 
 
         #region Unity events
@@ -313,6 +295,11 @@ namespace Primer.Shapes
                 1 / parentScale.y,
                 1 / parentScale.z
             );
+        }
+
+        MeshRenderer[] IMeshController.GetMeshRenderers()
+        {
+            return GetComponentsInChildren<MeshRenderer>();
         }
     }
 }

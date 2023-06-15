@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Primer.Animation
+namespace Primer
 {
     public static class MeshRendererExtensions
     {
+        private static Material defaultMaterialCache;
+        public static Material defaultMaterial
+            => defaultMaterialCache ??= Resources.Load<Material>("BasicDiffuseWhite");
+
         private static readonly Dictionary<WeakReference<MeshRenderer>, Material> memory = new();
         private static readonly Dictionary<WeakReference<SkinnedMeshRenderer>, Material> skinnedMemory = new();
 
@@ -13,59 +17,37 @@ namespace Primer.Animation
         {
             return memory.TryGetValue(new WeakReference<MeshRenderer>(renderer), out var material)
                 ? material.color
-                : renderer.sharedMaterial.color;
+                : renderer.sharedMaterial?.color
+                ?? defaultMaterial.color;
         }
 
         public static Color GetColor(this SkinnedMeshRenderer renderer)
         {
             return skinnedMemory.TryGetValue(new WeakReference<SkinnedMeshRenderer>(renderer), out var material)
                 ? material.color
-                : renderer.sharedMaterial.color;
+                : renderer.sharedMaterial?.color
+                ?? defaultMaterial.color;
         }
 
         public static void SetColor(this MeshRenderer renderer, Color color)
         {
-            if (renderer.sharedMaterial is null)
-                return;
-
-            Get(renderer).color = color;
+            GetMaterial(renderer).color = color;
         }
 
         public static void SetColor(this SkinnedMeshRenderer renderer, Color color)
         {
-            if (renderer.sharedMaterial == null)
-                return;
-
-            GetSkinned(renderer).color = color;
+            GetMaterial(renderer).color = color;
         }
 
-        public static Tween TweenColor(this MeshRenderer renderer, Color color)
+        public static Material GetMaterial(this MeshRenderer renderer)
         {
-            var material = Get(renderer);
-
-            return material.color == color
-                ? Tween.noop
-                : new Tween(t => material.color = Color.Lerp(material.color, color, t));
-        }
-
-        public static Tween TweenColor(this SkinnedMeshRenderer renderer, Color color)
-        {
-            var material = GetSkinned(renderer);
-
-            return material.color == color
-                ? Tween.noop
-                : new Tween(t => material.color = Color.Lerp(material.color, color, t));
-        }
-
-        private static Material Get(MeshRenderer renderer)
-        {
-            if (renderer.sharedMaterial == null)
-                throw new InvalidOperationException("MeshRenderer doesn't have a material");
-
             var weak = new WeakReference<MeshRenderer>(renderer);
 
             if (!memory.TryGetValue(weak, out var material)) {
-                material = new Material(renderer.sharedMaterial);
+                material = renderer.sharedMaterial is null
+                    ? new Material(defaultMaterial)
+                    : new Material(renderer.sharedMaterial);
+
                 memory.Add(weak, material);
             }
 
@@ -73,7 +55,7 @@ namespace Primer.Animation
             return material;
         }
 
-        private static Material GetSkinned(SkinnedMeshRenderer renderer)
+        public static Material GetMaterial(this SkinnedMeshRenderer renderer)
         {
             if (renderer.sharedMaterial == null)
                 throw new InvalidOperationException("SkinnedMeshRenderer doesn't have a material");

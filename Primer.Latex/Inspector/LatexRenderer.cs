@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -16,40 +15,24 @@ namespace Primer.Latex
     [DisableContextMenu]
     [HideReferenceObjectPicker]
     [Title("Rendering")]
-    internal class LatexRenderer : IMeshRendererController
+    internal class LatexRenderer : IMeshController
     {
-        [SerializeField]
-        [HideInInspector]
-        private Color _color = Color.white;
-
         [ShowInInspector]
         public Color color {
-            get => _color;
-            set {
-                _color = value;
-                this.SetColor(value);
-            }
+            get => this.GetColor();
+            set => this.SetColor(value);
         }
 
-        [SerializeField]
-        private Material _material;
-
+        [ShowInInspector]
         public Material material {
-            get => _material ??= IMeshRendererController.defaultMaterial;
-            set {
-                _material = value;
-                this.SetMaterial(value);
-            }
+            get => this.GetMaterial();
+            set => this.SetMaterial(value);
         }
-
 
         [NonSerialized] internal Transform transform;
         [NonSerialized] internal LatexGroups latexGroups;
 
         private LatexExpression expression => latexGroups?.expression;
-
-        MeshRenderer[] IMeshRendererController.meshRenderers => transform.GetComponentsInChildren<MeshRenderer>();
-
 
         public void SetColorInGroups(Color groupColor, params int[] groupIndexes)
         {
@@ -183,6 +166,11 @@ namespace Primer.Latex
                     Gizmos.DrawWireCube(character.position + rootPosition, character.bounds.size);
                 }
             }
+        }
+
+        MeshRenderer[] IMeshController.GetMeshRenderers()
+        {
+            return transform.GetComponentsInChildren<MeshRenderer>();
         }
     }
 }

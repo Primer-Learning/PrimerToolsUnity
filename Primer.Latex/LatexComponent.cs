@@ -11,7 +11,7 @@ namespace Primer.Latex
 {
     [ExecuteAlways]
     [AddComponentMenu("Primer / LaTeX")]
-    public class LatexComponent : MonoBehaviour, IMeshRendererController
+    public class LatexComponent : MonoBehaviour, IMeshController
     {
         public const string PREFAB_NAME = "LaTeX";
 
@@ -21,8 +21,6 @@ namespace Primer.Latex
 
         [Title("Events")]
         public UnityEvent<LatexExpression> onChange = new();
-
-        MeshRenderer[] IMeshRendererController.meshRenderers => GetComponentsInChildren<MeshRenderer>();
 
         // Processing
 
@@ -192,7 +190,7 @@ namespace Primer.Latex
             var presets = Preset.GetDefaultPresetsForObject(this);
 
             if (renderer.material is null || presets.All(preset => preset.excludedProperties.Contains("material"))) {
-                renderer.material = IMeshRendererController.defaultMaterial;
+                renderer.material = MeshRendererExtensions.defaultMaterial;
             }
         }
 
@@ -227,5 +225,10 @@ namespace Primer.Latex
             return $".SetGroupIndexes({string.Join(", ", groups.indexes)})\n";
         }
         #endregion
+
+        MeshRenderer[] IMeshController.GetMeshRenderers()
+        {
+            return GetComponentsInChildren<MeshRenderer>();
+        }
     }
 }
