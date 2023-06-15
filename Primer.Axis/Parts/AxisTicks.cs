@@ -58,10 +58,10 @@ namespace Primer.Axis
             if (!showTicks || step <= 0 || prefab.isEmpty)
                 return;
 
-            var container = parentContainer.AddContainer("Ticks container");
-            container.SetDefaults();
-            container.onCreate = OnCreateTick;
-            container.onRemove = OnRemoveTick;
+            var container = parentContainer
+                .AddContainer("Ticks container")
+                .ScaleGrandchildrenInPlayMode()
+                .SetDefaults();
 
             var expectedTicks = manualTicks.Count != 0
                 ? manualTicks
@@ -79,29 +79,8 @@ namespace Primer.Axis
                 var data = removing.GetComponent<AxisTick>();
                 removing.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, verticalOffset, 0);
             }
-        }
 
-        private void OnCreateTick(Transform tick)
-        {
-            if (!PrimerTimeline.isPlaying)
-                return;
-
-            tick.GetChildren()
-                .Select(x => x.ScaleUpFromZero() with { duration = 0.5f })
-                .RunInParallel()
-                .PlayAndForget();
-        }
-
-        private async void OnRemoveTick(Transform tick)
-        {
-            if (!PrimerTimeline.isPlaying)
-                return;
-
-            var childrenRemoval = tick.GetChildren()
-                .Select(x => x.GetPrimer().ShrinkAndDispose(0.1f));
-
-            await UniTask.WhenAll(childrenRemoval);
-            tick.Dispose();
+            container.Purge();
         }
 
         private List<TicData> CropTicksCount(List<TicData> ticks)

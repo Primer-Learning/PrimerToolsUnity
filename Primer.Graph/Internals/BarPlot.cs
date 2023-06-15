@@ -23,7 +23,8 @@ namespace Primer.Graph
         private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph.domain);
 
         private Container _labelsContainer;
-        public Container labelsContainer => _labelsContainer ??= new Container("Plotted bars labels", graph);
+        public Container labelsContainer
+            => _labelsContainer ??= new Container("Plotted bars labels", graph).ScaleChildrenInPlayMode();
 
         public BarData this[int index] => GetBar(index);
         public BarData this[string name] => GetBar(name);
@@ -210,24 +211,11 @@ namespace Primer.Graph
             var to = EnsureBarCount(values);
             var from = to.Select((x, i) => bars[i].value).ToArray();
 
-
-            var labelScaleTweens = new List<Tween>();
-            for (var i = 0; i < to.Length; i++)
-            {
-                labelScaleTweens.Add(labelsContainer.children.ToList()[i].ScaleTo(1));
-            }
-
-            return Tween.Parallel(
-                labelScaleTweens.RunInParallel(),
-                new Tween(t =>
-                    {
-                        for (var i = 0; i < to.Length; i++)
-                        {
-                            bars[i].value = Mathf.Lerp(from[i], to[i], t);
-                        }
-                    }
-                )
-            );
+            return new Tween(t => {
+                for (var i = 0; i < to.Length; i++) {
+                    bars[i].value = Mathf.Lerp(from[i], to[i], t);
+                }
+            });
         }
 
         public void SetColors(IEnumerable<Color> colors) => SetColors(colors.ToArray());

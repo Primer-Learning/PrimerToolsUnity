@@ -1,6 +1,5 @@
 using System;
-using Cysharp.Threading.Tasks;
-using Primer.Animation;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -60,10 +59,7 @@ namespace Primer.Axis
         [Button(ButtonSizes.Large)]
         public void UpdateChildren()
         {
-            var container = new Container(transform) {
-                onCreate = x => x.ScaleUpFromZero().PlayAndForget(),
-                onRemove = x => x.ShrinkAndDispose().Forget(),
-            };
+            var container = new Container(transform).ScaleChildrenInPlayMode();
 
             // Rod is not a generated object so we keep it as child even if disabled
             container.Insert(rod.transform);
