@@ -7,7 +7,8 @@ namespace Primer.Animation
 {
     public partial record Tween(Action<float> lerp) : IDisposable
     {
-        public static Tween noop = new(_ => {});
+        public static Tween empty = new(_ => {});
+        public static Tween noop = empty with { duration = 0 };
 
         public IEasing easing { get; init; } = IEasing.defaultMethod;
 
