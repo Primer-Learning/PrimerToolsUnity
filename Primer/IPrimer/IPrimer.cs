@@ -21,11 +21,6 @@ namespace Primer
             return self;
         }
 
-        public static IPrimer ToPrimer<T>(this Container<T> self) where T : Component
-        {
-            return self;
-        }
-
         public static IPrimer ToPrimer(this Component self)
         {
             return self as IPrimer ?? new PrimerWrapper(self.transform);
