@@ -12,7 +12,7 @@ namespace Primer
         // ReSharper disable Unity.PerformanceAnalysis
         public static Container ToContainer(this Transform self)
         {
-            var container = new Container(self);
+            var container = new Container<Transform>(self);
             var parent = self.GetPrimer().parentContainer;
 
             if (parent is not null)

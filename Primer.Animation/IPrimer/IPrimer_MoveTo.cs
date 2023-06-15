@@ -20,8 +20,7 @@ namespace Primer.Animation
         public static Tween MoveBy(this IPrimer self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
         {
-            var transform = self.transform;
-            var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
+            var initial = initialPosition ?? (globalSpace ? self.transform.position : self.transform.localPosition);
 
             var target = new Vector3(
                 x.HasValue ? initial.x + x.Value : initial.x,
@@ -31,7 +30,7 @@ namespace Primer.Animation
 
             return self is IPrimer_CustomMoveTo custom
                 ? custom.MoveTo(target, initial, globalSpace)
-                : transform.MoveTo(target, initial, globalSpace);
+                : self.component.MoveTo(target, initial, globalSpace);
         }
 
         public static Tween MoveBy(this IPrimer self, Vector3 displacement, Vector3? initialPosition = null,
@@ -49,8 +48,7 @@ namespace Primer.Animation
         public static Tween MoveTo(this IPrimer self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
         {
-            var transform = self.transform;
-            var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
+            var initial = initialPosition ?? (globalSpace ? self.transform.position : self.transform.localPosition);
 
             var target = new Vector3(
                 x ?? initial.x,
@@ -60,18 +58,17 @@ namespace Primer.Animation
 
             return self is IPrimer_CustomMoveTo custom
                 ? custom.MoveTo(target, initial, globalSpace)
-                : transform.MoveTo(target, initial, globalSpace);
+                : self.component.MoveTo(target, initial, globalSpace);
         }
 
         public static Tween MoveTo(this IPrimer self, Vector3 newPosition, Vector3? initialPosition = null,
             bool globalSpace = false)
         {
-            var transform = self.transform;
-            var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
+            var initial = initialPosition ?? (globalSpace ? self.transform.position : self.transform.localPosition);
 
             return self is IPrimer_CustomMoveTo custom
                 ? custom.MoveTo(newPosition, initial, globalSpace)
-                : transform.MoveTo(newPosition, initial, globalSpace);
+                : self.component.MoveTo(newPosition, initial, globalSpace);
         }
         #endregion
 
@@ -79,6 +76,7 @@ namespace Primer.Animation
         #region Polyfill Component.MoveTo()
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
+        // - fallback to transform instead of self.component
 
         public static Tween MoveBy(this Component self, float? x = null, float? y = null, float? z = null,
             Vector3? initialPosition = null, bool globalSpace = false)
@@ -148,7 +146,7 @@ namespace Primer.Animation
 
             // This was removed because if initialPosition is different from self.position (or localPosition)
             // we want to set it when the tween starts running
-
+            //
             // if (initial == newPosition)
             //     return Tween.noop;
 

@@ -11,6 +11,7 @@ namespace Primer
         // These static methods simplify the creation of a container from a component
 
         public Transform transform { get; }
+        public Component component { get; }
 
         public Container(string name, Component parent = null)
         {
@@ -18,13 +19,23 @@ namespace Primer
                 ? GetRootTransform(name)
                 : GetDirectChild(parent.transform, name);
 
+            component = transform;
             transform.SetActive(true);
             Reset();
         }
 
-        public Container(Transform t)
+        public Container(Transform component)
         {
-            transform = t;
+            this.component = component;
+            transform = component;
+            transform.SetActive(true);
+            Reset();
+        }
+
+        protected Container(Component component)
+        {
+            this.component = component;
+            transform = component.transform;
             transform.SetActive(true);
             Reset();
         }

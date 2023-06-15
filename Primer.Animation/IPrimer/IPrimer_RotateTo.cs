@@ -19,60 +19,55 @@ namespace Primer.Animation
         public static Tween RotateBy(this IPrimer self, float x = 0, float y = 0, float z = 0,
             Quaternion? initialRotation = null)
         {
-            var transform = self.transform;
-            var initial = initialRotation ?? transform.rotation;
+            var initial = initialRotation ?? self.transform.rotation;
             var target = Quaternion.Euler(x, y, z) * initial;
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(target, initial)
-                : transform.RotateTo(target, initial);
+                : self.component.RotateTo(target, initial);
         }
 
         public static Tween RotateBy(this IPrimer self, Vector3 degrees, Quaternion? initialRotation = null)
         {
-            var transform = self.transform;
-            var initial = initialRotation ?? transform.rotation;
+            var initial = initialRotation ?? self.transform.rotation;
             var target = Quaternion.Euler(degrees) * initial;
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(target, initial)
-                : transform.RotateTo(target, initial);
+                : self.component.RotateTo(target, initial);
         }
 
         public static Tween RotateBy(this IPrimer self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
-            var transform = self.transform;
-            var initial = initialRotation ?? transform.rotation;
+            var initial = initialRotation ?? self.transform.rotation;
             var target = newRotation * initial;
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(target, initial)
-                : transform.RotateTo(target, initial);
+                : self.component.RotateTo(target, initial);
         }
 
         public static Tween RotateTo(this IPrimer self, Vector3 newRotation, Vector3? initialRotation = null)
         {
-            var transform = self.transform;
-
             var initial = initialRotation.HasValue
                 ? Quaternion.Euler(initialRotation.Value)
-                : transform.rotation;
+                : self.transform.rotation;
 
             var target = Quaternion.Euler(newRotation);
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(target, initial)
-                : transform.RotateTo(target, initial);
+                : self.component.RotateTo(target, initial);
         }
 
         public static Tween RotateTo(this IPrimer self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
             var transform = self.transform;
-            var initial = initialRotation ?? transform.rotation;
+            var initial = initialRotation ?? self.transform.rotation;
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(newRotation, initial)
-                : transform.RotateTo(newRotation, initial);
+                : self.component.RotateTo(newRotation, initial);
         }
         #endregion
 
@@ -80,6 +75,7 @@ namespace Primer.Animation
         #region Polyfill Component.RotateTo()
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
+        // - fallback to transform instead of self.component
 
         public static Tween RotateBy(this Component self, float x = 0, float y = 0, float z = 0,
             Quaternion? initialRotation = null)

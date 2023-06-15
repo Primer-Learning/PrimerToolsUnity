@@ -54,7 +54,7 @@ namespace Primer.Animation
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.transform.ScaleTo(target, initial);
+                : self.component.ScaleTo(target, initial);
         }
 
         public static Tween ScaleDownToZero(this IPrimer self, Vector3? initialScale = null)
@@ -64,30 +64,27 @@ namespace Primer.Animation
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.transform.ScaleTo(target, initial);
+                : self.component.ScaleTo(target, initial);
         }
 
         public static Tween ScaleTo(this IPrimer self, float newScale, float? initialScale = null)
         {
-            var transform = self.transform;
-
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
-                : transform.localScale;
+                : self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(Vector3.one * newScale, initial)
-                : transform.ScaleTo(Vector3.one * newScale, initial);
+                : self.component.ScaleTo(Vector3.one * newScale, initial);
         }
 
         public static Tween ScaleTo(this IPrimer self, Vector3 newScale, Vector3? initialScale = null)
         {
-            var transform = self.transform;
-            var initial = initialScale ?? transform.localScale;
+            var initial = initialScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(newScale, initial)
-                : transform.ScaleTo(newScale, initial);
+                : self.component.ScaleTo(newScale, initial);
         }
         #endregion
 

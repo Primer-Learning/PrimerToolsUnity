@@ -12,6 +12,7 @@ namespace Primer.Timeline
         private bool isRunning = false;
 
         public Transform transform { get;  }
+        public Component component { get;  }
         public readonly Sequence sequence;
 
         public bool hasMoreClips { get; private set; } = true;
@@ -19,8 +20,9 @@ namespace Primer.Timeline
         public SequenceRunner(Sequence sequence)
         {
             transform = sequence.transform;
-            enumerator = sequence.Define();
+            component = sequence;
             this.sequence = sequence;
+            enumerator = sequence.Define();
             sequence.Cleanup();
         }
 

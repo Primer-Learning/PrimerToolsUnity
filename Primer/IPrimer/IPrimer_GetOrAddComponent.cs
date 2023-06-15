@@ -18,12 +18,12 @@ namespace Primer
 
         public static T GetOrAddComponent<T>(this IPrimer self) where T : Component
         {
-            return self.transform.gameObject.GetOrAddComponent<T>();
+            return self as T ?? self.transform.gameObject.GetOrAddComponent<T>();
         }
 
         public static T GetOrAddComponent<T>(this Component self) where T : Component
         {
-            return self.gameObject.GetOrAddComponent<T>();
+            return self as T ?? self.gameObject.GetOrAddComponent<T>();
         }
 
         // Actual implementation

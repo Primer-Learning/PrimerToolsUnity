@@ -11,6 +11,7 @@ namespace Primer
     public interface IPrimer
     {
         public Transform transform { get; }
+        public Component component { get; }
     }
 
 
@@ -23,7 +24,7 @@ namespace Primer
 
         public static IPrimer ToPrimer(this Component self)
         {
-            return self as IPrimer ?? new PrimerWrapper(self.transform);
+            return self as IPrimer ?? new PrimerWrapper(self);
         }
 
 
@@ -38,10 +39,12 @@ namespace Primer
         private readonly struct PrimerWrapper : IPrimer
         {
             public Transform transform { get; }
+            public Component component { get; }
 
-            public PrimerWrapper(Transform transform)
+            public PrimerWrapper(Component component)
             {
-                this.transform = transform;
+                this.component = component;
+                transform = component.transform;
             }
         }
     }

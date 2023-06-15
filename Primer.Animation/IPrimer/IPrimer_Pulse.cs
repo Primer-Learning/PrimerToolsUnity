@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
-    public interface IPrimer_CustomPulse
-    {
-        Tween Pulse(float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f, float decay = 0.5f);
-    }
-
     public static class IPrimer_PulseExtensions
     {
         public static Tween Pulse(this IPrimer self, float sizeFactor = 1.2f, float attack = 0.5f, float hold = 0.5f,

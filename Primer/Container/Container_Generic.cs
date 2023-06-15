@@ -16,14 +16,14 @@ namespace Primer
     {
         // public static Container<T> From<T>(T component) where T : Component => new(component);
 
-        public TComponent component { get; }
+        public new TComponent component { get; }
 
         public Container(string name, Component parent = null) : base(name, parent)
         {
             component = GetComponent<TComponent>(transform);
         }
 
-        public Container(TComponent component) : base(component.transform)
+        public Container(TComponent component) : base(component)
         {
             this.component = component;
         }
