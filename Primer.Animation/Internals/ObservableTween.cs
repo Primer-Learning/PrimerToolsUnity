@@ -6,27 +6,48 @@ namespace Primer.Animation
     {
         public enum State { Idle, Playing, Completed }
         private State state = State.Idle;
+        private bool isDisposed = false;
 
+        public Action onInitialState { get; init; }
         public Action beforePlay { get; init; }
         public Action onComplete { get; init; }
-        // public Action<float> beforeUpdate { get; init; }
+        public Action onDispose { get; init; }
         public Action<float> afterUpdate { get; init; }
+
+        ~ObservableTween()
+        {
+            Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (isDisposed) return;
+            isDisposed = true;
+
+            base.Dispose();
+            onDispose?.Invoke();
+        }
 
         public override void Evaluate(float t)
         {
             if (delay is not 0 && t < tStart)
                 return;
 
+            if (t <= 0 && onInitialState is not null) {
+                onInitialState.Invoke();
+                state = State.Idle;
+                return;
+            }
+
             if (state != State.Playing) {
                 beforePlay?.Invoke();
                 state = State.Playing;
             }
 
-            // beforeUpdate?.Invoke(t);
             base.Evaluate(t);
             afterUpdate?.Invoke(t);
 
-            if (state == State.Playing && t >= 1) {
+            if (t >= 1) {
                 onComplete?.Invoke();
                 state = State.Completed;
             }
@@ -37,13 +58,22 @@ namespace Primer.Animation
     {
         public static ObservableTween Observe(
             this Tween tween,
+            Action onInitialState = null,
             Action beforePlay = null,
             Action onComplete = null,
-            // Action<float> beforeUpdate = null,
+            Action onDispose = null,
             Action<float> afterUpdate = null)
         {
-            if (tween is ObservableTween observableTween)
-                return ExtendObservable(observableTween, beforePlay, onComplete, afterUpdate);
+            if (tween is ObservableTween observableTween) {
+                return ExtendObservable(
+                    observableTween,
+                    onInitialState,
+                    beforePlay,
+                    onComplete,
+                    onDispose,
+                    afterUpdate
+                );
+            }
 
             return new ObservableTween(tween.lerp) {
                 // all of Tween fields should be copied here
@@ -51,48 +81,31 @@ namespace Primer.Animation
                 delay = tween.delay,
                 isCalculated = tween.isCalculated,
                 ms = tween.ms,
+
                 // listeners
+                onInitialState = onInitialState,
                 beforePlay = beforePlay,
                 onComplete = onComplete,
-                // beforeUpdate = beforeUpdate,
+                onDispose = onDispose,
                 afterUpdate = afterUpdate,
             };
         }
 
         private static ObservableTween ExtendObservable(
             ObservableTween tween,
+            Action onInitialState,
             Action beforePlay,
             Action onComplete,
+            Action onDispose,
             Action<float> afterUpdate)
         {
             return tween with {
-                beforePlay = Merge(tween.beforePlay, beforePlay),
-                onComplete = Merge(tween.onComplete, onComplete),
-                afterUpdate = Merge(tween.afterUpdate, afterUpdate),
+                onInitialState = tween.onInitialState + onInitialState,
+                beforePlay = tween.beforePlay + beforePlay,
+                onComplete = tween.onComplete + onComplete,
+                onDispose = tween.onDispose + onDispose,
+                afterUpdate = tween.afterUpdate + afterUpdate,
             };
         }
-
-        private static Action Merge(Action a, Action b)
-        {
-            if (a is null || b is null)
-                return a ?? b;
-
-            return () => {
-                a.Invoke();
-                b.Invoke();
-            };
-        }
-
-        private static Action<T> Merge<T>(Action<T> a, Action<T> b)
-        {
-            if (a is null || b is null)
-                return a ?? b;
-
-            return x => {
-                a.Invoke(x);
-                b.Invoke(x);
-            };
-        }
-
     }
 }
