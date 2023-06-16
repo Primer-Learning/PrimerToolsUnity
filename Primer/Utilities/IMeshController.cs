@@ -12,7 +12,7 @@ namespace Primer
     {
         public static Color GetColor(this IMeshController self)
         {
-            return self.GetMeshRenderers()[0].GetColor();
+            return self.GetMaterial().color;
         }
 
         public static void SetColor(this IMeshController self, Color color)
@@ -24,7 +24,11 @@ namespace Primer
 
         public static Material GetMaterial(this IMeshController self)
         {
-            return self.GetMeshRenderers()[0].sharedMaterial;
+            var renderers = self.GetMeshRenderers();
+
+            return renderers.Length is 0
+                ? MeshRendererExtensions.defaultMaterial
+                : renderers[0].material;
         }
 
         public static void SetMaterial(this IMeshController self, Material material)

@@ -36,8 +36,6 @@ namespace Primer
                 ?? source.gameObject.AddComponent<TResult>();
         }
 
-        public static Container<T> From<T>(T component) where T : Component => new(component);
-
         // Automatic conversion to TComponent, Component and Transform
         public static implicit operator TComponent(Container<TComponent> container) => container.component;
         public static implicit operator Component(Container<TComponent> container) => container.component;
