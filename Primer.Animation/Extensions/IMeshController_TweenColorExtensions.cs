@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -14,18 +16,16 @@ namespace Primer.Animation
             return Tween.Value(self.SetColor, self.GetColor, () => newColor);
         }
 
+        public static Tween TweenColor(this IEnumerable<MeshRenderer> self, Color newColor)
+        {
+            var meshes = self.ToArray();
+            return Tween.Value(meshes.SetColor, meshes.GetColor, () => newColor);
+        }
+
         public static Tween TweenColor(this IMeshController self, Color newColor)
         {
             var meshes = self.GetMeshRenderers();
-
-            void SetColorToAll(Color x)
-            {
-                foreach (var mesh in meshes) {
-                    mesh.SetColor(x);
-                }
-            }
-
-            return Tween.Value(SetColorToAll, self.GetColor, () => newColor);
+            return Tween.Value(meshes.SetColor, meshes.GetColor, () => newColor);
         }
     }
 }
