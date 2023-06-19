@@ -13,21 +13,34 @@ namespace Primer.Latex
         [SerializeReference]
         private readonly LatexChar[] characters;
 
+        private readonly LatexInput input;
+
         public bool isEmpty => characters.Length == 0;
         public Vector2 center => GetBounds().center;
 
-
-        // public int count => characters.Length;
+        public int count => characters.Length;
         // public LatexChar this[int index] => characters[index];
 
+        public string source => input.code;
 
-        public LatexExpression() => characters = Array.Empty<LatexChar>();
 
-        public LatexExpression(LatexChar[] chars) => characters = chars;
+        public LatexExpression(LatexInput input)
+        {
+            this.input = input;
+            characters = Array.Empty<LatexChar>();
+        }
+
+        public LatexExpression(LatexInput input, LatexChar[] chars)
+        {
+            this.input = input;
+            characters = chars;
+        }
 
 
         public bool IsSame(LatexExpression other)
-            => !ReferenceEquals(null, other) && characters.SequenceEqual(other.characters);
+        {
+            return !ReferenceEquals(null, other) && characters.SequenceEqual(other.characters);
+        }
 
         public Rect GetBounds()
         {
@@ -44,8 +57,9 @@ namespace Primer.Latex
 
         public LatexExpression Slice(int start, int end)
         {
-            var chars = characters.Skip(start).Take(end - start).ToArray();
-            return new LatexExpression(chars);
+            var modifiedInput = input with { code = "{input.code} |slice({start},{end})" };
+            var chars = characters.Take(end).Skip(start).ToArray();
+            return new LatexExpression(modifiedInput, chars);
         }
 
 

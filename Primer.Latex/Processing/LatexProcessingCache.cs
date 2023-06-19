@@ -105,7 +105,7 @@ namespace Primer.Latex
             fs.Close();
 
             var chars = serialized.Select(x => x.ToLatexChar());
-            return new LatexExpression(chars.ToArray());
+            return new LatexExpression(config, chars.ToArray());
         }
 
         [Serializable]

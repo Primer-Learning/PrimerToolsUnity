@@ -14,7 +14,7 @@ namespace Primer.Latex
         {
             if (string.IsNullOrWhiteSpace(config.code)) {
                 state = LatexProcessingState.Completed;
-                return new LatexExpression();
+                return new LatexExpression(config);
             }
 
             state = LatexProcessingState.Processing;
@@ -22,7 +22,7 @@ namespace Primer.Latex
             try {
                 var renderedSprites = await DelegateRendering(config, ct);
                 state = LatexProcessingState.Completed;
-                return new LatexExpression(renderedSprites);
+                return new LatexExpression(config, renderedSprites);
             }
             catch (OperationCanceledException) {
                 state = LatexProcessingState.Cancelled;
