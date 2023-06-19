@@ -7,25 +7,26 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
-    [HideLabel]
-    [Serializable]
-    [InlineProperty]
-    [DisableContextMenu]
-    [HideReferenceObjectPicker]
-    [Title("LaTeX Processing")]
-    internal class LatexCliIntegration
+    public partial class LatexComponent
     {
+        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
+
+        public LatexExpression expression { get; private set; }
+
+        public bool isProcessing => processor.state == LatexProcessingState.Processing;
+
+
+        #region public string latex;
         [SerializeField]
         [HideInInspector]
         internal string _latex;
-
-        public bool isProcessing => processor.state == LatexProcessingState.Processing;
 
 #if UNITY_EDITOR
         private bool isIdle => !isProcessing && !isCancelling && !hasError;
         private bool isCancelling => processor.state == LatexProcessingState.Cancelled && isProcessing;
         private bool hasError => processor.renderError != null;
 
+        [Title("LaTeX Processing")]
         [InfoBox("Ok", VisibleIf = nameof(isIdle))]
         [InfoBox("Processing...", InfoMessageType.Warning, VisibleIf = nameof(isProcessing))]
         [InfoBox("Cancelling...", InfoMessageType.Warning, VisibleIf = nameof(isCancelling))]
@@ -38,12 +39,11 @@ namespace Primer.Latex
         public string latex
         {
             get => _latex;
-            set {
-                _latex = value;
-                Refresh();
-            }
+            set => config = new LatexInput(value, _headers);
         }
+        #endregion
 
+        #region public List<string> headers;
         [SerializeField]
         [HideInInspector]
         internal List<string> _headers = LatexInput.GetDefaultHeaders();
@@ -53,38 +53,29 @@ namespace Primer.Latex
         public List<string> headers
         {
             get => _headers;
-            set {
-                _headers = value;
-                Refresh();
-            }
+            set => config = new LatexInput(_latex, value);
         }
-
-        internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
-
-        [NonSerialized]
-        internal LatexExpression expression;
-
-        public Action onChange;
+        #endregion
 
         public LatexInput config {
             get => new(_latex, _headers);
             set => Process(value).Forget();
         }
 
-        public async void Refresh()
-        {
-            var newExpression = await Evaluate(config);
-            ApplyExpression(newExpression);
-        }
+
+        public UniTask Process(int input) => Process($"${input}$");
+        public UniTask Process(float input) => Process($"${input}$");
+        public UniTask Process(string input) => Process(new LatexInput(input, headers));
 
         public async UniTask Process(LatexInput input)
         {
             _latex = input.code;
             _headers = input.headers;
 
-            var request = PrimerTimeline.RegisterOperation(Evaluate(input));
-            var newExpression = await request;
-            ApplyExpression(newExpression);
+            var request = Evaluate(input);
+            expression = await PrimerTimeline.RegisterOperation(request);
+
+            UpdateChildren();
         }
 
         private async UniTask<LatexExpression> Evaluate(LatexInput input)
@@ -101,14 +92,6 @@ namespace Primer.Latex
             }
         }
 
-        private bool ApplyExpression(LatexExpression newExpression)
-        {
-            if (newExpression is null || expression is not null && expression.IsSame(newExpression))
-                return false;
-
-            expression = newExpression;
-            onChange?.Invoke();
-            return true;
-        }
+        // newExpression is null || expression is not null && expression.IsSame(newExpression)
     }
 }
