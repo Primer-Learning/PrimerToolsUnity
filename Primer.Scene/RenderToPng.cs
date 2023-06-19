@@ -44,7 +44,7 @@ namespace Primer.Scene
         public string frameOutDir;
 
         private bool waitingForEndProcess = false;
-        private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
+        private static string defaultOutDir => Path.Combine(Directory.GetCurrentDirectory(), "..");
         private string destinationDirectory;
         private byte[] lastFrame;
         
@@ -162,28 +162,27 @@ namespace Primer.Scene
             var scenePath = GetScenePath();
             var presetName = qualityPreset.ToString();
 
-            // Make a folder specifically for this take
-            var takeCount = 0;
-            var takesString = $"{presetName} take 1";
-            var takePath = Path.Combine(scenePath, takesString);
-            // Increment the folder number until one doesn't exist, 
-            while (Directory.Exists(takePath)) {
-                takeCount++;
-                takesString = $"{presetName} take {takeCount + 1}";
-                takePath = Path.Combine(scenePath, takesString);
-            }
+            var currentDirectoryPath = Path.Combine(scenePath, $"Current {presetName} take");
 
-            if (!fillGapsInPreviousTake)
+            if (Directory.Exists(currentDirectoryPath) && !fillGapsInPreviousTake)
             {
-                Directory.CreateDirectory(takePath);
+                // Find the next available numbered directory name
+                var takeCount = 0;
+                var takesString = $"{presetName} take 1";
+                var takePath = Path.Combine(scenePath, takesString);
+                while (Directory.Exists(takePath)) {
+                    takeCount++;
+                    takesString = $"{presetName} take {takeCount + 1}";
+                    takePath = Path.Combine(scenePath, takesString);
+                }
+                
+                // Move the previous take to the numbered directory name
+                Directory.Move(currentDirectoryPath, takePath);
             }
-            else
-            {
-                takesString = $"take {takeCount}";
-                takePath = Path.Combine(scenePath, takesString);
-            }
+            
+            Directory.CreateDirectory(currentDirectoryPath);
 
-            return takePath;
+            return currentDirectoryPath;
         }
 
         private string GetScenePath()
@@ -194,6 +193,12 @@ namespace Primer.Scene
 
             var dirname = $"{SceneManager.GetActiveScene().name}_recordings";
             var scenePath = Path.Combine(outDir, "png", dirname);
+
+            if (!Directory.Exists(scenePath))
+            {
+                Directory.CreateDirectory(scenePath);
+            }
+            
             return scenePath;
         }
 
