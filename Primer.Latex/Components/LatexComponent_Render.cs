@@ -69,10 +69,9 @@ namespace Primer.Latex
         }
 
 
-        [ButtonGroup("Children group")]
+        [ButtonGroup("Characters render")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
-        [ContextMenu("PRIMER > Update children")]
-        public void UpdateChildren()
+        public void UpdateCharacters()
         {
             var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
 
@@ -100,16 +99,15 @@ namespace Primer.Latex
             SetCastShadows(false);
         }
 
-        [ButtonGroup("Children group")]
+        [ButtonGroup("Characters render")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
-        [ContextMenu("PRIMER > Regenerate children")]
-        protected virtual void RegenerateChildren()
+        protected virtual void RegenerateCharacters()
         {
             if (gameObject.IsPreset())
                 return;
 
             transform.RemoveAllChildren();
-            UpdateChildren();
+            UpdateCharacters();
         }
 
         MeshRenderer[] IMeshController.GetMeshRenderers()

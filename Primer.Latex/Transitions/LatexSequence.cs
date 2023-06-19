@@ -33,11 +33,11 @@ namespace Primer.Latex
         // protected TweenProvider Transition(LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
         //     => Transition(null, stage, groupIndexesAfter, transition);
 
-        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
+        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transitions)
         {
             stages.Add(new Stage(
                 latex: stage,
-                transition,
+                transitions,
                 groupIndexesBefore,
                 groupIndexesAfter
             ));
@@ -45,14 +45,9 @@ namespace Primer.Latex
             var prev = activeLatex ?? initial;
 
             return new TweenProvider(() => {
-                if (groupIndexesBefore is not null)
-                    prev.SetGroupIndexes(groupIndexesBefore);
-
-                if (groupIndexesAfter is not null)
-                    stage.SetGroupIndexes(groupIndexesAfter);
-
-                runningScrubbable = prev.CreateTransition(stage, transition);
-                return runningScrubbable.AsTween();
+                var transition = prev.Transition(groupIndexesBefore, stage.expression, groupIndexesAfter, transitions);
+                runningTransition = transition;
+                return transition;
             });
         }
 
@@ -69,7 +64,7 @@ namespace Primer.Latex
         private Container container;
         private LatexComponent lastCreatedLatex;
         public LatexComponent activeLatex { get; private set; }
-        private LatexScrubbable runningScrubbable;
+        private Tween runningTransition;
         private bool isInitialized = false;
 
         internal LatexComponent initial;
@@ -86,9 +81,10 @@ namespace Primer.Latex
         {
             await EnsureIsInitialized();
 
-            if (runningScrubbable is not null) {
-                runningScrubbable.Dispose();
-                runningScrubbable = null;
+            if (runningTransition is not null) {
+                runningTransition.Evaluate(0);
+                runningTransition.Dispose();
+                runningTransition = null;
             }
 
             DisableObjects();

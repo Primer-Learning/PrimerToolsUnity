@@ -12,6 +12,7 @@ namespace Primer.Latex
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
 
         public LatexExpression expression { get; private set; }
+        public Action onExpressionChange;
 
         public bool isProcessing => processor.state == LatexProcessingState.Processing;
 
@@ -73,15 +74,20 @@ namespace Primer.Latex
             _headers = input.headers;
 
             var request = Evaluate(input);
-            expression = await PrimerTimeline.RegisterOperation(request);
+            var newExpression = await PrimerTimeline.RegisterOperation(request);
 
-            UpdateChildren();
+            if (newExpression is null || expression is not null && expression.IsSame(newExpression))
+                return;
+
+            expression = newExpression;
+            UpdateCharacters();
+            onExpressionChange?.Invoke();
         }
 
         private async UniTask<LatexExpression> Evaluate(LatexInput input)
         {
             if (string.IsNullOrWhiteSpace(input.code))
-                return new LatexExpression();
+                return new LatexExpression(input);
 
             try {
                 return await processor.Process(input);
@@ -92,6 +98,6 @@ namespace Primer.Latex
             }
         }
 
-        // newExpression is null || expression is not null && expression.IsSame(newExpression)
+        //
     }
 }

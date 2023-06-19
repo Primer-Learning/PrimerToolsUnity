@@ -2,29 +2,26 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Primer.Latex
 {
-    internal class TransitionList : IReadOnlyList<GroupTransitionType>
+    [Serializable]
+    public class TransitionList : IReadOnlyList<GroupTransitionType>
     {
-        public record TransitionEntry(GroupTransitionType type, int index, int? fromIndex, int? toIndex)
-        {
-            public bool isAnchor => type == GroupTransitionType.Anchor;
-            public bool isTransition => type == GroupTransitionType.Transition;
-            public bool isReplace => type == GroupTransitionType.Replace;
-            public bool isRemove => type == GroupTransitionType.Remove;
-            public bool isAdd => type == GroupTransitionType.Add;
-        }
+        public record TransitionEntry(GroupTransitionType type, int? fromIndex, int? toIndex);
 
-        private readonly IReadOnlyList<GroupTransitionType> transitions;
+        // This is readonly but that doesn't work with [SerializeField]
+        [SerializeField]
+        private List<GroupTransitionType> transitions;
 
         public int Count => transitions.Count;
         public GroupTransitionType this[int index] => transitions[index];
 
 
-        public TransitionList(IReadOnlyList<GroupTransitionType> transitions)
+        public TransitionList(IEnumerable<GroupTransitionType> transitions)
         {
-            this.transitions = transitions;
+            this.transitions = transitions.ToList();
         }
 
 
@@ -38,7 +35,6 @@ namespace Primer.Latex
 
                 yield return new TransitionEntry(
                     transition,
-                    i,
                     transition is GroupTransitionType.Add ? null : fromCursor++,
                     transition is GroupTransitionType.Remove ? null : toCursor++
                 );
@@ -53,12 +49,12 @@ namespace Primer.Latex
             return this;
         }
 
-        public TransitionList For(GroupedExpression from, GroupedExpression to)
+        public TransitionList For(GroupedLatex from, GroupedLatex to)
         {
             return Validate().AdjustLength(from, to);
         }
 
-        public TransitionList AdjustLength(GroupedExpression from, GroupedExpression to)
+        public TransitionList AdjustLength(GroupedLatex from, GroupedLatex to)
             => AdjustLength(from.Count, to.Count);
 
         public TransitionList AdjustLength(int fromGroupsCount, int toGroupsCount)
