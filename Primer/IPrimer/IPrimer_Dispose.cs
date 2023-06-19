@@ -49,5 +49,22 @@ namespace Primer
                 Object.Destroy(gameObject);
         }
 
+        // DisposeComponent is a special case
+        public static async void DisposeComponent(this Component self, bool urgent = false)
+        {
+            if (!self)
+                return;
+
+            // TODO: invert this boolean, the boolean should be called `delayed` and only run this line if true
+            if (!urgent)
+                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
+
+#if UNITY_EDITOR
+            if (Application.isEditor && !Application.isPlaying)
+                Object.DestroyImmediate(self);
+            else
+#endif
+                Object.Destroy(self);
+        }
     }
 }
