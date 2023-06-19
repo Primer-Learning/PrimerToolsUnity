@@ -17,7 +17,7 @@ namespace Primer
             target.localScale = source.localScale;
         }
 
-        public static void SetDefaults(this Transform transform, Vector3? scale = null, bool saveIntrinsicScale = false)
+        public static Transform SetDefaults(this Transform transform, Vector3? scale = null, bool saveIntrinsicScale = false)
         {
             if (saveIntrinsicScale)
                 transform.GetPrimer().FindIntrinsicScale();
@@ -25,6 +25,8 @@ namespace Primer
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
             transform.localScale = scale ?? Vector3.one;
+
+            return transform;
         }
     }
 }
