@@ -6,12 +6,12 @@ namespace Primer
     {
         public Container AddContainer(string name)
         {
-            return Add(name).ToContainer();
+            return Add(name).ToContainer(connectToParent: true);
         }
 
         public Container<TChild> AddContainer<TChild>(string name) where TChild : Component
         {
-            return Add<TChild>(name).ToContainer();
+            return Add<TChild>(name).ToContainer(connectToParent: true);
         }
     }
 }
