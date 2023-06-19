@@ -8,7 +8,8 @@ namespace Primer.Animation
         private State state = State.Idle;
         private bool isDisposed = false;
 
-        public Action onInitialState { get; init; }
+        public Action whenZero { get; init; }
+        public Action whenOne { get; init; }
         public Action beforePlay { get; init; }
         public Action onComplete { get; init; }
         public Action onDispose { get; init; }
@@ -33,15 +34,25 @@ namespace Primer.Animation
             if (delay is not 0 && t < tStart)
                 return;
 
-            if (t <= 0 && onInitialState is not null) {
-                onInitialState.Invoke();
-                state = State.Idle;
-                return;
-            }
-
             if (state != State.Playing) {
                 beforePlay?.Invoke();
                 state = State.Playing;
+            }
+
+            if (t <= 0 && whenZero is not null) {
+                whenZero.Invoke();
+                return;
+            }
+
+            if (t >= 1 && whenOne is not null) {
+                whenOne?.Invoke();
+
+                if (state != State.Completed) {
+                    onComplete?.Invoke();
+                    state = State.Completed;
+                }
+
+                return;
             }
 
             base.Evaluate(t);
@@ -58,18 +69,20 @@ namespace Primer.Animation
     {
         public static ObservableTween Observe(
             this Tween tween,
-            Action onInitialState = null,
             Action beforePlay = null,
             Action onComplete = null,
+            Action whenZero = null,
+            Action whenOne = null,
             Action onDispose = null,
             Action<float> afterUpdate = null)
         {
             if (tween is ObservableTween observableTween) {
                 return ExtendObservable(
                     observableTween,
-                    onInitialState,
                     beforePlay,
                     onComplete,
+                    whenZero,
+                    whenOne,
                     onDispose,
                     afterUpdate
                 );
@@ -83,7 +96,8 @@ namespace Primer.Animation
                 ms = tween.ms,
 
                 // listeners
-                onInitialState = onInitialState,
+                whenZero = whenZero,
+                whenOne = whenOne,
                 beforePlay = beforePlay,
                 onComplete = onComplete,
                 onDispose = onDispose,
@@ -93,14 +107,16 @@ namespace Primer.Animation
 
         private static ObservableTween ExtendObservable(
             ObservableTween tween,
-            Action onInitialState,
             Action beforePlay,
             Action onComplete,
+            Action whenZero,
+            Action whenOne,
             Action onDispose,
             Action<float> afterUpdate)
         {
             return tween with {
-                onInitialState = tween.onInitialState + onInitialState,
+                whenZero = tween.whenZero + whenZero,
+                whenOne = tween.whenOne + whenOne,
                 beforePlay = tween.beforePlay + beforePlay,
                 onComplete = tween.onComplete + onComplete,
                 onDispose = tween.onDispose + onDispose,
