@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Primer.Latex
 {
-    public sealed record LatexInput(string code, List<string> headers)
+    public sealed record LatexInput(string code, List<string> headers) : ISerializable
     {
         public int GetDeterministicHashCode()
         {
@@ -30,6 +31,12 @@ namespace Primer.Latex
                 hash.Add(headers[i]);
 
             return hash.ToHashCode();
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(code), code);
+            info.AddValue(nameof(headers), headers);
         }
 
         public static List<string> GetDefaultHeaders() => new() {

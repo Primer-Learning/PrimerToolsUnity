@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 using Unity.VectorGraphics;
 using UnityEngine;
 
 namespace Primer.Latex
 {
-    [Serializable]
-    public class LatexChar
+    public class LatexChar : ISerializable
     {
         public static LatexChar Lerp(LatexChar a, LatexChar b, float t) => new(
             mesh: a.mesh,
@@ -71,6 +71,13 @@ namespace Primer.Latex
                 tangents = Enumerable.Repeat(tangents, sprite.vertices.Length).ToArray(),
                 uv = sprite.vertices,
             };
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(mesh), mesh);
+            info.AddValue(nameof(bounds), bounds);
+            info.AddValue(nameof(position), position);
         }
     }
 }

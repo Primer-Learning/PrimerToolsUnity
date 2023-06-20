@@ -2,21 +2,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Unity.VectorGraphics;
 using UnityEngine;
 
 namespace Primer.Latex
 {
-    [Serializable]
-    public class LatexExpression : IEnumerable<LatexChar>
+    public class LatexExpression : IReadOnlyList<LatexChar>, ISerializable
     {
-        [SerializeField]
-        private LatexChar[] characters;
+        private readonly LatexChar[] characters;
         private readonly LatexInput input;
 
         public Vector2 center => GetBounds().center;
-        public int count => characters.Length;
         public string source => input.code;
+
+        public int Count => characters.Length;
+        public LatexChar this[int i] => characters[i];
 
 
         public LatexExpression(LatexInput input)
@@ -57,11 +58,17 @@ namespace Primer.Latex
             return new LatexExpression(modifiedInput, chars);
         }
 
+
         public override string ToString()
         {
-            return $"LatexExpression({input.code})[{characters.Length}]";
+            return $"LatexExpression({input?.code ?? "null"})[{characters.Length}]";
         }
 
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(input), input);
+            info.AddValue(nameof(characters), characters);
+        }
 
         public IEnumerator<LatexChar> GetEnumerator() => characters.ToList().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
