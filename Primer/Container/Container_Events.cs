@@ -8,7 +8,7 @@ namespace Primer
     // We need a non-generic class to contain the static values
     internal static class ContainerEvents
     {
-        internal static Action<Transform> defaultOnRemove = x => x.Dispose();
+        internal static Action<Transform> defaultOnRemove = x => x.Dispose(urgent: true);
 
         /// <summary>
         ///   If this function returns true, the container will not fire any events.
