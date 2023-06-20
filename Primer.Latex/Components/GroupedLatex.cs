@@ -7,11 +7,10 @@ using UnityEngine;
 
 namespace Primer.Latex
 {
+    [ExecuteAlways]
     [RequireComponent(typeof(LatexComponent))]
-    public class GroupedLatex : MonoBehaviour, IReadOnlyList<Transform>
+    public class GroupedLatex : MonoBehaviour, IReadOnlyList<Transform>, IHierarchyManipulator
     {
-        [Required] public string groupName;
-
         #region IReadOnlyList implementation
         private List<Transform> groups = new();
         public int Count => groups.Count;
@@ -20,10 +19,10 @@ namespace Primer.Latex
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion;
 
-        #region public Transform root { get; }
-        private Transform rootCache;
-        public Transform root => rootCache ??= transform.FindOrCreate($"Grouping_{groupName}");
-        #endregion
+        public Transform root => transform.FindOrCreate(
+            $"Grouping > {groupName}",
+            new ChildOptions { enable = false }
+        );
 
         #region public LatexComponent latex { get; }
         private LatexComponent latexCache;
@@ -31,8 +30,8 @@ namespace Primer.Latex
         #endregion
 
         #region public LatexExpression expression { get; set; } = latex.expression;
-        [SerializeField, HideInInspector]
         private LatexExpression customExpression;
+
         [SerializeField, HideInInspector]
         private bool hasCustomExpression = false;
 
@@ -42,6 +41,20 @@ namespace Primer.Latex
                 customExpression = value;
                 hasCustomExpression = true;
                 UpdateChildren();
+            }
+        }
+        #endregion
+
+        #region public string groupName;
+        [SerializeField, HideInInspector]
+        private string _groupName;
+
+        [ShowInInspector, Required]
+        public string groupName {
+            get => _groupName;
+            set {
+                root.name = $"Grouping > {value}";
+                _groupName = value;
             }
         }
         #endregion
@@ -72,10 +85,9 @@ namespace Primer.Latex
                 UpdateChildren();
         }
 
-        [Button("Update groups")]
-        private void UpdateChildren()
+        public void UpdateChildren()
         {
-            var currentExpression = this.expression;
+            var currentExpression = expression;
 
             if (currentExpression is null) {
                 Debug.LogError("Cannot create LatexGroup, expression is null!");
@@ -87,24 +99,25 @@ namespace Primer.Latex
                 return;
             }
 
+            // Groups are only used in transitions, we don't need to see them
+            var container = new Container(root, setActive: false);
             var zero = currentExpression.center;
-            var container = new Container(root);
             var currentMaterial = latex.material;
             var currentColor = latex.color;
 
             groups.Clear();
 
-            foreach (var (start, end) in CalculateRanges()) {
+            foreach (var (groupIndex, (start, end)) in CalculateRanges().WithIndex()) {
                 var chunk = currentExpression.Slice(start, end);
                 var center = chunk.center;
-                var group = container.AddContainer($"Group (chars {start} to {end - 1})");
+                var group = container.AddContainer($"Group {groupIndex} ({start} to {end - 1})");
 
                 group.transform.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
                 group.transform.localScale = Vector3.one;
                 group.transform.localRotation = Quaternion.identity;
 
                 foreach (var (index, character) in chunk.WithIndex()) {
-                    var charTransform = container.Add($"LatexChar {start + index}").SetDefaults();
+                    var charTransform = group.Add($"LatexChar {start + index}").SetDefaults();
                     character.RenderTo(charTransform, currentMaterial, currentColor);
                     charTransform.localPosition -= group.transform.localPosition;
                 }
@@ -116,8 +129,7 @@ namespace Primer.Latex
             onGroupsChange?.Invoke();
         }
 
-        [Button("Regenerate children")]
-        public void DestroyAndUpdate()
+        public void RegenerateChildren()
         {
             root.RemoveAllChildren();
             UpdateChildren();
@@ -144,10 +156,10 @@ namespace Primer.Latex
         public GroupedLatex Set(string groupName, IEnumerable<int> groupIndexes, LatexExpression expression = null)
         {
             customExpression = expression;
+            hasCustomExpression = expression is not null;
             this.groupName = groupName;
             this.groupIndexes = groupIndexes.ToList();
-            // Implicit when we set group indexes
-            // UpdateChildren();
+            UpdateChildren();
             return this;
         }
         #endregion
@@ -164,15 +176,15 @@ namespace Primer.Latex
                 if (start == last)
                     continue;
 
-                if (start >= expression.count)
+                if (start >= expression.Count)
                     break;
 
                 result.Add((last, start));
                 last = start;
             }
 
-            if (last != expression.count)
-                result.Add((last, expression.count));
+            if (last != expression.Count)
+                result.Add((last, expression.Count));
 
             return result.ToArray();
         }

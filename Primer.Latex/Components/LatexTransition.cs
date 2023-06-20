@@ -1,23 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
-using Primer.Animation;
-using Sirenix.OdinInspector;
-using UnityEngine;
+using Primer.Animation;using UnityEngine;
 
 namespace Primer.Latex
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(LatexComponent))]
     [RequireComponent(typeof(GroupedLatex))]
-    public class LatexTransition : MonoBehaviour
+    public class LatexTransition : MonoBehaviour, IHierarchyManipulator
     {
-        #region Transform root { get; }
-        public Transform rootCache;
-        public Transform root => rootCache ??= transform.FindOrCreate("Transition");
-        #endregion
+        public const string ROOT_NAME = "Transition";
+
+        public Transform root => transform.FindOrCreate(ROOT_NAME);
 
         #region LatexComponent latex { get; }
-        public LatexComponent latexCache;
+        private LatexComponent latexCache;
         public LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
         #endregion
 
@@ -38,9 +35,9 @@ namespace Primer.Latex
             return $@"
 .Transition(
     startLatex: ""{start.expression.source}""
-    new int[] {{{start.groupIndexes.Join(", ")}}},
-    ""{end.expression.source}"",
-    new int[] {{{end.groupIndexes.Join(", ")}}},
+    startGroups: new int[] {{{start.groupIndexes.Join(", ")}}},
+    endLatex: ""{end.expression.source}"",
+    endGroups: new int[] {{{end.groupIndexes.Join(", ")}}},
     {transitions.Select(x => x.ToCode()).Join(",\n    ")}
 );
             ".Trim();
@@ -58,6 +55,8 @@ namespace Primer.Latex
             this.end = end;
             this.transitions = transitions.For(start, end);
             offset = CalculateOffset();
+            start.onGroupsChange += UpdateChildren;
+            end.onGroupsChange += UpdateChildren;
             UpdateChildren();
             return this;
         }
@@ -71,17 +70,23 @@ namespace Primer.Latex
             );
         }
 
-        private void SetInitialState()
+        public void Deactivate()
+        {
+            root.SetActive(false);
+            latex.ResetActiveDisplay();
+        }
+
+        public void SetInitialState()
         {
             latex.SetActiveDisplay(start.root);
         }
 
-        private void SetEndState()
+        public void SetEndState()
         {
             latex.SetActiveDisplay(end.root);
         }
 
-        private void Evaluate(float t)
+        public void Evaluate(float t)
         {
             latex.SetActiveDisplay(root);
 
@@ -128,13 +133,14 @@ namespace Primer.Latex
         }
 
         #region Object creation
-        [Button]
         public void UpdateChildren()
         {
             transition.Clear();
             replace.Clear();
             remove.Clear();
             add.Clear();
+
+            Deactivate();
 
             var container = new Container(root);
 
@@ -166,6 +172,12 @@ namespace Primer.Latex
             }
 
             container.Purge();
+        }
+
+        public void RegenerateChildren()
+        {
+            root.RemoveAllChildren();
+            UpdateChildren();
         }
 
         private IEnumerable<Transform> GroupsToAdd()
@@ -202,4 +214,3 @@ namespace Primer.Latex
         #endregion
     }
 }
-

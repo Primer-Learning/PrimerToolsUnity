@@ -13,22 +13,6 @@ namespace Primer.Latex
 
         public bool isProcessing => processor.state == LatexProcessingState.Processing;
 
-        #region public LatexExpression expression;
-        [SerializeField, HideInInspector]
-        private LatexExpression _expression;
-        public Action onExpressionChange;
-
-        public LatexExpression expression {
-            get => _expression;
-            private set {
-                Debug.Log("WTF");
-                _expression = value;
-                UpdateCharacters();
-                onExpressionChange?.Invoke();
-            }
-        }
-        #endregion
-
         #region public string latex;
         [SerializeField, HideInInspector]
         internal string _latex;
@@ -88,7 +72,7 @@ namespace Primer.Latex
             var request = Evaluate(input);
             var newExpression = await PrimerTimeline.RegisterOperation(request);
 
-            if (newExpression is not null && !expression.IsSame(newExpression))
+            if (newExpression is not null && !newExpression.IsSame(expression))
                 expression = newExpression;
         }
 

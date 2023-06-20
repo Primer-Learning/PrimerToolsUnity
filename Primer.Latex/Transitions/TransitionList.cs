@@ -2,18 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System.Runtime.Serialization;
 
 namespace Primer.Latex
 {
-    [Serializable]
-    public class TransitionList : IReadOnlyList<GroupTransitionType>
+    public class TransitionList : IReadOnlyList<GroupTransitionType>, ISerializable
     {
-        public record TransitionEntry(GroupTransitionType type, int index, int? fromIndex, int? toIndex);
+        public record Entry(GroupTransitionType type, int index, int? fromIndex, int? toIndex);
 
-        // This is readonly but that doesn't work with [SerializeField]
-        [SerializeField]
-        private List<GroupTransitionType> transitions;
+        private readonly List<GroupTransitionType> transitions;
 
         public int Count => transitions.Count;
         public GroupTransitionType this[int index] {
@@ -28,7 +25,7 @@ namespace Primer.Latex
         }
 
 
-        public IEnumerable<TransitionEntry> GetIndexes()
+        public IEnumerable<Entry> GetIndexes()
         {
             var fromCursor = 0;
             var toCursor = 0;
@@ -36,7 +33,7 @@ namespace Primer.Latex
             for (var i = 0; i < transitions.Count; i++) {
                 var transition = transitions[i];
 
-                yield return new TransitionEntry(
+                yield return new Entry(
                     transition,
                     i,
                     transition is GroupTransitionType.Add ? null : fromCursor++,
@@ -105,6 +102,11 @@ namespace Primer.Latex
             return new TransitionList(copy.ToArray());
         }
 
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(transitions), transitions);
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<GroupTransitionType> GetEnumerator() => transitions.GetEnumerator();

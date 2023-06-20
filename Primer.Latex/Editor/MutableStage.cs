@@ -101,7 +101,7 @@ namespace Primer.Latex.Editor
             }
         }
 
-        private TransitionList.TransitionEntry GetIndexesAt(int index)
+        private TransitionList.Entry GetIndexesAt(int index)
         {
             return transitions.GetIndexes().Skip(index).First();
         }

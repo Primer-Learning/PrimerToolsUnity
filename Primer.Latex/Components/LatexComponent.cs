@@ -1,3 +1,5 @@
+using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Latex
@@ -8,7 +10,30 @@ namespace Primer.Latex
     {
         public const string PREFAB_NAME = "LaTeX";
 
-        [SerializeField] private Transform activeDisplay;
+        #region public LatexExpression expression;
+        private LatexExpression _expression;
+
+        public LatexExpression expression {
+            get => _expression;
+            private set {
+                _expression = value;
+                UpdateChildren();
+                onExpressionChange?.Invoke();
+            }
+        }
+        #endregion
+
+        public Action onExpressionChange;
+
+
+        [SerializeField]
+        [ChildGameObjectsOnly]
+        private Transform activeDisplay;
+
+        public void ResetActiveDisplay()
+        {
+            SetActiveDisplay(charactersContainer);
+        }
 
         public void SetActiveDisplay(Transform root)
         {
@@ -18,6 +43,7 @@ namespace Primer.Latex
             }
 
             if (activeDisplay == root) return;
+
 
             foreach (var child in transform.GetChildren()) {
                 child.SetActive(child == root);

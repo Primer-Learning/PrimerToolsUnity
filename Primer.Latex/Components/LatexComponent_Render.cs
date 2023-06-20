@@ -8,11 +8,15 @@ using UnityEngine.Rendering;
 
 namespace Primer.Latex
 {
-    public partial class LatexComponent : IMeshController
+    public partial class LatexComponent : IMeshController, IHierarchyManipulator
     {
         private const string CHARACTERS_CONTAINER_NAME = "Characters";
 
-        private Transform charactersContainer => transform.FindOrCreate(CHARACTERS_CONTAINER_NAME);
+        private Transform charactersContainerCache;
+        private Transform charactersContainer => charactersContainerCache ??= transform.FindOrCreate(
+            CHARACTERS_CONTAINER_NAME,
+            new ChildOptions { enable = false }
+        );
 
         [Title("Rendering")]
         [ShowInInspector]
@@ -69,11 +73,10 @@ namespace Primer.Latex
         }
 
 
-        [PropertySpace]
-        [ButtonGroup("Characters render")]
-        [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
-        public void UpdateCharacters()
+        public void UpdateChildren()
         {
+            this.Log("UpdateChildren");
+
             if (activeDisplay is null)
                 SetActiveDisplay(charactersContainer);
 
@@ -97,15 +100,13 @@ namespace Primer.Latex
             SetCastShadows(false);
         }
 
-        [ButtonGroup("Characters render")]
-        [Button(ButtonSizes.Medium, Icon = SdfIconType.Trash)]
-        protected virtual void RegenerateCharacters()
+        public void RegenerateChildren()
         {
             if (gameObject.IsPreset())
                 return;
 
             transform.RemoveAllChildren();
-            UpdateCharacters();
+            UpdateChildren();
         }
 
         MeshRenderer[] IMeshController.GetMeshRenderers()

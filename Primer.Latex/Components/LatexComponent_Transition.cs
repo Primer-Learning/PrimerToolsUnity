@@ -61,20 +61,21 @@ namespace Primer.Latex
         {
             RemovePreviousTransitions();
 
-            var start = transform.GetOrAddComponent<GroupedLatex>().Set(
+            var start = gameObject.AddComponent<GroupedLatex>().Set(
                 "Transition start",
                 startGroups.ToArray(),
                 startExpression
             );
 
-            var end = transform.GetOrAddComponent<GroupedLatex>().Set(
+            var end = gameObject.AddComponent<GroupedLatex>().Set(
                 "Transition end",
                 endGroups.ToArray(),
                 endExpression
             );
 
-            var transition = transform.GetOrAddComponent<LatexTransition>();
+            var transition = gameObject.AddComponent<LatexTransition>();
             transition.Set(start, end, new TransitionList(transitions));
+            transition.Deactivate();
             return transition.ToTween();
         }
 
@@ -88,7 +89,12 @@ namespace Primer.Latex
 
         private void RemovePreviousTransitions()
         {
-            GetComponent<LatexTransition>()?.DisposeComponent();
+            // Remove all children except for the characters container
+            var container = new Container(transform);
+            container.Insert(charactersContainer);
+            container.Purge();
+
+            GetComponent<LatexTransition>()?.DisposeComponent(urgent: true);
 
             foreach (var group in GetComponents<GroupedLatex>()) {
                 group.DisposeComponent();
