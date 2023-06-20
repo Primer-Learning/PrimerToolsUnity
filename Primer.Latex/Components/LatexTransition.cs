@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Primer.Animation;using UnityEngine;
+using Primer.Animation;
+using UnityEngine;
 
 namespace Primer.Latex
 {
@@ -34,10 +35,10 @@ namespace Primer.Latex
         {
             return $@"
 .Transition(
-    startLatex: ""{start.expression.source}""
-    startGroups: new int[] {{{start.groupIndexes.Join(", ")}}},
-    endLatex: ""{end.expression.source}"",
-    endGroups: new int[] {{{end.groupIndexes.Join(", ")}}},
+    from: ""{start.expression.source}""
+    fromGroups: new int[] {{{start.groupIndexes.Join(", ")}}},
+    to: ""{end.expression.source}"",
+    toGroups: new int[] {{{end.groupIndexes.Join(", ")}}},
     {transitions.Select(x => x.ToCode()).Join(",\n    ")}
 );
             ".Trim();

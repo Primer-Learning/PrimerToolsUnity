@@ -8,69 +8,104 @@ namespace Primer.Latex
 {
     public partial class LatexComponent
     {
-        public UniTask<Tween> Transition(string newLatex)
+        #region Transition(string)
+        public UniTask<Tween> Transition(string to)
         {
-            return Transition(Array.Empty<int>(), newLatex, Array.Empty<int>(), GroupTransitionType.Replace);
+            return Transition(Array.Empty<int>(), to, Array.Empty<int>(), GroupTransitionType.Replace);
         }
 
-        public UniTask<Tween> Transition(string startLatex, string endLatex)
+        public UniTask<Tween> Transition(string from, string to)
+        {
+            return Transition(from, Array.Empty<int>(), to, Array.Empty<int>(), GroupTransitionType.Replace);
+        }
+
+        public async UniTask<Tween> Transition(
+            IEnumerable<int> fromGroups,
+            string to, IEnumerable<int> toGroups,
+            params GroupTransitionType[] transitions)
+        {
+            var toExpression = await ProcessWithoutQueue(to);
+            return Transition(fromGroups, toExpression, toGroups, transitions);
+        }
+
+        public async UniTask<Tween> Transition(
+            string from, IEnumerable<int> fromGroups,
+            string to, IEnumerable<int> toGroups,
+            params GroupTransitionType[] transitions)
+        {
+            var (fromExpression, toExpression) = await UniTask.WhenAll(
+                ProcessWithoutQueue(from),
+                ProcessWithoutQueue(to)
+            );
+
+            return Transition(fromExpression, fromGroups, toExpression, toGroups, transitions);
+        }
+        #endregion
+
+
+        #region Transition(LatexComponent)
+        public Tween Transition(LatexComponent to)
         {
             return Transition(
-                startLatex,
+                expression,
                 Array.Empty<int>(),
-                endLatex,
+                to.expression,
                 Array.Empty<int>(),
                 GroupTransitionType.Replace
             );
         }
 
-        public async UniTask<Tween> Transition(
-            IEnumerable<int> startGroups,
-            string endLatex, IEnumerable<int> endGroups,
+        public Tween Transition(
+            IEnumerable<int> fromGroups,
+            LatexComponent to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
         {
-            var toExpression = await ProcessWithoutQueue(endLatex);
-            return Transition(startGroups, toExpression, endGroups, transitions);
+            return Transition(expression, fromGroups, to.expression, toGroups, transitions);
         }
+        #endregion
 
-        public async UniTask<Tween> Transition(
-            string startLatex, IEnumerable<int> startGroups,
-            string endLatex, IEnumerable<int> endGroups,
-            params GroupTransitionType[] transitions)
+
+        #region Transition(LatexExpression)
+        public Tween Transition(LatexExpression to)
         {
-            var (fromExpression, toExpression) = await UniTask.WhenAll(
-                ProcessWithoutQueue(startLatex),
-                ProcessWithoutQueue(endLatex)
+            return Transition(
+                expression,
+                Array.Empty<int>(),
+                to,
+                Array.Empty<int>(),
+                GroupTransitionType.Replace
             );
-
-            return Transition(fromExpression, startGroups, toExpression, endGroups, transitions);
         }
 
+
         public Tween Transition(
-            IEnumerable<int> startGroups,
-            LatexExpression endExpression, IEnumerable<int> endGroups,
+            IEnumerable<int> fromGroups,
+            LatexExpression to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
         {
-            return Transition(expression, startGroups, endExpression, endGroups, transitions);
+            return Transition(expression, fromGroups, to, toGroups, transitions);
         }
+        #endregion
 
+
+        // Actual implementation
         public Tween Transition(
-            LatexExpression startExpression, IEnumerable<int> startGroups,
-            LatexExpression endExpression, IEnumerable<int> endGroups,
+            LatexExpression from, IEnumerable<int> fromGroups,
+            LatexExpression to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
         {
             RemovePreviousTransitions();
 
             var start = gameObject.AddComponent<GroupedLatex>().Set(
                 "Transition start",
-                startGroups.ToArray(),
-                startExpression
+                fromGroups.ToArray(),
+                from
             );
 
             var end = gameObject.AddComponent<GroupedLatex>().Set(
                 "Transition end",
-                endGroups.ToArray(),
-                endExpression
+                toGroups.ToArray(),
+                to
             );
 
             var transition = gameObject.AddComponent<LatexTransition>();
@@ -79,6 +114,8 @@ namespace Primer.Latex
             return transition.ToTween();
         }
 
+
+        #region Helpers
         private async UniTask<LatexExpression> ProcessWithoutQueue(string code)
         {
             // We use a different processor to not be involved in this component's processing queue
@@ -100,5 +137,6 @@ namespace Primer.Latex
                 group.DisposeComponent();
             }
         }
+        #endregion
     }
 }
