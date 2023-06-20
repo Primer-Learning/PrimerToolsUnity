@@ -9,14 +9,17 @@ namespace Primer.Latex
     [Serializable]
     public class TransitionList : IReadOnlyList<GroupTransitionType>
     {
-        public record TransitionEntry(GroupTransitionType type, int? fromIndex, int? toIndex);
+        public record TransitionEntry(GroupTransitionType type, int index, int? fromIndex, int? toIndex);
 
         // This is readonly but that doesn't work with [SerializeField]
         [SerializeField]
         private List<GroupTransitionType> transitions;
 
         public int Count => transitions.Count;
-        public GroupTransitionType this[int index] => transitions[index];
+        public GroupTransitionType this[int index] {
+            get => transitions[index];
+            internal set => transitions[index] = value;
+        }
 
 
         public TransitionList(IEnumerable<GroupTransitionType> transitions)
@@ -35,6 +38,7 @@ namespace Primer.Latex
 
                 yield return new TransitionEntry(
                     transition,
+                    i,
                     transition is GroupTransitionType.Add ? null : fromCursor++,
                     transition is GroupTransitionType.Remove ? null : toCursor++
                 );
@@ -49,13 +53,12 @@ namespace Primer.Latex
             return this;
         }
 
-        public TransitionList For(GroupedLatex from, GroupedLatex to)
-        {
-            return Validate().AdjustLength(from, to);
-        }
+        public TransitionList For(GroupedLatex from, GroupedLatex to) => For(from.Count, to.Count);
 
-        public TransitionList AdjustLength(GroupedLatex from, GroupedLatex to)
-            => AdjustLength(from.Count, to.Count);
+        public TransitionList For(int fromGroupCount, int toGroupCount)
+        {
+            return Validate().AdjustLength(fromGroupCount, toGroupCount);
+        }
 
         public TransitionList AdjustLength(int fromGroupsCount, int toGroupsCount)
         {
@@ -105,5 +108,8 @@ namespace Primer.Latex
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<GroupTransitionType> GetEnumerator() => transitions.GetEnumerator();
+
+        internal void Insert(int index, GroupTransitionType newTransition) => transitions.Insert(index, newTransition);
+        public void RemoveAt(int index) => transitions.RemoveAt(index);
     }
 }

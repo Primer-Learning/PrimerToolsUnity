@@ -10,17 +10,12 @@ namespace Primer.Latex
     [Serializable]
     public class LatexExpression : IEnumerable<LatexChar>
     {
-        [SerializeReference]
-        private readonly LatexChar[] characters;
-
+        [SerializeField]
+        private LatexChar[] characters;
         private readonly LatexInput input;
 
-        public bool isEmpty => characters.Length == 0;
         public Vector2 center => GetBounds().center;
-
         public int count => characters.Length;
-        // public LatexChar this[int index] => characters[index];
-
         public string source => input.code;
 
 
@@ -62,42 +57,13 @@ namespace Primer.Latex
             return new LatexExpression(modifiedInput, chars);
         }
 
-
-        public IEnumerator<LatexChar> GetEnumerator()
-            => ((IEnumerable<LatexChar>)characters).GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
-
-
-        #region Groups
-        public IEnumerable<LatexExpression> Split(List<int> indexes) => Split(CalculateRanges(indexes));
-
-        public IEnumerable<LatexExpression> Split(List<(int start, int end)> ranges)
-            => ranges.Select(x => Slice(x.start, x.end));
-
-        // TODO: Move to LatexGroups
-        public List<(int start, int end)> CalculateRanges(List<int> indexes)
+        public override string ToString()
         {
-            var last = 0;
-            var result = new List<(int, int)>();
-
-            foreach (var start in indexes) {
-                if (start == last)
-                    continue;
-
-                if (start >= characters.Length)
-                    break;
-
-                result.Add((last, start));
-                last = start;
-            }
-
-            if (last != characters.Length)
-                result.Add((last, characters.Length));
-
-            return result;
+            return $"LatexExpression({input.code})[{characters.Length}]";
         }
-        #endregion
+
+
+        public IEnumerator<LatexChar> GetEnumerator() => characters.ToList().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -12,7 +12,7 @@ namespace Primer.Latex
     {
         private const string CHARACTERS_CONTAINER_NAME = "Characters";
 
-        private Transform charactersParent => transform.Find(CHARACTERS_CONTAINER_NAME);
+        private Transform charactersContainer => transform.FindOrCreate(CHARACTERS_CONTAINER_NAME);
 
         [Title("Rendering")]
         [ShowInInspector]
@@ -44,7 +44,7 @@ namespace Primer.Latex
 
         public IEnumerable<MeshRenderer> GetCharacters(int? startIndex = null, int? endIndex = null)
         {
-            var chars = charactersParent.GetChildren();
+            var chars = charactersContainer.GetChildren();
             var cropped = endIndex.HasValue ? chars.Take(endIndex.Value + 1) : chars;
             return cropped.Skip(startIndex ?? 0).Select(x => x.GetComponent<MeshRenderer>());
         }
@@ -69,31 +69,29 @@ namespace Primer.Latex
         }
 
 
+        [PropertySpace]
         [ButtonGroup("Characters render")]
         [Button(ButtonSizes.Medium, Icon = SdfIconType.ArrowRepeat)]
         public void UpdateCharacters()
         {
+            if (activeDisplay is null)
+                SetActiveDisplay(charactersContainer);
+
             var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
 
             if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
                 return;
 
-            var container = new Container(transform);
-            var charsContainer = container.AddContainer(CHARACTERS_CONTAINER_NAME);
+            var container = new Container(charactersContainer);
+            var currentMaterial = material;
+            var currentColor = color;
 
             foreach (var (index, character) in expression.WithIndex()) {
-                var charTransform = charsContainer.Add($"LatexChar {index}").SetDefaults();
-                charTransform.localPosition = character.position;
-
-                var meshFilter = charTransform.GetOrAddComponent<MeshFilter>();
-                meshFilter.sharedMesh = character.mesh;
-
-                var meshRenderer = charTransform.GetOrAddComponent<MeshRenderer>();
-                meshRenderer.material = material;
-                meshRenderer.SetColor(color);
+                var charTransform = container.Add($"LatexChar {index}").SetDefaults();
+                character.RenderTo(charTransform, currentMaterial, currentColor);
             }
 
-            charsContainer.Purge();
+            container.Purge();
 
             // Just make sure all shadows are off for now. Could make this an option in the future if needed.
             SetCastShadows(false);
@@ -112,7 +110,7 @@ namespace Primer.Latex
 
         MeshRenderer[] IMeshController.GetMeshRenderers()
         {
-            return charactersParent.GetComponentsInChildren<MeshRenderer>();
+            return charactersContainer.GetComponentsInChildren<MeshRenderer>();
         }
     }
 }

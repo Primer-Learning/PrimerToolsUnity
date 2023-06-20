@@ -26,23 +26,28 @@ namespace Primer.Latex
         #endregion
 
         #region public LatexComponent latex { get; }
-        public LatexComponent latexCache;
+        private LatexComponent latexCache;
         public LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
         #endregion
 
         #region public LatexExpression expression { get; set; } = latex.expression;
-        public LatexExpression customExpression = null;
+        [SerializeField, HideInInspector]
+        private LatexExpression customExpression;
+        [SerializeField, HideInInspector]
+        private bool hasCustomExpression = false;
+
         public LatexExpression expression {
-            get => customExpression ?? latex.expression;
+            get => hasCustomExpression ? customExpression ?? latex.expression : latex.expression;
             set {
                 customExpression = value;
+                hasCustomExpression = true;
                 UpdateChildren();
             }
         }
         #endregion
 
         #region public List<int> groupIndexes;
-        [SerializeField]
+        [SerializeField, HideInInspector]
         // TODO: This has to be edited from the editor!
         private List<int> _groupIndexes = new();
 
@@ -84,6 +89,8 @@ namespace Primer.Latex
 
             var zero = currentExpression.center;
             var container = new Container(root);
+            var currentMaterial = latex.material;
+            var currentColor = latex.color;
 
             groups.Clear();
 
@@ -96,12 +103,10 @@ namespace Primer.Latex
                 group.transform.localScale = Vector3.one;
                 group.transform.localRotation = Quaternion.identity;
 
-                foreach (var character in chunk) {
-                    var mesh = group.AddContainer<MeshFilter>($"LatexChar {character.position}");
-                    mesh.component.sharedMesh = character.mesh;
-                    mesh.transform.localScale = Vector3.one;
-                    mesh.transform.localPosition = character.position - group.transform.localPosition;
-                    mesh.transform.localRotation = Quaternion.identity;
+                foreach (var (index, character) in chunk.WithIndex()) {
+                    var charTransform = container.Add($"LatexChar {start + index}").SetDefaults();
+                    character.RenderTo(charTransform, currentMaterial, currentColor);
+                    charTransform.localPosition -= group.transform.localPosition;
                 }
 
                 groups.Add(group.transform);
@@ -147,12 +152,15 @@ namespace Primer.Latex
         }
         #endregion
 
-        private IEnumerable<(int, int)> CalculateRanges()
+        private IEnumerable<(int, int)> CalculateRanges() => CalculateRanges(expression, groupIndexes);
+
+        public static IEnumerable<(int, int)> CalculateRanges(LatexExpression expression, IEnumerable<int> groupIndexes = null)
         {
             var last = 0;
             var result = new List<(int, int)>();
+            var indexes = groupIndexes ?? Array.Empty<int>();
 
-            foreach (var start in groupIndexes) {
+            foreach (var start in indexes) {
                 if (start == last)
                     continue;
 

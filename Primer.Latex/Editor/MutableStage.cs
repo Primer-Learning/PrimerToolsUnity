@@ -15,11 +15,11 @@ namespace Primer.Latex.Editor
 {
     internal class MutableStage : IEnumerable<GroupTransition>
     {
-        private static readonly int[] empty = Array.Empty<int>();
+        private static List<int> CreateEmptyIndexList() => new List<int>();
 
         private readonly LatexComponent before;
         private readonly LatexComponent after;
-        private readonly List<GroupTransitionType> transitions;
+        private TransitionList transitions;
         private List<int> fromGroups;
         private List<int> toGroups;
 
@@ -28,11 +28,9 @@ namespace Primer.Latex.Editor
             if (before == null || stage.latex == null || stage.transition is null)
                 throw new ArgumentException("Invalid stage");
 
-            stage.latex.ConnectParts();
-
             this.before = before;
             after = stage.latex;
-            transitions = stage.transition.ToList();
+            transitions = new TransitionList(stage.transition);
             fromGroups = stage.groupIndexesBefore?.ToList();
             toGroups = stage.groupIndexesAfter?.ToList();
         }
@@ -54,13 +52,13 @@ namespace Primer.Latex.Editor
 
         public void AddGroupBefore(int index, int splitIndex)
         {
-            var (i, from, _) = GetIndexesAt(index);
-            if (from == null) return;
+            var entry = GetIndexesAt(index);
+            if (entry.fromIndex == null) return;
 
-            fromGroups ??= before.groupIndexes.ToList();
-            fromGroups.Insert(from.Value , splitIndex);
+            fromGroups ??= CreateEmptyIndexList();
+            fromGroups.Insert(entry.fromIndex.Value , splitIndex);
 
-            var newTransition = GetTransitionAfter(i) == GroupTransitionType.Add
+            var newTransition = GetTransitionAfter(entry.index) == GroupTransitionType.Add
                 ? GroupTransitionType.Transition
                 : GroupTransitionType.Remove;
 
@@ -69,13 +67,13 @@ namespace Primer.Latex.Editor
 
         public void AddGroupAfter(int index, int splitIndex)
         {
-            var (i, _, to) = GetIndexesAt(index);
-            if (to == null) return;
+            var entry = GetIndexesAt(index);
+            if (entry.toIndex == null) return;
 
-            toGroups ??= after.groupIndexes.ToList();
-            toGroups.Insert(to.Value , splitIndex);
+            toGroups ??= CreateEmptyIndexList();
+            toGroups.Insert(entry.toIndex.Value , splitIndex);
 
-            var newTransition = GetTransitionAfter(i) == GroupTransitionType.Remove
+            var newTransition = GetTransitionAfter(entry.index) == GroupTransitionType.Remove
                 ? GroupTransitionType.Transition
                 : GroupTransitionType.Add;
 
@@ -89,37 +87,30 @@ namespace Primer.Latex.Editor
 
         public void RemoveGroup(int index)
         {
-            var (_, from, to) = GetIndexesAt(index);
-            transitions.RemoveAt(index);
+            var entry = GetIndexesAt(index);
+            transitions.RemoveAt(entry.index);
 
-            if (from != null) {
-                fromGroups ??= before.groupIndexes.ToList();
-                fromGroups.RemoveAt(from.Value - 1);
+            if (entry.fromIndex.HasValue) {
+                fromGroups ??= CreateEmptyIndexList();
+                fromGroups.RemoveAt(entry.fromIndex.Value - 1);
             }
 
-            if (to != null) {
-                toGroups ??= after.groupIndexes.ToList();
-                toGroups.RemoveAt(to.Value - 1);
+            if (entry.toIndex.HasValue) {
+                toGroups ??= new List<int>();
+                toGroups.RemoveAt(entry.toIndex.Value - 1);
             }
         }
 
-        private (int, int?, int?) GetIndexesAt(int index)
+        private TransitionList.TransitionEntry GetIndexesAt(int index)
         {
-            var enumerator = transitions.GetGroupIndexes();
-
-            for (var i = 0; i <= index; i++) {
-                if (!enumerator.MoveNext())
-                    throw new IndexOutOfRangeException($"Index out of range {index}");
-            }
-
-            return enumerator.Current;
+            return transitions.GetIndexes().Skip(index).First();
         }
 
         public Stage ToStage(Stage previously)
         {
             if (transitions.SequenceEqual(previously.transition)
-                && (fromGroups is null || fromGroups.SequenceEqual(previously.groupIndexesBefore ?? empty))
-                && (toGroups is null || toGroups.SequenceEqual(previously.groupIndexesAfter ?? empty))) {
+                && fromGroups.IsSame(previously.groupIndexesBefore)
+                && toGroups.IsSame(previously.groupIndexesAfter)) {
                 return previously;
             }
 
@@ -135,20 +126,17 @@ namespace Primer.Latex.Editor
 
         public IEnumerator<GroupTransition> GetEnumerator()
         {
-            var fromRanges = before.expression.CalculateRanges(fromGroups ?? before.groupIndexes);
-            var toRanges = after.expression.CalculateRanges(toGroups ?? after.groupIndexes);
+            var fromRanges = GroupedLatex.CalculateRanges(before.expression, fromGroups).ToList();
+            var toRanges = GroupedLatex.CalculateRanges(after.expression, toGroups).ToList();
 
-            transitions.AdjustLength(fromRanges.Count, toRanges.Count);
+            transitions = transitions.For(fromRanges.Count, toRanges.Count);
 
-            var enumerator = transitions.GetGroupIndexes();
-            while (enumerator.MoveNext()) {
-                var (i, from, to) = enumerator.Current;
-
+            foreach (var (type, index, from, to) in transitions.GetIndexes()) {
                 yield return new GroupTransition(
-                    i,
-                    transitions[i],
-                    from is null ? null : fromRanges[from.Value],
-                    to is null ? null : toRanges[to.Value]
+                    index,
+                    type,
+                    from.HasValue ? fromRanges[from.Value] : null,
+                    to.HasValue ? toRanges[to.Value] : null
                 );
             }
         }

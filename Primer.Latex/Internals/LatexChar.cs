@@ -11,15 +11,13 @@ namespace Primer.Latex
         public static LatexChar Lerp(LatexChar a, LatexChar b, float t) => new(
             mesh: a.mesh,
             bounds: a.bounds,
-            position: Vector3.Lerp(a.position, b.position, t),
-            scale: Mathf.Lerp(a.scale, b.scale, t)
+            position: Vector3.Lerp(a.position, b.position, t)
         );
 
 
         public Mesh mesh { get; init; }
         public Rect bounds { get; init; }
         public Vector3 position { get; init; }
-        public float scale { get; init; }
 
 
         internal LatexChar(VectorUtils.Geometry geometry, Vector2 offset)
@@ -35,23 +33,30 @@ namespace Primer.Latex
             position = new Vector2(center.x, -center.y);
         }
 
-        internal LatexChar(Mesh mesh,
-            Rect bounds,
-            Vector3 position, float scale = 1f)
+        internal LatexChar(Mesh mesh, Rect bounds, Vector3 position)
         {
             this.mesh = mesh;
             this.bounds = bounds;
             this.position = position;
-            this.scale = scale;
         }
 
 
         public void Draw(Transform parent, Material material)
         {
-            var positionMod = Matrix4x4.Translate(position);
-            var scaleMod = Matrix4x4.Scale(Vector3.one * scale);
-            var matrix = parent.localToWorldMatrix * positionMod * scaleMod;
+            var matrix = parent.localToWorldMatrix * Matrix4x4.Translate(position);
             Graphics.DrawMesh(mesh, matrix, material, 0);
+        }
+
+        public void RenderTo(Transform transform, Material material, Color color)
+        {
+            transform.localPosition = position;
+
+            var meshFilter = transform.GetOrAddComponent<MeshFilter>();
+            meshFilter.sharedMesh = mesh;
+
+            var meshRenderer = transform.GetOrAddComponent<MeshRenderer>();
+            meshRenderer.material = material;
+            meshRenderer.SetColor(color);
         }
 
         private static Mesh ConvertToMesh(Sprite sprite)

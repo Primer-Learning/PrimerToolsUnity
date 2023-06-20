@@ -56,7 +56,7 @@ namespace Primer.Latex.Editor
             }
 
             if (GUILayout.Button("Copy code"))
-                CopyCode(prev, newStage);
+                CopyCode(newStage);
         }
 
         private LatexSequence GetSequence()
@@ -170,21 +170,23 @@ namespace Primer.Latex.Editor
             return left == right || (
                 left.latex == right.latex &&
                 left.transition.SequenceEqual(right.transition) &&
-                left.groupIndexesBefore.SequenceEqual(right.groupIndexesBefore) &&
-                left.groupIndexesAfter.SequenceEqual(right.groupIndexesAfter)
+                left.groupIndexesBefore.IsSame(right.groupIndexesBefore) &&
+                left.groupIndexesAfter.IsSame(right.groupIndexesAfter)
             );
         }
 
-        private static void CopyCode(LatexComponent prev, Stage stage)
+        private static void CopyCode(Stage stage)
         {
             var (latex, transition, groupIndexesBefore, groupIndexesAfter) = stage;
-            var before = groupIndexesBefore ?? prev.groupIndexes.ToArray();
-            var after = groupIndexesAfter ?? latex.groupIndexes.ToArray();
 
             var parameters = new List<string> {
-                before.Length is 0 ? "Array.Empty<int>()" : $"new[] {{ {string.Join(", ", before)} }}",
+                groupIndexesBefore?.Length is 0 or null
+                    ? "Array.Empty<int>()"
+                    : $"new[] {{ {groupIndexesBefore.Join(", ")} }}",
                 $"Latex(@\"{latex.latex}\")",
-                after.Length is 0 ? "Array.Empty<int>()" : $"new[] {{ {string.Join(", ", after)} }}",
+                groupIndexesAfter?.Length is 0 or null
+                    ? "Array.Empty<int>()"
+                    : $"new[] {{ {groupIndexesAfter.Join(", ")} }}",
             };
 
             parameters.AddRange(transition.Select(x => x.ToCode()));

@@ -11,15 +11,26 @@ namespace Primer.Latex
     {
         internal readonly LatexProcessor processor = LatexProcessor.GetInstance();
 
-        public LatexExpression expression { get; private set; }
-        public Action onExpressionChange;
-
         public bool isProcessing => processor.state == LatexProcessingState.Processing;
 
+        #region public LatexExpression expression;
+        [SerializeField, HideInInspector]
+        private LatexExpression _expression;
+        public Action onExpressionChange;
+
+        public LatexExpression expression {
+            get => _expression;
+            private set {
+                Debug.Log("WTF");
+                _expression = value;
+                UpdateCharacters();
+                onExpressionChange?.Invoke();
+            }
+        }
+        #endregion
 
         #region public string latex;
-        [SerializeField]
-        [HideInInspector]
+        [SerializeField, HideInInspector]
         internal string _latex;
 
 #if UNITY_EDITOR
@@ -32,6 +43,7 @@ namespace Primer.Latex
         [InfoBox("Processing...", InfoMessageType.Warning, VisibleIf = nameof(isProcessing))]
         [InfoBox("Cancelling...", InfoMessageType.Warning, VisibleIf = nameof(isCancelling))]
         [InfoBox("@processor.renderError.Message", InfoMessageType.Error, VisibleIf = nameof(hasError))]
+        // Attributes above are applied to `latex` below
 #endif
 
         [ShowInInspector]
@@ -76,12 +88,8 @@ namespace Primer.Latex
             var request = Evaluate(input);
             var newExpression = await PrimerTimeline.RegisterOperation(request);
 
-            if (newExpression is null || expression is not null && expression.IsSame(newExpression))
-                return;
-
-            expression = newExpression;
-            UpdateCharacters();
-            onExpressionChange?.Invoke();
+            if (newExpression is not null && !expression.IsSame(newExpression))
+                expression = newExpression;
         }
 
         private async UniTask<LatexExpression> Evaluate(LatexInput input)
@@ -97,7 +105,5 @@ namespace Primer.Latex
                 return null;
             }
         }
-
-        //
     }
 }
