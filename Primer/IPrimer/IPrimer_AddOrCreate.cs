@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class IPrimer_FindOrCreate
+    public static class IPrimer_FindOrCreateExtensions
     {
         public static Transform FindOrCreate(this IPrimer self, string name)
         {
