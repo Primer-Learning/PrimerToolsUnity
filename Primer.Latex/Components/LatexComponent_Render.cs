@@ -75,8 +75,6 @@ namespace Primer.Latex
 
         public void UpdateChildren()
         {
-            this.Log("UpdateChildren");
-
             if (activeDisplay is null)
                 SetActiveDisplay(charactersContainer);
 

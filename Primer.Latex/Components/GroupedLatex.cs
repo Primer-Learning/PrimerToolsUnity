@@ -135,15 +135,15 @@ namespace Primer.Latex
             UpdateChildren();
         }
 
-        #region Copy code
-        [CopyCode]
+        #region Code to clipboard
+        [CopyToClipboard]
         public string ToCode()
         {
             return $".Add<{nameof(GroupedLatex)}>(){SetInvoker()}";
         }
 
-        [CopyCode("Copy code w/ LatexComponent")]
-        public string CopyCodeWithLatexComponent()
+        [CopyToClipboard("Copy code w/ LatexComponent")]
+        public string ToCodeWithLatex()
         {
             return latex.ToCode() + $".GetOrAddComponent<{nameof(GroupedLatex)}>(){SetInvoker()}";
         }

@@ -30,7 +30,7 @@ namespace Primer.Latex
         private readonly List<(Transform mid, Transform from, Transform to)> replace = new();
 
         #region Copy code
-        [CopyCode]
+        [CopyToClipboard]
         public string ToCode()
         {
             return $@"
@@ -44,8 +44,8 @@ namespace Primer.Latex
             ".Trim();
         }
 
-        [CopyCode("Copy code w/ LatexComponent")]
-        public string CopyCodeWithLatexComponent()
+        [CopyToClipboard("Copy code w/ LatexComponent")]
+        public string ToCodeWithLatex()
         {
             return latex.ToCode() + ToCode();
         }
@@ -71,6 +71,7 @@ namespace Primer.Latex
             );
         }
 
+        #region Transition stages
         public void Deactivate()
         {
             root.SetActive(false);
@@ -120,6 +121,7 @@ namespace Primer.Latex
                     : after.localScale * easeIn;
             }
         }
+        #endregion
 
         public Vector3 CalculateOffset()
         {

@@ -44,6 +44,7 @@ namespace Primer.Editor
 
         private static void RegenerateChildrenAttributes(ICollection<Attribute> attributes)
         {
+            attributes.Add(new PropertySpaceAttribute());
             attributes.Add(new PropertyOrderAttribute(1001));
             attributes.Add(new ButtonGroupAttribute("Children manipulation"));
             attributes.Add(new ButtonAttribute(ButtonSizes.Medium) { Icon = SdfIconType.Trash });

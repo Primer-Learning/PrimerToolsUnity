@@ -53,10 +53,10 @@ namespace Primer.Latex
         }
 
 
-        [CopyCode]
+        [CopyToClipboard]
         public string ToCode()
         {
-            return $".AddLatex(@\"{latex}\", \"{name}\")";
+            return  $".AddLatex(@\"{latex}\", \"{name}\")";
         }
     }
 }
