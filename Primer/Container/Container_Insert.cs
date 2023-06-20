@@ -10,28 +10,33 @@ namespace Primer
 
         public int childCount => usedChildren.Count;
 
-        public void Insert<TChild>(TChild child, bool worldPositionStays = false, int? index = null)
+        public void Insert<TChild>(TChild child, ChildOptions options = null)
             where TChild : Component
         {
-            var siblingIndex = index ?? childCount;
+            options ??= new ChildOptions();
             var t = child.transform;
 
-            t.SetActive(true);
+            if (options.enable)
+                t.SetActive(true);
 
             if (t.parent != transform)
-                t.SetParent(transform, worldPositionStays);
+                t.SetParent(transform, options.worldPositionStays);
 
-            if (t.GetSiblingIndex() != siblingIndex)
-                t.SetSiblingIndex(siblingIndex);
-
-            if (index.HasValue)
-                usedChildren.Insert(index.Value, t);
-            else
+            if (options.ignoreSiblingOrder) {
                 usedChildren.Add(t);
+            } else {
+                var siblingIndex = (int?)options.siblingIndex ?? childCount;
+
+                usedChildren.Insert(siblingIndex, t);
+
+                if (t.GetSiblingIndex() != siblingIndex)
+                    t.SetSiblingIndex(siblingIndex);
+            }
 
             unusedChildren.Remove(t);
 
-            child.GetPrimer().parentContainer = this as Container<Component>;
+            // AQUI ESTA EL ERROR
+            child.GetPrimer().parentContainer = this;
         }
     }
 }

@@ -4,26 +4,24 @@ namespace Primer
 {
     public partial class Container
     {
-        public static Container<TComponent> From<TComponent>(TComponent component)
+        public static Container<TComponent> From<TComponent>(TComponent component, bool setActive = true)
             where TComponent : Component
         {
-            return new Container<TComponent>(component);
+            return new Container<TComponent>(component, setActive);
         }
     }
 
     public partial class Container<TComponent> : Container
         where TComponent : Component
     {
-        // public static Container<T> From<T>(T component) where T : Component => new(component);
-
         public new TComponent component { get; }
 
-        public Container(string name, Component parent = null) : base(name, parent)
+        public Container(string name, Component parent = null, bool setActive = true) : base(name, parent, setActive)
         {
             component = GetComponent<TComponent>(transform);
         }
 
-        public Container(TComponent component) : base(component)
+        public Container(TComponent component, bool setActive = true) : base(component, setActive)
         {
             this.component = component;
         }

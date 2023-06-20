@@ -4,37 +4,38 @@ namespace Primer
 {
     public partial class Container
     {
-        public Transform Add(string name = null, bool worldPositionStays = false)
+        public Transform Add(string name = null, ChildOptions options = null)
         {
             var child = FindChild<Transform>(name) ?? OnCreate(new GameObject(name).transform);
-            Insert(child, worldPositionStays);
+            Insert(child, options);
             return child;
         }
 
-        public TChild Add<TChild>(string name = null, bool worldPositionStays = false) where TChild : Component
+        public TChild Add<TChild>(string name = null, ChildOptions options = null)
+            where TChild : Component
         {
             var child = FindChild<TChild>(name) ?? OnCreate(new GameObject(name).AddComponent<TChild>());
-            Insert(child, worldPositionStays);
+            Insert(child, options);
             return child;
         }
 
-        public TChild Add<TChild>(TChild template, string name = null, bool worldPositionStays = false)
+        public TChild Add<TChild>(TChild template, string name = null, ChildOptions options = null)
             where TChild : Component
         {
             var child = FindInstanceOf(template, name)
                 ?? OnCreate(InstantiationTracker.InstantiateAndRegister(template, name));
 
-            Insert(child, worldPositionStays);
+            Insert(child, options);
             return child;
         }
 
-        public TChild Add<TChild>(PrefabProvider<TChild> provider, string name = null, bool worldPositionStays = false)
+        public TChild Add<TChild>(PrefabProvider<TChild> provider, string name = null, ChildOptions options = null)
             where TChild : Component
         {
             var child = FindInstanceOf(provider.value, name)
                 ?? OnCreate(InstantiationTracker.InstantiateAndRegister(provider.value, name));
 
-            Insert(child, worldPositionStays);
+            Insert(child, options);
             provider.Initialize(child);
             return child;
         }

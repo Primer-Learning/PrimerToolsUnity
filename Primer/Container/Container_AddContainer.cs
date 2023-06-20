@@ -4,14 +4,14 @@ namespace Primer
 {
     public partial class Container
     {
-        public Container AddContainer(string name)
+        public Container AddContainer(string name, ChildOptions options = null)
         {
-            return Add(name).ToContainer(connectToParent: true);
+            return Add(name, options).ToContainer(connectToParent: true);
         }
 
-        public Container<TChild> AddContainer<TChild>(string name) where TChild : Component
+        public Container<TChild> AddContainer<TChild>(string name, ChildOptions options = null) where TChild : Component
         {
-            return Add<TChild>(name).ToContainer(connectToParent: true);
+            return Add<TChild>(name, options).ToContainer(connectToParent: true);
         }
     }
 }

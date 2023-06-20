@@ -4,24 +4,29 @@ namespace Primer
 {
     public static class IPrimer_FindOrCreateExtensions
     {
-        public static Transform FindOrCreate(this IPrimer self, string name)
+        public static Transform FindOrCreate(this IPrimer self, string name, ChildOptions options = null)
         {
-            return self.ToContainer().Add(name);
+            options ??= new ChildOptions();
+            return self.ToContainer().Add(name, options with { ignoreSiblingOrder = true });
         }
 
-        public static T FindOrCreate<T>(this IPrimer self, string name) where T : Component
+        public static T FindOrCreate<T>(this IPrimer self, string name, ChildOptions options = null) where T : Component
         {
-            return self.ToContainer().Add<T>(name);
+            options ??= new ChildOptions();
+            return self.ToContainer().Add<T>(name, options with { ignoreSiblingOrder = true });
         }
 
-        public static Transform FindOrCreate(this Component self, string name)
+        public static Transform FindOrCreate(this Component self, string name, ChildOptions options = null)
         {
-            return self.ToContainer().Add(name);
+            options ??= new ChildOptions();
+            return self.ToContainer().Add(name, options with { ignoreSiblingOrder = true });
         }
 
-        public static T FindOrCreate<T>(this Component self, string name) where T : Component
+        public static T FindOrCreate<T>(this Component self, string name, ChildOptions options = null)
+            where T : Component
         {
-            return self.ToContainer().Add<T>(name);
+            options ??= new ChildOptions();
+            return self.ToContainer().Add<T>(name, options with { ignoreSiblingOrder = true });
         }
     }
 }

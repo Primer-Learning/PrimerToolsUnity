@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,35 +7,42 @@ namespace Primer
 {
     public partial class Container : IDisposable, IPrimer
     {
-        // These static methods simplify the creation of a container from a component
-
         public Transform transform { get; }
         public Component component { get; }
 
-        public Container(string name, Component parent = null)
+        public Container(string name, Component parent = null, bool setActive = true)
         {
             transform = parent is null
                 ? GetRootTransform(name)
                 : GetDirectChild(parent.transform, name);
 
             component = transform;
-            transform.SetActive(true);
+
+            if (setActive)
+                transform.SetActive(true);
+
             Reset();
         }
 
-        public Container(Transform component)
+        public Container(Transform component, bool setActive = true)
         {
             this.component = component;
             transform = component;
-            transform.SetActive(true);
+
+            if (setActive)
+                transform.SetActive(true);
+
             Reset();
         }
 
-        protected Container(Component component)
+        protected Container(Component component, bool setActive = true)
         {
             this.component = component;
             transform = component.transform;
-            transform.SetActive(true);
+
+            if (setActive)
+                transform.SetActive(true);
+
             Reset();
         }
 
