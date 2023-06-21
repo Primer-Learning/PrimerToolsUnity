@@ -14,7 +14,7 @@ namespace Primer.Animation
         SmoothIn,
         SmoothOut,
         Custom,
-        [Obsolete("Use Linear instead")]
+        // [Obsolete("Use Linear instead")]
         None,
         Linear,
     }
