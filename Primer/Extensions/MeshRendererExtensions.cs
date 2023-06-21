@@ -95,7 +95,7 @@ namespace Primer
 
             return renderers.Length is 0
                 ? defaultMaterial
-                : renderers[0].material;
+                : renderers[0].sharedMaterial;
         }
 
         public static void SetMaterial(this IEnumerable<MeshRenderer> self, Material material)
