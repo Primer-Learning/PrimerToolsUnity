@@ -128,9 +128,14 @@ namespace Primer.Latex.Editor
             var fromRanges = GroupedLatex.CalculateRanges(before, fromGroups).ToList();
             var toRanges = GroupedLatex.CalculateRanges(after, toGroups).ToList();
 
-            transitions = transitions.For(fromRanges.Count, toRanges.Count);
+            var newTransitions = transitions.For(fromRanges.Count, toRanges.Count);
 
-            foreach (var (type, index, from, to) in transitions.GetIndexes()) {
+            if (newTransitions != transitions) {
+                hasChanges = true;
+                transitions = newTransitions;
+            }
+
+            foreach (var (type, index, from, to) in newTransitions.GetIndexes()) {
                 yield return new GroupTransition(
                     index,
                     type,
@@ -143,6 +148,7 @@ namespace Primer.Latex.Editor
         public void RenderEditor()
         {
             SirenixEditorGUI.Title("Transition", "", TextAlignment.Center, false);
+            LatexCharEditor.CharPreviewSize();
 
             var width = LatexCharEditor.GetDefaultWidth();
             var forceAnchor = -1;

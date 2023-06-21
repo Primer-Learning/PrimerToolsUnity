@@ -99,8 +99,6 @@ namespace Primer.Latex.Editor
             // This should never be true, but just in case
             if (options.Count is 0) return;
 
-            LatexCharEditor.CharPreviewSize();
-
             EditorGUILayout.LabelField($"Select a transition:");
             GUILayout.BeginHorizontal();
 

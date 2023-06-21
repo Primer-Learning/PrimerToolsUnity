@@ -27,12 +27,6 @@ namespace Primer.Latex
         protected TweenProvider Transition(LatexComponent stage, params GroupTransitionType[] transition)
             => Transition(Array.Empty<int>(), stage, Array.Empty<int>(), transition);
 
-        // protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, params GroupTransitionType[] transition)
-        //     => Transition(groupIndexesBefore, stage, null, transition);
-
-        // protected TweenProvider Transition(LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transition)
-        //     => Transition(null, stage, groupIndexesAfter, transition);
-
         protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transitions)
         {
             stages.Add(new Stage(

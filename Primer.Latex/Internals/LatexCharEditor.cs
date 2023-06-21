@@ -9,6 +9,7 @@ namespace Primer.Latex
     public static class LatexCharEditor
     {
         private static int charPreviewSize = 16;
+        private static readonly Color inspectorBackground = new(56 / 255f, 56 / 255f, 56 / 255f);
 
         public static void CharPreviewSize()
         {
@@ -16,7 +17,7 @@ namespace Primer.Latex
             charPreviewSize = EditorGUILayout.IntSlider(charPreviewSize, 10, 100);
 
             if (charPreviewSize != prev)
-                cache.Clear();
+                ClearCache();
         }
 
         public static float GetDefaultWidth()
@@ -41,6 +42,7 @@ namespace Primer.Latex
                 0,
                 textures,
                 Mathf.FloorToInt(cols),
+                new GUIStyle(),
                 GUILayout.Width(width)
             );
         }
@@ -56,6 +58,8 @@ namespace Primer.Latex
         }
 
         private static readonly Dictionary<Mesh, Texture> cache = new();
+        public static void ClearCache() => cache.Clear();
+
         private static Texture CreateMeshPreviewTexture(Mesh mesh, float size = 32)
         {
             if (cache.ContainsKey(mesh))
@@ -67,15 +71,31 @@ namespace Primer.Latex
             previewRender.DrawMesh(mesh, Matrix4x4.identity, whiteMaterial, 0);
 
             previewRender.camera.transform.position = new Vector3(0, 0, -4);
-            previewRender.lights[0].intensity = 0.7f;
+            previewRender.lights[0].intensity = 1f;
             previewRender.camera.Render();
 
             var texture = (RenderTexture)previewRender.EndPreview();
             var copy = Clone(texture);
 
+            var defaultBackground = new Color(8 / 255f, 8 / 255f, 8 / 255f);
+            ChangePixels(copy, defaultBackground,inspectorBackground);
+
             cache.Add(mesh, copy);
             previewRender.Cleanup();
             return copy;
+        }
+
+        private static void ChangePixels(Texture2D texture, Color from, Color to)
+        {
+            var pixels = texture.GetPixels();
+
+            for (var i = 0; i < pixels.Length; i++) {
+                if (pixels[i] == from)
+                    pixels[i] = to;
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply();
         }
 
         // ReSharper disable Unity.PerformanceAnalysis

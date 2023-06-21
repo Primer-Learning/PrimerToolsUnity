@@ -12,6 +12,8 @@ namespace Primer.Latex.Editor
             var groups = (GroupedLatex)target;
             var width = LatexCharEditor.GetDefaultWidth();
 
+            LatexCharEditor.CharPreviewSize();
+
             foreach (var (index, (start, end)) in groups.CalculateRanges().WithIndex()) {
                 var group = groups.expression.Slice(start, end);
 

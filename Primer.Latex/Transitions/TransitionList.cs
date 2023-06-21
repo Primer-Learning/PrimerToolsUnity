@@ -64,7 +64,8 @@ namespace Primer.Latex
 
         public TransitionList AdjustLength(int fromGroupsCount, int toGroupsCount)
         {
-            var copy = transitions.ToList();
+            var copy = new List<GroupTransitionType>(transitions);
+            var hasChanges = false;
             var fromCursor = 0;
             var toCursor = 0;
 
@@ -78,33 +79,38 @@ namespace Primer.Latex
 
             while (fromCursor < fromGroupsCount && toCursor < toGroupsCount) {
                 copy.Add(GroupTransitionType.Transition);
+                hasChanges = true;
                 fromCursor++;
                 toCursor++;
             }
 
             while (fromCursor < fromGroupsCount) {
                 copy.Add(GroupTransitionType.Remove);
+                hasChanges = true;
                 fromCursor++;
             }
 
             while (toCursor < toGroupsCount) {
                 copy.Add(GroupTransitionType.Add);
+                hasChanges = true;
                 toCursor++;
             }
 
             while (copy.Count is not 0 && fromCursor > fromGroupsCount) {
                 var index = copy.LastIndexOf(GroupTransitionType.Remove);
                 copy.RemoveAt(index == -1 ? copy.Count - 1 : index);
+                hasChanges = true;
                 fromCursor--;
             }
 
             while (copy.Count is not 0 && toCursor > toGroupsCount) {
                 var index = copy.LastIndexOf(GroupTransitionType.Add);
                 copy.RemoveAt(index == -1 ? copy.Count - 1 : index);
+                hasChanges = true;
                 toCursor--;
             }
 
-            return new TransitionList(copy.ToArray());
+            return hasChanges ? new TransitionList(copy) : this;
         }
 
 
