@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using UnityEngine;
 
 namespace Primer.Latex
 {
+    [Serializable]
     public class TransitionList : IReadOnlyList<GroupTransitionType>, ISerializable
     {
         public record Entry(GroupTransitionType type, int index, int? fromIndex, int? toIndex);
 
-        private readonly List<GroupTransitionType> transitions;
+        [SerializeField] private List<GroupTransitionType> transitions;
 
         public int Count => transitions.Count;
         public GroupTransitionType this[int index] {

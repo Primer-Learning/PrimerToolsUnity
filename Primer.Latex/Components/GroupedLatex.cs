@@ -20,13 +20,13 @@ namespace Primer.Latex
         #endregion;
 
         #region public Transform root { get; }
-        public Transform rootCache;
-        public Transform root => Meta.CachedChildFind(ref rootCache, transform, $"Grouping > {groupName}");
+        private Transform rootCache;
+        internal Transform root => Meta.CachedChildFind(ref rootCache, transform, $"Grouping > {groupName}");
         #endregion
 
         #region public LatexComponent latex { get; }
         private LatexComponent latexCache;
-        public LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
+        private LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
         #endregion
 
         #region public LatexExpression expression { get; set; } = latex.expression;

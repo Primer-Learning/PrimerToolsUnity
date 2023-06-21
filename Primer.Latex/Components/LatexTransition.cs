@@ -94,6 +94,10 @@ namespace Primer.Latex
         {
             latex.SetActiveDisplay(root);
 
+            if (remove.Count + add.Count + transition.Count == 0) {
+                UpdateChildren();
+            }
+
             var easeOut = 1 - Mathf.Clamp(t * 2, 0, 1);
             var easeIn = Mathf.Clamp(t * 2 - 1, 0, 1);
 
