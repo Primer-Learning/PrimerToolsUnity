@@ -73,7 +73,7 @@ namespace Primer.Scene
             var dividers = group.GetComponentsInChildren<Image>().ToList();
 
             while (dividers.Count > divisions + 1) {
-                dividers[0].gameObject.Dispose();
+                dividers[0].gameObject.Dispose(defer: true);
                 dividers.RemoveAt(0);
             }
 

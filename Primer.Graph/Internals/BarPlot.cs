@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Latex;
 using Primer.Shapes;

@@ -131,7 +131,7 @@ namespace Primer.Latex
             container.Insert(characters);
             container.Purge();
 
-            GetComponent<LatexTransition>()?.DisposeComponent(urgent: true);
+            GetComponent<LatexTransition>()?.DisposeComponent();
 
             foreach (var group in GetComponents<GroupedLatex>()) {
                 group.DisposeComponent();
