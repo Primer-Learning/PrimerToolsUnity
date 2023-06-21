@@ -22,10 +22,10 @@ namespace Primer.Latex
         }
 
         protected TweenProvider Transition(string formula)
-            => Transition(null, Latex(formula), null, GroupTransitionType.Replace);
+            => Transition(Array.Empty<int>(), Latex(formula), Array.Empty<int>(), GroupTransitionType.Replace);
 
         protected TweenProvider Transition(LatexComponent stage, params GroupTransitionType[] transition)
-            => Transition(null, stage, null, transition);
+            => Transition(Array.Empty<int>(), stage, Array.Empty<int>(), transition);
 
         // protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, params GroupTransitionType[] transition)
         //     => Transition(groupIndexesBefore, stage, null, transition);
@@ -37,7 +37,7 @@ namespace Primer.Latex
         {
             stages.Add(new Stage(
                 latex: stage,
-                transitions,
+                new TransitionList(transitions),
                 groupIndexesBefore,
                 groupIndexesAfter
             ));
@@ -56,7 +56,7 @@ namespace Primer.Latex
         [Serializable]
         public record Stage(
             LatexComponent latex,
-            GroupTransitionType[] transition,
+            TransitionList transition,
             [CanBeNull] int[] groupIndexesBefore = null,
             [CanBeNull] int[] groupIndexesAfter = null
         );

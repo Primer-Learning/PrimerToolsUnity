@@ -36,7 +36,13 @@ namespace Primer.Latex
         private bool hasCustomExpression = false;
 
         public LatexExpression expression {
-            get => hasCustomExpression ? customExpression ?? latex.expression : latex.expression;
+            get {
+                if (!hasCustomExpression)
+                    return latex.expression;
+
+                customExpression ??= LatexExpression.FromHierarchy(root);
+                return customExpression;
+            }
             set {
                 customExpression = value;
                 hasCustomExpression = true;
@@ -164,7 +170,7 @@ namespace Primer.Latex
         }
         #endregion
 
-        private IEnumerable<(int, int)> CalculateRanges() => CalculateRanges(expression, groupIndexes);
+        internal IEnumerable<(int, int)> CalculateRanges() => CalculateRanges(expression, groupIndexes);
 
         public static IEnumerable<(int, int)> CalculateRanges(LatexExpression expression, IEnumerable<int> groupIndexes = null)
         {

@@ -22,10 +22,13 @@ namespace Primer.Latex
         private LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
         #endregion
 
-        [SerializeField] private GroupedLatex start;
-        [SerializeField] private GroupedLatex end;
-        [SerializeField] private TransitionList transitions;
-        [SerializeField] private Vector3 offset;
+        [SerializeField] internal GroupedLatex start;
+        [SerializeField] internal GroupedLatex end;
+
+        [SerializeField, HideInInspector]
+        private Vector3 offset;
+        [SerializeField, HideInInspector]
+        internal TransitionList transitions;
 
         private readonly List<(Transform mid, Transform to)> add = new();
         private readonly List<(Transform mid, Transform from)> remove = new();

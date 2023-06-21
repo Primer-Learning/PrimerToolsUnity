@@ -9,6 +9,18 @@ namespace Primer.Latex
 {
     public class LatexExpression : IReadOnlyList<LatexChar>
     {
+        public static LatexExpression FromHierarchy(Transform container, LatexInput input = null)
+        {
+            var chars = container
+                .GetComponentsInChildren<LatexCharComponent>()
+                .Select(x => x.ToLatexChar())
+                .ToArray();
+
+            input ??= LatexInput.From("");
+            return new LatexExpression(input, chars);
+        }
+
+
         private readonly LatexChar[] characters;
         private readonly LatexInput input;
 

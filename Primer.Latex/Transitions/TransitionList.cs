@@ -32,16 +32,19 @@ namespace Primer.Latex
             var fromCursor = 0;
             var toCursor = 0;
 
-            for (var i = 0; i < transitions.Count; i++) {
-                var transition = transitions[i];
-
-                yield return new Entry(
-                    transition,
-                    i,
-                    transition is GroupTransitionType.Add ? null : fromCursor++,
-                    transition is GroupTransitionType.Remove ? null : toCursor++
-                );
-            }
+            // transition list may be modified by whoever gets the "yield return"
+            // in that case the list will change mid-loop
+            // so instead of "yield return" we calculate the complete list and return it
+            return transitions
+                .Select(
+                    (transition, i) => new Entry(
+                        transition,
+                        i,
+                        transition is GroupTransitionType.Add ? null : fromCursor++,
+                        transition is GroupTransitionType.Remove ? null : toCursor++
+                    )
+                )
+                .ToArray();
         }
 
         public TransitionList Validate()

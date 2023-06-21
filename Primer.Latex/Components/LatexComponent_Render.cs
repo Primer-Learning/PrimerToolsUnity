@@ -45,15 +45,9 @@ namespace Primer.Latex
 
         private LatexExpression CreateExpressionFromHierarchy()
         {
-            if (string.IsNullOrWhiteSpace(latex))
-                return null;
-
-            var chars = characters
-                .GetComponentsInChildren<LatexCharComponent>()
-                .Select(x => x.ToLatexChar())
-                .ToArray();
-
-            return new LatexExpression(config, chars);
+            return string.IsNullOrWhiteSpace(latex)
+                ? null
+                : LatexExpression.FromHierarchy(characters, config);
         }
 
         public IEnumerable<MeshRenderer> GetCharacters(int? startIndex = null, int? endIndex = null)

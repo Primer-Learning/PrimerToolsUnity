@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -38,15 +38,22 @@ namespace Primer.Latex.Editor
 
             var prev = selectedTab > 0 ? stages[selectedTab - 1].latex : sequence.initial;
             var stage = overrides.ContainsKey(selectedTab) ? overrides[selectedTab] : stages[selectedTab];
-            // var stage = stages[selectedTab];
-            var mutable = new MutableStage(prev, stage);
 
-            RenderTransition(mutable);
+            var mutable = new MutableTransitions(
+                prev.expression,
+                stage.groupIndexesBefore,
+                stage.latex.expression,
+                stage.groupIndexesAfter,
+                stage.transition
+            );
 
-            var newStage = mutable.ToStage(stage);
+            EditorGUILayout.Space(16);
+            mutable.RenderEditor();
+            EditorGUILayout.Space(16);
 
-            if (newStage != stage)
-                overrides[selectedTab] = newStage;
+            var newStage = mutable.hasChanges
+                ? CreateStageFromMutable(mutable, stage)
+                : stage;
 
             if (!IsSame(stages[selectedTab], newStage)) {
                 EditorGUILayout.HelpBox(
@@ -59,12 +66,26 @@ namespace Primer.Latex.Editor
                 CopyCode(newStage);
         }
 
+        private Stage CreateStageFromMutable(MutableTransitions mutable, Stage previous)
+        {
+            var (fromGroups, toGroups, transitions) = mutable.GetResult();
+
+            overrides[selectedTab] = new Stage(
+                previous.latex,
+                transitions,
+                fromGroups.ToArray(),
+                toGroups.ToArray()
+            );
+
+            return overrides[selectedTab];
+        }
+
         private LatexSequence GetSequence()
         {
             if (target is not LatexSequence sequence)
                 return null;
 
-            sequence.EnsureIsInitialized();
+            sequence.EnsureIsInitialized().Forget();
             return sequence;
         }
 
@@ -93,9 +114,6 @@ namespace Primer.Latex.Editor
             }
 
             GUILayout.EndHorizontal();
-
-            EditorGUILayout.Space(16);
-            EditorGUILayout.LabelField($"Transition {selectedTab + 1}");
         }
 
         private void RenderTab(string label, int i)
@@ -114,56 +132,6 @@ namespace Primer.Latex.Editor
         }
         #endregion
 
-        private static void RenderTransition(MutableStage mutable)
-        {
-            var width = LatexCharEditor.GetDefaultWidth();
-            var forceAnchor = -1;
-
-            foreach (var (i, transition, fromRange, toRange) in mutable) {
-                EditorGUILayout.Space(4);
-
-                using (new GUILayout.HorizontalScope()) {
-                    var newValue = EditorGUILayout.EnumPopup("", transition);
-                    var newTransition = newValue is GroupTransitionType kind ? kind : transition;
-
-                    if (newTransition is GroupTransitionType.Anchor && transition is not GroupTransitionType.Anchor)
-                        forceAnchor = i;
-
-                    if (newTransition != transition)
-                        mutable.SetTransitionType(i, newTransition);
-
-                    if (i != 0 && GUILayout.Button("X", GUILayout.Width(20))) {
-                        mutable.RemoveGroup(i);
-                        break;
-                    }
-                }
-
-                if (fromRange.HasValue) {
-                    var clicked = LatexCharEditor.ShowGroup(mutable.GetGroupBefore(fromRange.Value), width);
-
-                    if (clicked is not 0)
-                        mutable.AddGroupBefore(i, fromRange.Value.start + clicked);
-                }
-
-                if (fromRange.HasValue && toRange.HasValue)
-                    EditorGUILayout.Space(4);
-
-                if (toRange.HasValue) {
-                    var clicked = LatexCharEditor.ShowGroup(mutable.GetGroupAfter(toRange.Value), width);
-
-                    if (clicked is not 0)
-                        mutable.AddGroupAfter(i, toRange.Value.start + clicked);
-                }
-            }
-
-            if (forceAnchor is -1)
-                return;
-
-            foreach (var (i, transition, _, _) in mutable) {
-                if (transition is GroupTransitionType.Anchor && i != forceAnchor)
-                    mutable.SetTransitionType(i, GroupTransitionType.Transition);
-            }
-        }
 
         private static bool IsSame(Stage left, Stage right)
         {
@@ -183,7 +151,9 @@ namespace Primer.Latex.Editor
                 groupIndexesBefore?.Length is 0 or null
                     ? "Array.Empty<int>()"
                     : $"new[] {{ {groupIndexesBefore.Join(", ")} }}",
+
                 $"Latex(@\"{latex.latex}\")",
+
                 groupIndexesAfter?.Length is 0 or null
                     ? "Array.Empty<int>()"
                     : $"new[] {{ {groupIndexesAfter.Join(", ")} }}",
