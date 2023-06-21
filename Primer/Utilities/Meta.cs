@@ -14,6 +14,14 @@ namespace Primer
             return cache;
         }
 
+        public static T CachedGetComponent<T>(ref T cache, Component parent) where T : Component
+        {
+            if (cache == null)
+                cache = parent.GetComponent<T>();
+
+            return cache;
+        }
+
         public static bool ReactiveProp<T>(ref T field, T newValue)
         {
             if (Equals(field, newValue))

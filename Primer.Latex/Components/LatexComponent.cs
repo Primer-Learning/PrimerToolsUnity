@@ -14,7 +14,7 @@ namespace Primer.Latex
         private LatexExpression _expression;
 
         public LatexExpression expression {
-            get => _expression;
+            get => _expression ??= CreateExpressionFromHierarchy();
             private set {
                 _expression = value;
                 UpdateChildren();

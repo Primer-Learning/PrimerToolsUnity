@@ -43,6 +43,19 @@ namespace Primer.Latex
         }
 
 
+        private LatexExpression CreateExpressionFromHierarchy()
+        {
+            if (string.IsNullOrWhiteSpace(latex))
+                return null;
+
+            var chars = characters
+                .GetComponentsInChildren<LatexCharComponent>()
+                .Select(x => x.ToLatexChar())
+                .ToArray();
+
+            return new LatexExpression(config, chars);
+        }
+
         public IEnumerable<MeshRenderer> GetCharacters(int? startIndex = null, int? endIndex = null)
         {
             var chars = characters.GetChildren();

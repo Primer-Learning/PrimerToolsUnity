@@ -41,14 +41,15 @@ namespace Primer.Latex
 
         public void RenderTo(Transform transform, Material material, Color color)
         {
+            var component = transform.GetOrAddComponent<LatexCharComponent>();
+
+            component.position = position;
+            component.bounds = bounds;
+            component.mesh = mesh;
+            component.material = material;
+            component.color = color;
+
             transform.localPosition = position;
-
-            var meshFilter = transform.GetOrAddComponent<MeshFilter>();
-            meshFilter.sharedMesh = mesh;
-
-            var meshRenderer = transform.GetOrAddComponent<MeshRenderer>();
-            meshRenderer.material = material;
-            meshRenderer.SetColor(color);
         }
 
         private static Mesh ConvertToMesh(Sprite sprite)
@@ -64,5 +65,7 @@ namespace Primer.Latex
                 uv = sprite.vertices,
             };
         }
+
+
     }
 }
