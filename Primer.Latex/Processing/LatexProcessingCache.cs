@@ -107,32 +107,6 @@ namespace Primer.Latex
             var chars = serialized.Select(x => x.ToLatexChar());
             return new LatexExpression(config, chars.ToArray());
         }
-
-        [Serializable]
-        private struct SerializableLatexChar
-        {
-            public readonly (float x, float y) position;
-            public readonly (float x, float y, float w, float h) bounds;
-            public readonly SerializableMesh mesh;
-
-            public SerializableLatexChar(LatexChar latexChar)
-            {
-                mesh = new SerializableMesh(latexChar.mesh);
-                position = (latexChar.position.x, latexChar.position.y);
-                bounds = (
-                    x: latexChar.bounds.xMin,
-                    y: latexChar.bounds.yMin,
-                    w: latexChar.bounds.width,
-                    h: latexChar.bounds.height
-                );
-            }
-
-            public LatexChar ToLatexChar() => new(
-                mesh.GetMesh(),
-                new Rect(bounds.x, bounds.y, bounds.w, bounds.h),
-                new Vector2(position.x, position.y)
-            );
-        }
         #endregion
 
 #if UNITY_EDITOR

@@ -7,6 +7,8 @@ namespace Primer.Latex
 {
     public sealed record LatexInput(string code, List<string> headers) : ISerializable
     {
+        public static LatexInput From(string code) => new(code, GetDefaultHeaders());
+
         public int GetDeterministicHashCode()
         {
             return $"{code}_${string.Join(',', headers)}".GetDeterministicHashCode();

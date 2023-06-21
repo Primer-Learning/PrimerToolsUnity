@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using Unity.VectorGraphics;
 using UnityEngine;
 
 namespace Primer.Latex
 {
-    public class LatexExpression : IReadOnlyList<LatexChar>, ISerializable
+    public class LatexExpression : IReadOnlyList<LatexChar>
     {
         private readonly LatexChar[] characters;
         private readonly LatexInput input;
@@ -57,12 +56,6 @@ namespace Primer.Latex
         public override string ToString()
         {
             return $"LatexExpression({input?.code ?? "null"})[{characters.Length}]";
-        }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue(nameof(input), input);
-            info.AddValue(nameof(characters), characters);
         }
 
         public IEnumerator<LatexChar> GetEnumerator() => characters.ToList().GetEnumerator();
