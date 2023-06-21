@@ -30,7 +30,6 @@ namespace Primer.Latex
         private readonly List<(Transform mid, Transform to)> add = new();
         private readonly List<(Transform mid, Transform from)> remove = new();
         private readonly List<(Transform mid, Transform from, Transform to)> transition = new();
-        private readonly List<(Transform mid, Transform from, Transform to)> replace = new();
 
         #region Copy code
         [CopyToClipboard]
@@ -104,25 +103,8 @@ namespace Primer.Latex
             foreach (var (groupTransform, group) in add)
                 groupTransform.localScale = group.localScale * easeIn;
 
-            foreach (var (groupTransform, before, after) in transition) {
-                groupTransform.localScale = Vector3.Lerp(before.localScale, after.localScale, t);
+            foreach (var (groupTransform, before, after) in transition)
                 groupTransform.localPosition = Vector3.Lerp(before.localPosition, after.localPosition + offset, t);
-            }
-
-            foreach (var (groupTransform, before, after) in replace) {
-                var isFirstHalf = easeIn <= 0;
-                var first = groupTransform.GetChild(0);
-                var second = groupTransform.GetChild(1);
-
-                first.SetActive(isFirstHalf);
-                second.SetActive(!isFirstHalf);
-
-                groupTransform.localPosition = Vector3.Lerp(before.localPosition, after.localPosition + offset, t);
-
-                groupTransform.localScale = isFirstHalf
-                    ? before.localScale * easeOut
-                    : after.localScale * easeIn;
-            }
         }
         #endregion
 
@@ -142,7 +124,6 @@ namespace Primer.Latex
         public void UpdateChildren()
         {
             transition.Clear();
-            replace.Clear();
             remove.Clear();
             add.Clear();
 
@@ -150,31 +131,33 @@ namespace Primer.Latex
 
             var container = new Container(root);
 
+            foreach (var group in GroupsToRemove()) {
+                var groupTransform = container.Add(group);
+                remove.Add((groupTransform, group));
+            }
+
+
+            foreach (var group in GroupsToAdd()) {
+                var groupTransform = container.Add(group);
+                groupTransform.localPosition += offset;
+                add.Add((groupTransform, group));
+            }
+
             foreach (var (before, after) in GetCommonGroups()) {
                 var groupTransform = container.Add(before);
-                groupTransform.localPosition += offset;
                 transition.Add((groupTransform, before, after));
             }
 
             foreach (var (before, after) in GroupToReplace()) {
                 var group = container.AddContainer("Replace");
-                group.localPosition += before.localPosition + offset;
-                group.Add(before).localPosition = Vector3.zero;
-                group.Add(after).localPosition = Vector3.zero;
-                replace.Add((group.transform, before, after));
-            }
+                var scaleDown = group.Add(before);
+                scaleDown.localPosition = Vector3.zero;
+                var scaleUp = group.Add(after);
+                scaleUp.localPosition = Vector3.zero;
 
-            foreach (var group in GroupsToRemove()) {
-                var groupTransform = container.Add(group);
-                groupTransform.localScale = Vector3.zero;
-                remove.Add((groupTransform, group));
-            }
-
-            foreach (var group in GroupsToAdd()) {
-                var groupTransform = container.Add(group);
-                groupTransform.localPosition += offset;
-                groupTransform.localScale = Vector3.zero;
-                add.Add((groupTransform, group));
+                transition.Add((group, before, after));
+                remove.Add((scaleDown, before));
+                add.Add((scaleUp, after));
             }
 
             container.Purge();
