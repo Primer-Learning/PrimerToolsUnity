@@ -1,10 +1,19 @@
 using System;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace Primer
 {
     public static class Meta
     {
+        public static Transform CachedChildFind(ref Transform cache, Transform parent, string name)
+        {
+            if (cache == null)
+                cache = parent.FindOrCreate(name, new ChildOptions { enable = false });
+
+            return cache;
+        }
+
         public static bool ReactiveProp<T>(ref T field, T newValue)
         {
             if (Equals(field, newValue))

@@ -12,11 +12,8 @@ namespace Primer.Latex
     {
         private const string CHARACTERS_CONTAINER_NAME = "Characters";
 
-        private Transform charactersContainerCache;
-        private Transform charactersContainer => charactersContainerCache ??= transform.FindOrCreate(
-            CHARACTERS_CONTAINER_NAME,
-            new ChildOptions { enable = false }
-        );
+        private Transform charactersCache;
+        private Transform characters => Meta.CachedChildFind(ref charactersCache, transform, CHARACTERS_CONTAINER_NAME);
 
         [Title("Rendering")]
         [ShowInInspector]
@@ -48,7 +45,7 @@ namespace Primer.Latex
 
         public IEnumerable<MeshRenderer> GetCharacters(int? startIndex = null, int? endIndex = null)
         {
-            var chars = charactersContainer.GetChildren();
+            var chars = characters.GetChildren();
             var cropped = endIndex.HasValue ? chars.Take(endIndex.Value + 1) : chars;
             return cropped.Skip(startIndex ?? 0).Select(x => x.GetComponent<MeshRenderer>());
         }
@@ -76,14 +73,14 @@ namespace Primer.Latex
         public void UpdateChildren()
         {
             if (activeDisplay is null)
-                SetActiveDisplay(charactersContainer);
+                SetActiveDisplay(characters);
 
             var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
 
             if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
                 return;
 
-            var container = new Container(charactersContainer);
+            var container = new Container(characters);
             var currentMaterial = material;
             var currentColor = color;
 
@@ -109,7 +106,7 @@ namespace Primer.Latex
 
         MeshRenderer[] IMeshController.GetMeshRenderers()
         {
-            return charactersContainer.GetComponentsInChildren<MeshRenderer>();
+            return transform.GetComponentsInChildren<MeshRenderer>();
         }
     }
 }

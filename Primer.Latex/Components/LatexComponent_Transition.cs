@@ -128,7 +128,7 @@ namespace Primer.Latex
         {
             // Remove all children except for the characters container
             var container = new Container(transform);
-            container.Insert(charactersContainer);
+            container.Insert(characters);
             container.Purge();
 
             GetComponent<LatexTransition>()?.DisposeComponent(urgent: true);

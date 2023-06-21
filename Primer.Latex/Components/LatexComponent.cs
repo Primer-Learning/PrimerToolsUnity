@@ -32,7 +32,7 @@ namespace Primer.Latex
 
         public void ResetActiveDisplay()
         {
-            SetActiveDisplay(charactersContainer);
+            SetActiveDisplay(characters);
         }
 
         public void SetActiveDisplay(Transform root)
