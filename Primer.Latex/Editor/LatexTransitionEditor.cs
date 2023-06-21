@@ -19,24 +19,29 @@ namespace Primer.Latex.Editor
             GUILayout.Label("Preview");
 
             var newT = EditorGUILayout.Slider(t, 0, 1);
-
-            if (newT != t) {
-                t = newT;
-                transition.Evaluate(t);
-                return;
-            }
+            var evaluate = newT != t;
 
             using (new EditorGUILayout.HorizontalScope()) {
-                if (GUILayout.Button("0"))
-                    transition.SetInitialState();
+                if (GUILayout.Button("0")) {
+                    newT = 0;
+                    evaluate = true;
+                }
 
-                if (GUILayout.Button("Clear"))
+                if (GUILayout.Button("Clear")) {
                     transition.Deactivate();
+                    evaluate = false;
+                }
 
-                if (GUILayout.Button("1"))
-                    transition.SetEndState();
+                if (GUILayout.Button("1")) {
+                    newT = 1;
+                    evaluate = true;
+                }
             }
 
+            if (evaluate) {
+                transition.ToTween().Evaluate(newT);
+                t = newT;
+            }
         }
     }
 }

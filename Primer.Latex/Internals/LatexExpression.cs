@@ -33,11 +33,6 @@ namespace Primer.Latex
         }
 
 
-        public bool IsSame(LatexExpression other)
-        {
-            return !ReferenceEquals(null, other) && characters.SequenceEqual(other.characters);
-        }
-
         public Rect GetBounds()
         {
             var allVertices = new Vector2[characters.Length * 2];

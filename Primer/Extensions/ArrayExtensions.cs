@@ -5,6 +5,17 @@ namespace Primer
 {
     public static class ArrayExtensions
     {
+        public static bool IsSame<T>(this IEnumerable<T> left, IEnumerable<T> right)
+        {
+            if (left is null && right is null)
+                return true;
+
+            if (left is null || right is null)
+                return false;
+
+            return left.SequenceEqual(right);
+        }
+
         public static T[] Append<T>(this T[] self, params T[] other) {
             var result = new T[self.Length + other.Length];
             self.CopyTo(result, 0);

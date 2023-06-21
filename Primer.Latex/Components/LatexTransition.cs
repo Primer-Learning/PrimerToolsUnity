@@ -10,13 +10,16 @@ namespace Primer.Latex
     [RequireComponent(typeof(GroupedLatex))]
     public class LatexTransition : MonoBehaviour, IHierarchyManipulator
     {
-        public const string ROOT_NAME = "Transition";
+        private const string ROOT_NAME = "Transition";
 
-        public Transform root => transform.FindOrCreate(ROOT_NAME);
+        #region public Transform root { get; }
+        private Transform rootCache;
+        private Transform root => Meta.CachedChildFind(ref rootCache, transform, ROOT_NAME);
+        #endregion
 
         #region LatexComponent latex { get; }
         private LatexComponent latexCache;
-        public LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
+        private LatexComponent latex => latexCache ??= GetComponent<LatexComponent>();
         #endregion
 
         [SerializeField] private GroupedLatex start;

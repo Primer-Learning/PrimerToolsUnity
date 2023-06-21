@@ -19,10 +19,10 @@ namespace Primer.Latex
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion;
 
-        public Transform root => transform.FindOrCreate(
-            $"Grouping > {groupName}",
-            new ChildOptions { enable = false }
-        );
+        #region public Transform root { get; }
+        public Transform rootCache;
+        public Transform root => Meta.CachedChildFind(ref rootCache, transform, $"Grouping > {groupName}");
+        #endregion
 
         #region public LatexComponent latex { get; }
         private LatexComponent latexCache;
