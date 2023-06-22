@@ -1,10 +1,39 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Primer
 {
     public static class ArrayExtensions
     {
+        [Pure]
+        public static TSource KeyedMax<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
+        {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+
+            var list = source.ToList();
+
+            if (list.Count is 0)
+                return default(TSource);
+
+            var max = list[0];
+            var maxVal = selector(max);
+
+            foreach (var item in list.Skip(1)) {
+                var key = selector(item);
+
+                if (key > maxVal) {
+                    max = item;
+                    maxVal = key;
+                }
+            }
+
+            return max;
+        }
+
+        [Pure]
         public static bool IsSame<T>(this IEnumerable<T> left, IEnumerable<T> right)
         {
             if (left is null && right is null)
@@ -16,6 +45,7 @@ namespace Primer
             return left.SequenceEqual(right);
         }
 
+        [Pure]
         public static T[] Append<T>(this T[] self, params T[] other) {
             var result = new T[self.Length + other.Length];
             self.CopyTo(result, 0);
@@ -23,11 +53,13 @@ namespace Primer
             return result;
         }
 
+        [Pure]
         public static IEnumerable<(int index, T value)> WithIndex<T>(this IEnumerable<T> items)
         {
             return items.Select((value, i) => (i, value));
         }
 
+        [Pure]
         public static IEnumerable<(T, float)> SpaceEvenly<T>(this IEnumerable<T> items, float distanceBetweenChildren)
         {
             var children = items.ToArray();
