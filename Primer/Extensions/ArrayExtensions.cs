@@ -8,7 +8,7 @@ namespace Primer
     public static class ArrayExtensions
     {
         [Pure]
-        public static TSource KeyedMax<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
+        public static TSource MaxBy<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
