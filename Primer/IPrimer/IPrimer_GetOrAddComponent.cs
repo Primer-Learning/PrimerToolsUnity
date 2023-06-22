@@ -21,9 +21,25 @@ namespace Primer
             return self as T ?? self.transform.gameObject.GetOrAddComponent<T>();
         }
 
+        public static T GetOrAddComponent<T>(this IPrimer self, ref T cache) where T : Component
+        {
+            if (cache == null)
+                cache = self as T ?? self.transform.gameObject.GetOrAddComponent<T>();
+
+            return cache;
+        }
+
         public static T GetOrAddComponent<T>(this Component self) where T : Component
         {
             return self as T ?? self.gameObject.GetOrAddComponent<T>();
+        }
+
+        public static T GetOrAddComponent<T>(this Component self, ref T cache) where T : Component
+        {
+            if (cache == null)
+                cache = self as T ?? self.gameObject.GetOrAddComponent<T>();
+
+            return cache;
         }
 
         // Actual implementation
