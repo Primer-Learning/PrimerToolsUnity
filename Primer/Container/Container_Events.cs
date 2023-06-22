@@ -41,10 +41,10 @@ namespace Primer
             return child;
         }
 
-        private void OnRemove(Component child)
+        private void OnRemove(Component child, bool defer)
         {
             if (onRemove is null || areEventsDeactivated) {
-                ContainerEvents.defaultOnRemove.Invoke(child.transform);
+                child.Dispose(defer);
                 return;
             }
 

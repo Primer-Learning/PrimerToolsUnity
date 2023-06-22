@@ -71,7 +71,7 @@ namespace Primer.Axis
                 ticks.Update(container, domain);
             }
 
-            container.Purge();
+            container.Purge(defer: true);
         }
     }
 }

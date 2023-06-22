@@ -7,15 +7,15 @@ namespace Primer
     public partial class Container
     {
         private readonly List<Action> onCleanup = new();
-        private readonly List<Action> onPurge = new();
+        private readonly List<Action<bool>> onPurge = new();
 
-        public void Purge()
+        public void Purge(bool defer = false)
         {
             foreach (var child in unusedChildren)
-                OnRemove(child);
+                OnRemove(child, defer);
 
             foreach (var listener in onPurge)
-                listener();
+                listener(defer);
 
             unusedChildren.Clear();
         }
