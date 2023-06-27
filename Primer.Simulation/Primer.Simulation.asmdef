@@ -2,6 +2,7 @@
   "name": "Primer.Simulation",
   "rootNamespace": "Primer.Simulation",
   "references": [
-    "Primer"
+    "Primer",
+    "UniTask"
   ]
 }
