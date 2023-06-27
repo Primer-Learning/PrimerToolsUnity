@@ -1,0 +1,7 @@
+{
+  "name": "Simulation.Evolution",
+  "rootNamespace": "Simulation.Evolution",
+  "references": [
+    "Primer"
+  ]
+}

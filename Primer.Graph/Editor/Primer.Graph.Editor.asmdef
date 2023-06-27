@@ -7,7 +7,6 @@
     "ShapesRuntime",
     "Primer",
     "Primer.Editor",
-    "Primer.Math",
     "Primer.Animation",
     "Primer.Timeline",
     "Primer.Graph"
