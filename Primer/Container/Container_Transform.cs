@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Primer
@@ -53,9 +54,11 @@ namespace Primer
             return transform.GetComponent<T>() ?? transform.gameObject.AddComponent<T>();
         }
 
-        public T[] GetChildComponents<T>() where T : Component
+        public T[] ChildComponents<T>() where T : Component
         {
-            return transform.GetComponentsInChildren<T>();
+            return transform.GetComponentsInChildren<T>()
+                .Where(x => x.GetComponent<ContainerEvents.IsRemoving>() is null)
+                .ToArray();
         }
 
         public Container SetDefaults()
