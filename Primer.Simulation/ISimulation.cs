@@ -5,9 +5,9 @@ namespace Primer.Simulation
 {
     public interface ISimulation
     {
-        public int millisecondsBetweenFrames { get; }
+        // public int secondsBetweenTurns { get; }
         public bool skipAnimations { get; }
-        public UniTask Tick();
+        public UniTask RunTurn();
     }
 
     public static class ISimulationExtensions
@@ -24,15 +24,15 @@ namespace Primer.Simulation
             Time.timeScale = 1;
 
             while (true) {
-                var startTime = Time.time;
+                // var startTime = Time.time;
 
-                await simulation.Tick();
+                await simulation.RunTurn();
 
-                var elapsedMilliseconds = (int)((Time.time - startTime) * 1000);
-                var remainingTime = simulation.millisecondsBetweenFrames - elapsedMilliseconds;
-
-                if (!simulation.skipAnimations && remainingTime > 0)
-                    await UniTask.Delay(remainingTime);
+                // var elapsedTime = Time.time - startTime;
+                // var remainingTime = simulation.secondsBetweenTurns - elapsedTime;
+                //
+                // if (!simulation.skipAnimations && remainingTime > 0)
+                //     await UniTask.Delay((int)(remainingTime * 1000));
             }
         }
     }

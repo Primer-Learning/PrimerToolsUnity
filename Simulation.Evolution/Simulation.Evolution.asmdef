@@ -2,6 +2,9 @@
   "name": "Simulation.Evolution",
   "rootNamespace": "Simulation.Evolution",
   "references": [
-    "Primer"
+    "Primer",
+    "Primer.Simulation",
+    "UniTask",
+    "Primer.Timeline"
   ]
 }
