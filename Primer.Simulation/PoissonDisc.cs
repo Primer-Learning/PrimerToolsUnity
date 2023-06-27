@@ -27,8 +27,14 @@ namespace Primer.Simulation
         private readonly Vector2 sampleRegionSize;
         private readonly bool circular;
         private List<Vector2> spawnPoints;
-        private float minDistance, cellSize;
+        private float _minDistance;
+        private float cellSize;
         private int[,] grid;
+
+        public float minDistance {
+            get => _minDistance;
+            set => SetMinDistance(value);
+        }
 
         public PoissonDisc(float minDistance, Vector2 sampleRegionSize, bool circular = false,
             OverflowMode overflowMode = OverflowMode.None)
@@ -37,7 +43,7 @@ namespace Primer.Simulation
             this.sampleRegionSize = sampleRegionSize;
             this.circular = circular;
             this.overflowMode = overflowMode;
-            this.minDistance = minDistance;
+            this._minDistance = minDistance;
             cellSize = minDistance / Mathf.Sqrt(2);
             Reset();
         }
@@ -57,7 +63,7 @@ namespace Primer.Simulation
                 for (var i = 0; i < maxSamples; i++) {
                     var theta = Random.value * Mathf.PI * 2;
                     var dir = new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
-                    var r = minDistance * Mathf.Sqrt(Random.value * 0.75f + 0.25f) * 2;
+                    var r = _minDistance * Mathf.Sqrt(Random.value * 0.75f + 0.25f) * 2;
                     var candidate = spawnCenter + dir * r;
 
                     if (!IsValid(candidate))
@@ -89,17 +95,17 @@ namespace Primer.Simulation
             if (!handleOverflow || added >= numPoints)
                 return added;
 
-            var prevMinDistance = minDistance;
+            var prevMinDistance = _minDistance;
 
             switch (overflowMode) {
                 case OverflowMode.Squeeze:
-                    SetMinDistance(minDistance / 2);
+                    SetMinDistance(_minDistance / 2);
                     added += AddPoints(numPoints - added, maxSamples);
                     SetMinDistance(prevMinDistance);
                     break;
 
                 case OverflowMode.Force: {
-                    SetMinDistance(minDistance / 2);
+                    SetMinDistance(_minDistance / 2);
                     added += AddPoints(numPoints - added, maxSamples);
                     SetMinDistance(prevMinDistance);
 
@@ -166,7 +172,7 @@ namespace Primer.Simulation
 
                     var sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
 
-                    if (sqrDst < minDistance * minDistance)
+                    if (sqrDst < _minDistance * _minDistance)
                         return false;
                 }
             }
@@ -190,9 +196,9 @@ namespace Primer.Simulation
         //     return points.Select(x => x - offset).ToList();
         // }
 
-        public void SetMinDistance(float newMinDistance)
+        private void SetMinDistance(float newMinDistance)
         {
-            minDistance = newMinDistance;
+            _minDistance = newMinDistance;
             cellSize = newMinDistance / Mathf.Sqrt(2);
             grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
             spawnPoints.Clear();
