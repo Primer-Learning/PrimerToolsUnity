@@ -3,6 +3,8 @@
   "rootNamespace": "Primer.Simulation",
   "references": [
     "Primer",
-    "UniTask"
+    "UniTask",
+    "Primer.Animation",
+    "Primer.Shapes"
   ]
 }

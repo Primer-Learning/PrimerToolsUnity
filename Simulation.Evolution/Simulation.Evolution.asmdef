@@ -5,6 +5,7 @@
     "Primer",
     "Primer.Simulation",
     "UniTask",
-    "Primer.Timeline"
+    "Primer.Timeline",
+    "Primer.Animation"
   ]
 }

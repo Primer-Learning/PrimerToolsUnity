@@ -1,16 +1,17 @@
 using System;
 using Primer;
+using Primer.Simulation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Simulation.Evolution
 {
     [ExecuteAlways]
+    [RequireComponent(typeof(Landscape))]
     public class EvolutionSimulationComponent : MonoBehaviour
     {
-        public Vector2 size = Vector2.one * 10;
-        public int foodPerTurn = 10;
-        public int initialBlobs = 2;
+        [Min(1)] public int foodPerTurn = 10;
+        [Min(1)] public int initialBlobs = 2;
         public bool skipAnimations = false;
 
         private EvolutionSimulation simulation;
@@ -24,7 +25,6 @@ namespace Simulation.Evolution
 
             simulation = new EvolutionSimulation(
                 transform: transform,
-                size: size,
                 foodPerTurn: foodPerTurn,
                 initialBlobs: initialBlobs
             ) {

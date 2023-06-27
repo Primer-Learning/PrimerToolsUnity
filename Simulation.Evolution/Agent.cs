@@ -7,8 +7,8 @@ namespace Simulation.Evolution
 {
     internal class Agent : MonoBehaviour
     {
-        private TerrainMovement movementCache;
-        private TerrainMovement movement => transform.GetOrAddComponent(ref movementCache);
+        private LandscapeWalker movementCache;
+        private LandscapeWalker movement => transform.GetOrAddComponent(ref movementCache);
 
         private float energy;
         public Food goingToEat;
@@ -19,7 +19,7 @@ namespace Simulation.Evolution
         public UniTask GoToEat(Food food)
         {
             goingToEat = food;
-            return movement.WalkTo(food.transform);
+            return movement.WalkTo(food.transform).Play();
         }
 
         public UniTask Eat()
@@ -30,7 +30,7 @@ namespace Simulation.Evolution
 
         public UniTask ReturnHome(Vector2 position)
         {
-            return movement.WalkTo(position);
+            return movement.WalkTo(position).Play();
         }
 
         public void ConsumeEnergy()

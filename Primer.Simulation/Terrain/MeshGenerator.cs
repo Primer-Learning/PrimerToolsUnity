@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer.Simulation
 {
-    public class MeshGenerator
+    internal class MeshGenerator
     {
         private float elevationOffset;
         private float[,] heightMap;
