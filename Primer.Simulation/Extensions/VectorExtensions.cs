@@ -9,5 +9,6 @@ namespace Primer.Simulation
         /// <returns>A 2D relative-to-terrain position.</returns>
         /// <remarks>Notice that no coordinate-space transformation is performed.</remarks>
         public static Vector2 To2D(this Vector3 position) => new(position.x, position.z);
+        public static Vector2Int To2D(this Vector3Int position) => new(position.x, position.z);
     }
 }
