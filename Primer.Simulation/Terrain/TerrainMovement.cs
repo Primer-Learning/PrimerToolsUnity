@@ -8,6 +8,15 @@ namespace Primer.Simulation
     [ExecuteInEditMode]
     public class TerrainMovement : MonoBehaviour
     {
+        public record Step(
+            Vector2 position2D,
+            Quaternion rotation,
+            Vector2 targetPosition2D,
+            Quaternion targetRotation,
+            float maxTraversalDelta,
+            float maxRotationDelta
+        );
+
         private RandomElevationTerrain terrainCache;
         private RandomElevationTerrain terrain => transform.ParentComponent(ref terrainCache);
 
@@ -23,39 +32,6 @@ namespace Primer.Simulation
         {
             if (terrain)
                 transform.localPosition = To3DPosition(position2D);
-        }
-
-        /// <summary>Get 2D position of an object.</summary>
-        /// <param name="transform">The transform of the object.</param>
-        /// <param name="terrain">The terrain the 2D position should be relative to.</param>
-        /// <returns>A 2D relative-to-terrain position.</returns>
-        public static Vector2 To2DPosition(Transform transform, RandomElevationTerrain terrain)
-        {
-            return terrain.transform.InverseTransformPoint(transform.position).To2D();
-        }
-
-        /// <summary>Get 3D position from a 2D position.</summary>
-        /// <param name="position">A 2D relative-to-terrain position.</param>
-        /// <returns>
-        ///     A relative-to-our-parent 3D position (ie: we could set `this.transform.localPosition` to
-        ///     this value and we'd be in the right spot).
-        /// </returns>
-        private Vector3 To3DPosition(Vector2 position)
-        {
-            var point = terrain.GetGroundAt(position.x, position.y);
-            return transform.parent.InverseTransformPoint(point);
-        }
-
-        public record Step
-        {
-            public Vector2 position2D { get; init; }
-            public Quaternion rotation { get; init; }
-
-            public Vector2 targetPosition2D { get; init; }
-            public Quaternion targetRotation { get; init; }
-
-            public float maxTraversalDelta { get; init; }
-            public float maxRotationDelta { get; init; }
         }
 
         public Step GetStepTowards(Component to, float? speed = null, float? turnSpeed = null)
@@ -97,47 +73,27 @@ namespace Primer.Simulation
             var distance = Vector2.Distance(ourPosition, theirPosition);
             var direction = (theirPosition - ourPosition).normalized;
 
-            return new Step {
-                position2D = ourPosition + direction * Mathf.Min(distance, maxTraversalDelta),
-                rotation = rotation,
-                targetPosition2D = theirPosition,
-                targetRotation = targetQuaternion,
-                maxTraversalDelta = maxTraversalDelta,
-                maxRotationDelta = maxRotationDelta,
-            };
+            return new Step(
+                position2D: ourPosition + direction * Mathf.Min(distance, maxTraversalDelta),
+                rotation: rotation,
+                targetPosition2D: theirPosition,
+                targetRotation: targetQuaternion,
+                maxTraversalDelta: maxTraversalDelta,
+                maxRotationDelta: maxRotationDelta
+            );
         }
 
         /// <summary>Moves object to given target.</summary>
-        /// <param name="to">The target to move to.</param>
-        /// <param name="speed">The speed of movement. Defaults to `defaultSpeed`.</param>
-        /// <param name="turnSpeed">
-        ///     The speed of turning. Defaults to `defaultTurnSpeed` (and is in the same
-        ///     units).
-        /// </param>
-        /// <param name="cancellationToken">
-        ///     The move will be cancelled if this `cancellationToken` is
-        ///     cancelled.
-        /// </param>
         /// <remarks>The task is completed when we've moved to the target.</remarks>
-        public UniTask MoveTo(Component to, CancellationToken cancellationToken = default)
-            => MoveTo(new TransformTarget(to.transform), ct: cancellationToken);
+        public UniTask WalkTo(Component to, CancellationToken cancellationToken = default)
+            => WalkTo(new TransformTarget(to.transform), ct: cancellationToken);
 
         /// <summary>Moves object to given target.</summary>
-        /// <param name="to">The target to move to.</param>
-        /// <param name="speed">The speed of movement. Defaults to `defaultSpeed`.</param>
-        /// <param name="turnSpeed">
-        ///     The speed of turning. Defaults to `defaultTurnSpeed` (and is in the same
-        ///     units).
-        /// </param>
-        /// <param name="cancellationToken">
-        ///     The move will be cancelled if this `cancellationToken` is
-        ///     cancelled.
-        /// </param>
         /// <remarks>The task is completed when we've moved to the target.</remarks>
-        public UniTask MoveTo(Vector2 to, CancellationToken cancellationToken = default)
-            => MoveTo(new Vector2Target(to), ct: cancellationToken);
+        public UniTask WalkTo(Vector2 to, CancellationToken cancellationToken = default)
+            => WalkTo(new Vector2Target(to), ct: cancellationToken);
 
-        private async UniTask MoveTo(Target to, float? speed = null, float? turnSpeed = null,
+        private async UniTask WalkTo(Target to, float? speed = null, float? turnSpeed = null,
             CancellationToken ct = default)
         {
             var mergedToken = CancellationTokenSource
@@ -169,6 +125,27 @@ namespace Primer.Simulation
         public void TeleportTo(Vector2 to)
         {
             transform.localPosition = To3DPosition(to);
+        }
+
+        /// <summary>Get 2D position of an object.</summary>
+        /// <param name="transform">The transform of the object.</param>
+        /// <param name="terrain">The terrain the 2D position should be relative to.</param>
+        /// <returns>A 2D relative-to-terrain position.</returns>
+        public static Vector2 To2DPosition(Transform transform, RandomElevationTerrain terrain)
+        {
+            return terrain.transform.InverseTransformPoint(transform.position).To2D();
+        }
+
+        /// <summary>Get 3D position from a 2D position.</summary>
+        /// <param name="position">A 2D relative-to-terrain position.</param>
+        /// <returns>
+        ///     A relative-to-our-parent 3D position (ie: we could set `this.transform.localPosition` to
+        ///     this value and we'd be in the right spot).
+        /// </returns>
+        private Vector3 To3DPosition(Vector2 position)
+        {
+            var point = terrain.GetGroundAt(position.x, position.y);
+            return transform.parent.InverseTransformPoint(point);
         }
 
         private static Vector2 RandomVector(Vector2 min, Vector2 max)
