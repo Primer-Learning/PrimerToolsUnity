@@ -21,8 +21,19 @@ namespace Primer.Simulation
             Force,
         }
 
-        public List<Vector2> points;
-        public OverflowMode overflowMode;
+        public static IEnumerable<Vector2> Rectangular(
+            int points,
+            Vector2 size,
+            float minDistance = 2,
+            OverflowMode overflowMode = OverflowMode.Squeeze)
+        {
+            var poisson = new PoissonDisc(minDistance, size, circular: false, overflowMode);
+            poisson.AddPoints(points);
+            return poisson.points;
+        }
+
+        private readonly List<Vector2> points;
+        public readonly OverflowMode overflowMode;
 
         private readonly Vector2 sampleRegionSize;
         private readonly bool circular;
@@ -31,20 +42,21 @@ namespace Primer.Simulation
         private float cellSize;
         private int[,] grid;
 
-        public float minDistance {
+        private float minDistance {
             get => _minDistance;
             set => SetMinDistance(value);
         }
 
-        public PoissonDisc(float minDistance, Vector2 sampleRegionSize, bool circular = false,
+        private PoissonDisc(float minDistance, Vector2 sampleRegionSize, bool circular = false,
             OverflowMode overflowMode = OverflowMode.None)
         {
             // If circular, sampleRegionSize's components must be equal
             this.sampleRegionSize = sampleRegionSize;
             this.circular = circular;
             this.overflowMode = overflowMode;
-            this._minDistance = minDistance;
+            _minDistance = minDistance;
             cellSize = minDistance / Mathf.Sqrt(2);
+            points = new List<Vector2>();
             Reset();
         }
 
@@ -214,7 +226,6 @@ namespace Primer.Simulation
         {
             grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
             spawnPoints = new List<Vector2>();
-            points = new List<Vector2>();
         }
     }
 }
