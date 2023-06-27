@@ -1,10 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Primer.Simulation
 {
-    public class PoissonDiscSampling
+    /// <summary>
+    ///   Generates a set of points using the Poisson Disc Sampling algorithm.
+    ///   Points are kind of random but they have a minimum distance between them.
+    ///   https://www.youtube.com/watch?v=7WcmyxyFO7o
+    /// </summary>
+    public class PoissonDiscSampler
     {
+        public static IEnumerable<Vector2> Rectangular(int pointsCount, Vector2 area, float minDistance = 2,
+            OverflowMode overflowMode = OverflowMode.None)
+        {
+            var sampler = new PoissonDiscSampler(minDistance, area, overflowMode);
+            sampler.AddPoints(pointsCount);
+            return sampler.points;
+        }
+
         public enum OverflowMode
         {
             None,
@@ -15,15 +29,15 @@ namespace Primer.Simulation
             Force,
         }
 
-        public OverflowMode overflowMode;
+        private readonly OverflowMode overflowMode;
         private float minDistance;
         private Vector2 sampleRegionSize;
         private float cellSize;
         private int[,] grid;
-        public List<Vector2> points = new();
+        private readonly List<Vector2> points = new();
         private List<Vector2> spawnPoints = new();
 
-        public PoissonDiscSampling(
+        private PoissonDiscSampler(
             float minDistance,
             Vector2 sampleRegionSize,
             OverflowMode overflowMode = OverflowMode.None)

@@ -30,7 +30,7 @@ namespace Simulation.Evolution
             this.size = size;
             this.initialBlobs = initialBlobs;
 
-            foodPosition = PoissonDisc.Rectangular(foodPerTurn, size).ToList();
+            foodPosition = PoissonDiscSampler.Rectangular(foodPerTurn, size).ToList();
             terrain = transform.GetOrAddComponent<RandomElevationTerrain>();
 
             var container = new Container(transform);
