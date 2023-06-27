@@ -11,6 +11,21 @@ namespace Primer.Animation
             return Series(tweenList.ToArray());
         }
 
+        // This overload doesn't work because Tween.Series() needs to know how much time to allocate to each tween.
+        // this is unknown until the function is called.
+        // otherwise it won't know when to invoke the next tween in the list.
+        //
+        // In the following example, the first tween is 0.1 seconds long, and the second tween is 0.9 seconds long.
+        // By looking at the source code we know the second function should be invoked when `t > 0.01`
+        // but Tween.Series() has no way of knowing this.
+        //
+        // Tween.Series(
+        //     () => SomeQuickTween() with { duration = 0.01f },
+        //     () => SomeSlowTween() with { duration = 0.99f },
+        // );
+        //
+        // public static Tween Series(params System.Func<Tween>[] tweenList)
+
         public static Tween Series(params Tween[] tweenList)
         {
             var fullDuration = tweenList.Sum(x => x.totalDuration);
