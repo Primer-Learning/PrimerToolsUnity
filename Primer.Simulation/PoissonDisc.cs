@@ -19,7 +19,6 @@ public class PoissonDisc
         Force,
     }
 
-
     public List<Vector2> points;
     public OverflowMode overflowMode;
 
