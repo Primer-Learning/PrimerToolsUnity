@@ -8,7 +8,7 @@ namespace Primer
     // We need a non-generic class to contain the static values
     internal static class ContainerEvents
     {
-        internal static Action<Transform> defaultOnRemove = x => x.Dispose();
+        internal static Action<Transform, bool> defaultOnRemove = (x, defer) => x.Dispose(defer);
 
         /// <summary>
         ///   If this function returns true, the container will not fire any events.
@@ -27,7 +27,7 @@ namespace Primer
         private static bool areEventsDeactivated => ContainerEvents.deactivateEventsIf?.Invoke() ?? false;
 
         public Action<Transform> onCreate;
-        public Action<Transform> onRemove;
+        public Action<Transform, bool> onRemove;
 
         public IEnumerable<Transform> removing => GetChildrenBeingRemoved(transform);
 
@@ -49,7 +49,7 @@ namespace Primer
             }
 
             child.GetOrAddComponent<ContainerEvents.IsRemoving>();
-            onRemove.Invoke(child.transform);
+            onRemove.Invoke(child.transform, defer);
         }
 
         private static List<Transform> ReadExistingChildren(Transform transform)

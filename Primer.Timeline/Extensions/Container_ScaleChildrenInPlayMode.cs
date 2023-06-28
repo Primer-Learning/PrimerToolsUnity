@@ -9,7 +9,7 @@ namespace Primer.Timeline
         public static T ScaleChildrenInPlayMode<T>(this T self) where T : Container
         {
             self.onCreate = x => x.ScaleUpFromZero().PlayAndForget();
-            self.onRemove = x => x.ShrinkAndDispose().Forget();
+            self.onRemove = (x, defer) => x.ShrinkAndDispose().Forget();
             return self;
         }
 
@@ -22,7 +22,7 @@ namespace Primer.Timeline
                     .PlayAndForget();
             };
 
-            self.onRemove = async tick => {
+            self.onRemove = async (tick, defer) => {
                 var childrenRemoval = tick
                     .GetChildren()
                     .Select(x => x.ShrinkAndDispose(0.1f));

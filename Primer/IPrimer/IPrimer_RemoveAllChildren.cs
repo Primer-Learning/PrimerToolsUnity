@@ -5,32 +5,32 @@ namespace Primer
 {
     public static class IPrimer_RemoveAllChildrenExtensions
     {
-        public static void RemoveAllChildren(this IEnumerable<IPrimer> self)
+        public static void RemoveAllChildren(this IEnumerable<IPrimer> self, bool defer = false)
         {
             foreach (var item in self)
-                item.transform.transform.RemoveAllChildren();
+                item.transform.transform.RemoveAllChildren(defer);
         }
 
-        public static void RemoveAllChildren(this IEnumerable<Component> self)
+        public static void RemoveAllChildren(this IEnumerable<Component> self, bool defer = false)
         {
             foreach (var item in self)
-                item.transform.RemoveAllChildren();
+                item.transform.RemoveAllChildren(defer);
         }
 
-        public static void RemoveAllChildren(this IPrimer self)
+        public static void RemoveAllChildren(this IPrimer self, bool defer = false)
         {
-            self.transform.transform.RemoveAllChildren();
+            self.transform.transform.RemoveAllChildren(defer);
         }
 
-        public static void RemoveAllChildren(this Component self)
+        public static void RemoveAllChildren(this Component self, bool defer = false)
         {
-            self.transform.RemoveAllChildren();
+            self.transform.RemoveAllChildren(defer);
         }
 
-        public static void RemoveAllChildren(this Transform self)
+        public static void RemoveAllChildren(this Transform self, bool defer = false)
         {
             foreach (var child in self.GetChildren())
-                child.Dispose();
+                child.Dispose(defer);
         }
     }
 }
