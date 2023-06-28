@@ -20,7 +20,7 @@ namespace Primer.Animation
 
             // This is false if the element has already been destroyed while we were scaling down
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (self != null)
+            if (self.transform != null)
                 self.transform.gameObject.Dispose();
         }
 
