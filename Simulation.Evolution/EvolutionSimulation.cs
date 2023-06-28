@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -9,12 +10,13 @@ using UnityEngine;
 
 namespace Simulation.Evolution
 {
-    public class EvolutionSimulation : ISimulation, IPrimer
+    public class EvolutionSimulation : ISimulation, IPrimer, IDisposable
     {
         private readonly List<Vector2> foodPosition;
         private readonly Landscape terrain;
         private readonly Container foodContainer;
         private readonly Container agentContainer;
+        private readonly int foodPerTurn;
 
         public Transform transform { get; }
         public Component component => transform;
@@ -23,10 +25,10 @@ namespace Simulation.Evolution
 
         public EvolutionSimulation(Transform transform, int foodPerTurn, int initialBlobs)
         {
+            this.foodPerTurn = foodPerTurn;
             this.transform = transform;
 
             terrain = transform.GetOrAddComponent<Landscape>();
-            foodPosition = PoissonDiscSampler.Rectangular(foodPerTurn, size).ToList();
 
             var container = new Container(transform);
             foodContainer = container.AddContainer("Food").ScaleChildrenInPlayMode();
@@ -35,15 +37,21 @@ namespace Simulation.Evolution
             PlaceInitialBlobs(initialBlobs);
         }
 
-        private void PlaceInitialBlobs(int initialBlobs)
+        private void PlaceInitialBlobs(int blobCount)
         {
             agentContainer.Reset();
 
-            foreach (var position in GetAgentsRestingPosition(initialBlobs)) {
+            var positions = GetAgentsRestingPosition(blobCount)
+                .Select(x => terrain.GetGroundAtLocal(x))
+                .ToList();
+
+            var center = positions.Average();
+
+            foreach (var position in positions) {
                 var blob = agentContainer.AddPrefab<Transform>("blob_skinned");
                 blob.GetOrAddComponent<Agent>();
-                blob.position = terrain.GetGroundAt(position);
-                blob.LookAt(blob.position + Vector3.forward);
+                blob.position = position;
+                blob.LookAt(center);
             }
 
             agentContainer.Purge(defer: true);
@@ -62,9 +70,10 @@ namespace Simulation.Evolution
         {
             foodContainer.Reset();
 
-            foreach (var point in foodPosition) {
+            foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size)) {
                 var item = foodContainer.Add<Food>();
-                item.transform.position = terrain.GetGroundAt(point.x, point.y) + Vector3.up * 0.5f;
+                item.transform.position = terrain.GetGroundAt(point - size / 2);
+                item.Initialize();
             }
 
             foodContainer.Purge();
@@ -88,13 +97,7 @@ namespace Simulation.Evolution
             return agentContainer
                 .ChildComponents<Agent>()
                 .GroupBy(x => x.goingToEat)
-                .Select(
-                    group => {
-                        var food = group.Key;
-                        var agents = group.ToList();
-                        return agents.Count == 1 ? agents[0].Eat() : ResolveConflict(agents, food);
-                    }
-                )
+                .Select(x => Eat(x.ToList(), x.Key))
                 .RunInParallel();
         }
 
@@ -125,24 +128,77 @@ namespace Simulation.Evolution
             await AgentsReturnHome();
         }
 
-        private UniTask ResolveConflict(List<Agent> agents, Food food)
+        private static async UniTask Eat(List<Agent> agents, Food food)
         {
-            throw new System.NotImplementedException();
+            if (agents.Count is 0)
+                throw new ArgumentException("Cannot eat without agents", nameof(agents));
+
+            if (agents.Count == 1) {
+                await agents[0].Eat(food);
+
+                if (food.hasMore)
+                    await agents[0].Eat(food);
+
+                return;
+            }
+
+            // only two are going to eat, no matter how many are in the group
+            var first = agents.RandomItem();
+            var second = agents.RandomItem();
+
+            while (first == second)
+                second = agents.RandomItem();
+
+            await UniTask.WhenAll(
+                first.Eat(food),
+                second.Eat(food)
+            );
         }
 
         private IEnumerable<Vector2> GetAgentsRestingPosition()
         {
-            return GetAgentsRestingPosition(agentContainer.ChildComponents<Agent>().Count());
+            return GetAgentsRestingPosition(agentContainer.ChildComponents<Agent>().Length);
         }
 
         private IEnumerable<Vector2> GetAgentsRestingPosition(int agentCount)
         {
-            const int margin = 1;
-            var positions = (size.x - margin * 2) / agentCount;
-            var offset = positions / 2 + margin;
+            const int margin = 2;
+            var offset = Vector2.one * margin;
+            var perimeter = size - offset * 2;
+            var edgeLength = perimeter.x * 2 + perimeter.y * 2;
+            var positions = edgeLength / agentCount;
+            var slotCenter = positions / 2;
 
-            for (var i = 0; i < agentCount; i++)
-                yield return new Vector2(positions * i + offset, margin);
+            for (var i = 0; i < agentCount; i++) {
+                var linearPosition = positions * i + slotCenter;
+                yield return PositionToPerimeter(perimeter, linearPosition) + offset;
+            }
+        }
+
+        private static Vector2 PositionToPerimeter(Vector2 perimeter, float position)
+        {
+            if (position < perimeter.x)
+                return new Vector2(position, 0);
+
+            position -= perimeter.x;
+
+            if (position < perimeter.y)
+                return new Vector2(perimeter.x, position);
+
+            position -= perimeter.y;
+
+            if (position < perimeter.x)
+                return new Vector2(perimeter.x - position, perimeter.y);
+
+            position -= perimeter.x;
+
+            return new Vector2(0, perimeter.y - position);
+        }
+
+        public void Dispose()
+        {
+            foodContainer?.RemoveAllChildren();
+            agentContainer?.RemoveAllChildren();
         }
     }
 }

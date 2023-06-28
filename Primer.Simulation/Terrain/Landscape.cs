@@ -1,11 +1,10 @@
 using Sirenix.OdinInspector;
-using Sirenix.Utilities.Editor;
 using UnityEngine;
 
 namespace Primer.Simulation
 {
     [ExecuteAlways]
-    public class Landscape : MonoBehaviour
+    public class Landscape : MonoBehaviour, IMeshController
     {
         #region public Vector3Int size;
         [SerializeField, HideInInspector]
@@ -152,6 +151,18 @@ namespace Primer.Simulation
                 GenerateMesh();
             }
         }
+
+        [ShowInInspector]
+        public Material material {
+            get => this.GetMaterial();
+            set => this.SetMaterial(value);
+        }
+
+        [ShowInInspector]
+        public Color color {
+            get => this.GetColor();
+            set => this.SetColor(value);
+        }
         #endregion
 
         #region Internal fields
@@ -169,7 +180,7 @@ namespace Primer.Simulation
         private void Awake()
         {
             var meshRenderer = root.GetOrAddComponent<MeshRenderer>();
-            meshRenderer.material ??= new Material(Shader.Find("Standard"));
+            meshRenderer.sharedMaterial ??= new Material(Shader.Find("Standard"));
             Generate();
         }
 
@@ -213,17 +224,29 @@ namespace Primer.Simulation
         #endregion
 
 
-        public Vector3 GetGroundAt(Vector2 localPosition) => GetGroundAt(localPosition.x, localPosition.y);
+        // public Vector3 GetGroundAt(Vector3 localPosition) => GetGroundAt(localPosition.x, localPosition.z);
+        // public Vector3 GetGroundAt(Vector2 localPosition) => GetGroundAt(localPosition.x, localPosition.y);
+
+        public Vector3 GetGroundAtLocal(Vector3 localPosition) => GetGroundAtLocal(localPosition.x, localPosition.z);
+        public Vector3 GetGroundAtLocal(Vector2 localPosition) => GetGroundAtLocal(localPosition.x, localPosition.y);
+        public Vector3 GetGroundAt(Vector3 worldPosition) => GetGroundAt(worldPosition.x, worldPosition.z);
+        public Vector3 GetGroundAt(Vector2 worldPosition) => GetGroundAt(worldPosition.x, worldPosition.y);
+
+        private Vector3 GetGroundAtLocal(float x, float z)
+        {
+            // The ray needs to be in world coordinates.
+            var worldPosition = transform.TransformPoint(new Vector3(x, 0, z));
+            return GetGroundAt(worldPosition.x, worldPosition.z);
+        }
 
         /// <summary>Gets the position of the ground at the given (x, z)</summary>
         /// <param name="x">Local-to-terrain x</param>
         /// <param name="z">Local-to-terrain y</param>
         /// <returns>The position of the ground in world space.</returns>
-        public Vector3 GetGroundAt(float x, float z)
+        private Vector3 GetGroundAt(float x, float z)
         {
-            // Create a ray pointing straight down from high above the (x, z) coordinate given. The
-            // ray needs to be in world coordinates.
-            var pointAbove = transform.TransformPoint(new Vector3(x, size.y * 2, z));
+            // Create a ray pointing straight down from high above the (x, z) coordinate given.
+            var pointAbove = new Vector3(x, size.y * 2, z);
             var down = transform.TransformDirection(Vector3.down);
             var ray = new Ray(pointAbove, down);
 
@@ -231,5 +254,7 @@ namespace Primer.Simulation
                 ? hitInfo.point
                 : transform.TransformPoint(new Vector3(x, 0, z));
         }
+
+        public MeshRenderer[] GetMeshRenderers() => root.GetComponentsInChildren<MeshRenderer>();
     }
 }

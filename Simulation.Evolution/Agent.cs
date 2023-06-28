@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Primer;
+using Primer.Animation;
 using Primer.Simulation;
 using UnityEngine;
 
@@ -19,18 +20,32 @@ namespace Simulation.Evolution
         public UniTask GoToEat(Food food)
         {
             goingToEat = food;
-            return movement.WalkTo(food.transform).Play();
+            var animation =  movement.WalkTo(food.transform);
+            animation.duration /= 2;
+            return animation.Play();
         }
 
-        public UniTask Eat()
+        public UniTask Eat(Food food)
         {
-            energy += 1;
-            return UniTask.CompletedTask;
+            goingToEat = null;
+            energy++;
+            // TODO: Play eating animation
+            return food.Consume();
         }
 
-        public UniTask ReturnHome(Vector2 position)
+        public async UniTask ReturnHome(Vector2 position)
         {
-            return movement.WalkTo(position).Play();
+            await movement.WalkToLocal(position).Play();
+
+            var originalRotation = transform.rotation;
+            transform.LookAt(Vector3.zero);
+            var targetRotation = transform.rotation;
+
+            if (targetRotation == originalRotation)
+                return;
+
+            transform.rotation = originalRotation;
+            await transform.RotateTo(targetRotation).Play();
         }
 
         public void ConsumeEnergy()

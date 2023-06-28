@@ -10,10 +10,8 @@ namespace Primer.Shapes
         private readonly Transform followGlobal;
         private readonly Transform followLocal;
 
-        public Vector3 value
-        {
-            get
-            {
+        public Vector3 value {
+            get {
                 if (constant.HasValue)
                     return constant.Value;
 
@@ -32,8 +30,7 @@ namespace Primer.Shapes
                 point.vector = constant.Value;
             else if (getter is not null)
                 point.getter = getter;
-            else
-            {
+            else {
                 point.follow = followLocal ?? followGlobal;
                 point.isWorldPosition = followGlobal is not null;
             }

@@ -6,34 +6,21 @@ namespace Primer.Simulation
 {
     public class LandscapeWalker : MonoBehaviour
     {
-        private const float DEFAULT_SPEED = 10;
-        private const float DEFAULT_TURN_SPEED = 8;
+        private const float DEFAULT_SPEED = 4;
+        private const float DEFAULT_TURN_SPEED = 16;
 
         private Landscape terrainCache;
         private Landscape terrain => transform.ParentComponent(ref terrainCache);
 
+        public Tween WalkTo(Vector2 to) => WalkToImpl(terrain.GetGroundAt(to));
+        public Tween WalkToLocal(Vector2 to) => WalkToImpl(terrain.GetGroundAtLocal(to));
+
         public Tween WalkTo(Component to)
-        {
-            return WalkToInternal(
-                new Vector3Provider(
-                    () => {
-                        var pos = to.transform.position;
-                        return terrain.GetGroundAt(pos.x, pos.z);
-                    }
-                )
-            );
-        }
+            => WalkToImpl(new Vector3Provider(() => terrain.GetGroundAt(to.transform.position)));
 
-        public Tween WalkTo(Vector2 to)
+        private Tween WalkToImpl(Vector3Provider to)
         {
-            var destination = terrain.GetGroundAt(to.x, to.y);
-            return WalkToInternal(destination);
-        }
-
-        private Tween WalkToInternal(Vector3Provider to, float? maybeSpeed = null, float? maybeTurnSpeed = null)
-        {
-            var speed = maybeSpeed ?? DEFAULT_SPEED;
-            var turnSpeed = maybeTurnSpeed ?? DEFAULT_TURN_SPEED;
+            var ignoreHeight = new Vector3(1, 0, 1);
             var myTransform = transform;
             var initialPosition = myTransform.position;
             var initialRotation = myTransform.rotation;
@@ -41,12 +28,22 @@ namespace Primer.Simulation
             return new Tween(
                 t => {
                     var targetPosition = to.value;
-                    var targetRotation = Quaternion.LookRotation(targetPosition - myTransform.position);
-                    myTransform.position = Vector3.Lerp(initialPosition, to.value, t);
-                    myTransform.rotation = Quaternion.Lerp(initialRotation, targetRotation, t * turnSpeed);
+
+                    // we want to walk _to_ the target, no walk over it
+                    var directionVector = targetPosition - initialPosition;
+                    var destination = targetPosition - directionVector.normalized;
+
+                    myTransform.position = terrain.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
+
+                    var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
+                    if (lookRotation == Vector3.zero)
+                        return;
+
+                    var targetRotation = Quaternion.LookRotation(lookRotation);
+                    myTransform.rotation = Quaternion.Lerp(initialRotation, targetRotation, t * DEFAULT_TURN_SPEED);
                 }
             ) {
-                duration = Vector3.Distance(initialPosition, to.value) / speed,
+                duration = Vector3.Distance(initialPosition, to.value) / DEFAULT_SPEED,
             };
         }
     }

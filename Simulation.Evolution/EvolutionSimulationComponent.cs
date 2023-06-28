@@ -1,4 +1,4 @@
-using System;
+using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Simulation;
 using Sirenix.OdinInspector;
@@ -17,9 +17,9 @@ namespace Simulation.Evolution
         private EvolutionSimulation simulation;
         private int turn;
 
-        private void OnValidate() => Awake();
+        private void OnValidate() => OnEnable();
 
-        public void Awake()
+        public void OnEnable()
         {
             turn = 0;
 
@@ -30,6 +30,22 @@ namespace Simulation.Evolution
             ) {
                 skipAnimations = skipAnimations,
             };
+        }
+
+        public void OnDisable()
+        {
+            simulation.Dispose();
+        }
+
+        public async void Start()
+        {
+            if (!Application.isPlaying)
+                return;
+
+            while (true) {
+                await simulation.RunTurn();
+                await UniTask.Delay(1000);
+            }
         }
 
         [Button]
