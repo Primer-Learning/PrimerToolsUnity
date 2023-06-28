@@ -45,7 +45,7 @@ namespace Primer.Timeline
             var tween = await NextClip();
 
             if (tween is not null)
-                await tween.Play();
+                await tween;
         }
 
         public void Dispose()

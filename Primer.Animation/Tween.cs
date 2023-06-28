@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -57,9 +58,11 @@ namespace Primer.Animation
         }
 
         #region public void Play();
-        public async void PlayAndForget(CancellationToken ct = default) => await Play(ct);
+        public async void PlayAndForget(CancellationToken ct = default) => await Play_Internal(ct);
 
-        public async UniTask Play(CancellationToken ct = default)
+        public  UniTask Play(CancellationToken ct) => Play_Internal(ct);
+
+        private async UniTask Play_Internal(CancellationToken ct = default)
         {
             if (!Application.isPlaying) {
                 Evaluate(1);
@@ -102,6 +105,12 @@ namespace Primer.Animation
         #endregion
 
         public virtual void Dispose() {}
+
+        // This method makes the class awaitable
+        public UniTask.Awaiter GetAwaiter()
+        {
+            return Play_Internal().GetAwaiter();
+        }
 
         public static implicit operator Tween(Action<float> value)
         {

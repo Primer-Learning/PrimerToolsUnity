@@ -24,9 +24,9 @@ namespace Primer.Timeline
 
         public void PlayAndForget() => Play();
 
-        public UniTask Play()
+        public async UniTask Play()
         {
-            return AsTween().Play();
+            await AsTween();
         }
 
         public Tween AsTween()

@@ -17,12 +17,12 @@ namespace Simulation.Evolution
         public bool canSurvive => energy >= 1;
         public bool canReproduce => energy >= 2;
 
-        public UniTask GoToEat(Food food)
+        public async UniTask GoToEat(Food food)
         {
             goingToEat = food;
-            var animation =  movement.WalkTo(food.transform);
-            animation.duration /= 2;
-            return animation.Play();
+            var tween = movement.WalkTo(food.transform);
+            tween.duration /= 2;
+            await tween;
         }
 
         public UniTask Eat(Food food)
@@ -35,7 +35,7 @@ namespace Simulation.Evolution
 
         public async UniTask ReturnHome(Vector2 position)
         {
-            await movement.WalkToLocal(position).Play();
+            await movement.WalkToLocal(position);
 
             var originalRotation = transform.rotation;
             transform.LookAt(Vector3.zero);
@@ -45,7 +45,7 @@ namespace Simulation.Evolution
                 return;
 
             transform.rotation = originalRotation;
-            await transform.RotateTo(targetRotation).Play();
+            await transform.RotateTo(targetRotation);
         }
 
         public void ConsumeEnergy()
