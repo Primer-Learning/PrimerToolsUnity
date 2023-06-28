@@ -24,7 +24,8 @@ namespace Primer
 
     public partial class Container
     {
-        private static bool areEventsDeactivated => ContainerEvents.deactivateEventsIf?.Invoke() ?? false;
+        private static bool areEventsDeactivated
+            => ContainerEvents.deactivateEventsIf?.Invoke() ?? Application.isPlaying;
 
         public Action<Transform> onCreate;
         public Action<Transform, bool> onRemove;

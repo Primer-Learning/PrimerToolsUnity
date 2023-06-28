@@ -35,7 +35,6 @@ namespace Primer
 
             unusedChildren.Remove(t);
 
-            // AQUI ESTA EL ERROR
             child.GetPrimer().parentContainer = this;
         }
     }
