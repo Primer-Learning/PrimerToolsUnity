@@ -15,12 +15,12 @@ namespace Primer.Animation
         public float delay = 0f;
 
         #region public float duration;
-        internal bool isCalculated { get; init; } = false;
-        internal int ms { get; init; } = 500;
+        internal bool isCalculated { get; set; } = false;
+        internal int ms { get; set; } = 500;
 
         public int milliseconds {
             get => ms;
-            init {
+            set {
                 if (isCalculated) {
                     Debug.LogWarning("Forcing the duration of a calculated tween");
                     isCalculated = false;
@@ -32,12 +32,12 @@ namespace Primer.Animation
 
         public float seconds {
             get => milliseconds / 1000f;
-            init => milliseconds = (int)(value * 1000);
+            set => milliseconds = (int)(value * 1000);
         }
 
         public float duration {
             get => milliseconds / 1000f;
-            init => milliseconds = (int)(value * 1000);
+            set => milliseconds = (int)(value * 1000);
         }
         #endregion
 
