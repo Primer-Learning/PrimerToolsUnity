@@ -7,6 +7,25 @@ namespace Primer
 {
     public static class ArrayExtensions
     {
+        public static void Deconstruct<T>(this IEnumerable<T> self, out T first)
+        {
+            var list = self.ToList();
+            first = list[0];
+        }
+        public static void Deconstruct<T>(this IEnumerable<T> self, out T first, out T second)
+        {
+            var list = self.ToList();
+            first = list[0];
+            second = list[1];
+        }
+        public static void Deconstruct<T>(this IEnumerable<T> self, out T first, out T second, out T third)
+        {
+            var list = self.ToList();
+            first = list[0];
+            second = list[1];
+            third = list[2];
+        }
+
         [Pure]
         public static TSource MaxBy<TSource>(this IEnumerable<TSource> source, Func<TSource, float> selector)
         {
