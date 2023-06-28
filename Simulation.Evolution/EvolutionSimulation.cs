@@ -12,21 +12,29 @@ namespace Simulation.Evolution
 {
     public class EvolutionSimulation : ISimulation, IPrimer, IDisposable
     {
-        private readonly List<Vector2> foodPosition;
+        private readonly int foodPerTurn;
+
         private readonly Landscape terrain;
         private readonly Container foodContainer;
         private readonly Container agentContainer;
-        private readonly int foodPerTurn;
+
+        private readonly ConflictResolutionRule conflictResolutionRule;
 
         public Transform transform { get; }
         public Component component => transform;
         public Vector2 size => new(terrain.size.x, terrain.size.z);
         public bool skipAnimations { get; init; }
+        private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
-        public EvolutionSimulation(Transform transform, int foodPerTurn, int initialBlobs)
+        public EvolutionSimulation(
+            Transform transform,
+            int foodPerTurn,
+            int initialBlobs,
+            ConflictResolutionRule conflictResolutionRule)
         {
             this.foodPerTurn = foodPerTurn;
             this.transform = transform;
+            this.conflictResolutionRule = conflictResolutionRule;
 
             terrain = transform.GetOrAddComponent<Landscape>();
 
@@ -41,7 +49,7 @@ namespace Simulation.Evolution
         {
             agentContainer.Reset();
 
-            var positions = GetAgentsRestingPosition(blobCount)
+            var positions = GetBlobsRestingPosition(blobCount)
                 .Select(x => terrain.GetGroundAtLocal(x))
                 .ToList();
 
@@ -49,7 +57,8 @@ namespace Simulation.Evolution
 
             foreach (var position in positions) {
                 var blob = agentContainer.AddPrefab<Transform>("blob_skinned");
-                blob.GetOrAddComponent<Agent>();
+                var agent = blob.GetOrAddComponent<Agent>();
+                conflictResolutionRule.OnAgentCreated(agent);
                 blob.position = position;
                 blob.LookAt(center);
             }
@@ -86,25 +95,23 @@ namespace Simulation.Evolution
         {
             var food = foodContainer.ChildComponents<Food>().ToList();
 
-            return agentContainer
-                .ChildComponents<Agent>()
+            return agents
                 .Select(agent => agent.GoToEat(food.RandomItem()))
                 .RunInParallel();
         }
 
         private UniTask AgentsEatFood()
         {
-            return agentContainer
-                .ChildComponents<Agent>()
+            return agents
                 .GroupBy(x => x.goingToEat)
-                .Select(x => Eat(x.ToList(), x.Key))
+                .Select(x => Eat(competitors: x.ToList(), food: x.Key))
                 .RunInParallel();
         }
 
         private UniTask AgentsReturnHome()
         {
-            return agentContainer.ChildComponents<Agent>()
-                .Zip(GetAgentsRestingPosition(), (agent, position) => agent.ReturnHome(position))
+            return agents
+                .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
                 .RunInParallel();
         }
 
@@ -112,7 +119,7 @@ namespace Simulation.Evolution
         {
             agentContainer.Reset();
 
-            foreach (var agent in agentContainer.ChildComponents<Agent>()) {
+            foreach (var agent in agents) {
                 if (agent.canSurvive)
                     agentContainer.Insert(agent);
 
@@ -128,49 +135,38 @@ namespace Simulation.Evolution
             await AgentsReturnHome();
         }
 
-        private static async UniTask Eat(List<Agent> agents, Food food)
+        private async UniTask Eat(List<Agent> competitors, Food food)
         {
-            if (agents.Count is 0)
-                throw new ArgumentException("Cannot eat without agents", nameof(agents));
+            switch (competitors.Count) {
+                case 0:
+                    throw new ArgumentException("Cannot eat without agents", nameof(competitors));
 
-            if (agents.Count == 1) {
-                await agents[0].Eat(food);
+                case 1:
+                    await competitors[0].Eat(food);
 
-                if (food.hasMore)
-                    await agents[0].Eat(food);
+                    if (food.hasMore)
+                        await competitors[0].Eat(food);
 
-                return;
+                    return;
+
+                case > 1:
+                    conflictResolutionRule.Resolve(competitors, food);
+                    return;
             }
-
-            // only two are going to eat, no matter how many are in the group
-            var first = agents.RandomItem();
-            var second = agents.RandomItem();
-
-            while (first == second)
-                second = agents.RandomItem();
-
-            await UniTask.WhenAll(
-                first.Eat(food),
-                second.Eat(food)
-            );
         }
 
-        private IEnumerable<Vector2> GetAgentsRestingPosition()
-        {
-            return GetAgentsRestingPosition(agentContainer.ChildComponents<Agent>().Length);
-        }
-
-        private IEnumerable<Vector2> GetAgentsRestingPosition(int agentCount)
+        private IEnumerable<Vector2> GetBlobsRestingPosition(int? blobCount = null)
         {
             const int margin = 2;
             var offset = Vector2.one * margin;
             var perimeter = size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
+            var agentCount = blobCount ?? agents.Count();
             var positions = edgeLength / agentCount;
-            var slotCenter = positions / 2;
+            var centerInSlot = positions / 2;
 
             for (var i = 0; i < agentCount; i++) {
-                var linearPosition = positions * i + slotCenter;
+                var linearPosition = positions * i + centerInSlot;
                 yield return PositionToPerimeter(perimeter, linearPosition) + offset;
             }
         }

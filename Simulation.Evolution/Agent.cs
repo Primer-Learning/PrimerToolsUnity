@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Simulation.Evolution
 {
-    internal class Agent : MonoBehaviour
+    public class Agent : MonoBehaviour
     {
         private LandscapeWalker movementCache;
         private LandscapeWalker movement => transform.GetOrAddComponent(ref movementCache);
 
-        private float energy;
+        public float energy;
         public Food goingToEat;
 
         public bool canSurvive => energy >= 1;

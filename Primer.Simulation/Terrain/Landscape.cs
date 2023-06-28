@@ -188,7 +188,7 @@ namespace Primer.Simulation
         #region Mesh generation
         private float[,] noiseMap;
 
-        [Title("Controls")]
+        [Title("Controls", HorizontalLine = false)]
         [Button]
         public void Generate()
         {

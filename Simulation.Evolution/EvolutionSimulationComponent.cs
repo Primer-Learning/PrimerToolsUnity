@@ -14,6 +14,10 @@ namespace Simulation.Evolution
         [Min(1)] public int initialBlobs = 2;
         public bool skipAnimations = false;
 
+        [SerializeReference, Required]
+        [HideLabel, Title("Conflict Resolution Rule")]
+        public ConflictResolutionRule conflictResolutionRule = new SimpleConflictResolution();
+
         private EvolutionSimulation simulation;
         private int turn;
 
@@ -26,7 +30,8 @@ namespace Simulation.Evolution
             simulation = new EvolutionSimulation(
                 transform: transform,
                 foodPerTurn: foodPerTurn,
-                initialBlobs: initialBlobs
+                initialBlobs: initialBlobs,
+                conflictResolutionRule
             ) {
                 skipAnimations = skipAnimations,
             };
@@ -34,7 +39,7 @@ namespace Simulation.Evolution
 
         public void OnDisable()
         {
-            simulation.Dispose();
+            simulation?.Dispose();
         }
 
         public async void Start()
@@ -48,6 +53,7 @@ namespace Simulation.Evolution
             }
         }
 
+        [Title("Controls", HorizontalLine = false)]
         [Button]
         public async void RunTurn()
         {
