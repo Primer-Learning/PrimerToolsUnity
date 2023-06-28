@@ -6,9 +6,19 @@ namespace Primer
     public static class IPrimer_SetScaleExtensions
     {
         #region Overloads for IPrimer and Component with float and Vector3
+        public static void SetScale(this IPrimer self, int scale, bool isGlobal = false)
+        {
+            self.transform.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
         public static void SetScale(this IPrimer self, float scale, bool isGlobal = false)
         {
             self.transform.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
+        public static void SetScale(this IPrimer self, double scale, bool isGlobal = false)
+        {
+            self.transform.transform.SetScale(Vector3.one * (float)scale, isGlobal);
         }
 
         public static void SetScale(this IPrimer self, Vector3 scale, bool isGlobal = false)
@@ -16,9 +26,19 @@ namespace Primer
             self.transform.transform.SetScale(scale, isGlobal);
         }
 
+        public static void SetScale(this Component self, int scale, bool isGlobal = false)
+        {
+            self.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
         public static void SetScale(this Component self, float scale, bool isGlobal = false)
         {
             self.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
+        public static void SetScale(this Component self, double scale, bool isGlobal = false)
+        {
+            self.transform.SetScale(Vector3.one * (float)scale, isGlobal);
         }
 
         public static void SetScale(this Component self, Vector3 scale, bool isGlobal = false)
