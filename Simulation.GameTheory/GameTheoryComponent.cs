@@ -12,6 +12,7 @@ namespace Simulation.GameTheory
     {
         [Min(1)] public int foodPerTurn = 10;
         [Min(1)] public int initialBlobs = 2;
+        public int seed = 0;
         public bool skipAnimations = false;
 
         [SerializeReference, Required]
@@ -29,6 +30,7 @@ namespace Simulation.GameTheory
 
             simulation = new GameTheorySimulation(
                 transform: transform,
+                seed: seed,
                 foodPerTurn: foodPerTurn,
                 initialBlobs: initialBlobs,
                 conflictResolutionRule

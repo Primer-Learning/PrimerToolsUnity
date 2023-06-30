@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Primer.Simulation
 {
@@ -11,10 +10,14 @@ namespace Primer.Simulation
     /// </summary>
     public class PoissonDiscSampler
     {
-        public static IEnumerable<Vector2> Rectangular(int pointsCount, Vector2 area, float minDistance = 2,
-            OverflowMode overflowMode = OverflowMode.None)
+        public static IEnumerable<Vector2> Rectangular(
+            int pointsCount,
+            Vector2 area,
+            float minDistance = 2,
+            OverflowMode overflowMode = OverflowMode.None,
+            Rng rng = null)
         {
-            var sampler = new PoissonDiscSampler(minDistance, area, overflowMode);
+            var sampler = new PoissonDiscSampler(minDistance, area, overflowMode) { rng = rng };
             sampler.AddPoints(pointsCount);
             return sampler.points;
         }
@@ -36,6 +39,8 @@ namespace Primer.Simulation
         private int[,] grid;
         private readonly List<Vector2> points = new();
         private List<Vector2> spawnPoints = new();
+
+        private Rng rng { get; init; }
 
         private PoissonDiscSampler(
             float minDistance,
@@ -74,13 +79,13 @@ namespace Primer.Simulation
             }
 
             while (spawnPoints.Count > 0 && !pointFound) {
-                var spawnIndex = Random.Range(0, spawnPoints.Count);
+                var spawnIndex = rng.Range(0, spawnPoints.Count);
                 var spawnCentre = spawnPoints[spawnIndex];
 
                 for (var i = 0; i < numSamplesBeforeRejection; i++) {
-                    var angle = Random.value * Mathf.PI * 2;
+                    var angle = rng.Range(Mathf.PI * 2);
                     var dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                    var candidate = spawnCentre + dir * Random.Range(minDistance, 2 * minDistance);
+                    var candidate = spawnCentre + dir * rng.Range(minDistance, 2 * minDistance);
 
                     if (!IsValidRect(candidate))
                         continue;

@@ -19,14 +19,16 @@ namespace Simulation.GameTheory
 
         private readonly ConflictResolutionRule conflictResolutionRule;
 
+        public Rng rng { get; }
+        public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
         public Vector2 size => new(terrain.size.x, terrain.size.z);
-        public bool skipAnimations { get; init; }
         private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
         public GameTheorySimulation(
             Transform transform,
+            int seed,
             int foodPerTurn,
             int initialBlobs,
             ConflictResolutionRule conflictResolutionRule)
@@ -35,6 +37,7 @@ namespace Simulation.GameTheory
             this.transform = transform;
             this.conflictResolutionRule = conflictResolutionRule;
 
+            rng = new Rng(seed);
             terrain = transform.GetOrAddComponent<Landscape>();
 
             var container = new Container(transform);
@@ -78,10 +81,10 @@ namespace Simulation.GameTheory
         {
             foodContainer.Reset();
 
-            foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size)) {
+            foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size, rng: rng)) {
                 var item = foodContainer.Add<Food>();
                 item.transform.position = terrain.GetGroundAt(point - size / 2);
-                item.Initialize();
+                item.Initialize(rng);
             }
 
             foodContainer.Purge();
