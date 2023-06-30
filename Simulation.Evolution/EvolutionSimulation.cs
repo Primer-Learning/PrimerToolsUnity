@@ -66,7 +66,7 @@ namespace Simulation.Evolution
             agentContainer.Purge(defer: true);
         }
 
-        public async UniTask RunTurn()
+        public async UniTask SimulateSingleCycle()
         {
             await CreateFood();
             await AgentsGatherFood();

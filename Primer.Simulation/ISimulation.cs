@@ -7,7 +7,7 @@ namespace Primer.Simulation
     {
         // public int secondsBetweenTurns { get; }
         public bool skipAnimations { get; }
-        public UniTask RunTurn();
+        public UniTask SimulateSingleCycle();
     }
 
     public static class ISimulationExtensions
@@ -26,7 +26,7 @@ namespace Primer.Simulation
             while (true) {
                 // var startTime = Time.time;
 
-                await simulation.RunTurn();
+                await simulation.SimulateSingleCycle();
 
                 // var elapsedTime = Time.time - startTime;
                 // var remainingTime = simulation.secondsBetweenTurns - elapsedTime;

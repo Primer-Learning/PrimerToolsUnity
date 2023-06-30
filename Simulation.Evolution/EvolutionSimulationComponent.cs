@@ -48,7 +48,7 @@ namespace Simulation.Evolution
                 return;
 
             while (true) {
-                await simulation.RunTurn();
+                await simulation.SimulateSingleCycle();
                 await UniTask.Delay(1000);
             }
         }
@@ -59,7 +59,7 @@ namespace Simulation.Evolution
         {
             turn++;
             this.Log($"Running turn {turn}");
-            await simulation.RunTurn();
+            await simulation.SimulateSingleCycle();
             this.Log($"Completed turn {turn}");
         }
     }
