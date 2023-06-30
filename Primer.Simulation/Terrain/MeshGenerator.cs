@@ -6,19 +6,6 @@ namespace Primer.Simulation
 {
     internal class MeshGenerator
     {
-        private float elevationOffset;
-        private float[,] heightMap;
-        private float heightMultiplier;
-
-        private Mesh mesh;
-        private Vector3[] normals;
-        private int roundness;
-        private Vector2[] uv;
-        private Vector3[] vertices;
-        private int xSize, ySize, zSize;
-
-        private MeshGenerator() { }
-
         public static Mesh CreateMesh(int roundness, Vector3Int size, float[,] heightMap,
             float heightMultiplier, float elevationOffset)
         {
@@ -45,6 +32,22 @@ namespace Primer.Simulation
 
             return generator.mesh;
         }
+
+
+        // Implementation below
+
+        private float elevationOffset;
+        private float[,] heightMap;
+        private float heightMultiplier;
+
+        private Mesh mesh;
+        private Vector3[] normals;
+        private int roundness;
+        private Vector2[] uv;
+        private Vector3[] vertices;
+        private int xSize, ySize, zSize;
+
+        private MeshGenerator() { }
 
         private void CreateVertices()
         {
