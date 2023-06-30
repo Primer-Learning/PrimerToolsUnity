@@ -3,7 +3,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
     public class SimpleConflictResolution : ConflictResolutionRule
     {

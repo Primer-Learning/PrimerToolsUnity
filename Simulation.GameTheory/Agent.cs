@@ -4,7 +4,7 @@ using Primer.Animation;
 using Primer.Simulation;
 using UnityEngine;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
     public class Agent : MonoBehaviour
     {

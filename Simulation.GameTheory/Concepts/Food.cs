@@ -6,7 +6,7 @@ using Primer.Simulation;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
     public class Food : MonoBehaviour
     {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Simulation.Evolution.Extensions
+namespace Simulation.GameTheory
 {
     public static class EnumerableExtensions
     {

@@ -5,12 +5,11 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Simulation;
 using Primer.Timeline;
-using Simulation.Evolution.Extensions;
 using UnityEngine;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
-    public class EvolutionSimulation : ISimulation, IPrimer, IDisposable
+    public class GameTheorySimulation : ISimulation, IPrimer, IDisposable
     {
         private readonly int foodPerTurn;
 
@@ -26,7 +25,7 @@ namespace Simulation.Evolution
         public bool skipAnimations { get; init; }
         private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
-        public EvolutionSimulation(
+        public GameTheorySimulation(
             Transform transform,
             int foodPerTurn,
             int initialBlobs,

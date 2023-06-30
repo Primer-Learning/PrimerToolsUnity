@@ -1,6 +1,6 @@
 {
-  "name": "Simulation.Evolution",
-  "rootNamespace": "Simulation.Evolution",
+  "name": "Simulation.GameTheory",
+  "rootNamespace": "Simulation.GameTheory",
   "references": [
     "Primer",
     "Primer.Simulation",

@@ -4,11 +4,11 @@ using Primer.Simulation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
     [ExecuteAlways]
     [RequireComponent(typeof(Landscape))]
-    public class EvolutionSimulationComponent : MonoBehaviour
+    public class GameTheoryComponent : MonoBehaviour
     {
         [Min(1)] public int foodPerTurn = 10;
         [Min(1)] public int initialBlobs = 2;
@@ -18,7 +18,7 @@ namespace Simulation.Evolution
         [HideLabel, Title("Conflict Resolution Rule")]
         public ConflictResolutionRule conflictResolutionRule = new SimpleConflictResolution();
 
-        private EvolutionSimulation simulation;
+        private GameTheorySimulation simulation;
         private int turn;
 
         private void OnValidate() => OnEnable();
@@ -27,7 +27,7 @@ namespace Simulation.Evolution
         {
             turn = 0;
 
-            simulation = new EvolutionSimulation(
+            simulation = new GameTheorySimulation(
                 transform: transform,
                 foodPerTurn: foodPerTurn,
                 initialBlobs: initialBlobs,

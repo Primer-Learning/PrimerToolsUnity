@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Primer.Simulation;
 
-namespace Simulation.Evolution
+namespace Simulation.GameTheory
 {
     public abstract class ConflictResolutionRule : IRule
     {
