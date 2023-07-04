@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Primer
@@ -32,6 +33,9 @@ namespace Primer
         public TChild Add<TChild>(PrefabProvider<TChild> provider, string name = null, ChildOptions options = null)
             where TChild : Component
         {
+            if (provider.value == null)
+                throw new ArgumentNullException(nameof(provider), "PrefabProvider value is null.");
+
             var child = FindInstanceOf(provider.value, name)
                 ?? OnCreate(InstantiationTracker.InstantiateAndRegister(provider.value, name));
 
