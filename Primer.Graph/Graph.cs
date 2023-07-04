@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Primer.Axis;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -28,26 +26,26 @@ namespace Primer.Graph
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private AxisRenderer x;
+        private Axis x;
 
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private AxisRenderer y;
+        private Axis y;
 
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private AxisRenderer z;
+        private Axis z;
 
 
         // This warning is show where these properties are used, we checked for != null here
         // ReSharper disable Unity.NoNullPropagation
-        public AxisRenderer enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
-        public AxisRenderer enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
-        public AxisRenderer enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
+        public Axis enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
+        public Axis enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
+        public Axis enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
 
         public Vector3 positionMultiplier => new(
             enabledXAxis ? 1 : 0,

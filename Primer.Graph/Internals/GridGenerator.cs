@@ -1,7 +1,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Table
+namespace Primer.Graph
 {
     [ExecuteAlways]
     [DisallowMultipleComponent]

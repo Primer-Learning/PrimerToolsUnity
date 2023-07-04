@@ -2,15 +2,14 @@ using Primer.Latex;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Axis
+namespace Primer.Graph
 {
     public class AxisTick : MonoBehaviour
     {
         public float value;
 
         private LatexComponent latexCache;
-        private LatexComponent latex
-            => latexCache != null ? latexCache : latexCache = GetComponentInChildren<LatexComponent>();
+        public LatexComponent latex => transform.ChildComponent(ref latexCache);
 
         [ShowInInspector]
         public string label {

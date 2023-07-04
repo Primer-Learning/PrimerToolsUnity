@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8141656979337668102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8141656979337668103}
+  - component: {fileID: 4748708022717725990}
+  m_Layer: 0
+  m_Name: Axis
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8141656979337668103
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141656979337668102}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4748708022717725990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141656979337668102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _arrowPresence: 2
+  _arrowPrefab:
+    stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
+    _position: {x: 0, y: 0, z: 0}
+    hasPosition: 0
+    _rotation: {x: 0, y: 0, z: 0, w: 0}
+    hasRotation: 0
+    _scale: {x: 1, y: 1, z: 1}
+    hasScale: 0
+  _range:
+    min: 0
+    max: 10
+  _scale: 1
+  _padding: {x: 0, y: 0}
+  _showLabel: 1
+  _label: Label
+  _labelOffset: {x: 0, y: 0, z: 0}
+  _labelRotation: {x: 0, y: 0, z: 0, w: 1}
+  _labelPosition: 1
+  _thickness: 1
+  _showTicks: 1
+  _showZero: 0
+  _lockTickOrientation:
+    enabled: 0
+    value: 0
+  _step: 2
+  _maxTicks: 50
+  _maxDecimals: 2
+  _tickOffset: 0
+  _labelNumberOffset: 0
+  _valuePositionOffset: 0
+  _manualTicks: []
+  _tickPrefab:
+    stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+    _position: {x: 0, y: 0, z: 0}
+    hasPosition: 0
+    _rotation: {x: 0, y: 0, z: 0, w: 0}
+    hasRotation: 0
+    _scale: {x: 1, y: 1, z: 1}
+    hasScale: 0

@@ -67,10 +67,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68e48d7d394b4cdd9763085c907e1d22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scale: 0.2
-  rodThickness: 1
-  arrowPresence: 2
-  arrowPrefab:
+  _scale: 0.2
+  _padding: {x: 0.1, y: 0.1}
+  _rodThickness: 1
+  _arrowPresence: 2
+  _arrowPrefab:
     stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
     _position: {x: 0, y: 0, z: 0}
     hasPosition: 0
@@ -78,14 +79,17 @@ MonoBehaviour:
     hasRotation: 0
     _scale: {x: 1, y: 1, z: 1}
     hasScale: 0
-  showTicks: 1
-  showZero: 0
-  tickSteps: 2
-  maxTicks: 50
-  maxDecimals: 2
-  offset: 0
-  manualTicks: []
-  ticksPrefab:
+  _showTicks: 1
+  _showZero: 0
+  _lockTickOrientation:
+    _enabled: 1
+    _value: 4
+  _tickSteps: 2
+  _maxTicks: 50
+  _maxDecimals: 2
+  _offset: 0
+  _manualTicks: []
+  _ticksPrefab:
     stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
     _position: {x: 0, y: 0, z: 0}
     hasPosition: 0
@@ -129,9 +133,24 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _scale
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _thickness
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: label.text
       value: z
@@ -139,6 +158,14 @@ PrefabInstance:
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: domain.scale
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._value
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
@@ -205,7 +232,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
 --- !u!114 &6709040623969359777 stripped
 MonoBehaviour:
@@ -228,12 +254,35 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _scale
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _thickness
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: domain.scale
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._value
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
@@ -284,7 +333,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
 --- !u!114 &1168500524678457913 stripped
 MonoBehaviour:
@@ -307,9 +355,24 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 2390685873607332846}
     m_Modifications:
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _scale
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _padding.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _thickness
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: label.text
       value: y
@@ -322,6 +385,14 @@ PrefabInstance:
       propertyPath: ticks.prefab.stored
       value: 
       objectReference: {fileID: 9045329591203473548, guid: aed2a79473b7bc742b56fb42e8e29ce1, type: 3}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._value
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: _lockTickOrientation._enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8141656979337668102, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: m_Name
       value: Y
@@ -371,7 +442,6 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
 --- !u!4 &1186540838256425874 stripped
 Transform:

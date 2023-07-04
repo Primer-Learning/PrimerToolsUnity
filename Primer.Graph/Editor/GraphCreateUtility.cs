@@ -7,5 +7,8 @@ namespace Primer.Graph.Editor
     {
         [MenuItem("GameObject/Primer/Graph", false, CreateUtility.PRIORITY)]
         public static void Graph() => CreateUtility.Prefab("Graph2");
+
+        [MenuItem("GameObject/Primer/Table", false, CreateUtility.PRIORITY)]
+        public static void Table() => CreateUtility.Prefab("Table");
     }
 }

@@ -1,15 +1,10 @@
-using System;
-using Primer.Axis;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Table
+namespace Primer.Graph
 {
-    // When this is moved we should rename Primer.Graph to Primer.Dataviz
-    [Obsolete("This should be moved to Primer.Graph")]
-
     [RequireComponent(typeof(MultipleAxesController))]
-    public class PrimerTable : MonoBehaviour
+    public class Table : MonoBehaviour
     {
         private MultipleAxesController axes;
 
@@ -22,13 +17,13 @@ namespace Primer.Table
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        public AxisRenderer x;
+        public Axis x;
 
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        public AxisRenderer y;
+        public Axis y;
 
         private void OnEnable() => UpdateAxes();
 
