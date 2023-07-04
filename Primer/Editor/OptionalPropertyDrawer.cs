@@ -12,18 +12,17 @@ namespace Primer.Editor
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            var valueProperty = property.FindPropertyRelative("value");
+            var valueProperty = property.FindPropertyRelative("_value");
             return EditorGUI.GetPropertyHeight(valueProperty);
         }
 
         public override void OnGUI(
             Rect position,
             SerializedProperty property,
-            GUIContent label
-        )
+            GUIContent label)
         {
-            var valueProperty = property.FindPropertyRelative("value");
-            var enabledProperty = property.FindPropertyRelative("enabled");
+            var valueProperty = property.FindPropertyRelative("_value");
+            var enabledProperty = property.FindPropertyRelative("_enabled");
 
             EditorGUI.BeginProperty(position, label, property);
             position.width -= 24;

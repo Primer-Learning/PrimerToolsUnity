@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // From
 // https://www.youtube.com/watch?v=uZmWgQ7cLNI
@@ -10,16 +11,18 @@ namespace Primer
     [Serializable]
     public struct Optional<T>
     {
-        [SerializeField] private bool enabled;
-        [SerializeField] private T value;
+        [SerializeField] private bool _enabled;
+        [SerializeField] private T _value;
 
-        public bool Enabled => enabled;
-        public T Value => value;
+        public bool enabled => _enabled;
+        public T value => _value;
 
         public Optional(T initialValue)
         {
-            enabled = true;
-            value = initialValue;
+            _enabled = true;
+            _value = initialValue;
         }
+
+        public static implicit operator Optional<T>(T value) => new(value);
     }
 }
