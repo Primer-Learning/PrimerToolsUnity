@@ -20,36 +20,49 @@ namespace Primer.Axis
     {
         public bool showTicks = true;
 
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public bool showZero;
 
+        public enum Direction
+        {
+            Up,
+            Down,
+            Left,
+            Right,
+            Front,
+            Back,
+        }
+
+        [EnableIf(nameof(showTicks))]
+        public Optional<Direction> lockTickDirection;
+
         [MinValue(0.1f)]
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         [DisableIf("@manualTicks.Count != 0")]
         public float step = 2;
 
         [Range(1, 100)]
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public int maxTicks = 50;
 
         [Range(0, 10)]
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public int maxDecimals = 2;
 
-        [FormerlySerializedAs("offset")] [EnableIf("showTicks")]
+        [FormerlySerializedAs("offset")] [EnableIf(nameof(showTicks))]
         public float verticalOffset = 0;
 
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public int labelNumberOffset = 0;
         
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public float valuePositionOffset = 0;
         
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public List<TicData> manualTicks = new();
 
         [RequiredIn(PrefabKind.PrefabAsset)]
-        [EnableIf("showTicks")]
+        [EnableIf(nameof(showTicks))]
         public PrefabProvider<AxisTick> prefab;
 
 
