@@ -14,12 +14,12 @@ namespace Primer
 
     [Serializable]
     [InlineProperty]
+    [HideReferenceObjectPicker]
     public class PrefabProvider<T> where T : Component
     {
         private Transform target;
+        private Func<T> getter = null;
         public bool hasChanges { get; set; }
-        public Func<T> getter = null;
-
         public bool isEmpty => value == null;
 
 
