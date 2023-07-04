@@ -24,10 +24,16 @@ namespace Primer
 
         private static GameObject GetPrimitive(PrimitiveType type)
         {
-            if (primitives.TryGetValue(type, out var primitive))
-                return primitive;
+            if (primitives.TryGetValue(type, out var primitive)) {
+                if (primitive == null)
+                    primitives.Remove(type);
+                else
+                    return primitive;
+            }
 
             primitive = GameObject.CreatePrimitive(type);
+            primitive.hideFlags = HideFlags.HideInHierarchy;
+            primitive.gameObject.SetActive(false);
             primitives.Add(type, primitive);
             return primitive;
         }
