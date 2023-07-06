@@ -1,4 +1,4 @@
-Shader "Primer/StackedAreas" {
+Shader "Custom/StackedAreas" {
     Properties{
         _VisibleMin("VisibleMin", Vector) = (0,0,0,0)
         _VisibleMax("VisibleMax", Vector) = (1,1,1,0)
