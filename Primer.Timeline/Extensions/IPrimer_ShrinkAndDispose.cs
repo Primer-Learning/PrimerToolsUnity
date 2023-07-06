@@ -7,7 +7,7 @@ namespace Primer.Animation
 {
     public static class IPrimer_ShrinkAndDisposeExtensions
     {
-        public static async UniTask ShrinkAndDispose(this IPrimer self, float duration = 0.5f,
+        public static async UniTask ShrinkAndDispose(this IPrimer self, float duration = 0.5f, bool defer = false,
             CancellationToken ct = default)
         {
             if (self == null)
@@ -21,13 +21,13 @@ namespace Primer.Animation
             // This is false if the element has already been destroyed while we were scaling down
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (self.transform != null)
-                self.transform.gameObject.Dispose();
+                self.transform.gameObject.Dispose(defer);
         }
 
-        public static UniTask ShrinkAndDispose(this Component self, float duration = 0.5f,
+        public static UniTask ShrinkAndDispose(this Component self, float duration = 0.5f, bool defer = false,
             CancellationToken ct = default)
         {
-            return self.ToPrimer().ShrinkAndDispose(duration, ct);
+            return self.ToPrimer().ShrinkAndDispose(duration, defer, ct);
         }
     }
 }
