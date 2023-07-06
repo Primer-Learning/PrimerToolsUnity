@@ -15,8 +15,9 @@ namespace Primer.Graph
     {
         public static Color defaultColor = new Vector4(62, 126, 160, 255) / 255;
         private int barCountForHax;
+
         private Graph graphCache;
-        private Graph graph => graphCache ??= GetComponent<Graph>();
+        private Graph graph => transform.GetOrAddComponent(ref graphCache);
 
         private Container _barsContainer;
         private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph.domain);
