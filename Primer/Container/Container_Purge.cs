@@ -9,6 +9,12 @@ namespace Primer
         private readonly List<Action> onCleanup = new();
         private readonly List<Action<bool>> onPurge = new();
 
+        public void RemoveAllChildren(bool defer = false)
+        {
+            Reset();
+            Purge(defer);
+        }
+
         public void Purge(bool defer = false)
         {
             foreach (var child in unusedChildren)
