@@ -14,7 +14,16 @@ namespace Simulation.GameTheory
         public int seed = 0;
         public bool _skipAnimations = false;
 
-        [SerializeReference, Required]
+        [ShowInInspector]
+        [MinValue(4)]
+        public int size {
+            get => terrain.size.x;
+            set => terrain.size = new Vector3Int(value, 4, value);
+        }
+
+        [SerializeReference]
+        [Required]
+        [PropertyOrder(10)]
         [HideLabel, Title("Conflict Resolution Rule")]
         public ConflictResolutionRule conflictResolutionRule = new SimpleConflictResolution();
 
