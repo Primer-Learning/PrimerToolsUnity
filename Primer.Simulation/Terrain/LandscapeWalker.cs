@@ -9,14 +9,23 @@ namespace Primer.Simulation
         private const float DEFAULT_SPEED = 4;
         private const float DEFAULT_TURN_SPEED = 16;
 
-        private Landscape terrainCache;
-        private Landscape terrain => transform.ParentComponent(ref terrainCache);
+        private ISimulation simulationCache;
+        private ISimulation simulation => transform.ParentComponent(ref simulationCache);
 
-        public Tween WalkTo(Vector2 to) => WalkToImpl(terrain.GetGroundAt(to));
-        public Tween WalkToLocal(Vector2 to) => WalkToImpl(terrain.GetGroundAtLocal(to));
+        public Tween WalkTo(Vector2 to)
+        {
+            return WalkToImpl(simulation.GetGroundAt(to));
+        }
+
+        public Tween WalkToLocal(Vector2 to)
+        {
+            return WalkToImpl(simulation.GetGroundAtLocal(to));
+        }
 
         public Tween WalkTo(Component to)
-            => WalkToImpl(new Vector3Provider(() => terrain.GetGroundAt(to.transform.position)));
+        {
+            return WalkToImpl(new Vector3Provider(() => simulation.GetGroundAt(to.transform.position)));
+        }
 
         private Tween WalkToImpl(Vector3Provider to)
         {
@@ -33,7 +42,7 @@ namespace Primer.Simulation
                     var directionVector = targetPosition - initialPosition;
                     var destination = targetPosition - directionVector.normalized;
 
-                    myTransform.position = terrain.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
+                    myTransform.position = simulation.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
 
                     var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
                     if (lookRotation == Vector3.zero)

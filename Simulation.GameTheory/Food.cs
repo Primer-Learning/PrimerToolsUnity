@@ -16,7 +16,7 @@ namespace Simulation.GameTheory
             amount = 2;
 
             var t = transform;
-            var terrain = t.ParentComponent<Landscape>();
+            var sim = t.ParentComponent<ISimulation>();
             var container = new Container(t);
 
             container.rotation = Quaternion.Euler(0, rng.Range(0, 180), 0);
@@ -26,7 +26,7 @@ namespace Simulation.GameTheory
                 food.SetScale(0.3);
                 food.GetComponent<MeshRenderer>().SetColor(Color.green);
                 var position = t.TransformPoint(i == 0 ? 0.3f : -0.3f, 0, 0);
-                food.position = terrain.GetGroundAt(position) + Vector3.up * 0.15f;
+                food.position = sim.GetGroundAt(position) + Vector3.up * 0.15f;
             }
 
             container.Purge();

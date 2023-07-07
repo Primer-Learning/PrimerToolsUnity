@@ -167,7 +167,7 @@ namespace Primer.Simulation
 
         #region Internal fields
         private Transform rootCache;
-        private Transform root => transform.FindOrCreate("Landscape mesh");
+        private Transform root => transform.FindOrCreate("Mesh");
 
         private MeshCollider meshColliderCache;
         private MeshCollider meshCollider => root.GetOrAddComponent(ref meshColliderCache);
@@ -215,11 +215,9 @@ namespace Primer.Simulation
                 elevationOffset
             );
 
-            transform.FindOrCreate("Landscape mesh");
-
-
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
+            root.localPosition = ((Vector3)size) / -2f;
         }
         #endregion
 

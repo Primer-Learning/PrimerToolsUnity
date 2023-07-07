@@ -13,13 +13,13 @@ namespace Simulation.GameTheory
     {
         private readonly int foodPerTurn;
 
-        private readonly Landscape terrain;
         private readonly Container foodContainer;
         private readonly Container agentContainer;
 
         private readonly ConflictResolutionRule conflictResolutionRule;
 
         public Rng rng { get; }
+        public Landscape terrain { get; }
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
@@ -38,9 +38,9 @@ namespace Simulation.GameTheory
             this.conflictResolutionRule = conflictResolutionRule;
 
             rng = new Rng(seed);
-            terrain = transform.GetOrAddComponent<Landscape>();
 
             var container = new Container(transform);
+            terrain = container.Add<Landscape>("Landscape");
             foodContainer = container.AddContainer("Food").ScaleChildrenInPlayMode();
             agentContainer = container.AddContainer("Blobs").ScaleChildrenInPlayMode();
 
@@ -83,7 +83,8 @@ namespace Simulation.GameTheory
 
             foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size, rng: rng)) {
                 var item = foodContainer.Add<Food>();
-                item.transform.position = terrain.GetGroundAt(point - size / 2);
+                var centered = point - size / 2;
+                item.transform.localPosition = terrain.GetGroundAt(centered);
                 item.Initialize(rng);
             }
 
@@ -166,10 +167,12 @@ namespace Simulation.GameTheory
             var agentCount = blobCount ?? agents.Count();
             var positions = edgeLength / agentCount;
             var centerInSlot = positions / 2;
+            var centerInTerrain = size / -2;
 
             for (var i = 0; i < agentCount; i++) {
                 var linearPosition = positions * i + centerInSlot;
-                yield return PositionToPerimeter(perimeter, linearPosition) + offset;
+                var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
+                yield return perimeterPosition + offset + centerInTerrain;
             }
         }
 
