@@ -41,8 +41,8 @@ namespace Simulation.GameTheory
 
             var container = new Container(transform);
             terrain = container.Add<Landscape>("Landscape");
-            foodContainer = container.AddContainer("Food").ScaleChildrenInPlayMode();
-            agentContainer = container.AddContainer("Blobs").ScaleChildrenInPlayMode();
+            foodContainer = container.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
+            agentContainer = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
 
             PlaceInitialBlobs(initialBlobs);
         }
@@ -103,9 +103,9 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        private UniTask AgentsEatFood()
+        private async UniTask AgentsEatFood()
         {
-            return agents
+            await agents
                 .GroupBy(x => x.goingToEat)
                 .Select(x => Eat(competitors: x.ToList(), food: x.Key))
                 .RunInParallel();
@@ -120,6 +120,7 @@ namespace Simulation.GameTheory
 
         private async UniTask AgentsReproduceOrDie()
         {
+            foodContainer.RemoveAllChildren();
             agentContainer.Reset();
 
             foreach (var agent in agents) {

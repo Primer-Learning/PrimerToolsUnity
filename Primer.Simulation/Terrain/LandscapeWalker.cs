@@ -6,8 +6,8 @@ namespace Primer.Simulation
 {
     public class LandscapeWalker : MonoBehaviour
     {
-        private const float DEFAULT_SPEED = 4;
-        private const float DEFAULT_TURN_SPEED = 16;
+        private const float DEFAULT_SPEED = 8;
+        private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
         private ISimulation simulationCache;
         private ISimulation simulation => transform.ParentComponent(ref simulationCache);
