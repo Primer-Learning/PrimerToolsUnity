@@ -156,7 +156,7 @@ namespace Simulation.GameTheory
                     return;
 
                 case > 1:
-                    conflictResolutionRule.Resolve(competitors, food);
+                    await conflictResolutionRule.Resolve(competitors, food);
                     return;
             }
         }
