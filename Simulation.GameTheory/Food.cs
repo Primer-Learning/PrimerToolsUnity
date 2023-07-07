@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks;
 using Primer;
-using Primer.Animation;
 using Primer.Simulation;
 using UnityEngine;
 
@@ -32,19 +30,20 @@ namespace Simulation.GameTheory
             container.Purge();
         }
 
-        public UniTask Consume()
+        public Transform Consume()
         {
             if (transform.childCount is 0)
                 throw new System.Exception("Food has no more items to consume.");
 
             amount--;
 
-            if (transform.childCount is 1)
-                return transform.ShrinkAndDispose();
+            if (transform.childCount is 1) {
+                return transform;
+            }
 
             var sphere = transform.GetChild(0);
             sphere.SetParent(null, worldPositionStays: true);
-            return sphere.ShrinkAndDispose();
+            return sphere;
         }
     }
 }

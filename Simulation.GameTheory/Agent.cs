@@ -8,8 +8,13 @@ namespace Simulation.GameTheory
 {
     public class Agent : MonoBehaviour
     {
+        private static readonly int scoop = Animator.StringToHash("Scoop");
+
         private LandscapeWalker movementCache;
         private LandscapeWalker movement => transform.GetOrAddComponent(ref movementCache);
+
+        private PrimerBlob blobCache;
+        private PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
 
         public float energy;
         public Food goingToEat;
@@ -25,12 +30,15 @@ namespace Simulation.GameTheory
             await tween;
         }
 
-        public UniTask Eat(Food food)
+        public async UniTask Eat(Food food)
         {
             goingToEat = null;
             energy++;
-            // TODO: Play eating animation
-            return food.Consume();
+
+            var bite = food.Consume();
+            blob.animator.SetTrigger(scoop);
+            await bite.MoveBy(y: 0.5f);
+            await bite.ShrinkAndDispose();
         }
 
         public async UniTask ReturnHome(Vector2 position)
