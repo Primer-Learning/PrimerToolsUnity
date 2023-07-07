@@ -9,6 +9,8 @@ namespace Simulation.GameTheory
     public class Agent : MonoBehaviour
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
+        // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
+        // private static readonly int mouthClosed = Animator.StringToHash("MouthClosed");
 
         private LandscapeWalker movementCache;
         private LandscapeWalker movement => transform.GetOrAddComponent(ref movementCache);
@@ -34,10 +36,12 @@ namespace Simulation.GameTheory
         {
             goingToEat = null;
             energy++;
-
-            var bite = food.Consume();
             blob.animator.SetTrigger(scoop);
-            await bite.MoveBy(y: 0.5f);
+
+            var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
+            var bite = food.Consume();
+
+            await bite.MoveTo(mouthPosition, globalSpace: true);
             await bite.ShrinkAndDispose();
         }
 
