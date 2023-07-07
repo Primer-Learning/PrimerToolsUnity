@@ -45,6 +45,9 @@ namespace Simulation.GameTheory
         {
             await movement.WalkToLocal(position);
 
+            if (this == null)
+                return;
+
             var originalRotation = transform.rotation;
             transform.LookAt(Vector3.zero);
             var targetRotation = transform.rotation;
