@@ -11,6 +11,7 @@ namespace Simulation.GameTheory
 {
     public class GameTheorySimulation : ISimulation, IPrimer, IDisposable
     {
+        private int turn = 0;
         private readonly int foodPerTurn;
 
         private readonly Container foodContainer;
@@ -58,7 +59,7 @@ namespace Simulation.GameTheory
             var center = positions.Average();
 
             foreach (var position in positions) {
-                var blob = agentContainer.AddPrefab<Transform>("blob_skinned");
+                var blob = agentContainer.AddPrefab<Transform>("blob_skinned", "Initial blob");
                 var agent = blob.GetOrAddComponent<Agent>();
                 conflictResolutionRule.OnAgentCreated(agent);
                 blob.position = position;
@@ -70,6 +71,7 @@ namespace Simulation.GameTheory
 
         public async UniTask SimulateSingleCycle()
         {
+            turn++;
             await CreateFood();
             await AgentsGatherFood();
             await AgentsEatFood();
@@ -128,7 +130,7 @@ namespace Simulation.GameTheory
                     agentContainer.Insert(agent);
 
                 if (agent.canReproduce)
-                    agentContainer.Add(agent);
+                    agentContainer.Add(agent, $"Blob born in {turn}");
 
                 agent.ConsumeEnergy();
             }
@@ -165,7 +167,7 @@ namespace Simulation.GameTheory
             var offset = Vector2.one * margin;
             var perimeter = size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var agentCount = blobCount ?? agents.Count();
+            var agentCount = blobCount ?? agentContainer.childCount;
             var positions = edgeLength / agentCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = size / -2;
