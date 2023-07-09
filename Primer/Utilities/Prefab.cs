@@ -8,12 +8,12 @@ namespace Primer
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
         // private static readonly Cleaner cleaner = new Cleaner();
 
-        public static GameObject Get(string prefabName)
-            => Get<Transform>(prefabName).gameObject;
+        public static Transform Get(string prefabName)
+            => Get<Transform>(prefabName);
 
         public static T Get<T>(string prefabName) where T : Component
         {
-            if (cachedPrefabs.TryGetValue(prefabName, out var cachedPrefab)) {
+            if (cachedPrefabs.TryGetValue(prefabName, out var cachedPrefab) && cachedPrefab != null) {
                 return cachedPrefab as T;
             }
 
