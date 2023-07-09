@@ -6,14 +6,14 @@ namespace Primer
 {
     public static class IPrimer_GetChildrenExtensions
     {
-        public static IEnumerable<Transform[]> GetChildren(this IEnumerable<IPrimer> self)
+        public static IEnumerable<Transform> GetChildren(this IEnumerable<IPrimer> self)
         {
-            return self.Select(x => x.transform.GetChildren());
+            return self.SelectMany(x => x.transform.GetChildren());
         }
 
-        public static IEnumerable<Transform[]> GetChildren(this IEnumerable<Component> self)
+        public static IEnumerable<Transform> GetChildren(this IEnumerable<Component> self)
         {
-            return self.Select(x => x.transform.GetChildren());
+            return self.SelectMany(x => x.transform.GetChildren());
         }
 
         public static Transform[] GetChildren(this IPrimer self)
