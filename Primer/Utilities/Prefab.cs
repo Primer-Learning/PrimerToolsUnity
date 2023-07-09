@@ -13,8 +13,11 @@ namespace Primer
 
         public static T Get<T>(string prefabName) where T : Component
         {
-            if (cachedPrefabs.TryGetValue(prefabName, out var cachedPrefab) && cachedPrefab != null) {
-                return cachedPrefab as T;
+            if (cachedPrefabs.TryGetValue(prefabName, out var cachedPrefab)) {
+                if (cachedPrefab != null)
+                    return cachedPrefab as T;
+
+                cachedPrefabs.Remove(prefabName);
             }
 
             var prefab = Resources.Load<T>(prefabName);
