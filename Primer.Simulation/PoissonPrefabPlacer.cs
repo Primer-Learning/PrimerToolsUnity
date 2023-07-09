@@ -13,7 +13,8 @@ namespace Primer.Simulation
         public float minDistance = 2;
         public int amount = 30;
         public PrefabProvider prefab;
-        public bool center;
+        public bool center = true;
+        public bool randomizeRotation = true;
 
         public void OnEnable()
         {
@@ -40,6 +41,9 @@ namespace Primer.Simulation
             foreach (var point in PoissonDiscSampler.Rectangular(amount, size, minDistance)) {
                 var instance = container.Add(prefab);
                 instance.localPosition = toVector3(point + offset);
+
+                if (randomizeRotation)
+                    instance.localRotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
             }
 
             container.Purge();
