@@ -97,7 +97,7 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public Vector2 _offset = Vector2.zero;
+        private Vector2 _offset = Vector2.zero;
 
         [ShowInInspector]
         [Tooltip("Moves the region we sample elevation values from.")]
@@ -112,7 +112,7 @@ namespace Primer.Simulation
 
         #region Mesh settings
         [SerializeField, HideInInspector]
-        public float _meshHeightMultiplier = 4;
+        private float _meshHeightMultiplier = 4;
 
         [Title("Mesh settings")]
         [ShowInInspector]
@@ -126,7 +126,7 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public float _roundness = 1;
+        private float _roundness = 1;
 
         [ShowInInspector]
         [Tooltip("Determines the roundness of the edges. Max roundness will be better if `size.y` is even.")]
@@ -140,7 +140,7 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public float _elevationOffset = 2;
+        private float _elevationOffset = 2;
 
         [ShowInInspector]
         [Tooltip("A constant that's subtracted from the elevation value.")]
