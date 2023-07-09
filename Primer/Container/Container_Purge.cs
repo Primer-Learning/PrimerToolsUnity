@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Primer
 {
     public partial class Container
     {
+        public bool disableWhenDisposed = true;
         private readonly List<Action> onCleanup = new();
         private readonly List<Action<bool>> onPurge = new();
 
@@ -33,6 +33,9 @@ namespace Primer
 
         public void Dispose()
         {
+            if (disableWhenDisposed)
+                transform.SetActive(false);
+
             foreach (var broomUp in onCleanup)
                 broomUp();
         }
