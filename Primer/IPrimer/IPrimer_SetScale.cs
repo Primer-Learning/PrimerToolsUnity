@@ -8,22 +8,22 @@ namespace Primer
         #region Overloads for IPrimer and Component with float and Vector3
         public static void SetScale(this IPrimer self, int scale, bool isGlobal = false)
         {
-            self.transform.transform.SetScale(Vector3.one * scale, isGlobal);
+            self.transform.SetScale(Vector3.one * scale, isGlobal);
         }
 
         public static void SetScale(this IPrimer self, float scale, bool isGlobal = false)
         {
-            self.transform.transform.SetScale(Vector3.one * scale, isGlobal);
+            self.transform.SetScale(Vector3.one * scale, isGlobal);
         }
 
         public static void SetScale(this IPrimer self, double scale, bool isGlobal = false)
         {
-            self.transform.transform.SetScale(Vector3.one * (float)scale, isGlobal);
+            self.transform.SetScale(Vector3.one * (float)scale, isGlobal);
         }
 
         public static void SetScale(this IPrimer self, Vector3 scale, bool isGlobal = false)
         {
-            self.transform.transform.SetScale(scale, isGlobal);
+            self.transform.SetScale(scale, isGlobal);
         }
 
         public static void SetScale(this Component self, int scale, bool isGlobal = false)
@@ -52,13 +52,13 @@ namespace Primer
         public static void SetScale(this IEnumerable<IPrimer> self, float scale, bool isGlobal = false)
         {
             foreach (var item in self)
-                item.transform.transform.SetScale(Vector3.one * scale, isGlobal);
+                item.transform.SetScale(Vector3.one * scale, isGlobal);
         }
 
         public static void SetScale(this IEnumerable<IPrimer> self, Vector3 scale, bool isGlobal = false)
         {
             foreach (var item in self)
-                item.transform.transform.SetScale(scale, isGlobal);
+                item.transform.SetScale(scale, isGlobal);
         }
 
         public static void SetScale(this IEnumerable<Component> self, float scale, bool isGlobal = false)
