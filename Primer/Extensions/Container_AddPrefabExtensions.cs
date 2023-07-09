@@ -9,7 +9,13 @@ namespace Primer
             where T : Component
         {
             var prefab = Prefab.Get<T>(prefabName);
-            return container.Add(prefab, name, options);
+
+            if (prefab != null)
+                return container.Add(prefab, name, options);
+
+            var prefabTransform = Prefab.Get(prefabName);
+            var child = container.Add(prefabTransform, name, options);
+            return child.GetOrAddComponent<T>();
         }
     }
 }
