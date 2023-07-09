@@ -29,10 +29,10 @@ namespace Primer.Timeline
             }
         }
 
-        public static void Clear()
+        public static async void Clear()
         {
             foreach (var player in players.Values) {
-                player.Reset().Forget();
+                await player.Reset();
                 player.Clean();
             }
 
