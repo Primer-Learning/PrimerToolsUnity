@@ -49,6 +49,12 @@ namespace Primer
 
 
         #region Overloads for IEnumerable<IPrimer> and IEnumerable<Component>
+        public static void SetScale(this IEnumerable<IPrimer> self, int scale, bool isGlobal = false)
+        {
+            foreach (var item in self)
+                item.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
         public static void SetScale(this IEnumerable<IPrimer> self, float scale, bool isGlobal = false)
         {
             foreach (var item in self)
@@ -61,6 +67,12 @@ namespace Primer
                 item.transform.SetScale(scale, isGlobal);
         }
 
+        public static void SetScale(this IEnumerable<Component> self, int scale, bool isGlobal = false)
+        {
+            foreach (var item in self)
+                item.transform.SetScale(Vector3.one * scale, isGlobal);
+        }
+
         public static void SetScale(this IEnumerable<Component> self, float scale, bool isGlobal = false)
         {
             foreach (var item in self)
@@ -71,6 +83,12 @@ namespace Primer
         {
             foreach (var item in self)
                 item.transform.SetScale(scale, isGlobal);
+        }
+
+        public static void SetScale(this IEnumerable<Transform> self, int scale, bool isGlobal = false)
+        {
+            foreach (var item in self)
+                item.SetScale(Vector3.one * scale, isGlobal);
         }
 
         public static void SetScale(this IEnumerable<Transform> self, float scale, bool isGlobal = false)
