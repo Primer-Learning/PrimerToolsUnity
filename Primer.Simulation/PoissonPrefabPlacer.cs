@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Primer.Simulation
 {
     [ExecuteAlways]
-    public class PoissonPrefabDistribution : MonoBehaviour
+    public class PoissonPrefabPlacer : MonoBehaviour
     {
         public Landscape landscape;
         [DisableIf(nameof(landscape))]
