@@ -1,30 +1,41 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Simulation
 {
     [ExecuteAlways]
     public class PoissonPrefabPlacer : MonoBehaviour
     {
-        public Landscape landscape;
-        [DisableIf(nameof(landscape))]
-        public Vector2 size = new(100, 100);
+        [SerializeField]
+        private Landscape _landscape;
+        public Landscape landscape => this.FindTerrain(ref _landscape);
+
+
         public float distanceFromBorder = 0;
+        public bool center = true;
+
+        [Title("Spawn items")]
         public float minDistance = 2;
         public int amount = 30;
-        public PrefabProvider prefab;
-        public bool center = true;
         public bool randomizeRotation = true;
+        public PrefabProvider prefab;
 
-        public void OnEnable()
-        {
-            if (!landscape)
-                landscape = GetComponentInParent<Landscape>() ?? GetComponentInParent<ISimulation>()?.terrain;
+        #region public Vector2 size;
+        [SerializeField, HideInInspector]
+        [FormerlySerializedAs("size")]
+        private Vector2 _size = new(100, 100);
 
-            if (landscape)
-                size = new Vector2(landscape.size.x, landscape.size.z);
+        [Title("Spawn area")]
+        [ShowInInspector]
+        [PropertyOrder(-1)]
+        [DisableIf(nameof(landscape))]
+        public Vector2 size {
+            get => landscape ? new Vector2(landscape.size.x, landscape.size.z) : _size;
+            set => _size = value;
         }
+        #endregion
 
         public void SetPrefabByName(string prefabName)
         {
@@ -32,23 +43,31 @@ namespace Primer.Simulation
             prefab.value = Prefab.Get(prefabName);
         }
 
-        public void EmplaceIfEmpty(int? amount = null, string prefabName = null)
+        public void EmplaceIfEmpty(string prefabName = null)
         {
             if (prefabName is not null)
                 SetPrefabByName(prefabName);
 
-            if (amount is not null)
-                this.amount = amount.Value;
-
-            if (transform.childCount != this.amount)
+            if (transform.childCount is 0)
                 Emplace();
         }
 
-        [Button]
+        [Title("Controls")]
+        [Button(ButtonSizes.Large)]
+        // [ButtonGroup]
+        [DisableIf(nameof(locked))]
         public void Emplace()
         {
             if (prefab?.value is null)
                 throw new Exception("Need a prefab to place!");
+
+#if UNITY_EDITOR
+            if (locked) {
+                throw new Exception(
+                    $"Refusing to replace children while locked. Unlock {name}'s {nameof(PoissonPrefabPlacer)} to continue."
+                );
+            }
+#endif
 
             var hasLandscape = landscape != null;
             var container = new Container(transform);
@@ -75,5 +94,22 @@ namespace Primer.Simulation
 
             container.Purge();
         }
+
+#if UNITY_EDITOR
+        [SerializeField, HideInInspector]
+        private bool locked = false;
+
+        [PropertySpace]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.Lock)]
+        // [ButtonGroup]
+        [HideIf(nameof(locked))]
+        private void Lock() => locked = true;
+
+        [PropertySpace]
+        [Button(ButtonSizes.Medium, Icon = SdfIconType.Unlock)]
+        // [ButtonGroup]
+        [ShowIf(nameof(locked))]
+        private void Unlock() => locked = false;
+#endif
     }
 }

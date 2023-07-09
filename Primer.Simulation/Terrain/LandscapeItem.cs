@@ -5,12 +5,13 @@ namespace Primer.Simulation
 {
     public class LandscapeItem : MonoBehaviour
     {
-        public Landscape landscape;
+        [SerializeField]
+        private Landscape _landscape;
+        public Landscape landscape => this.FindTerrain(ref _landscape);
 
         [Button]
         public void TouchGround()
         {
-            landscape ??= GetComponentInParent<Landscape>() ?? GetComponentInParent<ISimulation>()?.terrain;
             transform.position = landscape.GetGroundAt(transform.position);
         }
     }

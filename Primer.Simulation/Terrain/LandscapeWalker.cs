@@ -4,30 +4,27 @@ using UnityEngine;
 
 namespace Primer.Simulation
 {
-    public class LandscapeWalker : MonoBehaviour
+    public class LandscapeWalker : LandscapeItem
     {
         private const float DEFAULT_SPEED = 8;
         private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
-        private ISimulation simulationCache;
-        private ISimulation simulation => transform.ParentComponent(ref simulationCache);
-
-        public Tween WalkTo(Vector2 to)
+        public Tween WalkTo(Vector2 to, float stopDistance = 0)
         {
-            return WalkToImpl(simulation.GetGroundAt(to));
+            return WalkToImpl(landscape.GetGroundAt(to), stopDistance);
         }
 
-        public Tween WalkToLocal(Vector2 to)
+        public Tween WalkToLocal(Vector2 to, float stopDistance = 0)
         {
-            return WalkToImpl(simulation.GetGroundAtLocal(to));
+            return WalkToImpl(landscape.GetGroundAtLocal(to), stopDistance);
         }
 
-        public Tween WalkTo(Component to)
+        public Tween WalkTo(Component to, float stopDistance = 0)
         {
-            return WalkToImpl(new Vector3Provider(() => simulation.GetGroundAt(to.transform.position)));
+            return WalkToImpl(new Vector3Provider(() => landscape.GetGroundAt(to.transform.position)), stopDistance);
         }
 
-        private Tween WalkToImpl(Vector3Provider to)
+        private Tween WalkToImpl(Vector3Provider to, float stopDistance)
         {
             var ignoreHeight = new Vector3(1, 0, 1);
             var myTransform = transform;
@@ -40,9 +37,9 @@ namespace Primer.Simulation
 
                     // we want to walk _to_ the target, no walk over it
                     var directionVector = targetPosition - initialPosition;
-                    var destination = targetPosition - directionVector.normalized;
+                    var destination = targetPosition - directionVector.normalized * stopDistance;
 
-                    myTransform.position = simulation.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
+                    myTransform.position = landscape.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
 
                     var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
                     if (lookRotation == Vector3.zero)
