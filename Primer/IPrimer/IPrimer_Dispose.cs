@@ -9,13 +9,13 @@ namespace Primer
         public static void Dispose(this IEnumerable<IPrimer> self, bool defer = false)
         {
             foreach (var item in self)
-                item.transform.gameObject.Dispose(defer);
+                item.Dispose(defer);
         }
 
         public static void Dispose(this IEnumerable<Component> self, bool defer = false)
         {
             foreach (var item in self)
-                item.gameObject.Dispose(defer);
+                item.Dispose(defer);
         }
 
         public static void Dispose(this IPrimer self, bool defer = false)
