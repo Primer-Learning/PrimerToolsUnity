@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Primer.Timeline
 {
@@ -38,6 +39,14 @@ namespace Primer.Timeline
 
             players.Clear();
             tasks.Clear();
+
+            Object.FindObjectsOfType<RemoveOnCleanup>().Dispose();
+        }
+
+        public static void EnsureDisposal(Component target)
+        {
+            if (target != null)
+                target.GetOrAddComponent<RemoveOnCleanup>();
         }
 
         internal static SequencePlayer GetPlayerFor(Sequence sequence)
@@ -53,5 +62,7 @@ namespace Primer.Timeline
             players.Add(sequence, player);
             return player;
         }
+
+        internal class RemoveOnCleanup : Component {}
     }
 }

@@ -16,16 +16,14 @@ namespace Primer.Timeline
 
         public virtual void Cleanup()
         {
-            foreach (var child in disposeOnCleanup)
-                if (child != null)
-                    child.Dispose();
-
+            disposeOnCleanup.Dispose();
             disposeOnCleanup.Clear();
         }
 
         protected void DisposeOnCleanup(Component child)
         {
             disposeOnCleanup.Add(child.transform);
+            SequenceOrchestrator.EnsureDisposal(child);
         }
 
         public SequenceRunner Run() => new(this);
