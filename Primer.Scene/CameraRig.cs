@@ -65,6 +65,11 @@ namespace Primer.Scene
             }
         }
 
+        public Tween FocusOn(Component target, Vector3 offset, float? distance = null, Vector3? swivel = null)
+        {
+            return Travel(distance, target.transform.position + offset, swivel);
+        }
+
         public Tween Travel(float? distance = null, Vector3? swivelOrigin = null, Vector3? swivel = null)
         {
             var tween = new List<Tween>();
