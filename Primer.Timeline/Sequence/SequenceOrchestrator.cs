@@ -63,6 +63,6 @@ namespace Primer.Timeline
             return player;
         }
 
-        internal class RemoveOnCleanup : Component {}
+        internal class RemoveOnCleanup : MonoBehaviour {}
     }
 }
