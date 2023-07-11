@@ -52,7 +52,7 @@ namespace Primer.Simulation
 
             foreach (var (strategy, frequency, fitness) in list) {
                 var difference = frequency * (fitness - avgFitness) / avgFitness;
-                result[strategy] = frequency + stepSize + difference;
+                result[strategy] = frequency + stepSize * difference;
             }
 
             result.Normalize();
