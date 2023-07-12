@@ -52,7 +52,7 @@ namespace Primer
             for (var i = 0; i < unusedChildren.Count; i++) {
                 var child = unusedChildren[i];
 
-                if (hasName && child.name != childName)
+                if (!child || hasName && child.name != childName)
                     continue;
 
                 if (isTransform)
@@ -73,7 +73,7 @@ namespace Primer
             for (var i = 0; i < unusedChildren.Count; i++) {
                 var child = unusedChildren[i];
 
-                if (hasName && child.name != childName)
+                if (!child || hasName && child.name != childName)
                     continue;
 
                 if (!InstantiationTracker.IsInstanceOf(child, template))
