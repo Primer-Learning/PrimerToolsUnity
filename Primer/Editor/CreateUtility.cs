@@ -10,8 +10,9 @@ namespace Primer.Editor
     {
         public const int PRIORITY = 0;
 
-        public static void Prefab(string path) => Prefab(path, null);
-        public static GameObject Prefab(string path, Transform parent) {
+        public static T Prefab<T>(string path) => Prefab(path).GetComponent<T>();
+
+        public static GameObject Prefab(string path, Transform parent = null) {
             var resource = Resources.Load(path);
 
             if (resource is null) {
