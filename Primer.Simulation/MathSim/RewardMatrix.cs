@@ -9,16 +9,14 @@ namespace Primer.Simulation
         private readonly Dictionary<T, Dictionary<T, float>> data = new();
 
         public float this[T a, T b] {
-            get => data.ContainsKey(a) && data[a].ContainsKey(b) ? data[a][b] : 0;
-            set {
+            get => data[a][b];
+            init {
                 if (!data.ContainsKey(a))
                     data[a] = new Dictionary<T, float>();
 
                 data[a][b] = value;
             }
         }
-
-        public RewardMatrix() {}
 
         public RewardMatrix(float[,] values)
         {
@@ -36,8 +34,6 @@ namespace Primer.Simulation
             for (var j = 0; j < rows; j++)
                 this[types[i], types[j]] = values[i, j];
         }
-
-        public void Add(T a, T b, float f) => this[a, b] = f;
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
