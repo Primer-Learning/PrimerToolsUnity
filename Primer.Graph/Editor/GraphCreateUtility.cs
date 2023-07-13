@@ -10,5 +10,8 @@ namespace Primer.Graph.Editor
 
         [MenuItem("GameObject/Primer/Table", false, CreateUtility.PRIORITY)]
         public static void Table() => CreateUtility.Prefab("Table");
+
+        [MenuItem("GameObject/Primer/TernaryPlot", false, CreateUtility.PRIORITY)]
+        public static void TernaryPlot() => CreateUtility.Prefab<TernaryPlot>("TernaryPlot").Reset();
     }
 }
