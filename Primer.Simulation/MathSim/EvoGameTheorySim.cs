@@ -9,13 +9,13 @@ namespace Primer.Simulation
     {
         private readonly RewardMatrix<T> rewardMatrix;
         private readonly float baseFitness;
-        private readonly float stepSize;
+        private readonly float runStepSize;
 
-        public EvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float stepSize = 0.1f)
+        public EvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float runStepSize = 0.1f)
         {
             this.rewardMatrix = rewardMatrix;
             this.baseFitness = baseFitness;
-            this.stepSize = stepSize;
+            this.runStepSize = runStepSize;
         }
 
         public IEnumerable<AlleleFrequency<T>> Simulate(AlleleFrequency<T> initial, int maxIterations = 1000, float minDelta = 0.01f)
@@ -24,7 +24,7 @@ namespace Primer.Simulation
             yield return initial;
 
             for (var i = 0; i < maxIterations; i++) {
-                var current = SingleIteration(last);
+                var current = SingleIteration(last, runStepSize);
 
                 yield return current;
 
@@ -37,7 +37,8 @@ namespace Primer.Simulation
             }
         }
 
-        private AlleleFrequency<T> SingleIteration(AlleleFrequency<T> previous)
+        // The Vector Field plotter uses this but wants to set its own step size.
+        public AlleleFrequency<T> SingleIteration(AlleleFrequency<T> previous, float stepSize)
         {
             var difference = CalculateDifference(previous);
             var result = new AlleleFrequency<T>();
