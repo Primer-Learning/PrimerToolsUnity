@@ -24,12 +24,14 @@ namespace Primer.Graph
             var ternaryPlot = GetComponent<TernaryPlot>();
             var container = ternaryPlot.GetContentContainer("Points");
 
-            var points = TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
-            foreach (var point in points)
-            {
+            var points = ternaryPlot.isQuaternary
+                ? TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements)
+                : TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
+
+            foreach (var point in points) {
                 var sphere = container.AddPrimitive(PrimitiveType.Sphere);
                 sphere.localScale = Vector3.one * sphereSize / 10; // Arbitrary, but 1 is way too big
-                sphere.localPosition = ternaryPlot.CoordinatesToPosition(point);
+                sphere.localPosition = ternaryPlot.CoordinatesToLocalPosition(point);
             }
 
             container.Purge(defer: true);
