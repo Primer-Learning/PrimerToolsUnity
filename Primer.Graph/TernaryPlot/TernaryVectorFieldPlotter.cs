@@ -53,7 +53,7 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
                 var adjustedDifferenceVector = baseArrowLength * differenceVector / automaticPointIncrements;
                 
                 // Draw the arrow
-                var arrow = container.Add3DArrow();
+                var arrow = container.AddArrow();
                 arrow.thickness = baseArrowThickness / automaticPointIncrements;
                 arrow.tail = pointAsVector - adjustedDifferenceVector / 2;
                 arrow.head = pointAsVector + adjustedDifferenceVector / 2;
