@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Primer.Graph
 {
     public static class TernaryPlotUtility
     {
-        public static List<float[]> EvenlyDistributedPoints(int steps)
+        public static List<float[]> EvenlyDistributedPoints(int steps, bool nudgeAwayFromZero = false)
         {
             if (steps < 1)
                 throw new ArgumentException("EvenlyDistributedPoints needs at least one step");
@@ -20,17 +21,22 @@ namespace Primer.Graph
             for (var b = 0; b <= steps; b++) {
                 // I chose c next, because it also has a direction according to how the graph is drawn. (a is at the origin)
                 // It starts at 0 but stops before the total would get too high
-                for (var c = 0; c <= steps - b; c++) {
+                for (var c = 0; c <= steps - b; c++)
+                {
                     // a is what's left over
                     // And we have to norm
-                    points.Add(NormalizedPoint(steps - b - c, b, c));
+                    var provisionalPoint = new float[] {steps - b - c, b, c};
+                    points.Add(nudgeAwayFromZero
+                        ? NudgedNormalizedPoint(provisionalPoint)
+                        : NormalizedPoint(provisionalPoint));
                 }
             }
+            
 
             return points;
         }
 
-        public static List<float[]> EvenlyDistributedPoints3D(int steps)
+        public static List<float[]> EvenlyDistributedPoints3D(int steps, bool nudgeAwayFromZero = false)
         {
             if (steps < 1)
                 throw new ArgumentException("EvenlyDistributedPoints needs at least one step");
@@ -39,8 +45,12 @@ namespace Primer.Graph
 
             for (var b = 0; b <= steps; b++) {
                 for (var c = 0; c <= steps - b; c++) {
-                    for (var d = 0; d <= steps - b - c; d++) {
-                        points.Add(NormalizedPoint(steps - b - c - d, b, c, d));
+                    for (var d = 0; d <= steps - b - c; d++)
+                    {
+                        var provisionalPoint = new float[] {steps - b - c - d, b, c, d};
+                        points.Add(nudgeAwayFromZero
+                            ? NudgedNormalizedPoint(provisionalPoint)
+                            : NormalizedPoint(provisionalPoint));
                     }
                 }
             }
@@ -60,6 +70,17 @@ namespace Primer.Graph
             }
 
             return normalizedPoint;
+        }
+
+        public static float[] NudgedNormalizedPoint(float[] point)
+        {
+            var floatArray = new float[point.Length];
+            for (int i = 0; i < point.Length; i++) 
+            {
+                if (point[i] == 0) {floatArray[i] = 1;}
+                else floatArray[i] = point[i] * 100; // Make everything else big by comparison
+            }
+            return NormalizedPoint(floatArray);
         }
 
         public static float[] AddFloatArrays(float[] thisOne, float[] thatOne)
