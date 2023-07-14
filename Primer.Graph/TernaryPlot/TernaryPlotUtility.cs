@@ -70,6 +70,49 @@ namespace Primer.Graph
             return normalizedPoint;
         }
 
+        public static float[] AddFloatArrays(float[] thisOne, float[] thatOne)
+        {
+            if (thisOne.Length != thatOne.Length)
+            {
+                throw new ArgumentException("Arrays must be the same length to add them");
+            }
+
+            var sum = new float[thisOne.Length];
+            for (int i = 0; i < thisOne.Length; i++)
+            {
+                sum[i] = thisOne[i] + thatOne[i];
+            }
+
+            return sum;
+        }
+        
+        public static float[] SubtractFloatArrays(float[] thisOne, float[] thatOne)
+        {
+            if (thisOne.Length != thatOne.Length)
+            {
+                throw new ArgumentException("Arrays must be the same length to add them");
+            }
+
+            var sum = new float[thisOne.Length];
+            for (int i = 0; i < thisOne.Length; i++)
+            {
+                sum[i] = thisOne[i] - thatOne[i];
+            }
+
+            return sum;
+        }
+
+        public static float[] DivideFloatArray(float[] thisOne, float divisor)
+        {
+            var result = new float[thisOne.Length];
+            for (int i = 0; i < thisOne.Length; i++)
+            {
+                result[i] = thisOne[i] / divisor;
+            }
+
+            return result;
+        }
+
         // Keeping this for now
         // manualInitialConditions = new AlleleFrequency<Strategy>(
         //     Random.Range(0f, 1f),
