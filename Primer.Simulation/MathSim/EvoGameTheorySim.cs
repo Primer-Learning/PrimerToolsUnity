@@ -10,6 +10,7 @@ namespace Primer.Simulation
         private readonly RewardMatrix<T> rewardMatrix;
         private readonly float baseFitness;
         private readonly float runStepSize;
+        public bool logWhenEquilibrium = false;
 
         public EvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float runStepSize = 0.1f)
         {
@@ -29,7 +30,7 @@ namespace Primer.Simulation
                 yield return current;
 
                 if (last.DeltaMagnitude(current) < minDelta) {
-                    Debug.Log($"DeltaMagnitude is below threshold after {i} iterations: {last.DeltaMagnitude(current)} < {minDelta}");
+                    if (logWhenEquilibrium) Debug.Log($"DeltaMagnitude is below threshold after {i} iterations: {last.DeltaMagnitude(current)} < {minDelta}");
                     break;
                 }
 
