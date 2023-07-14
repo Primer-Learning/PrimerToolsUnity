@@ -26,17 +26,6 @@ namespace Primer.Simulation
             for (var i = 0; i < values.Length; i++)
                 alleles[types[i]] = values[i];
         }
-        
-        public float[] ToFloatArray()
-        {
-            var types = EnumUtil.Values<T>();
-            var values = new float[types.Length];
-            
-            for (var i = 0; i < values.Length; i++)
-                values[i] = alleles[types[i]];
-        
-            return values;
-        }
 
         public void Normalize()
         {
