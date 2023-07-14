@@ -8,6 +8,11 @@ namespace Primer.Shapes
         {
             return children.AddPrefab<PrimerArrow2>(PrimerArrow2.PREFAB_NAME, name);
         }
+        
+        public static PrimerArrow2 Add3DArrow(this Container children, string name = null)
+        {
+            return children.AddPrefab<PrimerArrow2>("3DArrow", name);
+        }
 
         public static PrimerBracket2 AddBracket(this Container children, string name = null)
         {

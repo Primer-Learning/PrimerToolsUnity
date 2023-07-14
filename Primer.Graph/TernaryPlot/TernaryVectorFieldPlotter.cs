@@ -1,4 +1,5 @@
-﻿using Primer.Graph;
+﻿using System.Collections.Generic;
+using Primer.Graph;
 using Primer.Shapes;
 using Primer.Simulation;
 using Sirenix.OdinInspector;
@@ -12,6 +13,8 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
     public float baseArrowLength = 1;
     public float baseArrowThickness = 1;
 
+    protected TernaryPlot ternaryPlot => GetComponent<TernaryPlot>();
+    
     public void OnValidate()
     {
         if (liveUpdate)
@@ -30,10 +33,12 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
     private void PlotArrows()
     {
         SetUp();
-        var ternaryPlot = GetComponent<TernaryPlot>();
         var container = ternaryPlot.GetContentContainer("VectorFieldArrows");
 
-        var points = TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
+        List<float[]> points;
+        if (ternaryPlot.isQuaternary) points = TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements);
+        else points = TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
+
         foreach (var point in points)
         {
             var difference = TernaryDifferential(point);
@@ -48,7 +53,7 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
                 var adjustedDifferenceVector = baseArrowLength * differenceVector / automaticPointIncrements;
                 
                 // Draw the arrow
-                var arrow = container.AddArrow();
+                var arrow = container.Add3DArrow();
                 arrow.thickness = baseArrowThickness / automaticPointIncrements;
                 arrow.tail = pointAsVector - adjustedDifferenceVector / 2;
                 arrow.head = pointAsVector + adjustedDifferenceVector / 2;
