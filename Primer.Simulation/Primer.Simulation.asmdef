@@ -5,6 +5,7 @@
     "Primer",
     "UniTask",
     "Primer.Animation",
-    "Primer.Shapes"
+    "Primer.Shapes",
+    "Primer.Graph"
   ]
 }
