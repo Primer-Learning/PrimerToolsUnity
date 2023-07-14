@@ -31,7 +31,9 @@ namespace Primer.Shapes
             var diff = head - tail;
 
             arrow.SetScale(Vector3.one, isGlobal: true);
-            arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
+            // arrow.rotation = Quaternion.FromToRotation(Vector3.right, diff);
+            // This ignores the diff.z, but it prevents flipping the arrow around (which currently makes it invisible)
+            arrow.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg);
             arrow.position = diff / 2 + tail;
         }
 
