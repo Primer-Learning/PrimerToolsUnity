@@ -122,50 +122,50 @@ namespace Primer.Graph
             var borders = transform.FindOrCreate("Borders").ToContainer();
 
             var bottom = borders.AddPrimitive(PrimitiveType.Cylinder, "Bottom line");
-            bottom.localPosition = CoordinatesToLocalPosition(0.5f, 0.5f, 0);
+            bottom.localPosition = CoordinatesToPosition(0.5f, 0.5f, 0);
             bottom.localRotation = Quaternion.Euler(0, 0, 90);
             bottom.localScale = edgeScale;
 
             var left = borders.AddPrimitive(PrimitiveType.Cylinder, "Left line");
-            left.localPosition = CoordinatesToLocalPosition(0.5f, 0, 0.5f);
+            left.localPosition = CoordinatesToPosition(0.5f, 0, 0.5f);
             left.localRotation = Quaternion.Euler(0, 0, -30);
             left.localScale = edgeScale;
 
             var right = borders.AddPrimitive(PrimitiveType.Cylinder, "Right line");
-            right.localPosition = CoordinatesToLocalPosition(0, 0.5f, 0.5f);
+            right.localPosition = CoordinatesToPosition(0, 0.5f, 0.5f);
             right.localRotation = Quaternion.Euler(0, 0, 30);
             right.localScale = edgeScale;
 
             var a = borders.AddPrimitive(PrimitiveType.Sphere, "A");
-            a.localPosition = CoordinatesToLocalPosition(1, 0, 0);
+            a.localPosition = CoordinatesToPosition(1, 0, 0);
             a.localScale = vertexScale;
 
             var b = borders.AddPrimitive(PrimitiveType.Sphere, "B");
-            b.localPosition = CoordinatesToLocalPosition(0, 1, 0);
+            b.localPosition = CoordinatesToPosition(0, 1, 0);
             b.localScale = vertexScale;
 
             var c = borders.AddPrimitive(PrimitiveType.Sphere, "C");
-            c.localPosition = CoordinatesToLocalPosition(0, 0, 1);
+            c.localPosition = CoordinatesToPosition(0, 0, 1);
             c.localScale = vertexScale;
 
             if (isQuaternary) {
                 var edge1 = borders.AddPrimitive(PrimitiveType.Cylinder, "3D Edge 1");
-                edge1.localPosition = CoordinatesToLocalPosition(0.5f, 0, 0, 0.5f);
+                edge1.localPosition = CoordinatesToPosition(0.5f, 0, 0, 0.5f);
                 edge1.localRotation = Quaternion.Euler(109.47f, 0, 30);
                 edge1.localScale = edgeScale;
 
                 var edge2 = borders.AddPrimitive(PrimitiveType.Cylinder, "3D Edge 2");
-                edge2.localPosition = CoordinatesToLocalPosition(0, 0.5f, 0, 0.5f);
+                edge2.localPosition = CoordinatesToPosition(0, 0.5f, 0, 0.5f);
                 edge2.localRotation = Quaternion.Euler(109.47f, 0, -30);
                 edge2.localScale = edgeScale;
 
                 var edge3 = borders.AddPrimitive(PrimitiveType.Cylinder, "3D Edge 3");
-                edge3.localPosition = CoordinatesToLocalPosition(0, 0, 0.5f, 0.5f);
+                edge3.localPosition = CoordinatesToPosition(0, 0, 0.5f, 0.5f);
                 edge3.localRotation = Quaternion.Euler(54.73f, 0, 0);
                 edge3.localScale = edgeScale;
 
                 var d = borders.AddPrimitive(PrimitiveType.Sphere, "D");
-                d.localPosition = CoordinatesToLocalPosition(0, 0, 0, 1);
+                d.localPosition = CoordinatesToPosition(0, 0, 0, 1);
                 d.localScale = vertexScale;
             }
 
