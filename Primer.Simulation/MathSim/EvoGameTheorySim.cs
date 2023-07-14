@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace Primer.Simulation
 {
-    public class GameTheorySim<T> where T : Enum
+    public class EvoGameTheorySim<T> where T : Enum
     {
         private readonly RewardMatrix<T> rewardMatrix;
         private readonly float baseFitness;
         private readonly float stepSize;
 
-        public GameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float stepSize = 0.1f)
+        public EvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float stepSize = 0.1f)
         {
             this.rewardMatrix = rewardMatrix;
             this.baseFitness = baseFitness;
