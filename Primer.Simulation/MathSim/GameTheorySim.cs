@@ -28,8 +28,8 @@ namespace Primer.Simulation
 
                 yield return current;
 
-                if (last.Delta(current) < minDelta) {
-                    Debug.Log($"Delta is below threshold after {i} iterations: {last.Delta(current)} < {minDelta}");
+                if (last.DeltaMagnitude(current) < minDelta) {
+                    Debug.Log($"DeltaMagnitude is below threshold after {i} iterations: {last.DeltaMagnitude(current)} < {minDelta}");
                     break;
                 }
 
