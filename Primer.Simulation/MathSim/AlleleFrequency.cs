@@ -7,7 +7,7 @@ namespace Primer.Simulation
 {
     public class AlleleFrequency<T> : IEnumerable<KeyValuePair<T, float>> where T : Enum
     {
-        public readonly Dictionary<T, float> alleles = new();
+        private readonly Dictionary<T, float> alleles = new();
 
         public float this[T allele] {
             get => alleles[allele];

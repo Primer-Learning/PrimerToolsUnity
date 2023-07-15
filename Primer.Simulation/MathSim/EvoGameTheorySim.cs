@@ -44,8 +44,7 @@ namespace Primer.Simulation
             var difference = CalculateDifference(previous);
             var result = new AlleleFrequency<T>();
             
-            foreach (var (strategy, _) in previous)
-            {
+            foreach (var (strategy, _) in previous) {
                 result[strategy] = previous[strategy] + stepSize * difference[strategy];
             }
 
