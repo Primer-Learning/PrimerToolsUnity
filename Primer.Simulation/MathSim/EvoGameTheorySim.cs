@@ -7,6 +7,7 @@ namespace Primer.Simulation
 {
     public class EvoGameTheorySim<T> where T : Enum
     {
+        public static readonly Cache<AlleleFrequency<T>, int, float, AlleleFrequency<T>[]> cache = new();
         private readonly RewardMatrix<T> rewardMatrix;
         private readonly float baseFitness;
         private readonly float runStepSize;
@@ -20,6 +21,18 @@ namespace Primer.Simulation
         }
 
         public IEnumerable<AlleleFrequency<T>> Simulate(AlleleFrequency<T> initial, int maxIterations = 1000, float minDelta = 0.01f)
+        {
+            if (cache.Peek(initial, maxIterations, minDelta, out var cached)) {
+                Debug.Log("Cache hit!");
+                return cached.ToList();
+            }
+
+            var result = SimulateInternal(initial, maxIterations, minDelta).ToArray();
+            cache.Save(initial, maxIterations, minDelta, result);
+            return result;
+        }
+
+        private IEnumerable<AlleleFrequency<T>> SimulateInternal(AlleleFrequency<T> initial, int maxIterations = 1000, float minDelta = 0.01f)
         {
             var last = initial;
             yield return initial;
@@ -57,9 +70,9 @@ namespace Primer.Simulation
         {
             var list = currentState
                 .Select(x => (
-                    strategy: x.Key,
-                    frequency: x.Value,
-                    fitness: CalculateFitness(x.Key, currentState)
+                    strategy: x.Item1,
+                    frequency: x.Item2,
+                    fitness: CalculateFitness(x.Item1, currentState)
                 ))
                 .ToList();
             
@@ -76,7 +89,7 @@ namespace Primer.Simulation
 
         private float CalculateFitness(T strategy, AlleleFrequency<T> previous)
         {
-            return previous.Sum(x => x.Value * rewardMatrix[strategy, x.Key]) + baseFitness;
+            return previous.Sum(x => x.Item2 * rewardMatrix[strategy, x.Item1]) + baseFitness;
         }
     }
 }

@@ -2,46 +2,65 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Primer.Simulation
 {
-    public class AlleleFrequency<T> : IEnumerable<KeyValuePair<T, float>> where T : Enum
+    [Serializable]
+    public class AlleleFrequency<T> : IEnumerable<(T, float)> where T : Enum
     {
-        private readonly Dictionary<T, float> alleles = new();
+        private static readonly T[] keys = EnumUtil.Values<T>();
+        [SerializeField] private float[] alleles = new float[keys.Length];
 
         public float this[T allele] {
-            get => alleles[allele];
-            set => alleles[allele] = value;
+            get => alleles[Array.IndexOf(keys, allele)];
+            set => alleles[Array.IndexOf(keys, allele)] = value;
         }
 
         public AlleleFrequency() {}
 
         public AlleleFrequency(params float[] values)
         {
-            var types = EnumUtil.Values<T>();
-
-            if (values.Length != types.Length)
+            if (values.Length != keys.Length)
                 throw new ArgumentException("Number of values must match number of enum values");
 
             for (var i = 0; i < values.Length; i++)
-                alleles[types[i]] = values[i];
+                values[i] = values[i];
         }
 
         public void Normalize()
         {
-            var sum = alleles.Values.Sum();
-            var keys = alleles.Keys.ToList();
+            var sum = alleles.Sum();
 
-            foreach (var allele in keys)
-                alleles[allele] /= sum;
+            for (var i = 0; i < keys.Length; i++)
+                alleles[i] /= sum;
         }
 
         public float DeltaMagnitude(AlleleFrequency<T> other)
         {
-            return alleles.Keys.Sum(allele => Math.Abs(alleles[allele] - other[allele]));
+            var result = 0f;
+
+            for (var i = 0; i < keys.Length; i++)
+                result += Math.Abs(alleles[i] - other.alleles[i]);
+
+            return result;
         }
 
-        public IEnumerator<KeyValuePair<T, float>> GetEnumerator() => alleles.GetEnumerator();
+        public override int GetHashCode()
+        {
+            var hash = 17;
+
+            for (var i = 0; i < keys.Length; i++)
+                hash = hash * 23 + alleles[i].GetHashCode();
+
+            return hash;
+        }
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerator<(T, float)> GetEnumerator()
+        {
+            for (var i = 0; i < keys.Length; i++)
+                yield return (keys[i], alleles[i]);
+        }
     }
 }
