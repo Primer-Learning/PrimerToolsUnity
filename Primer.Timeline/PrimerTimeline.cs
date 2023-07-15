@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.SceneManagement;
 
 namespace Primer.Timeline
 {
@@ -16,6 +15,11 @@ namespace Primer.Timeline
         static PrimerTimeline()
         {
             ContainerEvents.deactivateEventsIf = () => !isPlaying;
+        }
+
+        public static UniTask RegisterOperation(UniTask request)
+        {
+            return TimelineAsynchrony.RegisterOperation(request);
         }
 
         public static UniTask<T> RegisterOperation<T>(UniTask<T> request)

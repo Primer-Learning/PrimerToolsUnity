@@ -25,6 +25,23 @@ namespace Primer.Timeline
             return source.Task;
         }
 
+        public static UniTask RegisterOperation(UniTask request)
+        {
+            var source = request.ToSource();
+
+            // We create a function that returns a new task each time
+            UniTask Operation() => source.Task;
+
+            // and add it to the list if things that need to finish
+            // before we can consider the timeline scrubbed
+            operations.Add(Operation);
+
+            // the function should be removed when the task done
+            RemoveWhenCompleted(Operation);
+
+            return source.Task;
+        }
+
         private static async void RemoveWhenCompleted(Func<UniTask> operation)
         {
             try {
