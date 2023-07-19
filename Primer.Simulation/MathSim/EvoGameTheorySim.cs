@@ -5,9 +5,11 @@ using UnityEngine;
 
 namespace Primer.Simulation
 {
+
     public class EvoGameTheorySim<T> where T : Enum
     {
-        public static readonly Cache<AlleleFrequency<T>, int, float, AlleleFrequency<T>[]> cache = new();
+        private static readonly Cache<SimParams, AlleleFrequency<T>[]> cache = new();
+
         private readonly RewardMatrix<T> rewardMatrix;
         private readonly float baseFitness;
         private readonly float runStepSize;
@@ -22,15 +24,18 @@ namespace Primer.Simulation
 
         public IEnumerable<AlleleFrequency<T>> Simulate(AlleleFrequency<T> initial, int maxIterations = 1000, float minDelta = 0.01f)
         {
-            if (cache.Peek(initial, maxIterations, minDelta, out var cached)) {
+            var simParams = new SimParams(rewardMatrix, baseFitness, runStepSize, initial, maxIterations, minDelta);
+
+            if (cache.Peek(simParams, out var cached)) {
                 Debug.Log("Cache hit!");
                 return cached.ToList();
             }
 
             var result = SimulateInternal(initial, maxIterations, minDelta).ToArray();
-            cache.Save(initial, maxIterations, minDelta, result);
+            cache.Save(simParams, result);
             return result;
         }
+
 
         private IEnumerable<AlleleFrequency<T>> SimulateInternal(AlleleFrequency<T> initial, int maxIterations = 1000, float minDelta = 0.01f)
         {
@@ -90,6 +95,30 @@ namespace Primer.Simulation
         private float CalculateFitness(T strategy, AlleleFrequency<T> previous)
         {
             return previous.Sum(x => x.Item2 * rewardMatrix[strategy, x.Item1]) + baseFitness;
+        }
+
+
+        [Serializable]
+        private class SimParams
+        {
+            public RewardMatrix<T> rewardMatrix;
+            public float baseFitness;
+            public float runStepSize;
+            public AlleleFrequency<T> initial;
+            public int maxIterations;
+            public float minDelta;
+
+            public SimParams(
+                RewardMatrix<T> rewardMatrix, float baseFitness, float runStepSize,
+                AlleleFrequency<T> initial, int maxIterations, float minDelta
+            ) {
+                this.rewardMatrix = rewardMatrix;
+                this.baseFitness = baseFitness;
+                this.runStepSize = runStepSize;
+                this.initial = initial;
+                this.maxIterations = maxIterations;
+                this.minDelta = minDelta;
+            }
         }
     }
 }

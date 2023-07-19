@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer
 {
@@ -10,12 +12,13 @@ namespace Primer
         [Serializable]
         private class Entry
         {
-            public int hash;
+            [FormerlySerializedAs("hash")]
+            public string key;
             public TValue data;
         }
 
         private readonly JsonStorage<Entry[]> file;
-        private readonly Dictionary<int, TValue> cache = new();
+        private readonly Dictionary<string, TValue> cache = new();
 
         public Cache([CallerFilePath] string scriptPath = null)
         {
@@ -25,22 +28,29 @@ namespace Primer
             if (stored is null) return;
 
             foreach (var keyValue in stored)
-                cache[keyValue.hash] = keyValue.data;
+                if (keyValue.key is not null)
+                    cache[keyValue.key] = keyValue.data;
         }
+
 
         public bool Peek(TKey key, out TValue value)
         {
-            var hash = key.GetHashCode();
-            return cache.TryGetValue(hash, out value);
+            var strKey = SerializeKey(key);
+            return cache.TryGetValue(strKey, out value);
         }
 
         public void Save(TKey key, TValue value)
         {
-            var hash = key.GetHashCode();
-            cache[hash] = value;
+            var strKey = SerializeKey(key);
+            cache[strKey] = value;
 
-            var serializable = cache.Select(x => new Entry { hash = x.Key, data = x.Value });
+            var serializable = cache.Select(x => new Entry { key = x.Key, data = x.Value });
             file.Write(serializable.ToArray());
+        }
+
+        private static string SerializeKey(TKey key)
+        {
+            return JsonUtility.ToJson(key);
         }
     }
 

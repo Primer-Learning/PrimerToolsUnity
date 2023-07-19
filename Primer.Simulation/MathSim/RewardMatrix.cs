@@ -1,22 +1,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Primer.Simulation
 {
+    [Serializable]
     public class RewardMatrix<T> : IEnumerable<(T, T, float)> where T : Enum
     {
-        private readonly Dictionary<T, Dictionary<T, float>> data = new();
-
-        public float this[T a, T b] {
-            get => data[a][b];
-            init {
-                if (!data.ContainsKey(a))
-                    data[a] = new Dictionary<T, float>();
-
-                data[a][b] = value;
-            }
+        [Serializable]
+        private struct Entry
+        {
+            public T a;
+            public T b;
+            public float value;
         }
+
+        [SerializeField] private List<Entry> entries = new();
+
+        // private readonly Dictionary<T, Dictionary<T, float>> data = new();
+
+        public float this[T a, T b] => Get(a, b);
 
         public RewardMatrix(float[,] values)
         {
@@ -32,7 +37,27 @@ namespace Primer.Simulation
 
             for (var i = 0; i < cols; i++)
             for (var j = 0; j < rows; j++)
-                this[types[i], types[j]] = values[i, j];
+                Set(types[i], types[j], values[i, j]);
+        }
+
+        public float Get(T a, T b)
+        {
+            var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
+
+            if (index == -1)
+                throw new ArgumentException($"No entry found for {a} and {b}");
+
+            return entries[index].value;
+        }
+
+        public void Set(T a, T b, float value)
+        {
+            var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
+
+            if (index == -1)
+                entries.Add(new Entry { a = a, b = b, value = value });
+            else
+                entries[index] = new Entry { a = a, b = b, value = value };
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

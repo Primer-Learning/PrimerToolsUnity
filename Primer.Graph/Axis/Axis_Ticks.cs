@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -188,7 +187,7 @@ namespace Primer.Graph
             var domain = this;
             var container = parentContainer
                 .AddContainer("Ticks container")
-                .ScaleGrandchildrenInPlayMode()
+                //.ScaleGrandchildrenInPlayMode()
                 .SetDefaults();
 
             var expectedTicks = manualTicks.Count != 0
