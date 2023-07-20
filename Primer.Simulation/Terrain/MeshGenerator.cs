@@ -91,16 +91,16 @@ namespace Primer.Simulation
             if (y < roundness)
             {
                 inner.y = roundness;
-                
-                if (x < roundness)
-                    inner.x = roundness;
-                else if (x > xSize - roundness)
-                    inner.x = xSize - roundness;
-                if (z < roundness)
-                    inner.z = roundness;
-                else if (z > zSize - roundness)
-                    inner.z = zSize - roundness;
             }
+            if (x < roundness)
+                inner.x = roundness;
+            else if (x > xSize - roundness)
+                inner.x = xSize - roundness;
+            if (z < roundness)
+                inner.z = roundness;
+            else if (z > zSize - roundness)
+                inner.z = zSize - roundness;
+            
             // Also round the top
             // else if (y > ySize - roundness)
             // { 
