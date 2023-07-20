@@ -142,18 +142,23 @@ namespace Primer.Simulation
 
             int ClampDimension(int index, int dimension)
             {
-                return Math.Min(array.GetLength(dimension), index);
+                // Debug.Log($"Clamping {index} to {array.GetLength(dimension)}");
+                return Math.Min(array.GetLength(dimension) - 1, index);
             }
 
-            // Modified from https://stackoverflow.com/a/22153181/3920202. Breaking it out by
-            // dimension would make it easy to read if we need that at some point.
-            return (1 - fractionX) * ((1 - fractionY) * array[integerX, integerY] +
-                                      fractionY * array[integerX,
-                                          ClampDimension(integerY + 1, 1)]) + fractionX *
-                ((1 - fractionY) * array[ClampDimension(ClampDimension(integerX + 1, 0), 0),
-                     integerY] +
-                 fractionY * array[ClampDimension(integerX + 1, 0),
-                     ClampDimension(integerY + 1, 1)]);
+            // Modified from https://stackoverflow.com/a/22153181/3920202.
+            // Find the four corners we're interpolating between.
+            var bottomLeft = array[integerX, integerY];
+            var bottomRight = array[ClampDimension(integerX + 1, 0), integerY];
+            var topLeft  = array[integerX, ClampDimension(integerY + 1, 1)];
+            var topRight = array[ClampDimension(integerX + 1, 0), ClampDimension(integerY + 1, 1)];
+            
+            // Interpolate horizontally
+            var topInterpolation = fractionX * (topRight - topLeft) + topLeft;
+            var bottomInterpolation = fractionX * (bottomRight - bottomLeft) + bottomLeft;
+            
+            // Interpolate vertically
+            return fractionY * (topInterpolation - bottomInterpolation) + bottomInterpolation;
         }
 
         private void CreateTriangles()
