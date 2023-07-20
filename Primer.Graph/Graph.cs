@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
@@ -16,42 +19,39 @@ namespace Primer.Graph
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
 
-        [OnValueChanged(nameof(EnsureDomainDimensions))]
-        public Transform domain;
-
         private MultipleAxesController axes;
 
         [Title("Axes references")]
+        [FormerlySerializedAs("x")]
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private Axis x;
+        private Axis xAxis;
 
+        [FormerlySerializedAs("y")]
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private Axis y;
+        private Axis yAxis;
 
+        [FormerlySerializedAs("z")]
         [SerializeField]
         [Required]
         [InlineEditor]
         [ChildGameObjectsOnly]
-        private Axis z;
+        private Axis zAxis;
 
+        public Axis x => (xAxis != null) && xAxis.enabled && xAxis.isActiveAndEnabled ? xAxis : null;
+        public Axis y => (yAxis != null) && yAxis.enabled && yAxis.isActiveAndEnabled ? yAxis : null;
+        public Axis z => (zAxis != null) && zAxis.enabled && zAxis.isActiveAndEnabled ? zAxis : null;
 
-        // This warning is show where these properties are used, we checked for != null here
-        // ReSharper disable Unity.NoNullPropagation
-        public Axis enabledXAxis => (x != null) && x.enabled && x.isActiveAndEnabled ? x : null;
-        public Axis enabledYAxis => (y != null) && y.enabled && y.isActiveAndEnabled ? y : null;
-        public Axis enabledZAxis => (z != null) && z.enabled && z.isActiveAndEnabled ? z : null;
+        [OnValueChanged(nameof(EnsureDomainDimensions))]
+        public Transform domain;
 
-        public Vector3 positionMultiplier => new(
-            enabledXAxis ? 1 : 0,
-            enabledYAxis ? 1 : 0,
-            enabledZAxis ? 1 : 0
-        );
+        private Container contentCache;
+        public Container content => contentCache ??= new Container(domain);
 
         public Action onDomainChanged;
 
@@ -63,25 +63,41 @@ namespace Primer.Graph
 
         private void UpdateAxes()
         {
-            if (z != null) {
-                z.gameObject.SetActive(enableZAxis);
+            if (zAxis != null) {
+                zAxis.SetActive(enableZAxis);
 
                 if (enableZAxis) {
-                    z.transform.rotation = isRightHanded
+                    zAxis.transform.rotation = isRightHanded
                         ? Quaternion.Euler(0, 90, 0)
                         : Quaternion.Euler(0, -90, 0);
                 }
             }
 
             axes ??= GetComponent<MultipleAxesController>();
-            axes.SetAxes(EnsureDomainDimensions, x, y, z);
+            axes.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
         }
 
-        public Vector3 DomainToPosition(Vector3 value) => new(
-            enabledXAxis?.DomainToPosition(value.x) ?? 0,
-            enabledYAxis?.DomainToPosition(value.y) ?? 0,
-            enabledZAxis?.DomainToPosition(value.z) ?? 0
-        );
+        public Tween Transition()
+        {
+            var tweens = new List<Tween> {
+                x.Transition(),
+                y.Transition(),
+            };
+
+            if (enableZAxis)
+                tweens.Add(z.Transition());
+
+            return Tween.Parallel(tweens);
+        }
+
+        public Vector3 DomainToPosition(Vector3 value)
+        {
+            return new Vector3(
+                x?.DomainToPosition(value.x) ?? 0,
+                y?.DomainToPosition(value.y) ?? 0,
+                z?.DomainToPosition(value.z) ?? 0
+            );
+        }
 
         public Vector3 GetScaleNeutralizer(Vector3 originalScale)
         {
@@ -97,9 +113,9 @@ namespace Primer.Graph
         private void EnsureDomainDimensions()
         {
             var scale = new Vector3(
-                x?.DomainToPosition(1) ?? 1,
-                y?.DomainToPosition(1) ?? 1,
-                z?.DomainToPosition(1) ?? 1
+                xAxis?.DomainToPosition(1) ?? 1,
+                yAxis?.DomainToPosition(1) ?? 1,
+                zAxis?.DomainToPosition(1) ?? 1
             );
 
             if (isRightHanded)
@@ -108,28 +124,7 @@ namespace Primer.Graph
             if (domain is null || domain.localScale == scale)
                 return;
 
-            // TODO: this causes problems when we don't want to change the scale of domain childrens
-            // this should be converted into a Component "InvertParentScale" that listens to onDomainChange
-            // beforeDomainChange can be added to track the previous scale value
-
-            // var childCount = domain.childCount;
-            // var children = new List<(Transform child, Vector3 pos, Vector3 scale)>();
-
-            // Reverse iteration because we remove them as we go
-            // for (var i = childCount - 1; i >= 0; i--) {
-            //     var child = domain.GetChild(i);
-            //     children.Add((child, child.localPosition, child.localScale));
-            //     child.parent = null;
-            // }
-
             domain.localScale = scale;
-
-            // foreach (var (child, pos, prevScale) in children) {
-            //     child.parent = domain;
-            //     child.localPosition = pos;
-            //     child.localScale = prevScale;
-            // }
-
             onDomainChanged?.Invoke();
         }
     }
