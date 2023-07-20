@@ -193,7 +193,7 @@ namespace Primer.Simulation
         public void Generate()
         {
             noiseMap = Noise.GenerateNoiseMap(
-                size.To2D(),
+                new Vector2Int(size.x + 1, size.z + 1),
                 seed,
                 noiseScale,
                 octaves,
