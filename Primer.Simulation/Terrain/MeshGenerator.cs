@@ -86,64 +86,44 @@ namespace Primer.Simulation
         private void SetVertex(int i, int x, int y, int z)
         {
             var inner = vertices[i] = new Vector3(x, y, z);
-
-
-            // Only round the lower corners and edges
-            if (y < roundness)
-            {
-                if (y > 0)
-                {
-                    // Debug.Log($"{y}, {roundness}");
-                };
-                
-                inner.y = roundness;
-                if (x < roundness)
-                    inner.x = roundness;
-                else if (x > xSize - roundness)
-                    inner.x = xSize - roundness;
-                if (z < roundness)
-                    inner.z = roundness;
-                else if (z > zSize - roundness)
-                    inner.z = zSize - roundness;
-            }
-            else
-            {
-                // If both x and z are on the edge, round the corner
-                if (x < roundness && z < roundness)
-                {
-                    inner.x = roundness;
-                    inner.z = roundness;
-                }
-                else if (x < roundness && z > zSize - roundness)
-                {
-                    inner.x = roundness;
-                    inner.z = zSize - roundness;
-                }
-                else if (x > xSize - roundness && z < roundness)
-                {
-                    inner.x = xSize - roundness;
-                    inner.z = roundness;
-                }
-                else if (x > xSize - roundness && z > zSize - roundness)
-                {
-                    inner.x = xSize - roundness;
-                    inner.z = zSize - roundness;
-                }
-            }
             
-            // Also round the top
-            // else if (y > ySize - roundness)
-            // { 
-            //     inner.y = ySize - roundness;
-            //     if (x < roundness)
-            //         inner.x = roundness;
-            //     else if (x > xSize - roundness)
-            //         inner.x = xSize - roundness;
-            //     if (z < roundness)
-            //         inner.z = roundness;
-            //     else if (z > zSize - roundness)
-            //         inner.z = zSize - roundness;
-            // }
+            // There is probably a more compact way to do this.
+            // Each outer if statement checks if the vertex is within the roundness distance from one of the corners
+            // in both directions.
+            // Then the inner if statement checks pythagorean distance from the "inner" corner.
+            if (x < roundness && z < roundness)
+            {
+                if ((roundness - x)  * (roundness - x) + (roundness - z) * (roundness - z) > roundness * roundness)
+                {
+                    inner.x = roundness;
+                    inner.z = roundness;
+                }
+            }
+            else if (x < roundness && z > zSize - roundness)
+            {
+                if ((roundness - x)  * (roundness - x) + (zSize - roundness - z) * (zSize - roundness - z) > roundness * roundness)
+                {
+                    inner.x = roundness;
+                    inner.z = zSize - roundness;
+                }
+
+            }
+            else if (x > xSize - roundness && z < roundness)
+            {
+                if ((xSize - roundness - x)  * (xSize - roundness - x) + (roundness - z) * (roundness - z) > roundness * roundness)
+                {
+                    inner.x = xSize - roundness;
+                    inner.z = roundness;
+                }
+            }
+            else if (x > xSize - roundness && z > zSize - roundness)
+            {
+                if ((xSize - roundness - x)  * (xSize - roundness - x) + (zSize - roundness - z) * (zSize - roundness - z) > roundness * roundness)
+                {
+                    inner.x = xSize - roundness;
+                    inner.z = zSize - roundness;
+                }
+            }
 
 
             normals[i] = (vertices[i] - inner).normalized;

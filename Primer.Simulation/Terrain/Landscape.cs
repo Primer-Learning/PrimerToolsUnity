@@ -1,5 +1,7 @@
+using System.Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Color = UnityEngine.Color;
 
 namespace Primer.Simulation
 {
@@ -130,11 +132,11 @@ namespace Primer.Simulation
 
         [ShowInInspector]
         [Tooltip("Determines the roundness of the edges. Max roundness will be better if `size.y` is even.")]
-        [PropertyRange(0, 5)]
+        [PropertyRange(0, 50)]
         public float roundness {
             get => _roundness;
             set {
-                _roundness = value;
+                _roundness = Mathf.Min(value, Mathf.Min(size.x / 2, size.z / 2));
                 GenerateMesh();
             }
         }
