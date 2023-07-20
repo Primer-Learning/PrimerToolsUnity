@@ -6,13 +6,14 @@ namespace Primer.Simulation
 {
     internal class MeshGenerator
     {
-        public static Mesh CreateMesh(int roundness, Vector3Int size, float[,] heightMap,
+        public static Mesh CreateMesh(float roundness, Vector3Int size, float[,] heightMap,
             float heightMultiplier, float elevationOffset)
         {
             // This code was initially copied from
             // https://catlikecoding.com/unity/tutorials/rounded-cube/ and it was designed there
             // to be in a MonoBehaviour, thus it's fairly stateful. This class could be refactored
             // to be static if we wanted to.
+            
             var generator = new MeshGenerator {
                 roundness = roundness,
                 xSize = size.x,
@@ -42,7 +43,7 @@ namespace Primer.Simulation
 
         private Mesh mesh;
         private Vector3[] normals;
-        private int roundness;
+        private float roundness;
         private Vector2[] uv;
         private Vector3[] vertices;
         private int xSize, ySize, zSize;
@@ -71,7 +72,7 @@ namespace Primer.Simulation
             // This is the top face
             for (var z = 1; z < zSize; z++)
             for (var x = 1; x < xSize; x++)
-                SetVertex(v++, x, ySize, z, true);
+                SetVertex(v++, x, ySize, z);
 
             for (var z = 1; z < zSize; z++)
             for (var x = 1; x < xSize; x++)
@@ -82,24 +83,53 @@ namespace Primer.Simulation
             mesh.uv = uv;
         }
 
-        private void SetVertex(int i, int x, int y, int z, bool shouldElevate = false)
+        private void SetVertex(int i, int x, int y, int z)
         {
             var inner = vertices[i] = new Vector3(x, y, z);
 
-            
+
             // Only round the lower corners and edges
             if (y < roundness)
             {
+                if (y > 0)
+                {
+                    // Debug.Log($"{y}, {roundness}");
+                };
+                
                 inner.y = roundness;
+                if (x < roundness)
+                    inner.x = roundness;
+                else if (x > xSize - roundness)
+                    inner.x = xSize - roundness;
+                if (z < roundness)
+                    inner.z = roundness;
+                else if (z > zSize - roundness)
+                    inner.z = zSize - roundness;
             }
-            if (x < roundness)
-                inner.x = roundness;
-            else if (x > xSize - roundness)
-                inner.x = xSize - roundness;
-            if (z < roundness)
-                inner.z = roundness;
-            else if (z > zSize - roundness)
-                inner.z = zSize - roundness;
+            else
+            {
+                // If both x and z are on the edge, round the corner
+                if (x < roundness && z < roundness)
+                {
+                    inner.x = roundness;
+                    inner.z = roundness;
+                }
+                else if (x < roundness && z > zSize - roundness)
+                {
+                    inner.x = roundness;
+                    inner.z = zSize - roundness;
+                }
+                else if (x > xSize - roundness && z < roundness)
+                {
+                    inner.x = xSize - roundness;
+                    inner.z = roundness;
+                }
+                else if (x > xSize - roundness && z > zSize - roundness)
+                {
+                    inner.x = xSize - roundness;
+                    inner.z = zSize - roundness;
+                }
+            }
             
             // Also round the top
             // else if (y > ySize - roundness)
@@ -120,11 +150,12 @@ namespace Primer.Simulation
             vertices[i] = inner + normals[i] * roundness;
             uv[i] = new Vector2(x / (float)xSize, z / (float)zSize);
 
-            if (!shouldElevate)
+            // If we're on the top face, we want to elevate the vertices based on the height map
+            if (y < ySize)
                 return;
 
             var elevationAdjustment =
-                BilinearSample(heightMap, vertices[i].x, vertices[i].z) * heightMultiplier -
+                BilinearSample(heightMap, vertices[i].x, vertices[i].z) * heightMultiplier +
                 elevationOffset;
 
             // We don't want the terrain to dip below ground level once it starts to approach

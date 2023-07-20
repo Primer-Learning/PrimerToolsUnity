@@ -130,7 +130,7 @@ namespace Primer.Simulation
 
         [ShowInInspector]
         [Tooltip("Determines the roundness of the edges. Max roundness will be better if `size.y` is even.")]
-        [PropertyRange(0, 1)]
+        [PropertyRange(0, 5)]
         public float roundness {
             get => _roundness;
             set {
@@ -208,7 +208,7 @@ namespace Primer.Simulation
         private void GenerateMesh()
         {
             var mesh = MeshGenerator.CreateMesh(
-                Mathf.FloorToInt(roundness * size.y / 2),
+                roundness,
                 size,
                 noiseMap,
                 meshHeightMultiplier,
