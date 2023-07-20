@@ -86,20 +86,35 @@ namespace Primer.Simulation
         {
             var inner = vertices[i] = new Vector3(x, y, z);
 
-            if (x < roundness)
-                inner.x = roundness;
-            else if (x > xSize - roundness)
-                inner.x = xSize - roundness;
-
+            
+            // Only round the lower corners and edges
             if (y < roundness)
+            {
                 inner.y = roundness;
-            else if (y > ySize - roundness)
-                inner.y = ySize - roundness;
+                
+                if (x < roundness)
+                    inner.x = roundness;
+                else if (x > xSize - roundness)
+                    inner.x = xSize - roundness;
+                if (z < roundness)
+                    inner.z = roundness;
+                else if (z > zSize - roundness)
+                    inner.z = zSize - roundness;
+            }
+            // Also round the top
+            // else if (y > ySize - roundness)
+            // { 
+            //     inner.y = ySize - roundness;
+            //     if (x < roundness)
+            //         inner.x = roundness;
+            //     else if (x > xSize - roundness)
+            //         inner.x = xSize - roundness;
+            //     if (z < roundness)
+            //         inner.z = roundness;
+            //     else if (z > zSize - roundness)
+            //         inner.z = zSize - roundness;
+            // }
 
-            if (z < roundness)
-                inner.z = roundness;
-            else if (z > zSize - roundness)
-                inner.z = zSize - roundness;
 
             normals[i] = (vertices[i] - inner).normalized;
             vertices[i] = inner + normals[i] * roundness;
@@ -117,10 +132,10 @@ namespace Primer.Simulation
             if (elevationAdjustment < 0) {
                 // Distance from current vertex on the positive-y face to an edge, in vertices
                 var distanceToEdge = Mathf.Min(1 + x, xSize - x - 1, 1 + z, zSize - z - 1);
-
+            
                 // Maximum possible value of distanceToEdge
                 var maxDistance = Math.Max((xSize + 1) / 2, (ySize + 1) / 2);
-
+            
                 var edgeDecay = Mathf.Clamp(Mathf.Pow(distanceToEdge * 4f / maxDistance, 2f), 0f, 1f);
                 elevationAdjustment *= edgeDecay;
             }
