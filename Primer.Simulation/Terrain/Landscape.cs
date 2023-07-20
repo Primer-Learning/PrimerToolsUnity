@@ -221,6 +221,23 @@ namespace Primer.Simulation
             meshFilter.sharedMesh = mesh;
             root.localPosition = ((Vector3)size) / -2f;
         }
+
+        [Button]
+        public void CleanUp()
+        {
+            var mesh = MeshGenerator.CreateMesh(
+                roundness,
+                size,
+                noiseMap,
+                meshHeightMultiplier,
+                elevationOffset,
+                cleanUp: true
+            );
+
+            meshCollider.sharedMesh = mesh;
+            meshFilter.sharedMesh = mesh;
+            root.localPosition = ((Vector3)size) / -2f;
+        }
         #endregion
 
 
