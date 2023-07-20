@@ -127,5 +127,25 @@ namespace Primer.Graph
             domain.localScale = scale;
             onDomainChanged?.Invoke();
         }
+
+        public PrimerLine AddLine(string name)
+        {
+            return content.Add<PrimerLine>(name);
+        }
+
+        public PrimerSurface AddSurface(string name)
+        {
+            return content.Add<PrimerSurface>(name);
+        }
+
+        public StackedArea AddStackedArea(string name)
+        {
+            return content.Add<StackedArea>(name);
+        }
+
+        public NewBarPlot AddBarPlot(string name)
+        {
+            return content.Add<NewBarPlot>(name);
+        }
     }
 }
