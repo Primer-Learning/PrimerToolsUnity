@@ -88,7 +88,7 @@ namespace Primer.Graph
         [ShowInInspector]
         [HorizontalGroup("Data")]
         [HideReferenceObjectPicker]
-        [ListDrawerSettings(ShowFoldout = true, AlwaysAddDefaultValue = true)]
+        [ListDrawerSettings(AlwaysAddDefaultValue = true)]
         private List<BarData> bars {
             get => _bars;
             set => Meta.ReactiveProp(ref _bars, value, UpdateBars);
