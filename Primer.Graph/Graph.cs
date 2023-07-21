@@ -1,5 +1,4 @@
 ﻿using System;
-using Codice.CM.WorkspaceServer.Tree.GameUI.Checkin.Updater;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -48,6 +47,7 @@ namespace Primer.Graph
 
         public Container<Graph> containerCache;
         public Container<Graph> container => containerCache ??= Container.From(this);
+
         public Vector3 domain { get; private set; }
 
         public Action onDomainChanged;
@@ -82,17 +82,6 @@ namespace Primer.Graph
                 z?.DomainToPosition(value.z) ?? 0
             );
         }
-
-        // public Vector3 GetScaleNeutralizer(Vector3 originalScale)
-        // {
-        //     var domainScale = domain.localScale;
-        //
-        //     return new Vector3(
-        //         originalScale.x / domainScale.x,
-        //         originalScale.y / domainScale.y,
-        //         originalScale.z / domainScale.z
-        //     );
-        // }
 
         private void EnsureDomainDimensions()
         {
@@ -139,7 +128,6 @@ namespace Primer.Graph
 
         public void Dispose()
         {
-            container.Purge();
             Reset();
             gameObject.SetActive(false);
         }
