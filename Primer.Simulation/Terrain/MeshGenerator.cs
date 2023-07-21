@@ -134,13 +134,15 @@ namespace Primer.Simulation
         
         private float EdgeElevationDamping(Vector3 vertex)
         {
+            if (roundingRadius == 0) return 1;
+            
             // Recalculate this because the position has changed since it was previously calculated
             var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
             
             // Ranges from 0 at the edge to 1
             var normalizedOuterDistance = 1 - innerDifference.magnitude / roundingRadius;
             
-            return Mathf.Min(1 ,normalizedOuterDistance / edgeClampFactor);
+            return Mathf.Clamp(normalizedOuterDistance / edgeClampFactor, 0, 1);
         }
 
         private void CleanDuplicateVerticesAndZeroAreaTriangles()
