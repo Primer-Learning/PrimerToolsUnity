@@ -10,6 +10,15 @@ namespace Primer.Shapes
         private const float DEFAULT_END = 1;
         private readonly Func<float, Vector3> function;
 
+        public static FunctionLine Default()
+        {
+            return new FunctionLine(x => Vector3.zero) {
+                resolution = DEFAULT_RESOLUTION,
+                xStart = DEFAULT_START,
+                xEnd = DEFAULT_END,
+            };
+        }
+
         public int resolution { get; init; }
         public float xStart { get; init; }
         public float xEnd { get; init; }
@@ -62,10 +71,12 @@ namespace Primer.Shapes
 
         public ILine SmoothCut(float toResolution, bool fromOrigin)
         {
+            var xDelta = PrimerMath.Remap(0, resolution, xEnd, xStart, toResolution);
+
             return new FunctionLine(function) {
                 resolution = Mathf.CeilToInt(toResolution),
-                xStart = fromOrigin ? xStart + (resolution - toResolution) : xStart,
-                xEnd = fromOrigin ? xEnd : xEnd - (resolution - toResolution),
+                xStart = fromOrigin ? xStart + xDelta : xStart,
+                xEnd = fromOrigin ? xEnd : xEnd - xDelta,
             };
         }
 
