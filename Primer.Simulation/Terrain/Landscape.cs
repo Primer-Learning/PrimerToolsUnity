@@ -282,7 +282,8 @@ namespace Primer.Simulation
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset,
-                edgeClampDistance
+                edgeClampDistance,
+                true
             );
 
             meshCollider.sharedMesh = mesh;
