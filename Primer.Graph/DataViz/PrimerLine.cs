@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PlasticGui;
 using Primer.Animation;
 using Primer.Shapes;
 using Sirenix.OdinInspector;
@@ -8,8 +9,10 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
+    [ExecuteAlways]
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-    public class PrimerLine : MonoBehaviour
+    [RequireComponent(typeof(GraphDomain))]
+    public class PrimerLine : MonoBehaviour, IMeshController
     {
         private ILine renderedLine = new DiscreteLine(0);
         private ILine incomingLine = null;
@@ -17,16 +20,24 @@ namespace Primer.Graph
         private MeshFilter meshFilterCache;
         private MeshFilter meshFilter => transform.GetOrAddComponent(ref meshFilterCache);
 
+        private MeshRenderer meshRendererCache;
+        private MeshRenderer meshRenderer => transform.GetOrAddComponent(ref meshRendererCache);
+
+        #region private GraphDomain domain;
+        private GraphDomain domainCache;
+        private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
+        #endregion
+
         #region public float width;
         [SerializeField, HideInInspector]
-        private float _width = 1;
+        private float _width = 0.2f;
 
         [ShowInInspector]
         public float width {
             get => _width;
             set {
                 _width = value;
-                Render(renderedLine);
+                Render();
             }
         }
         #endregion
@@ -40,10 +51,11 @@ namespace Primer.Graph
             get => _endCapVertices;
             set {
                 _endCapVertices = value;
-                Render(renderedLine);
+                Render();
             }
         }
         #endregion
+
         #region public int miterVertices;
         [SerializeField, HideInInspector]
         private int _miterVertices = 3;
@@ -53,11 +65,23 @@ namespace Primer.Graph
             get => _miterVertices;
             set {
                 _miterVertices = value;
-                Render(renderedLine);
+                Render();
             }
         }
         #endregion
 
+        private void OnEnable()
+        {
+            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
+            domain.onDomainChange = Render;
+            meshRenderer.sharedMaterial ??= MeshRendererExtensions.defaultMaterial;
+        }
+
+        public void SetZIndex(int index)
+        {
+            var pos = transform.localPosition;
+            transform.localPosition = new Vector3(pos.x, pos.y, index * -0.01f);
+        }
 
         #region SetData(float[] | Vector2[] | Vector3[])
         public void SetData(IEnumerable<float> data)
@@ -132,20 +156,37 @@ namespace Primer.Graph
 
         public Tween Transition()
         {
-            var sameSize = ILine.SameResolution(renderedLine, incomingLine);
+            if (incomingLine is null)
+                return Tween.noop;
+
+            var targetLine = incomingLine;
+            var sameSize = ILine.SameResolution(renderedLine, targetLine);
             var from = sameSize[0];
             var to = sameSize[1];
 
             incomingLine = null;
 
-            return new Tween(t => Render(ILine.Lerp(from, to, t)));
+            return new Tween(
+                t => {
+                    Render(ILine.Lerp(from, to, t));
+                }
+            ).Observe(
+                onComplete: () => Render(targetLine)
+            );
         }
 
         public Tween GrowFromStart()
         {
             var targetLine = incomingLine ?? renderedLine;
             var resolution = targetLine.resolution;
-            return new Tween(t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: false)));
+
+            return new Tween(
+                t => {
+                    Render(targetLine.SmoothCut(resolution * t, fromOrigin: false));
+                }
+            ).Observe(
+                onComplete: () => Render(targetLine)
+            );
         }
 
         public Tween ShrinkToEnd()
@@ -176,6 +217,9 @@ namespace Primer.Graph
             return FunctionLine.Default();
         }
 
+        public MeshRenderer[] GetMeshRenderers() => new[] { meshRenderer };
+
+        private void Render() => Render(renderedLine);
         private void Render(ILine line)
         {
             if (line == null)
@@ -200,7 +244,7 @@ namespace Primer.Graph
             }
 
             meshFilter.mesh = new Mesh {
-                vertices = vertices.Select(transform.TransformPoint).ToArray(),
+                vertices = vertices.Select(domain.TransformPoint).ToArray(),
                 triangles = triangles.ToArray(),
             };
 
