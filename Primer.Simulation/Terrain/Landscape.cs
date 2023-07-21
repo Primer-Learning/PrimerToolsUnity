@@ -188,7 +188,27 @@ namespace Primer.Simulation
 
 
         #region Mesh generation
-        private float[,] noiseMap;
+
+        private float[,] _noiseMap;
+        public float[,] noiseMap {
+            get
+            {
+                if (_noiseMap is null)
+                {
+                    _noiseMap = Noise.GenerateNoiseMap(
+                        new Vector2Int(size.x + 1, size.z + 1),
+                        seed,
+                        noiseScale,
+                        octaves,
+                        persistance,
+                        lacunarity,
+                        offset
+                    );
+                };
+                return _noiseMap;
+            }
+            set => _noiseMap = value;
+        }
 
         [Title("Controls", HorizontalLine = false)]
         [Button]
