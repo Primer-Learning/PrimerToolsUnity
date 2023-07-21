@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -75,19 +73,6 @@ namespace Primer.Graph
 
             axes ??= GetComponent<MultipleAxesController>();
             axes.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
-        }
-
-        public Tween Transition()
-        {
-            var tweens = new List<Tween> {
-                x.Transition(),
-                y.Transition(),
-            };
-
-            if (enableZAxis)
-                tweens.Add(z.Transition());
-
-            return Tween.Parallel(tweens);
         }
 
         public Vector3 DomainToPosition(Vector3 value)

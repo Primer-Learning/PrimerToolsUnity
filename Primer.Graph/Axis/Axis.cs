@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Primer.Animation;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -53,15 +51,6 @@ namespace Primer.Graph
             }
 
             container.Purge(defer: true);
-        }
-
-        private readonly List<Tween> transitions = new();
-        public Tween Transition()
-        {
-            // TODO: This is doing nothing so far
-            var tween = transitions.RunInParallel();
-            transitions.Clear();
-            return tween;
         }
     }
 }
