@@ -1,6 +1,7 @@
 using System.Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Color = UnityEngine.Color;
 
 namespace Primer.Simulation
@@ -143,16 +144,16 @@ namespace Primer.Simulation
             }
         }
 
-        [SerializeField, HideInInspector]
-        private float _roundness = 1;
+        [FormerlySerializedAs("_roundness")] [SerializeField, HideInInspector]
+        private float _roundingRadius = 1;
 
         [ShowInInspector]
-        [Tooltip("Determines the roundness of the edges. Max roundness will be better if `size.y` is even.")]
+        [Tooltip("Determines the roundingRadius of the edges. Max roundingRadius will be better if `size.y` is even.")]
         [PropertyRange(0, 50)]
-        public float roundness {
-            get => _roundness;
+        public float roundingRadius {
+            get => _roundingRadius;
             set {
-                _roundness = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
+                _roundingRadius = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
                 GenerateMesh();
             }
         }
@@ -167,6 +168,18 @@ namespace Primer.Simulation
             get => _elevationOffset;
             set {
                 _elevationOffset = value;
+                GenerateMesh();
+            }
+        }
+
+        [SerializeField, HideInInspector]
+        private float _edgeClampDistance;
+        [ShowInInspector]
+        [PropertyRange(0, 1)]
+        public float edgeClampDistance {
+            get => _edgeClampDistance;
+            set {
+                _edgeClampDistance = value;
                 GenerateMesh();
             }
         }
@@ -247,11 +260,12 @@ namespace Primer.Simulation
         private void GenerateMesh()
         {
             var mesh = MeshGenerator.CreateMesh(
-                roundness,
+                roundingRadius,
                 size,
                 noiseMap,
                 meshHeightMultiplier,
-                elevationOffset
+                elevationOffset,
+                edgeClampDistance
             );
 
             meshCollider.sharedMesh = mesh;
@@ -263,11 +277,12 @@ namespace Primer.Simulation
         public void CleanUp()
         {
             var mesh = MeshGenerator.CreateMesh(
-                roundness,
+                roundingRadius,
                 size,
                 noiseMap,
                 meshHeightMultiplier,
-                elevationOffset
+                elevationOffset,
+                edgeClampDistance
             );
 
             meshCollider.sharedMesh = mesh;

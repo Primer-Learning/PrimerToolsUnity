@@ -46,7 +46,7 @@ namespace Primer.Simulation
         public float meshHeightMultiplier = 4;
 
         [OnValueChanged(nameof(GenerateMesh))]
-        [Tooltip("Determines the roundness of the edges. Max roundness will be better if `size.y` is even.")]
+        [Tooltip("Determines the roundingRadius of the edges. Max roundingRadius will be better if `size.y` is even.")]
         [Range(0, 1)]
         public float roundness = 1;
 
@@ -80,7 +80,8 @@ namespace Primer.Simulation
                 new Vector2Int(size.x, size.z),
                 noiseMap,
                 meshHeightMultiplier,
-                elevationOffset
+                elevationOffset,
+                0
             );
 
             meshCollider.sharedMesh = mesh;

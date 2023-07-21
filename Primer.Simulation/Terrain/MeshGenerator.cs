@@ -9,7 +9,7 @@ namespace Primer.Simulation
     internal class MeshGenerator
     {
         public static Mesh CreateMesh(float roundness, Vector2Int size, float[,] heightMap,
-            float heightMultiplier, float elevationOffset, bool cleanUp = false)
+            float heightMultiplier, float elevationOffset, float edgeClampDistance, bool cleanUp = false)
         {
             // This code was initially copied from
             // https://catlikecoding.com/unity/tutorials/rounded-cube/ and it was designed there
@@ -25,6 +25,7 @@ namespace Primer.Simulation
                 heightMultiplier = heightMultiplier,
                 heightMap = heightMap,
                 elevationOffset = elevationOffset,
+                edgeClampFactor = edgeClampDistance
             };
 
             generator.CreateVertices();
@@ -50,6 +51,7 @@ namespace Primer.Simulation
         private Mesh mesh;
         private Vector3[] normals;
         private float roundingRadius;
+        private float edgeClampFactor;
         private Vector2[] uv;
         private Vector3[] vertices;
         private int xSize, ySize, zSize;
@@ -93,9 +95,7 @@ namespace Primer.Simulation
         {
             vertices[i] = new Vector3(x, y, z);
             
-            // A small buffer makes non-rounded sides fit into this approach better
-            var buffer = 0.0001f;
-            var innerDifference = CalculateDistanceFromInnerSurface(x, y, z, buffer);
+            var innerDifference = CalculateDistanceFromInnerSurface(x, y, z, roundingRadius);
 
             var verticalFace = innerDifference.magnitude > roundingRadius;
             if (verticalFace) {
@@ -125,23 +125,22 @@ namespace Primer.Simulation
             // to be small so the normals and eventual textures look good
 
             var elevationAdjustment =
-                BilinearSample(heightMap, vertices[i].x, vertices[i].z) * heightMultiplier +
-                elevationOffset;
+                BilinearSample(heightMap, vertices[i].x, vertices[i].z) * heightMultiplier;
 
-            // We don't want the terrain to dip below ground level once it starts to approach
-            // the edge of the map, so we'll smoothly raise it up.
-            if (elevationAdjustment < 0) {
-                // Distance from current vertex on the positive-y face to an edge, in vertices
-                var distanceToEdge = Mathf.Min(1 + x, xSize - x - 1, 1 + z, zSize - z - 1);
-            
-                // Maximum possible value of distanceToEdge
-                var maxDistance = Math.Max((xSize + 1) / 2, (ySize + 1) / 2);
-            
-                var edgeDecay = Mathf.Clamp(Mathf.Pow(distanceToEdge * 4f / maxDistance, 2f), 0f, 1f);
-                elevationAdjustment *= edgeDecay;
-            }
+            if (edgeClampFactor > 0) elevationAdjustment *= EdgeElevationDamping(vertices[i]);
 
-            vertices[i].y += elevationAdjustment;
+            vertices[i].y += elevationAdjustment + elevationOffset;
+        }
+        
+        private float EdgeElevationDamping(Vector3 vertex)
+        {
+            // Recalculate this because the position has changed since it was previously calculated
+            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            
+            // Ranges from 0 at the edge to 1
+            var normalizedOuterDistance = 1 - innerDifference.magnitude / roundingRadius;
+            
+            return Mathf.Min(1 ,normalizedOuterDistance / edgeClampFactor);
         }
 
         private void CleanDuplicateVerticesAndZeroAreaTriangles()
@@ -191,9 +190,10 @@ namespace Primer.Simulation
 
         // The outer mesh is rounded by creating a virtual inner surface,
         // then moving vertices to a point within the "roundingRadius" distance of the inner surface
-        private Vector3 CalculateDistanceFromInnerSurface(float x, float y, float z, float buffer)
+        private Vector3 CalculateDistanceFromInnerSurface(float x, float y, float z, float radius)
         {
-            var radiusWithBuffer = roundingRadius + buffer;
+            float buffer = 0.0001f;
+            var radiusWithBuffer = radius + buffer;
             var position = new Vector3(x, y, z);
             if (x < radiusWithBuffer)
             {
