@@ -46,7 +46,7 @@ namespace Primer.Simulation
                         var sampleX = (x - halfWidth) / scale * frequency + octaveOffsets[i].x;
                         var sampleY = (y - halfHeight) / scale * frequency + octaveOffsets[i].y;
 
-                        var perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                        var perlinValue = Mathf.PerlinNoise(sampleX, sampleY);
                         noiseHeight += perlinValue * amplitude;
 
                         amplitude *= persistance;

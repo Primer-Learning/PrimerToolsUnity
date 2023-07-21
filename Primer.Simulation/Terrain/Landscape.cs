@@ -142,10 +142,11 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        private float _elevationOffset = 2;
+        private float _elevationOffset = 0;
 
         [ShowInInspector]
         [Tooltip("A constant that's subtracted from the elevation value.")]
+        [PropertyRange(0, 10)]
         public float elevationOffset {
             get => _elevationOffset;
             set {
