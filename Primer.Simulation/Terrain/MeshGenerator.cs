@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace Primer.Simulation
@@ -16,7 +17,7 @@ namespace Primer.Simulation
             // to be static if we wanted to.
             
             var generator = new MeshGenerator {
-                roundness = roundness,
+                roundingRadius = roundness,
                 xSize = size.x,
                 ySize = size.y,
                 zSize = size.z,
@@ -40,7 +41,6 @@ namespace Primer.Simulation
             return generator.mesh;
         }
 
-
         // Implementation below
 
         private float elevationOffset;
@@ -49,7 +49,7 @@ namespace Primer.Simulation
 
         private Mesh mesh;
         private Vector3[] normals;
-        private float roundness;
+        private float roundingRadius;
         private Vector2[] uv;
         private Vector3[] vertices;
         private int xSize, ySize, zSize;
@@ -91,54 +91,38 @@ namespace Primer.Simulation
 
         private void SetVertex(int i, int x, int y, int z)
         {
-            var inner = vertices[i] = new Vector3(x, y, z);
+            vertices[i] = new Vector3(x, y, z);
             
-            // There is probably a more compact way to do this.
-            // Each outer if statement checks if the vertex is within the roundness distance from one of the corners
-            // in both directions.
-            // Then the inner if statement checks pythagorean distance from the "inner" corner.
-            if (x < roundness && z < roundness)
-            {
-                if ((roundness - x)  * (roundness - x) + (roundness - z) * (roundness - z) > roundness * roundness)
-                {
-                    inner.x = roundness;
-                    inner.z = roundness;
-                }
-            }
-            else if (x < roundness && z > zSize - roundness)
-            {
-                if ((roundness - x)  * (roundness - x) + (zSize - roundness - z) * (zSize - roundness - z) > roundness * roundness)
-                {
-                    inner.x = roundness;
-                    inner.z = zSize - roundness;
-                }
+            // A small buffer makes non-rounded sides fit into this approach better
+            var buffer = 0.0001f;
+            var innerDifference = CalculateDistanceFromInnerSurface(x, y, z, buffer);
 
+            var verticalFace = innerDifference.magnitude > roundingRadius;
+            if (verticalFace) {
+                normals[i] = innerDifference.normalized;
+                vertices[i] = new Vector3(x, y, z) - innerDifference + innerDifference.normalized * roundingRadius;
             }
-            else if (x > xSize - roundness && z < roundness)
+            
+            // Make bottom face normals point down
+            // Also make the bottom edge normals point down at a 45 degree angle
+            if (y == 0)
             {
-                if ((xSize - roundness - x)  * (xSize - roundness - x) + (roundness - z) * (roundness - z) > roundness * roundness)
-                {
-                    inner.x = xSize - roundness;
-                    inner.z = roundness;
-                }
-            }
-            else if (x > xSize - roundness && z > zSize - roundness)
-            {
-                if ((xSize - roundness - x)  * (xSize - roundness - x) + (zSize - roundness - z) * (zSize - roundness - z) > roundness * roundness)
-                {
-                    inner.x = xSize - roundness;
-                    inner.z = zSize - roundness;
-                }
+                normals[i] = (Vector3.down + normals[i]).normalized; 
             }
 
-
-            normals[i] = (vertices[i] - inner).normalized;
-            vertices[i] = inner + normals[i] * roundness;
+            if (y == ySize)
+            {
+                normals[i] = (Vector3.up + normals[i]).normalized;
+            }
+            
             uv[i] = new Vector2(x / (float)xSize, z / (float)zSize);
 
-            // If we're on the top face, we want to elevate the vertices based on the height map
-            if (y < ySize)
+            // If this point is in the bottom half, we're done.
+            if (y < ySize / 2)
                 return;
+            // The top half will be elevated by the height map
+            // Top half instead of the very top because we want the triangles adjacent to the top and bottom
+            // to be small so the normals and eventual textures look good
 
             var elevationAdjustment =
                 BilinearSample(heightMap, vertices[i].x, vertices[i].z) * heightMultiplier +
@@ -205,6 +189,31 @@ namespace Primer.Simulation
             mesh.vertices = distinctVertices.Keys.ToArray();
         }
 
+        // The outer mesh is rounded by creating a virtual inner surface,
+        // then moving vertices to a point within the "roundingRadius" distance of the inner surface
+        private Vector3 CalculateDistanceFromInnerSurface(float x, float y, float z, float buffer)
+        {
+            var radiusWithBuffer = roundingRadius + buffer;
+            var position = new Vector3(x, y, z);
+            if (x < radiusWithBuffer)
+            {
+                x = radiusWithBuffer;
+            }
+            else if (x > xSize - radiusWithBuffer)
+            {
+                x = xSize - radiusWithBuffer;
+            }
+            if (z < radiusWithBuffer)
+            {
+                z = radiusWithBuffer;
+            }
+            else if (z > zSize - radiusWithBuffer)
+            {
+                z = zSize - radiusWithBuffer;
+            }
+            return position - new Vector3(x, y, z);
+        }
+        
         /// <summary>
         /// Samples a 2D array, interpolating between adjacent values if given fractional
         /// coordinates.
