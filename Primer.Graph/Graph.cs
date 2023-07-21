@@ -1,4 +1,5 @@
 ﻿using System;
+using Codice.CM.WorkspaceServer.Tree.GameUI.Checkin.Updater;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -7,7 +8,7 @@ namespace Primer.Graph
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph : MonoBehaviour
+    public class Graph : MonoBehaviour, IDisposable
     {
         [Title("Graph controls")]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
@@ -45,11 +46,9 @@ namespace Primer.Graph
         public Axis y => (yAxis != null) && yAxis.enabled && yAxis.isActiveAndEnabled ? yAxis : null;
         public Axis z => (zAxis != null) && zAxis.enabled && zAxis.isActiveAndEnabled ? zAxis : null;
 
-        [OnValueChanged(nameof(EnsureDomainDimensions))]
-        public Transform domain;
-
-        private Container contentCache;
-        public Container content => contentCache ??= new Container(domain);
+        public Container<Graph> containerCache;
+        public Container<Graph> container => containerCache ??= Container.From(this);
+        public Vector3 domain { get; private set; }
 
         public Action onDomainChanged;
 
@@ -84,16 +83,16 @@ namespace Primer.Graph
             );
         }
 
-        public Vector3 GetScaleNeutralizer(Vector3 originalScale)
-        {
-            var domainScale = domain.localScale;
-
-            return new Vector3(
-                originalScale.x / domainScale.x,
-                originalScale.y / domainScale.y,
-                originalScale.z / domainScale.z
-            );
-        }
+        // public Vector3 GetScaleNeutralizer(Vector3 originalScale)
+        // {
+        //     var domainScale = domain.localScale;
+        //
+        //     return new Vector3(
+        //         originalScale.x / domainScale.x,
+        //         originalScale.y / domainScale.y,
+        //         originalScale.z / domainScale.z
+        //     );
+        // }
 
         private void EnsureDomainDimensions()
         {
@@ -103,34 +102,46 @@ namespace Primer.Graph
                 zAxis?.DomainToPosition(1) ?? 1
             );
 
-            if (isRightHanded)
-                scale.z *= -1;
-
-            if (domain is null || domain.localScale == scale)
+            if (scale == domain)
                 return;
 
-            domain.localScale = scale;
+            domain = scale;
             onDomainChanged?.Invoke();
         }
 
         public PrimerLine AddLine(string name)
         {
-            return content.Add<PrimerLine>(name);
+            return container.Add<PrimerLine>(name);
         }
 
         public PrimerSurface AddSurface(string name)
         {
-            return content.Add<PrimerSurface>(name);
+            return container.Add<PrimerSurface>(name);
         }
 
         public StackedArea AddStackedArea(string name)
         {
-            return content.Add<StackedArea>(name);
+            return container.Add<StackedArea>(name);
         }
 
         public NewBarPlot AddBarPlot(string name)
         {
-            return content.Add<NewBarPlot>(name);
+            return container.Add<NewBarPlot>(name);
+        }
+
+        public void Reset()
+        {
+            container.Reset();
+            container.Insert(xAxis);
+            container.Insert(yAxis);
+            container.Insert(zAxis);
+        }
+
+        public void Dispose()
+        {
+            container.Purge();
+            Reset();
+            gameObject.SetActive(false);
         }
     }
 }

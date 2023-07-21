@@ -20,7 +20,7 @@ namespace Primer.Graph
         private Graph graph => transform.GetOrAddComponent(ref graphCache);
 
         private Container _barsContainer;
-        private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph.domain);
+        private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph);
 
         private Container _labelsContainer;
         public Container labelsContainer
@@ -306,7 +306,7 @@ namespace Primer.Graph
                 var barMiddleTop = new Vector3(barWidth / 2, data.value);
                 var domainPosition = bar.transform.localPosition + barMiddleTop;
                 // return domain.TransformPoint(domainPosition);
-                var graphSpace = domain.localScale.ElementWiseMultiply(domainPosition);
+                var graphSpace = domain.ElementWiseMultiply(domainPosition);
                 return graph.transform.TransformPoint(graphSpace + labelOffset);
             };
 
