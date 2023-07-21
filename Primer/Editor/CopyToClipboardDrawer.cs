@@ -34,7 +34,7 @@ namespace Primer.Editor
 
         private void Invoke()
         {
-            try {
+            // try {
                 GUIHelper.RemoveFocusControl();
                 GUIHelper.RequestRepaint();
 
