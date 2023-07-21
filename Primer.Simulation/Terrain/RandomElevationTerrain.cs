@@ -77,7 +77,7 @@ namespace Primer.Simulation
         {
             var mesh = MeshGenerator.CreateMesh(
                 Mathf.FloorToInt(roundness * size.y / 2),
-                size,
+                new Vector2Int(size.x, size.z),
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset

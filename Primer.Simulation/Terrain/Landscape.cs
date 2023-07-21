@@ -8,16 +8,43 @@ namespace Primer.Simulation
     [ExecuteAlways]
     public class Landscape : MonoBehaviour, IMeshController
     {
-        #region public Vector3Int size;
-        [SerializeField, HideInInspector]
-        private Vector2Int _size = new(50, 50);
+        #region public Vector2Int size;
+        public Vector2Int size
+        {
+            get => new(_width, _depth);
+            set
+            {
+                _width = value.x;
+                _depth = value.y;
+                Generate();
+            }
+        }
+
+        private int _width = 50;
+        private int _depth = 50;
+        
+        [ShowInInspector]
+        [HorizontalGroup("Size")]
+        [LabelText("Width")]
+        public int width 
+        { 
+            get => _width;
+            set
+            {
+                _width = value;
+                Generate();
+            }
+        }
 
         [ShowInInspector]
-        [Tooltip("The natural size of cuboid. Will be used to determine the number of vertices along each dimension as well.")]
-        public Vector2Int size {
-            get => _size;
-            set {
-                _size = value;
+        [HorizontalGroup("Size")]
+        [LabelText("Depth")]
+        public int depth 
+        { 
+            get => _depth;
+            set
+            {
+                _depth = value;
                 Generate();
             }
         }
@@ -221,7 +248,7 @@ namespace Primer.Simulation
         {
             var mesh = MeshGenerator.CreateMesh(
                 roundness,
-                new Vector3Int(size.x, 3, size.y),
+                size,
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset
@@ -229,7 +256,7 @@ namespace Primer.Simulation
 
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
-            root.localPosition = new Vector3(size.x, 3, size.y) / -2f;
+            root.localPosition = new Vector3(size.x, 0, size.y) / -2f;
         }
 
         [Button]
@@ -237,7 +264,7 @@ namespace Primer.Simulation
         {
             var mesh = MeshGenerator.CreateMesh(
                 roundness,
-                new Vector3Int(size.x, 3, size.y),
+                size,
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset
@@ -245,7 +272,7 @@ namespace Primer.Simulation
 
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
-            root.localPosition = new Vector3(size.x, 3, size.y) / -2f;
+            root.localPosition = new Vector3(size.x, 0, size.y) / -2f;
         }
         #endregion
 

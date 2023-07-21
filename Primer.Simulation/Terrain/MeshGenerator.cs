@@ -8,7 +8,7 @@ namespace Primer.Simulation
 {
     internal class MeshGenerator
     {
-        public static Mesh CreateMesh(float roundness, Vector3Int size, float[,] heightMap,
+        public static Mesh CreateMesh(float roundness, Vector2Int size, float[,] heightMap,
             float heightMultiplier, float elevationOffset, bool cleanUp = false)
         {
             // This code was initially copied from
@@ -19,8 +19,8 @@ namespace Primer.Simulation
             var generator = new MeshGenerator {
                 roundingRadius = roundness,
                 xSize = size.x,
-                ySize = size.y,
-                zSize = size.z,
+                ySize = 3,
+                zSize = size.y,
                 mesh = new Mesh(),
                 heightMultiplier = heightMultiplier,
                 heightMap = heightMap,
@@ -118,7 +118,7 @@ namespace Primer.Simulation
             uv[i] = new Vector2(x / (float)xSize, z / (float)zSize);
 
             // If this point is in the bottom half, we're done.
-            if (y < ySize / 2)
+            if (y < (float) ySize / 2)
                 return;
             // The top half will be elevated by the height map
             // Top half instead of the very top because we want the triangles adjacent to the top and bottom
