@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Primer
@@ -9,7 +10,7 @@ namespace Primer
     {
         private static Material defaultMaterialCache;
         public static Material defaultMaterial
-            => defaultMaterialCache ??= Resources.Load<Material>("BasicDiffuseWhite");
+            => defaultMaterialCache ??= AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
 
         private static readonly Dictionary<WeakReference<MeshRenderer>, Material> memory = new();
         private static readonly Dictionary<WeakReference<SkinnedMeshRenderer>, Material> skinnedMemory = new();
@@ -44,7 +45,7 @@ namespace Primer
 
         public static Color GetColor(this IEnumerable<MeshRenderer> self)
         {
-            return self.GetMaterial().color;
+            return self.GetMaterial()?.color ?? Color.white;
         }
 
         public static void SetColor(this IEnumerable<MeshRenderer> self, Color color)
