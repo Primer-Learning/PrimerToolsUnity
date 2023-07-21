@@ -17,7 +17,10 @@ namespace Primer.Graph
         [LabelText("Graph")]
         [InfoBox("It will autofill if this object is a child of a Graph component")]
         private Graph graphCache;
-        public Graph graph => transform.ParentComponent(ref graphCache);
+        public Graph graph {
+            get => transform.ParentComponent(ref graphCache);
+            internal set => graphCache = value;
+        }
 
         #region public Behaviour behaviour;
         [SerializeField, HideInInspector]

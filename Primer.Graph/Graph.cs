@@ -118,6 +118,31 @@ namespace Primer.Graph
             return container.Add<NewBarPlot>(name);
         }
 
+        public GraphDomain AddPoint(string name, Vector3? coords = null)
+        {
+            var point = container.AddPrimitive(PrimitiveType.Sphere, name);
+            point.SetScale(0.1f);
+            return Track(point, coords);
+        }
+
+        public GraphDomain AddTracker<T>(string name, T template, Vector3? coords = null) where T : Component
+        {
+            var point = container.Add(template, name);
+            return Track(point, coords);
+        }
+
+        public GraphDomain Track(Component target, Vector3? coords = null)
+        {
+            var tracker = target.GetOrAddComponent<GraphDomain>();
+            tracker.graph = this;
+            tracker.behaviour = GraphDomain.Behaviour.FollowPoint;
+
+            if (coords is not null)
+                tracker.point = coords.Value;
+
+            return tracker;
+        }
+
         public void Reset()
         {
             container.Reset();
