@@ -57,10 +57,10 @@ namespace Primer.Editor
                     : InvokeMethodInfo(methodInfo, Property.Parent);
 
                 CopyToClipboard(result);
-            }
-            finally {
-                GUIHelper.ExitGUI(true);
-            }
+            // }
+            // finally {
+            //     GUIHelper.RequestRepaint();
+            // }
         }
 
         private static object InvokeDelegate(Delegate delegateInfo)
@@ -110,19 +110,23 @@ namespace Primer.Editor
 
         private static Rect OdinBullshitToGetRect(string text, float buttonHeight)
         {
-            SirenixEditorGUI.CalculateMinimumSDFIconButtonWidth(
-                text,
-                null,
-                hasIcon: true,
-                buttonHeight,
-                out var num2,
-                out var num3,
-                out var num4,
-                out var minWidth
-            );
+            throw new NotImplementedException();
 
-            var rect = GUILayoutUtility.GetRect(0.0f, buttonHeight, GUILayout.MinWidth(minWidth));
-            return EditorGUI.IndentedRect(rect);
+            // FIXME: Thanks Odin for breaking this
+
+            // SirenixEditorGUI.CalculateMinimumSDFIconButtonWidth(
+            //     text,
+            //     null,
+            //     hasIcon: true,
+            //     buttonHeight
+            //     out var num2,
+            //     out var num3,
+            //     out var num4,
+            //     out var minWidth
+            // );
+            //
+            // var rect = GUILayoutUtility.GetRect(0.0f, buttonHeight, GUILayout.MinWidth(minWidth));
+            // return EditorGUI.IndentedRect(rect);
         }
     }
 }
