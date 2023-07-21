@@ -48,7 +48,7 @@ namespace Primer.Shapes
             this.function = x => new Vector3(x, function(x), 0);
         }
 
-        public ILine Resize(int newResolution)
+        public ILine ChangeResolution(int newResolution)
         {
             if (newResolution == resolution)
                 return this;

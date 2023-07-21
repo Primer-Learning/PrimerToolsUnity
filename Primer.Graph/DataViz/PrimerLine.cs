@@ -132,7 +132,7 @@ namespace Primer.Graph
 
         public Tween Transition()
         {
-            var sameSize = ILine.Resize(renderedLine, incomingLine);
+            var sameSize = ILine.SameResolution(renderedLine, incomingLine);
             var from = sameSize[0];
             var to = sameSize[1];
 

@@ -32,7 +32,7 @@ namespace Primer.Shapes
             return new DiscreteLine(newPoints);
         }
 
-        public ILine Resize(int newResolution) {
+        public ILine ChangeResolution(int newResolution) {
             if (newResolution == resolution)
                 return this;
 
