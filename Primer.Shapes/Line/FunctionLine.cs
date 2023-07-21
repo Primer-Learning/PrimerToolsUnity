@@ -62,22 +62,23 @@ namespace Primer.Shapes
 
         public ILine Crop(int maxResolution, bool fromOrigin)
         {
+            var xDelta = PrimerMath.Remap(0, resolution, xEnd, xStart, maxResolution);
+
             return new FunctionLine(function) {
                 resolution = maxResolution,
-                xStart = fromOrigin ? xStart + (resolution - maxResolution) : xStart,
-                xEnd = fromOrigin ? xEnd : xEnd - (resolution - maxResolution),
+                xStart = fromOrigin ? xStart + xDelta : xStart,
+                xEnd = fromOrigin ? xEnd : xEnd - xDelta,
             };
         }
 
         public ILine SmoothCut(float toResolution, bool fromOrigin)
         {
-            var xDelta = PrimerMath.Remap(0, resolution, xEnd, xStart, toResolution);
+            return ToDiscrete().SmoothCut(toResolution, fromOrigin);
+        }
 
-            return new FunctionLine(function) {
-                resolution = Mathf.CeilToInt(toResolution),
-                xStart = fromOrigin ? xStart + xDelta : xStart,
-                xEnd = fromOrigin ? xEnd : xEnd - xDelta,
-            };
+        public DiscreteLine ToDiscrete()
+        {
+            return new DiscreteLine(points);
         }
 
         private Vector3[] CalculatePoints()
