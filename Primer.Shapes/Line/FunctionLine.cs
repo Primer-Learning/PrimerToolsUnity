@@ -1,0 +1,86 @@
+using System;
+using UnityEngine;
+
+namespace Primer.Shapes
+{
+    public readonly struct FunctionLine : ILine
+    {
+        private const int DEFAULT_RESOLUTION = 10;
+        private const float DEFAULT_START = 0;
+        private const float DEFAULT_END = 1;
+        private readonly Func<float, Vector3> function;
+
+        public int resolution { get; init; }
+        public float xStart { get; init; }
+        public float xEnd { get; init; }
+        public Vector3[] points => CalculatePoints();
+
+        public FunctionLine(Func<float, Vector3> function)
+        {
+            resolution = DEFAULT_RESOLUTION;
+            xStart = DEFAULT_START;
+            xEnd = DEFAULT_END;
+            this.function = function;
+        }
+
+        public FunctionLine(Func<float, Vector2> function)
+        {
+            resolution = DEFAULT_RESOLUTION;
+            xStart = DEFAULT_START;
+            xEnd = DEFAULT_END;
+            this.function = x => function(x);
+        }
+
+        public FunctionLine(Func<float, float> function)
+        {
+            resolution = DEFAULT_RESOLUTION;
+            xStart = DEFAULT_START;
+            xEnd = DEFAULT_END;
+            this.function = x => new Vector3(x, function(x), 0);
+        }
+
+        public ILine Resize(int newResolution)
+        {
+            if (newResolution == resolution)
+                return this;
+
+            return new FunctionLine(function) {
+                resolution = newResolution,
+                xStart = xStart,
+                xEnd = xEnd,
+            };
+        }
+
+        public ILine Crop(int maxResolution, bool fromOrigin)
+        {
+            return new FunctionLine(function) {
+                resolution = maxResolution,
+                xStart = fromOrigin ? xStart + (resolution - maxResolution) : xStart,
+                xEnd = fromOrigin ? xEnd : xEnd - (resolution - maxResolution),
+            };
+        }
+
+        public ILine SmoothCut(float toResolution, bool fromOrigin)
+        {
+            return new FunctionLine(function) {
+                resolution = Mathf.CeilToInt(toResolution),
+                xStart = fromOrigin ? xStart + (resolution - toResolution) : xStart,
+                xEnd = fromOrigin ? xEnd : xEnd - (resolution - toResolution),
+            };
+        }
+
+        private Vector3[] CalculatePoints()
+        {
+            var result = new Vector3[resolution + 1];
+            var step = (xEnd - xStart) / resolution;
+            var x = xStart;
+
+            for (var i = 0; i <= resolution; i++) {
+                result[i] = function(x);
+                x += step;
+            }
+
+            return result;
+        }
+    }
+}
