@@ -18,7 +18,7 @@ namespace Simulation.GameTheory
         [MinValue(4)]
         public int size {
             get => terrain.size.x;
-            set => terrain.size = new Vector3Int(value, 4, value);
+            set => terrain.size = new Vector2Int(value, value);
         }
 
         [SerializeReference]

@@ -10,24 +10,13 @@ namespace Primer.Simulation
     {
         #region public Vector3Int size;
         [SerializeField, HideInInspector]
-        private Vector3Int _size = new(50, 4, 50);
+        private Vector2Int _size = new(50, 50);
 
         [ShowInInspector]
         [Tooltip("The natural size of cuboid. Will be used to determine the number of vertices along each dimension as well.")]
-        public Vector3Int size {
+        public Vector2Int size {
             get => _size;
             set {
-                if (value.y < 4) {
-                    Debug.Log($"{nameof(Landscape)}'s height must be at least 4");
-                    value.y = 4;
-                }
-
-                if (value.y > value.x || value.y > value.z) {
-                    Debug.Log($"{nameof(Landscape)}'s height can't be greater than its width and depth");
-                    value.x = value.y;
-                    value.z = value.y;
-                }
-
                 _size = value;
                 Generate();
             }
@@ -136,7 +125,7 @@ namespace Primer.Simulation
         public float roundness {
             get => _roundness;
             set {
-                _roundness = Mathf.Min(value, Mathf.Min(size.x / 2, size.z / 2));
+                _roundness = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
                 GenerateMesh();
             }
         }
@@ -197,7 +186,7 @@ namespace Primer.Simulation
                 if (_noiseMap is null)
                 {
                     _noiseMap = Noise.GenerateNoiseMap(
-                        new Vector2Int(size.x + 1, size.z + 1),
+                        new Vector2Int(size.x + 1, size.y + 1),
                         seed,
                         noiseScale,
                         octaves,
@@ -216,7 +205,7 @@ namespace Primer.Simulation
         public void Generate()
         {
             noiseMap = Noise.GenerateNoiseMap(
-                new Vector2Int(size.x + 1, size.z + 1),
+                new Vector2Int(size.x + 1, size.y + 1),
                 seed,
                 noiseScale,
                 octaves,
@@ -232,7 +221,7 @@ namespace Primer.Simulation
         {
             var mesh = MeshGenerator.CreateMesh(
                 roundness,
-                size,
+                new Vector3Int(size.x, 3, size.y),
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset
@@ -240,7 +229,7 @@ namespace Primer.Simulation
 
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
-            root.localPosition = ((Vector3)size) / -2f;
+            root.localPosition = new Vector3(size.x, 3, size.y) / -2f;
         }
 
         [Button]
@@ -248,16 +237,15 @@ namespace Primer.Simulation
         {
             var mesh = MeshGenerator.CreateMesh(
                 roundness,
-                size,
+                new Vector3Int(size.x, 3, size.y),
                 noiseMap,
                 meshHeightMultiplier,
-                elevationOffset,
-                cleanUp: true
+                elevationOffset
             );
 
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
-            root.localPosition = ((Vector3)size) / -2f;
+            root.localPosition = new Vector3(size.x, 3, size.y) / -2f;
         }
         #endregion
 

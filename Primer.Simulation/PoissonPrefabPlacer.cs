@@ -32,7 +32,7 @@ namespace Primer.Simulation
         [PropertyOrder(-1)]
         [DisableIf(nameof(landscape))]
         public Vector2 size {
-            get => landscape ? new Vector2(landscape.size.x, landscape.size.z) : _size;
+            get => landscape ? new Vector2(landscape.size.x, landscape.size.y) : _size;
             set => _size = value;
         }
         #endregion

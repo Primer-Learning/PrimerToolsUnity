@@ -24,7 +24,7 @@ namespace Simulation.GameTheory
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        public Vector2 size => new(terrain.size.x, terrain.size.z);
+        public Vector2 size => new(terrain.size.x, terrain.size.y);
         private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
         public GameTheorySimulation(
