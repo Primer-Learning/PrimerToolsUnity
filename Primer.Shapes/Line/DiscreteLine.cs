@@ -58,9 +58,6 @@ namespace Primer.Shapes
             return new DiscreteLine(result);
         }
 
-        public ILine Crop(int maxResolution, bool fromOrigin) =>
-            new DiscreteLine(CutToArray(maxResolution + 1, fromOrigin));
-
         public ILine SmoothCut(float toResolution, bool fromOrigin) {
             if (toResolution.IsInteger() && resolution == (int)toResolution)
                 return this;

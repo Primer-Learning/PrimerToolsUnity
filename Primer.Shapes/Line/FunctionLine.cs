@@ -60,16 +60,16 @@ namespace Primer.Shapes
             };
         }
 
-        public ILine Crop(int maxResolution, bool fromOrigin)
-        {
-            var xDelta = PrimerMath.Remap(0, resolution, xEnd, xStart, maxResolution);
-
-            return new FunctionLine(function) {
-                resolution = maxResolution,
-                xStart = fromOrigin ? xStart + xDelta : xStart,
-                xEnd = fromOrigin ? xEnd : xEnd - xDelta,
-            };
-        }
+        // public ILine Crop(int maxResolution, bool fromOrigin)
+        // {
+        //     var xDelta = PrimerMath.Remap(0, resolution, xEnd, xStart, maxResolution);
+        //
+        //     return new FunctionLine(function) {
+        //         resolution = maxResolution,
+        //         xStart = fromOrigin ? xStart + xDelta : xStart,
+        //         xEnd = fromOrigin ? xEnd : xEnd - xDelta,
+        //     };
+        // }
 
         public ILine SmoothCut(float toResolution, bool fromOrigin)
         {

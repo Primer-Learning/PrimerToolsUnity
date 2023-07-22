@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +9,6 @@ namespace Primer.Shapes
         Vector3[] points { get; }
 
         ILine ChangeResolution(int newResolution);
-        ILine Crop(int maxResolution, bool fromOrigin);
         ILine SmoothCut(float toResolution, bool fromOrigin);
 
 
@@ -34,14 +32,20 @@ namespace Primer.Shapes
         ///     this ensures grids don't suffer more than one transformation
         /// </summary>
         public static ILine[] SameResolution(params ILine[] inputs) {
-            var sameSize = new ILine[inputs.Length];
-            var maxSize = inputs.Select(t => t.resolution).Prepend(0).Max();
+            var sameResolution = new ILine[inputs.Length];
+            var maxResolution = inputs.Select(t => t.resolution).Prepend(0).Max();
 
             for (var i = 0; i < inputs.Length; i++) {
-                sameSize[i] = inputs[i].ChangeResolution(maxSize);
+                sameResolution[i] = inputs[i].ChangeResolution(maxResolution);
             }
 
-            return sameSize;
+            return sameResolution;
+        }
+
+        // For convenience
+        public static (ILine, ILine) SameResolution(ILine a, ILine b) {
+            var maxResolution = Mathf.Max(a.resolution, b.resolution);
+            return (a.ChangeResolution(maxResolution), b.ChangeResolution(maxResolution));
         }
     }
 }

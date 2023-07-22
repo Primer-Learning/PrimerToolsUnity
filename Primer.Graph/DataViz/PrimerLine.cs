@@ -22,10 +22,8 @@ namespace Primer.Graph
         private MeshRenderer meshRendererCache;
         private MeshRenderer meshRenderer => transform.GetOrAddComponent(ref meshRendererCache);
 
-        #region private GraphDomain domain;
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
-        #endregion
 
         #region public float width;
         [SerializeField, HideInInspector]
@@ -164,17 +162,15 @@ namespace Primer.Graph
                 return Tween.noop;
 
             var targetLine = incomingLine;
-            var sameSize = ILine.SameResolution(renderedLine, targetLine);
-            var from = sameSize[0];
-            var to = sameSize[1];
+            var (from, to) = ILine.SameResolution(renderedLine, targetLine);
 
             incomingLine = null;
 
             return new Tween(
-                t => {
-                    Render(ILine.Lerp(from, to, t));
-                }
+                t => Render(ILine.Lerp(from, to, t))
             ).Observe(
+                // After the transition is complete, we ensure we store the line we got
+                // instead of the result of ILine.Lerp() which is always a DiscreteLine.
                 onComplete: () => Render(targetLine)
             );
         }
@@ -185,10 +181,10 @@ namespace Primer.Graph
             var resolution = targetLine.resolution;
 
             return new Tween(
-                t => {
-                    Render(targetLine.SmoothCut(resolution * t, fromOrigin: false));
-                }
+                t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: false))
             ).Observe(
+                // After the transition is complete, we ensure we store the line we got
+                // instead of the result of SmoothCut() which is always a DiscreteLine.
                 onComplete: () => Render(targetLine)
             );
         }
@@ -197,7 +193,10 @@ namespace Primer.Graph
         {
             var targetLine = renderedLine;
             var resolution = targetLine.resolution;
-            return new Tween(t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: true)));
+
+            return new Tween(
+                t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: true))
+            );
         }
 
         public void Dispose()
@@ -277,8 +276,8 @@ namespace Primer.Graph
 
                 // Add the indices of the two triangles to the list
                 var index = i * 4;
-                AddTriangle(triangles, index, index + 1, index + 2);
-                AddTriangle(triangles, index + 1, index + 2, index + 3);
+                triangles.AddTriangle(index, index + 1, index + 2);
+                triangles.AddTriangle(index + 1, index + 2, index + 3);
             }
         }
 
@@ -306,7 +305,7 @@ namespace Primer.Graph
                 // miterVertices = Vector3.Angle(left - b, right - b) / degreesPerVertex
 
                 if (miterVertices <= 0) {
-                    AddTriangle(triangles, center, leftIndex, rightIndex);
+                    triangles.AddTriangle(center, leftIndex, rightIndex);
                     continue;
                 }
 
@@ -315,10 +314,10 @@ namespace Primer.Graph
                     vertices.Add(Vector3.Slerp(left - b, right - b, t) + b);
 
                     var corner = j == 0 ? leftIndex : center + j;
-                    AddTriangle(triangles, center, corner, center + j + 1);
+                    triangles.AddTriangle(center, corner, center + j + 1);
                 }
 
-                AddTriangle(triangles, center, center + miterVertices, rightIndex);
+                triangles.AddTriangle(center, center + miterVertices, rightIndex);
             }
         }
 
@@ -339,18 +338,8 @@ namespace Primer.Graph
                     : Vector3.Slerp(direction, perpendicular, t * 2 - 1);
 
                 vertices.Add(a + point);
-                AddTriangle(triangles, center, center + i, center + i + 1);
+                triangles.AddTriangle(center, center + i, center + i + 1);
             }
-        }
-
-        private static void AddTriangle(List<int> triangles, int a, int b, int c)
-        {
-            triangles.Add(a);
-            triangles.Add(b);
-            triangles.Add(c);
-            triangles.Add(a);
-            triangles.Add(c);
-            triangles.Add(b);
         }
         #endregion
     }
