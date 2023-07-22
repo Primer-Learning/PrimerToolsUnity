@@ -195,7 +195,9 @@ namespace Primer.Graph
             var resolution = targetLine.resolution;
 
             return new Tween(
-                t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: true))
+                t => Render(targetLine.SmoothCut(resolution * (1 - t), fromOrigin: true))
+            ).Observe(
+                onComplete: () => gameObject.SetActive(false)
             );
         }
 
