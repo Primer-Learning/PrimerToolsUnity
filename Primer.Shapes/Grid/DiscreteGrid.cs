@@ -3,35 +3,35 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    public readonly struct ContinuousGrid : IGrid
+    public readonly struct DiscreteGrid : IGrid
     {
         const int minSize = 1;
-        public static ContinuousGrid zero = new(0);
+        public static DiscreteGrid zero = new(0);
 
-        public Vector3[] Points { get; }
-        public int Size { get; }
+        public Vector3[] points { get; }
+        public int size { get; }
 
-        int SideLength => Size + 1;
+        int SideLength => size + 1;
 
 
-        ContinuousGrid(Vector3[] points, int size) {
-            Points = points;
-            Size = size;
+        DiscreteGrid(Vector3[] points, int size) {
+            this.points = points;
+            this.size = size;
         }
 
 
         #region Public constructors
-        public ContinuousGrid(int size) {
-            Size = size;
-            Points = new Vector3[(size + 1) * (size + 1)];
+        public DiscreteGrid(int size) {
+            this.size = size;
+            points = new Vector3[(size + 1) * (size + 1)];
         }
 
-        public ContinuousGrid(Vector3[] vertices) {
+        public DiscreteGrid(Vector3[] vertices) {
             var originalSize = GetSizeFromArray(vertices) - 1;
 
             if (originalSize.IsInteger() && originalSize >= minSize) {
-                Size = (int)originalSize;
-                Points = vertices;
+                size = (int)originalSize;
+                points = vertices;
                 return;
             }
 
@@ -41,8 +41,8 @@ namespace Primer.Graph
 
             vertices.CopyTo(newVertices, 0);
 
-            Size = newSize;
-            Points = newVertices;
+            size = newSize;
+            points = newVertices;
         }
         #endregion
 
@@ -50,7 +50,7 @@ namespace Primer.Graph
         #region Render to mesh
         public void RenderTo(Mesh mesh, bool bothSides = false) {
             var triangles = DefineTriangles(bothSides);
-            var points = bothSides ? DuplicatedList(Points) : Points;
+            var points = bothSides ? DuplicatedList(this.points) : this.points;
 
             mesh.Clear();
             mesh.vertices = points;
@@ -62,13 +62,13 @@ namespace Primer.Graph
 
         #region Manipulation
         public IGrid Resize(int newSize) {
-            var size = Size;
+            var size = this.size;
             if (newSize == size) return this;
 
             var sideLength = SideLength;
             var newSideLength = newSize + 1;
 
-            var points = Points;
+            var points = this.points;
             var result = new Vector3[newSideLength * newSideLength];
 
             for (var y = 0; y < newSideLength; y++) {
@@ -83,18 +83,18 @@ namespace Primer.Graph
                 }
             }
 
-            return new ContinuousGrid(result, newSize);
+            return new DiscreteGrid(result, newSize);
         }
 
         public IGrid Crop(float newSize) => SmoothCut(newSize, false);
         public IGrid SmoothCut(float croppedSize, bool fromOrigin) {
             if (croppedSize == 0) return zero;
 
-            if (croppedSize.IsInteger() && Size == (int)croppedSize) {
+            if (croppedSize.IsInteger() && size == (int)croppedSize) {
                 return this;
             }
 
-            if (Size < croppedSize) {
+            if (size < croppedSize) {
                 throw new Exception("Crop size is bigger than grid area. Do you want IGrid.Resize()?");
             }
 
@@ -104,7 +104,7 @@ namespace Primer.Graph
             var offset = fromOrigin ? sideLength - length : 0;
             var t = croppedSize.GetDecimals();
 
-            var points = Points;
+            var points = this.points;
             var copy = new Vector3[length * length];
 
             // Copy unchanged points, including points to lerp
@@ -151,14 +151,14 @@ namespace Primer.Graph
                 copy[lastIndex * length + lastIndex] = QuadLerp(points, sideLength, croppedSize, croppedSize);
             }
 
-            return new ContinuousGrid(copy, finalSize);
+            return new DiscreteGrid(copy, finalSize);
         }
         #endregion
 
 
         #region Triangles
         int[] DefineTriangles(bool bothSides) {
-            var size = Size;
+            var size = this.size;
             var sideLength = SideLength;
             var pointsCount = sideLength * sideLength;
             var trianglesPerSquare = bothSides ? 4 : 2;
