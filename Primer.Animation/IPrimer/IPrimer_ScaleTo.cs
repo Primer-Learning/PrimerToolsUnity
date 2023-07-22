@@ -115,6 +115,9 @@ namespace Primer.Animation
 
         public static Tween ScaleTo(this Component self, float newScale, float? initialScale = null)
         {
+            if (self == null)
+                return Tween.empty;
+
             var transform = self.transform;
 
             var initial = initialScale.HasValue
