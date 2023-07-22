@@ -11,7 +11,7 @@ namespace Primer.Graph
     [ExecuteAlways]
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     [RequireComponent(typeof(GraphDomain))]
-    public class PrimerLine : MonoBehaviour, IMeshController
+    public class PrimerLine : MonoBehaviour, IMeshController, IDisposable
     {
         private ILine renderedLine = new DiscreteLine(0);
         private ILine incomingLine = null;
@@ -198,6 +198,11 @@ namespace Primer.Graph
             var targetLine = renderedLine;
             var resolution = targetLine.resolution;
             return new Tween(t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: true)));
+        }
+
+        public void Dispose()
+        {
+            new Container(transform).Dispose();
         }
 
         private DiscreteLine GetCurrentDiscreteLine()
