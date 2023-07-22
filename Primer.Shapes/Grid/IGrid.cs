@@ -1,55 +1,57 @@
-using System;
+using Primer.Shapes;
 using UnityEngine;
 
 namespace Primer.Graph
 {
     public interface IGrid
     {
-        int size { get; }
-        Vector3[] points { get; }
+        Vector2Int resolution { get; }
+        Vector3[,] points { get; }
 
-        void RenderTo(Mesh mesh, bool bothSides);
-
-        IGrid Resize(int newSize);
-        IGrid SmoothCut(float newSize, bool fromOrigin);
+        IGrid ChangeResolution(Vector2Int newResolution);
+        IGrid SmoothCut(Vector2 newSize, bool fromOrigin);
 
 
-        public static T Lerp<T>(T a, T b, float t) where T : IGrid {
-            var maxSize = a.size > b.size ? a.size : b.size;
-            var pointsPerSide = maxSize + 1;
-            var length = pointsPerSide * pointsPerSide;
-            var finalPoints = new Vector3[length];
+        public static IGrid Lerp(IGrid a, IGrid b, float t)
+        {
+            var maxResolution = Vector2Int.Max(a.resolution, b.resolution);
+            var finalPoints = new Vector3[maxResolution.x, maxResolution.y];
 
-            if (a.size != maxSize) a = (T)a.Resize(maxSize);
-            if (b.size != maxSize) b = (T)b.Resize(maxSize);
+            if (a.resolution != maxResolution) a = a.ChangeResolution(maxResolution);
+            if (b.resolution != maxResolution) b = b.ChangeResolution(maxResolution);
 
-            for (var i = 0; i < length; i++) {
-                finalPoints[i] = Vector3.Lerp(a.points[i], b.points[i], t);
+            for (var x = 0; x < maxResolution.x; x++) {
+                for (var y = 0; y < maxResolution.y; y++) {
+                    finalPoints[x, y] = Vector3.Lerp(a.points[x, y], b.points[x, y], t);
+                }
             }
 
-            return (T)Activator.CreateInstance(a.GetType(), finalPoints);
+            return new DiscreteGrid(finalPoints);
         }
 
         /// <summary>
         ///     Use this when resizing several grids at the same time
         ///     this ensures grids don't suffer more than one transformation
         /// </summary>
-        public static IGrid[] Resize(params IGrid[] inputs) {
-            var copy = new IGrid[inputs.Length];
-            var maxSize = 0;
+        public static IGrid[] SameResolution(params IGrid[] inputs) {
+            var sameResolution = new IGrid[inputs.Length];
+            var maxResolution = Vector2Int.zero;
 
             for (var i = 0; i < inputs.Length; i++) {
-                var size = inputs[i].size;
-                if (size > maxSize) maxSize = size;
+                maxResolution = Vector2Int.Max(maxResolution, inputs[i].resolution);
             }
 
             for (var i = 0; i < inputs.Length; i++) {
-                copy[i] = inputs[i].size == maxSize
-                    ? inputs[i]
-                    : inputs[i].Resize(maxSize);
+                sameResolution[i] = inputs[i].ChangeResolution(maxResolution);
             }
 
-            return copy;
+            return sameResolution;
+        }
+
+        // For convenience
+        public static (IGrid, IGrid) SameResolution(IGrid a, IGrid b) {
+            var maxResolution = Vector2Int.Max(a.resolution, b.resolution);
+            return (a.ChangeResolution(maxResolution), b.ChangeResolution(maxResolution));
         }
     }
 }
