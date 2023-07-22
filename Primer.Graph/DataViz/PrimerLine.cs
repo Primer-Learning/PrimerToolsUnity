@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PlasticGui;
 using Primer.Animation;
 using Primer.Shapes;
 using Sirenix.OdinInspector;
@@ -77,6 +76,11 @@ namespace Primer.Graph
             meshRenderer.sharedMaterial ??= MeshRendererExtensions.defaultMaterial;
         }
 
+        /// <summary>
+        ///   Allows to set one lines above the others.
+        ///   Positive values will move the line closer to the camera.
+        ///   Default index is 0 for all lines.
+        /// </summary>
         public void SetZIndex(int index)
         {
             var pos = transform.localPosition;

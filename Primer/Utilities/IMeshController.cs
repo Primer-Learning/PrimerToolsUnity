@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Primer
 {
+    /// <summary>
+    ///     Implement this interface to get methods like `SetColor()` and `SetMaterial()` in your class
+    /// </summary>
     public interface IMeshController
     {
         public MeshRenderer[] GetMeshRenderers();
