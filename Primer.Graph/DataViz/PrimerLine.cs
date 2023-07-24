@@ -38,6 +38,17 @@ namespace Primer.Graph
             }
         }
         #endregion
+        
+        #region public float resolution;
+        [ShowInInspector]
+        public int resolution {
+            get => renderedLine.resolution;
+            set {
+                var newILine = renderedLine.ChangeResolution(value);
+                Render(newILine);
+            }
+        }
+        #endregion
 
         #region public int endCapVertices;
         [SerializeField, HideInInspector]
