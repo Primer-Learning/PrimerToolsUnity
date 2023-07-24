@@ -53,7 +53,6 @@ namespace Primer.Simulation
         
         private List<Vector3> vertices;
         private int[,,] vertexXYZToIndex;
-        private List<Vector3Int> unusedVertices;
         
         private List<int> triangles;
         
@@ -65,7 +64,6 @@ namespace Primer.Simulation
         {
             vertices = new List<Vector3>();
             vertexXYZToIndex = new int[xSize + 1, ySize + 1, zSize + 1];
-            unusedVertices = new List<Vector3Int>();
 
             for (var y = 0; y <= ySize; y++) {
                 for (var x = 0; x <= xSize; x++) SetVertex(x, y, 0);
@@ -91,23 +89,18 @@ namespace Primer.Simulation
             var candidate = new Vector3(x, y, z);
             
             var innerDifference = CalculateDistanceFromInnerSurface(x, y, z, roundingRadius);
-
-            var verticalFace = innerDifference.magnitude > roundingRadius;
-            if (verticalFace) {
-                candidate = new Vector3(x, y, z) - innerDifference + innerDifference.normalized * roundingRadius;
-
-                var newX = x;
-                var newZ = z;
-                // systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
-
-                // If this isn't an outer vertex, we'll actually skip it but map it to another one
-                if (x > 0 && x < xSize && z > 0 && z < zSize)
-                {
-                    unusedVertices.Add( new Vector3Int(newX, y, newZ));
-                    return;
-                }
+            if (innerDifference.magnitude > 0 && roundingRadius > 0)
+            {
+                var factorThatExtendsToNonroundedEdge =
+                    roundingRadius / Mathf.Max(Mathf.Abs(innerDifference.x), Mathf.Abs(innerDifference.z));
+                var fullLength = innerDifference * factorThatExtendsToNonroundedEdge;
+                
+                var innerEdge = new Vector3(x, y, z) - innerDifference;
+                var addition = innerDifference * roundingRadius / fullLength.magnitude;
+                
+                candidate = innerEdge + addition;
             }
-            
+
             // If this point is in the bottom half, we're done.
             if (y < (float)ySize / 2)
             {
@@ -147,7 +140,7 @@ namespace Primer.Simulation
         // then moving vertices to a point within the "roundingRadius" distance of the inner surface
         private Vector3 CalculateDistanceFromInnerSurface(float x, float y, float z, float radius)
         {
-            float buffer = 0.0001f;
+            float buffer = 0.001f;
             var radiusWithBuffer = radius + buffer;
             var position = new Vector3(x, y, z);
             if (x < radiusWithBuffer)
@@ -173,8 +166,11 @@ namespace Primer.Simulation
         /// Samples a 2D array, interpolating between adjacent values if given fractional
         /// coordinates.
         /// </summary>
-        private static float BilinearSample(float[,] array, float x, float y)
+        private float BilinearSample(float[,] array, float x, float y)
         {
+            x = Mathf.Clamp(x, 0, xSize);
+            y = Mathf.Clamp(y, 0, zSize);
+            
             var integerX = Mathf.FloorToInt(x);
             var fractionX = x - integerX;
 
@@ -246,14 +242,6 @@ namespace Primer.Simulation
 
         private void SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
         {
-            foreach (var vertex in new[] {v00, v10, v01, v11})
-            {
-                if (unusedVertices.Contains(vertex))
-                {
-                    return;
-                }
-            }
-            
             // Get the indices
             var i00 = vertexXYZToIndex[v00.x, v00.y, v00.z];
             var i10 = vertexXYZToIndex[v10.x, v10.y, v10.z];
