@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Serialization;
 using Sirenix.Utilities;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Primer.Simulation
 {
@@ -55,11 +57,10 @@ namespace Primer.Simulation
         private float edgeClampFactor;
         
         private List<Vector3> vertices;
-        // These two contain the same information
-        // But including the second prevents slow calls to IndexOf when setting triangles
-        // private List<Vector3Int> vertexIndexToXYZ;
         private int[,,] vertexXYZToIndex;
-        private Vector3Int[,,] systematicXYZToUsedXYX;
+        private List<Vector3Int> unusedVertices;
+        
+        private List<int> triangles;
         
         private int xSize, ySize, zSize;
 
@@ -69,7 +70,7 @@ namespace Primer.Simulation
         {
             vertices = new List<Vector3>();
             vertexXYZToIndex = new int[xSize + 1, ySize + 1, zSize + 1];
-            systematicXYZToUsedXYX = new Vector3Int[xSize + 1, ySize + 1, zSize + 1];
+            unusedVertices = new List<Vector3Int>();
 
             for (var y = 0; y <= ySize; y++) {
                 for (var x = 0; x <= xSize; x++) SetVertex(x, y, 0);
@@ -102,35 +103,14 @@ namespace Primer.Simulation
 
                 var newX = x;
                 var newZ = z;
-                systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
+                // systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
 
                 // If this isn't an outer vertex, we'll actually skip it but map it to another one
                 if (x > 0 && x < xSize && z > 0 && z < zSize)
                 {
-                    if (x < xSize / 2)
-                    {
-                        newX = Math.Max(0, x - 1);
-                    }
-                    else if (x > xSize / 2)
-                    {
-                        newX = Math.Min(xSize, x + 1);
-                    }
-
-                    if (z < zSize / 2)
-                    {
-                        newZ = Math.Max(0, z - 1);
-                    }
-                    else if (z > zSize / 2)
-                    {
-                        newZ = Math.Min(zSize, z + 1);
-                    }
-                    systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
+                    unusedVertices.Add( new Vector3Int(newX, y, newZ));
                     return;
                 }
-            }
-            else
-            {
-                systematicXYZToUsedXYX[x, y, z] = new Vector3Int(x, y, z);
             }
             
             // If this point is in the bottom half, we're done.
@@ -153,21 +133,6 @@ namespace Primer.Simulation
             
             vertices.Add(candidate);
             vertexXYZToIndex[x, y, z] = vertices.Count - 1;
-        }
-        
-        private Vector3Int GetUsedIndexFromSystematicIndex(Vector3Int systematicIndex, int recursionDepth = 0)
-        {
-            if (recursionDepth > 100)
-            {
-                Debug.LogError("Recursion depth exceeded");
-                return systematicIndex;
-            }
-            var nextIndex = systematicXYZToUsedXYX[systematicIndex.x, systematicIndex.y, systematicIndex.z];
-            if (nextIndex == systematicIndex)
-            {
-                return nextIndex;
-            }
-            else return GetUsedIndexFromSystematicIndex(nextIndex, recursionDepth + 1);
         }
 
         private float EdgeElevationDamping(Vector3 vertex)
@@ -289,17 +254,17 @@ namespace Primer.Simulation
 
         private void CreateTriangles()
         {
-            var triangles = new List<int>();
+            triangles = new List<int>();
 
             for (var y = 0; y < ySize; y++) {
                 for (var x = 0; x < xSize; x++)
-                    triangles.AddRange(SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0), new Vector3Int(x + 1, y + 1, 0)));
+                    SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0), new Vector3Int(x + 1, y + 1, 0));
                 for (var z = 0; z < zSize; z++)
-                    triangles.AddRange(SetQuad(new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1), new Vector3Int(0, y + 1, z + 1)));
+                    SetQuad(new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1), new Vector3Int(0, y + 1, z + 1));
                 for (var x = 0; x < xSize; x++)
-                    triangles.AddRange(SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize), new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize)));
+                    SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize), new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize));
                 for (var z = 0; z < zSize; z++)
-                    triangles.AddRange(SetQuad(new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1), new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1)));
+                    SetQuad(new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1), new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1));
             }
 
             triangles.AddRange(CreateTopFace());
@@ -314,7 +279,7 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                tris.AddRange(SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1)));
+                SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1));
 
             return tris;
         }
@@ -324,49 +289,49 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                tris.AddRange(SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1)));
+                SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1));
 
             return tris;
         }
 
-        private int[] SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
+        private void SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
         {
-            // Get the 3-indices of the corresponding real vertices
-            var u00 = GetUsedIndexFromSystematicIndex(v00);
-            var u10 = GetUsedIndexFromSystematicIndex(v10);
-            var u01 = GetUsedIndexFromSystematicIndex(v01);
-            var u11 = GetUsedIndexFromSystematicIndex(v11);
-
-            // Get the 1-indices
-            var i00 = vertexXYZToIndex[u00.x, u00.y, u00.z];
-            var i10 = vertexXYZToIndex[u10.x, u10.y, u10.z];
-            var i01 = vertexXYZToIndex[u01.x, u01.y, u01.z];
-            var i11 = vertexXYZToIndex[u11.x, u11.y, u11.z];
+            foreach (var vertex in new[] {v00, v10, v01, v11})
+            {
+                if (unusedVertices.Contains(vertex))
+                {
+                    return;
+                }
+            }
+            
+            // Get the indices
+            var i00 = vertexXYZToIndex[v00.x, v00.y, v00.z];
+            var i10 = vertexXYZToIndex[v10.x, v10.y, v10.z];
+            var i01 = vertexXYZToIndex[v01.x, v01.y, v01.z];
+            var i11 = vertexXYZToIndex[v11.x, v11.y, v11.z];
 
             List<int> tris = new List<int>();
 
             if (AreAllUnique(i00, i01, i10))
-            {
-                tris.AddRange(SetTriangle(i00, i01, i10));
+            { 
+                SetTriangle(i00, i01, i10);
             }
-            else Debug.Log("Skipping triangle because of duplicate vertices");
+            // else Debug.Log("Skipping triangle because of duplicate vertices");
             if (AreAllUnique(i10, i01, i11))
             {
-                tris.AddRange(SetTriangle(i10, i01, i11));
+                SetTriangle(i10, i01, i11);   
             }
-            else Debug.Log("Skipping triangle because of duplicate vertices");
-            
-            return tris.ToArray();
+            // else Debug.Log("Skipping triangle because of duplicate vertices");
         }
 
-        private int[] SetTriangle(int i0, int i1, int i2)
+        private void  SetTriangle(int i0, int i1, int i2)
         {
-            return new[] { i0, i1, i2 };
+            triangles.AddRange(new[] { i0, i1, i2 });
         }
 
         private bool AreAllUnique(params int[] indices)
         {
-            return indices.Distinct().Count() == indices.Length;
+            return new HashSet<int>(indices).Count == indices.Length;
         }
     }
 }
