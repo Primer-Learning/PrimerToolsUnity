@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Simulation
@@ -245,50 +246,52 @@ namespace Primer.Simulation
 
         private void CreateTriangles()
         {
-            var triangles = new int[xSize * ySize * 12 + ySize * zSize * 12 + xSize * zSize * 12];
-            int t = 0;
+            var triangles = new List<int>();
 
             for (var y = 0; y < ySize; y++) {
                 for (var x = 0; x < xSize; x++)
-                    t = SetQuad(triangles, t, new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0), new Vector3Int(x + 1, y + 1, 0));
+                    triangles.AddRange(SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0), new Vector3Int(x + 1, y + 1, 0)));
                 for (var z = 0; z < zSize; z++)
-                    t = SetQuad(triangles, t, new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1), new Vector3Int(0, y + 1, z + 1));
+                    triangles.AddRange(SetQuad(new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1), new Vector3Int(0, y + 1, z + 1)));
                 for (var x = 0; x < xSize; x++)
-                    t = SetQuad(triangles, t, new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize), new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize));
+                    triangles.AddRange(SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize), new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize)));
                 for (var z = 0; z < zSize; z++)
-                    t = SetQuad(triangles, t, new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1), new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1));
+                    triangles.AddRange(SetQuad(new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1), new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1)));
             }
 
-            t = CreateTopFace(triangles, t);
-            t = CreateBottomFace(triangles, t);
-            mesh.SetTriangles(triangles, 0);
+            triangles.AddRange(CreateTopFace());
+            triangles.AddRange(CreateBottomFace());
+            mesh.SetTriangles(triangles.ToArray(), 0);
         }
 
-        private int CreateTopFace(int[] triangles, int t)
+        private List<int> CreateTopFace()
         {
+            var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                t = SetQuad(triangles, t, new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1));
+                tris.AddRange(SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1)));
 
-            return t;
+            return tris;
         }
 
-        private int CreateBottomFace(int[] triangles, int t)
+        private List<int> CreateBottomFace()
         {
+            var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                t = SetQuad(triangles, t, new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1));
+                tris.AddRange(SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1)));
 
-            return t;
+            return tris;
         }
 
-        private int SetQuad(int[] triangles, int i, Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
+        private int[] SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
         {
-            triangles[i] = vertexXYZToIndex[v00.x, v00.y, v00.z];
-            triangles[i + 1] = triangles[i + 4] = vertexXYZToIndex[v01.x, v01.y, v01.z];
-            triangles[i + 2] = triangles[i + 3] = vertexXYZToIndex[v10.x, v10.y, v10.z];
-            triangles[i + 5] = vertexXYZToIndex[v11.x, v11.y, v11.z];
-            return i + 6;
+            var tris = new int[6]; 
+            tris[0] = vertexXYZToIndex[v00.x, v00.y, v00.z];
+            tris[1] = tris[4] = vertexXYZToIndex[v01.x, v01.y, v01.z];
+            tris[2] = tris[3] = vertexXYZToIndex[v10.x, v10.y, v10.z];
+            tris[5] = vertexXYZToIndex[v11.x, v11.y, v11.z];
+            return tris;
         }
 
         private bool AreAllUnique(params int[] indices)
