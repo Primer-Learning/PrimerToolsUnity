@@ -225,7 +225,10 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1));
+                if (x < xSize / 2 ^ z < zSize / 2)
+                    SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1));
+                else
+                    SetQuad(new Vector3Int(x, ySize, z + 1), new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z + 1), new Vector3Int(x + 1, ySize, z));
 
             return tris;
         }
@@ -235,9 +238,12 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1));
+                if (x < xSize / 2 ^ z < zSize / 2)
+                    SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1));
+                else
+                    SetQuad(new Vector3Int(x + 1, 0, z), new Vector3Int(x, 0, z), new Vector3Int(x + 1, 0, z + 1), new Vector3Int(x, 0, z + 1));
 
-            return tris;
+                    return tris;
         }
 
         private void SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
