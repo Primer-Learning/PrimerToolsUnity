@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using Sirenix.Utilities;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Primer.Simulation
@@ -56,8 +57,9 @@ namespace Primer.Simulation
         private List<Vector3> vertices;
         // These two contain the same information
         // But including the second prevents slow calls to IndexOf when setting triangles
-        private List<Vector3Int> vertexIndexToXYZ;
+        // private List<Vector3Int> vertexIndexToXYZ;
         private int[,,] vertexXYZToIndex;
+        private Vector3Int[,,] systematicXYZToUsedXYX;
         
         private int xSize, ySize, zSize;
 
@@ -66,32 +68,29 @@ namespace Primer.Simulation
         private void CreateVertices()
         {
             vertices = new List<Vector3>();
-            vertexIndexToXYZ = new List<Vector3Int>();
             vertexXYZToIndex = new int[xSize + 1, ySize + 1, zSize + 1];
-            // uv = new Vector2[vertices.Length];
-            // normals = new Vector3[vertices.Length];
+            systematicXYZToUsedXYX = new Vector3Int[xSize + 1, ySize + 1, zSize + 1];
 
-            var v = 0;
             for (var y = 0; y <= ySize; y++) {
-                for (var x = 0; x <= xSize; x++) SetVertex(v++, x, y, 0);
-                for (var z = 1; z <= zSize; z++) SetVertex(v++, xSize, y, z);
-                for (var x = xSize - 1; x >= 0; x--) SetVertex(v++, x, y, zSize);
-                for (var z = zSize - 1; z > 0; z--) SetVertex(v++, 0, y, z);
+                for (var x = 0; x <= xSize; x++) SetVertex(x, y, 0);
+                for (var z = 1; z <= zSize; z++) SetVertex(xSize, y, z);
+                for (var x = xSize - 1; x >= 0; x--) SetVertex(x, y, zSize);
+                for (var z = zSize - 1; z > 0; z--) SetVertex(0, y, z);
             }
 
             // This is the top face
             for (var z = 1; z < zSize; z++)
             for (var x = 1; x < xSize; x++)
-                SetVertex(v++, x, ySize, z);
+                SetVertex(x, ySize, z);
 
             for (var z = 1; z < zSize; z++)
             for (var x = 1; x < xSize; x++)
-                SetVertex(v++, x, 0, z);
+                SetVertex(x, 0, z);
 
             mesh.vertices = vertices.ToArray();
         }
 
-        private void SetVertex(int i, int x, int y, int z)
+        private void SetVertex(int x, int y, int z)
         {
             var candidate = new Vector3(x, y, z);
             
@@ -99,16 +98,46 @@ namespace Primer.Simulation
 
             var verticalFace = innerDifference.magnitude > roundingRadius;
             if (verticalFace) {
-                // normals[i] = innerDifference.normalized;
                 candidate = new Vector3(x, y, z) - innerDifference + innerDifference.normalized * roundingRadius;
+
+                var newX = x;
+                var newZ = z;
+                systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
+
+                // If this isn't an outer vertex, we'll actually skip it but map it to another one
+                if (x > 0 && x < xSize && z > 0 && z < zSize)
+                {
+                    if (x < xSize / 2)
+                    {
+                        newX = Math.Max(0, x - 1);
+                    }
+                    else if (x > xSize / 2)
+                    {
+                        newX = Math.Min(xSize, x + 1);
+                    }
+
+                    if (z < zSize / 2)
+                    {
+                        newZ = Math.Max(0, z - 1);
+                    }
+                    else if (z > zSize / 2)
+                    {
+                        newZ = Math.Min(zSize, z + 1);
+                    }
+                    systematicXYZToUsedXYX[x, y, z] = new Vector3Int(newX, y, newZ);
+                    return;
+                }
+            }
+            else
+            {
+                systematicXYZToUsedXYX[x, y, z] = new Vector3Int(x, y, z);
             }
             
             // If this point is in the bottom half, we're done.
             if (y < (float)ySize / 2)
             {
                 vertices.Add(candidate);
-                vertexIndexToXYZ.Add(new Vector3Int(x, y, z));
-                vertexXYZToIndex[x, y, z] = i;
+                vertexXYZToIndex[x, y, z] = vertices.Count - 1;
                 return;
             }
             // The top half will be elevated by the height map
@@ -123,8 +152,22 @@ namespace Primer.Simulation
             candidate.y += elevationAdjustment + elevationOffset;
             
             vertices.Add(candidate);
-            vertexIndexToXYZ.Add(new Vector3Int(x, y, z));
-            vertexXYZToIndex[x, y, z] = i;
+            vertexXYZToIndex[x, y, z] = vertices.Count - 1;
+        }
+        
+        private Vector3Int GetUsedIndexFromSystematicIndex(Vector3Int systematicIndex, int recursionDepth = 0)
+        {
+            if (recursionDepth > 100)
+            {
+                Debug.LogError("Recursion depth exceeded");
+                return systematicIndex;
+            }
+            var nextIndex = systematicXYZToUsedXYX[systematicIndex.x, systematicIndex.y, systematicIndex.z];
+            if (nextIndex == systematicIndex)
+            {
+                return nextIndex;
+            }
+            else return GetUsedIndexFromSystematicIndex(nextIndex, recursionDepth + 1);
         }
 
         private float EdgeElevationDamping(Vector3 vertex)
@@ -261,6 +304,8 @@ namespace Primer.Simulation
 
             triangles.AddRange(CreateTopFace());
             triangles.AddRange(CreateBottomFace());
+            // Debug.Log(triangles.Max());
+            // Debug.Log(vertices.Count);
             mesh.SetTriangles(triangles.ToArray(), 0);
         }
 
@@ -286,12 +331,37 @@ namespace Primer.Simulation
 
         private int[] SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
         {
-            var tris = new int[6]; 
-            tris[0] = vertexXYZToIndex[v00.x, v00.y, v00.z];
-            tris[1] = tris[4] = vertexXYZToIndex[v01.x, v01.y, v01.z];
-            tris[2] = tris[3] = vertexXYZToIndex[v10.x, v10.y, v10.z];
-            tris[5] = vertexXYZToIndex[v11.x, v11.y, v11.z];
-            return tris;
+            // Get the 3-indices of the corresponding real vertices
+            var u00 = GetUsedIndexFromSystematicIndex(v00);
+            var u10 = GetUsedIndexFromSystematicIndex(v10);
+            var u01 = GetUsedIndexFromSystematicIndex(v01);
+            var u11 = GetUsedIndexFromSystematicIndex(v11);
+
+            // Get the 1-indices
+            var i00 = vertexXYZToIndex[u00.x, u00.y, u00.z];
+            var i10 = vertexXYZToIndex[u10.x, u10.y, u10.z];
+            var i01 = vertexXYZToIndex[u01.x, u01.y, u01.z];
+            var i11 = vertexXYZToIndex[u11.x, u11.y, u11.z];
+
+            List<int> tris = new List<int>();
+
+            if (AreAllUnique(i00, i01, i10))
+            {
+                tris.AddRange(SetTriangle(i00, i01, i10));
+            }
+            else Debug.Log("Skipping triangle because of duplicate vertices");
+            if (AreAllUnique(i10, i01, i11))
+            {
+                tris.AddRange(SetTriangle(i10, i01, i11));
+            }
+            else Debug.Log("Skipping triangle because of duplicate vertices");
+            
+            return tris.ToArray();
+        }
+
+        private int[] SetTriangle(int i0, int i1, int i2)
+        {
+            return new[] { i0, i1, i2 };
         }
 
         private bool AreAllUnique(params int[] indices)
