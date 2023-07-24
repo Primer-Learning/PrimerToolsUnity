@@ -35,11 +35,6 @@ namespace Primer.Simulation
             generator.CreateVertices();
             generator.CreateTriangles();
 
-            if (cleanUp)
-            {
-                generator.CleanDuplicateVerticesAndZeroAreaTriangles();
-            }
-
             generator.mesh.RecalculateNormals();
             generator.mesh.RecalculateTangents();
 
@@ -146,51 +141,6 @@ namespace Primer.Simulation
             var normalizedOuterDistance = 1 - innerDifference.magnitude / roundingRadius;
             
             return Mathf.Clamp(normalizedOuterDistance / edgeClampFactor, 0, 1);
-        }
-
-        private void CleanDuplicateVerticesAndZeroAreaTriangles()
-        {
-            float tolerance = 0.1f; // Adjust this value as needed.
-            var comparer = new Vector3Comparer(tolerance);
-            Dictionary<Vector3, int> distinctVertices = new Dictionary<Vector3, int>(comparer);
-
-            // Create a list of unique vertices and record the mapping from old to new indices
-            for (int i = 0; i < mesh.vertexCount; i++)
-            {
-                Vector3 vertex = mesh.vertices[i];
-
-                distinctVertices.TryAdd(vertex, distinctVertices.Count);
-            }
-    
-            // Update the triangles to use the new indices
-            // Remove triangles with zero area
-            List<int> newTriangles = new List<int>();
-            for (int i = 0; i < mesh.triangles.Length; i += 3)
-            {
-                var indices = new[]
-                {
-                    distinctVertices[mesh.vertices[mesh.triangles[i]]],
-                    distinctVertices[mesh.vertices[mesh.triangles[i + 1]]],
-                    distinctVertices[mesh.vertices[mesh.triangles[i + 2]]]
-                };
-
-                if (indices.Distinct().Count() == indices.Length)
-                {
-                    newTriangles.AddRange(indices);
-                }
-            }
-
-            Debug.Log("Old vertex count: " + mesh.vertexCount);
-            Debug.Log("New vertex count: " + distinctVertices.Count);
-            
-            Debug.Log("Old max triangle index: " + mesh.triangles.Max());
-            Debug.Log("New max triangle index: " + newTriangles.Max());
-            
-            Debug.Log("Removed " + (mesh.vertices.Length - distinctVertices.Count) + " vertices");
-            Debug.Log("Removed " + (mesh.triangles.Length - newTriangles.Count) / 3 + " triangles");
-            
-            mesh.triangles = newTriangles.ToArray();
-            mesh.vertices = distinctVertices.Keys.ToArray();
         }
 
         // The outer mesh is rounded by creating a virtual inner surface,
