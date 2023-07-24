@@ -259,24 +259,16 @@ namespace Primer.Simulation
             var i10 = vertexXYZToIndex[v10.x, v10.y, v10.z];
             var i01 = vertexXYZToIndex[v01.x, v01.y, v01.z];
             var i11 = vertexXYZToIndex[v11.x, v11.y, v11.z];
-
-            List<int> tris = new List<int>();
-
-            if (AreAllUnique(i00, i01, i10))
-            { 
-                SetTriangle(i00, i01, i10);
-            }
-            // else Debug.Log("Skipping triangle because of duplicate vertices");
-            if (AreAllUnique(i10, i01, i11))
-            {
-                SetTriangle(i10, i01, i11);   
-            }
-            // else Debug.Log("Skipping triangle because of duplicate vertices");
+            
+            SetTriangle(i00, i01, i10);
+            SetTriangle(i10, i01, i11);
         }
 
         private void  SetTriangle(int i0, int i1, int i2)
         {
-            triangles.AddRange(new[] { i0, i1, i2 });
+            if (AreAllUnique(i0, i1, i2))
+                triangles.AddRange(new[] { i0, i1, i2 });
+            // else Debug.Log("Skipping triangle because of duplicate vertices");
         }
 
         private bool AreAllUnique(params int[] indices)
