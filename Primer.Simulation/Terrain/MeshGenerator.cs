@@ -1,19 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Xml.Serialization;
-using Sirenix.Utilities;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace Primer.Simulation
 {
     internal class MeshGenerator
     {
         public static Mesh CreateMesh(float roundness, Vector2Int size, float[,] heightMap,
-            float heightMultiplier, float elevationOffset, float edgeClampDistance, bool cleanUp = false)
+            float heightMultiplier, float elevationOffset, float edgeClampDistance)
         {
             // This code was initially copied from
             // https://catlikecoding.com/unity/tutorials/rounded-cube/ and it was designed there
@@ -36,6 +30,7 @@ namespace Primer.Simulation
             generator.CreateTriangles();
 
             generator.mesh.RecalculateNormals();
+            generator.CorrectBottomEdgeNormals();
             generator.mesh.RecalculateTangents();
 
             return generator.mesh;
@@ -123,6 +118,30 @@ namespace Primer.Simulation
             vertexXYZToIndex[x, y, z] = vertices.Count - 1;
         }
 
+        private void CorrectBottomEdgeNormals()
+        {
+            var normals = mesh.normals;
+            for (var x = 0; x <= xSize; x++)
+            {
+                for (var z = 0; z <= zSize; z++)
+                {
+                    // Only looking at edges
+                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
+                    var index = vertexXYZToIndex[x, 0, z];
+                    var vertex = vertices[index];
+                    normals[index] = BottomEdgeNormal(vertex);
+                }
+            }
+            mesh.normals = normals;
+        }
+
+        private Vector3 BottomEdgeNormal(Vector3 vertex)
+        {
+            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            
+            return (innerDifference.normalized + Vector3.down).normalized;
+        }
+
         private float EdgeElevationDamping(Vector3 vertex)
         {
             if (roundingRadius == 0) return 1;
@@ -206,7 +225,7 @@ namespace Primer.Simulation
             {
                 for (var x = 0; x < xSize; x++)
                 {
-                    var rotate90 = !(x < xSize / 2 ^ y < ySize / 2);;
+                    var rotate90 = x < xSize / 2 ^ y < ySize / 2;
                     SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0),
                         new Vector3Int(x + 1, y + 1, 0), rotate90);
                 }
@@ -219,7 +238,7 @@ namespace Primer.Simulation
 
                 for (var x = 0; x < xSize; x++)
                 {
-                    var rotate90 = !(x < xSize / 2 ^ y < ySize / 2);
+                    var rotate90 = x < xSize / 2 ^ y < ySize / 2;
                     SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize),
                         new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize), rotate90);
                 }

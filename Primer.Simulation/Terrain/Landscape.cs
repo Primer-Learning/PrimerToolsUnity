@@ -195,6 +195,25 @@ namespace Primer.Simulation
             get => this.GetColor();
             set => this.SetColor(value);
         }
+        
+        [SerializeField, HideInInspector]
+        private bool _showNormals;
+        
+        [ShowInInspector]
+        public bool showNormals
+        {
+            get => _showNormals;
+            set
+            {
+                _showNormals = value;
+                var normalViewer = root.GetComponent<MeshNormalViewer>();
+                if (normalViewer is not null)
+                {
+                    if (value) normalViewer.DrawNormals();
+                    else normalViewer.ClearNormals();
+                }
+            }
+        }
         #endregion
 
         #region Internal fields
@@ -271,6 +290,15 @@ namespace Primer.Simulation
             meshCollider.sharedMesh = mesh;
             meshFilter.sharedMesh = mesh;
             root.localPosition = new Vector3(size.x, 0, size.y) / -2f;
+
+            if (_showNormals)
+            {
+                var normalViewer = root.GetComponent<MeshNormalViewer>();
+                if (normalViewer is not null && normalViewer.enabled)
+                {
+                    normalViewer.DrawNormals();
+                }
+            }
         }
         #endregion
 
