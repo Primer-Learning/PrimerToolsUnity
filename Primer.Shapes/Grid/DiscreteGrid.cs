@@ -1,5 +1,4 @@
 using System;
-using Primer.Graph;
 using UnityEngine;
 
 namespace Primer.Shapes
@@ -9,7 +8,7 @@ namespace Primer.Shapes
         public static DiscreteGrid zero = new(0);
 
         public Vector3[,] points { get; }
-        public Vector2Int resolution => new(points.GetLength(0), points.GetLength(1));
+        public Vector2Int resolution => new(points.GetLength(0) - 1, points.GetLength(1) - 1);
 
 
         public DiscreteGrid(int cellsPerSide) {
@@ -21,7 +20,7 @@ namespace Primer.Shapes
         }
 
         public DiscreteGrid(Vector2Int resolution) {
-            points = new Vector3[resolution.x, resolution.y];
+            points = new Vector3[resolution.x + 1, resolution.y + 1];
         }
 
         public DiscreteGrid(Vector3[,] points) {
@@ -35,10 +34,10 @@ namespace Primer.Shapes
             if (newResolution == currentResolution)
                 return this;
 
-            var result = new Vector3[newResolution.x, newResolution.y];
+            var result = new Vector3[newResolution.x + 1, newResolution.y + 1];
 
-            for (var y = 0; y < newResolution.y; y++) {
-                for (var x = 0; x < newResolution.x; x++) {
+            for (var y = 0; y <= newResolution.y; y++) {
+                for (var x = 0; x <= newResolution.x; x++) {
                     var coords = new Vector2(x, y) / newResolution * currentResolution;
 
                     result[x, y] = coords.IsInteger()
@@ -51,56 +50,55 @@ namespace Primer.Shapes
         }
 
         // public IGrid Crop(float newSize) => SmoothCut(newSize, false);
-        public IGrid SmoothCut(Vector2 croppedSize, bool fromOrigin) {
-            if (croppedSize == Vector2.zero)
+        public IGrid SmoothCut(Vector2 croppedResolution, bool fromOrigin) {
+            if (croppedResolution == Vector2.zero)
                 return zero;
 
-            if (resolution == croppedSize)
+            if (resolution == croppedResolution)
                 return this;
 
-            if (croppedSize.x > resolution.x || croppedSize.y > resolution.y)
+            if (croppedResolution.x > resolution.x || croppedResolution.y > resolution.y)
                 throw new Exception("Crop size is bigger than grid area. Do you want IGrid.ChangeResolution()?");
 
-            var finalSize = Vector2Int.CeilToInt(croppedSize);
-            // var sideLength = this.sideLength;
-            // var length = finalSize + 1;
-            // var offset = fromOrigin ? sideLength - length : 0;
-            var offset = fromOrigin ? resolution - finalSize : Vector2Int.zero;
-            var t = new Vector2(croppedSize.x.GetDecimals(), croppedSize.y.GetDecimals());
-            var copy = new Vector3[finalSize.x, finalSize.y];
+            var finalResolution = Vector2Int.CeilToInt(croppedResolution);
+            var offset = fromOrigin ? resolution - finalResolution : Vector2Int.zero;
+            var copy = new Vector3[finalResolution.x + 1, finalResolution.y + 1];
+            var t = croppedResolution.IsInteger() ? croppedResolution : croppedResolution.GetDecimals();
 
             // Copy unchanged points, including points to lerp
-            for (var x = 0; x < finalSize.x; x++) {
-                for (var y = 0; y < finalSize.y; y++) {
+            for (var x = 0; x <= finalResolution.x; x++) {
+                for (var y = 0; y <= finalResolution.y; y++) {
                     copy[x, y] = points[x + offset.x, y + offset.y];
                 }
             }
 
             if (fromOrigin) {
                 // Lerp corner
-                copy[0, 0] = QuadLerp(GetQuad(points, resolution - croppedSize), Vector2.one - t);
+                var cornerQuad = GetQuad(points, resolution - croppedResolution);
+                copy[0, 0] = QuadLerp(cornerQuad, Vector2.one - t);
 
                 // Lerp left side
-                for (var x = 1; x < finalSize.x; x++)
+                for (var x = 1; x <= finalResolution.x; x++)
                     copy[x, 0] = Vector3.Lerp(copy[x, 1], copy[x, 0], t.x);
 
                 // Lerp top
-                for (var y = 1; y < finalSize.y; y++)
+                for (var y = 1; y <= finalResolution.y; y++)
                     copy[0, y] = Vector3.Lerp(copy[1, y], copy[0, y], t.y);
             }
             else {
-                var lastIndex = finalSize - Vector2Int.one;
+                var lastIndex = finalResolution;
 
                 // Lerp right side
-                for (var x = 0; x < lastIndex.x; x++)
+                for (var x = 0; x <= lastIndex.x; x++)
                     copy[x, lastIndex.y] = Vector3.Lerp(copy[x, lastIndex.y - 1], copy[x, lastIndex.y], t.y);
 
                 // Lerp bottom
-                for (var y = 0; y < lastIndex.y; y++)
+                for (var y = 0; y <= lastIndex.y; y++)
                     copy[lastIndex.x, y] = Vector3.Lerp(copy[lastIndex.x - 1, y], copy[lastIndex.x, y], t.x);
 
                 // Lerp corner
-                copy[lastIndex.x, lastIndex.y] = QuadLerp(GetQuad(points, croppedSize), t);
+                var cornerQuad = GetQuad(points, croppedResolution);
+                copy[lastIndex.x, lastIndex.y] = QuadLerp(cornerQuad, t);
             }
 
             return new DiscreteGrid(copy);
@@ -121,9 +119,6 @@ namespace Primer.Shapes
             var floorY = Mathf.FloorToInt(location.y);
             var ceilX = Mathf.CeilToInt(location.x);
             var ceilY = Mathf.CeilToInt(location.y);
-
-            if (ceilX >= points.GetLength(0) || ceilY >= points.GetLength(1))
-                throw new Exception("WAT");
 
             return (
                 x0y0: points[floorX, floorY],

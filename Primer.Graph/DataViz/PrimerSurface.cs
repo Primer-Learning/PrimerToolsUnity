@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Primer.Shapes;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Graph
@@ -24,14 +25,36 @@ namespace Primer.Graph
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
+        #region public bool invertTriangles;
+        [SerializeField, HideInInspector]
+        private bool _invertTriangles;
+
+        [ShowInInspector]
+        public bool invertTriangles {
+            get => _invertTriangles;
+            set {
+                _invertTriangles = value;
+                Render();
+            }
+        }
+        #endregion
+
+        [ShowInInspector]
+        public Vector2Int resolution {
+            get => renderedGrid.resolution;
+            set => Render(renderedGrid.ChangeResolution(value));
+        }
+
         public void SetData(float[,] data)
         {
-            incomingGrid = new DiscreteGrid(data.GetLength(0), data.GetLength(1));
+            var cols = data.GetLength(0) - 1;
+            var rows = data.GetLength(1) - 1;
+            incomingGrid = new DiscreteGrid(cols, rows);
 
             // create x,y,z points from data
-            for (var x = 0; x < data.GetLength(0); x++) {
-                for (var y = 0; y < data.GetLength(1); y++) {
-                    incomingGrid.points[x, y] = new Vector3(x, y, data[x, y]);
+            for (var x = 0; x <= cols; x++) {
+                for (var z = 0; z <= rows; z++) {
+                    incomingGrid.points[x, z] = new Vector3(x, data[x, z], z);
                 }
             }
         }
@@ -59,9 +82,15 @@ namespace Primer.Graph
             incomingGrid = new DiscreteGrid(data);
         }
 
-        public void SetFunction(Func<float, float, float> function, int? resolution = null)
+        public void SetFunction(Func<float, float, float> function, Vector2Int? resolution = null, Vector2? start = null, Vector2? end = null)
         {
-            throw new NotImplementedException();
+            var current = GetFunctionLineParams();
+
+            incomingGrid = new FunctionGrid(function) {
+                resolution = resolution ?? current.resolution,
+                start = start ?? current.start,
+                end = end ?? current.end,
+            };
         }
 
         public void SetFunction(Func<Vector2, Vector3> function, int? resolution = null)
@@ -108,11 +137,11 @@ namespace Primer.Graph
         public Tween ShrinkToEnd()
         {
             var targetGrid = renderedGrid;
-            var resolution = targetGrid.resolution;
+            var res = targetGrid.resolution;
 
             return new Tween(
                 t => {
-                    var cutLength = new Vector2(resolution.x * t, resolution.y * t);
+                    var cutLength = new Vector2(res.x * (1 - t), res.y * (1 - t));
                     Render(targetGrid.SmoothCut(cutLength, fromOrigin: true));
                 }
             );
@@ -123,6 +152,18 @@ namespace Primer.Graph
             new Container(transform).Dispose();
         }
 
+        private FunctionGrid GetFunctionLineParams()
+        {
+            if (incomingGrid is FunctionGrid incoming)
+                return incoming;
+
+            if (renderedGrid is FunctionGrid rendered)
+                return rendered;
+
+            return FunctionGrid.Default();
+        }
+
+        private void Render() => Render(renderedGrid);
         private void Render(IGrid grid)
         {
             if (grid is null)
@@ -130,8 +171,10 @@ namespace Primer.Graph
 
             meshFilter.mesh = new Mesh {
                 vertices = DefinePoints(grid),
-                triangles = DefineTriangles(grid.resolution),
+                triangles = DefineTriangles(grid.resolution + Vector2Int.one),
             };
+
+            renderedGrid = grid;
         }
 
         private static Vector3[] DefinePoints(IGrid grid)
@@ -139,32 +182,37 @@ namespace Primer.Graph
             var points2D = grid.points;
             var colCount = points2D.GetLength(0);
             var rowCount = points2D.GetLength(1);
-
             var points = new Vector3[rowCount * colCount];
 
             for (var y = 0; y < rowCount; y++) {
                 for (var x = 0; x < colCount; x++) {
-                    points[y * colCount + x] = points2D[x, y];
+                    var p = points2D[x, y];
+                    points[y * colCount + x] = new Vector3(p.x, p.y, -p.z);
                 }
             }
 
             return points;
         }
 
-        private static int[] DefineTriangles(Vector2Int size) {
+        private int[] DefineTriangles(Vector2Int size) {
             var triangles = new List<int>();
-            var cols = size.x;
 
             // setting each square's triangles
             for (var x = 0; x < size.x - 1; x++) {
                 for (var y = 0; y < size.y - 1; y++) {
-                    var topLeft = y * cols + x;
-                    var topRight = y * cols + x + 1;
-                    var bottomLeft = (y + 1) * cols + x;
-                    var bottomRight = (y + 1) * cols + x + 1;
+                    var topLeft = y * size.x + x;
+                    var topRight = y * size.x + x + 1;
+                    var bottomLeft = (y + 1) * size.x + x;
+                    var bottomRight = (y + 1) * size.x + x + 1;
 
-                    triangles.AddTriangle(topLeft, topRight, bottomRight);
-                    triangles.AddTriangle(topLeft, bottomLeft, bottomRight);
+                    if (invertTriangles) {
+                        triangles.AddTriangle(topRight, topLeft, bottomLeft);
+                        triangles.AddTriangle(topRight, bottomRight, bottomLeft);
+                    }
+                    else {
+                        triangles.AddTriangle(topLeft, topRight, bottomRight);
+                        triangles.AddTriangle(topLeft, bottomLeft, bottomRight);
+                    }
                 }
             }
 

@@ -71,9 +71,9 @@ namespace Primer.Shapes
         //     };
         // }
 
-        public ILine SmoothCut(float toResolution, bool fromOrigin)
+        public ILine SmoothCut(float croppedResolution, bool fromOrigin)
         {
-            return ToDiscrete().SmoothCut(toResolution, fromOrigin);
+            return ToDiscrete().SmoothCut(croppedResolution, fromOrigin);
         }
 
         public DiscreteLine ToDiscrete()
