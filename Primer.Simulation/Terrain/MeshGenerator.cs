@@ -60,6 +60,7 @@ namespace Primer.Simulation
 
         private MeshGenerator() { }
 
+        #region Vertices
         private void CreateVertices()
         {
             vertices = new List<Vector3>();
@@ -123,67 +124,6 @@ namespace Primer.Simulation
             vertexXYZToIndex[x, y, z] = vertices.Count - 1;
         }
 
-        private void CorrectBottomEdgeNormals()
-        {
-            var normals = mesh.normals;
-            for (var x = 0; x <= xSize; x++)
-            {
-                for (var z = 0; z <= zSize; z++)
-                {
-                    // Only looking at edges
-                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
-                    var index = vertexXYZToIndex[x, 0, z];
-                    var vertex = vertices[index];
-                    normals[index] = BottomEdgeNormal(vertex);
-                }
-            }
-            mesh.normals = normals;
-        }
-        private void CorrectTopEdgeNormals()
-        {
-            var normals = mesh.normals;
-            for (var x = 0; x <= xSize; x++)
-            {
-                for (var z = 0; z <= zSize; z++)
-                {
-                    // Only looking at edges
-                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
-                    var index = vertexXYZToIndex[x, ySize, z];
-                    var vertex = vertices[index];
-                    normals[index] = TopEdgeNormal(vertex);
-                }
-            }
-            mesh.normals = normals;
-        }
-
-        private Vector3 BottomEdgeNormal(Vector3 vertex)
-        {
-            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
-            
-            var vertical = roundingRadius > 0 ? Vector3.down : Vector3.zero;
-            
-            return (innerDifference.normalized + vertical).normalized;
-        }
-        private Vector3 TopEdgeNormal(Vector3 vertex)
-        {
-            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
-            
-            return (innerDifference.normalized + Vector3.up).normalized;
-        }
-
-        private float EdgeElevationDamping(Vector3 vertex)
-        {
-            if (roundingRadius == 0) return 1;
-            
-            // Recalculate this because the position has changed since it was previously calculated
-            var innerDistance = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
-            var outerDistance = roundingRadius - innerDistance.magnitude;
-            var maxDistance = roundingRadius * edgeClampFactor;
-            if (outerDistance > maxDistance) return 1;
-            
-            return Mathf.Sin(outerDistance / maxDistance * Mathf.PI / 2);
-        }
-
         // The outer mesh is rounded by creating a virtual inner surface,
         // then moving vertices to a point within the "roundingRadius" distance of the inner surface
         private Vector3 CalculateDifferenceVectorFromInnerSurface(float x, float y, float z, float radius)
@@ -209,7 +149,9 @@ namespace Primer.Simulation
             }
             return position - new Vector3(x, y, z);
         }
-        
+        #endregion
+
+        #region Elevation methods
         /// <summary>
         /// Samples a 2D array, interpolating between adjacent values if given fractional
         /// coordinates.
@@ -246,6 +188,21 @@ namespace Primer.Simulation
             return fractionY * (topInterpolation - bottomInterpolation) + bottomInterpolation;
         }
 
+        private float EdgeElevationDamping(Vector3 vertex)
+        {
+            if (roundingRadius == 0) return 1;
+            
+            // Recalculate this because the position has changed since it was previously calculated
+            var innerDistance = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            var outerDistance = roundingRadius - innerDistance.magnitude;
+            var maxDistance = roundingRadius * edgeClampFactor;
+            if (outerDistance > maxDistance) return 1;
+            
+            return Mathf.Sin(outerDistance / maxDistance * Mathf.PI / 2);
+        }
+        #endregion
+        
+        #region Triangles
         private void CreateTriangles()
         {
             triangles = new List<int>();
@@ -344,5 +301,56 @@ namespace Primer.Simulation
         {
             return new HashSet<int>(indices).Count == indices.Length;
         }
+        #endregion
+
+        #region Normal Correction
+        private void CorrectBottomEdgeNormals()
+        {
+            var normals = mesh.normals;
+            for (var x = 0; x <= xSize; x++)
+            {
+                for (var z = 0; z <= zSize; z++)
+                {
+                    // Only looking at edges
+                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
+                    var index = vertexXYZToIndex[x, 0, z];
+                    var vertex = vertices[index];
+                    normals[index] = BottomEdgeNormal(vertex);
+                }
+            }
+            mesh.normals = normals;
+        }
+        private void CorrectTopEdgeNormals()
+        {
+            var normals = mesh.normals;
+            for (var x = 0; x <= xSize; x++)
+            {
+                for (var z = 0; z <= zSize; z++)
+                {
+                    // Only looking at edges
+                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
+                    var index = vertexXYZToIndex[x, ySize, z];
+                    var vertex = vertices[index];
+                    normals[index] = TopEdgeNormal(vertex);
+                }
+            }
+            mesh.normals = normals;
+        }
+
+        private Vector3 BottomEdgeNormal(Vector3 vertex)
+        {
+            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            
+            var vertical = roundingRadius > 0 ? Vector3.down : Vector3.zero;
+            
+            return (innerDifference.normalized + vertical).normalized;
+        }
+        private Vector3 TopEdgeNormal(Vector3 vertex)
+        {
+            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            
+            return (innerDifference.normalized + Vector3.up).normalized;
+        }
+        #endregion
     }
 }
