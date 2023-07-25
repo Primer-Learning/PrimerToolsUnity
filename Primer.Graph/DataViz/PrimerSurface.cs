@@ -82,7 +82,8 @@ namespace Primer.Graph
             incomingGrid = new DiscreteGrid(data);
         }
 
-        public void SetFunction(Func<float, float, float> function, Vector2Int? resolution = null, Vector2? start = null, Vector2? end = null)
+        public void SetFunction(Func<float, float, float> function, Vector2Int? resolution = null,
+            Vector2? start = null, Vector2? end = null)
         {
             var current = GetFunctionLineParams();
 
@@ -93,9 +94,16 @@ namespace Primer.Graph
             };
         }
 
-        public void SetFunction(Func<Vector2, Vector3> function, int? resolution = null)
+        public void SetFunction(Func<Vector2, Vector3> function, Vector2Int? resolution = null, Vector2? start = null,
+            Vector2? end = null)
         {
-            throw new NotImplementedException();
+            var current = GetFunctionLineParams();
+
+            incomingGrid = new FunctionGrid((x, z) => function(new Vector2(x, z))) {
+                resolution = resolution ?? current.resolution,
+                start = start ?? current.start,
+                end = end ?? current.end,
+            };
         }
 
         public Tween Transition()
@@ -177,6 +185,7 @@ namespace Primer.Graph
             renderedGrid = grid;
         }
 
+        #region Drawing mesh
         private static Vector3[] DefinePoints(IGrid grid)
         {
             var points2D = grid.points;
@@ -218,5 +227,6 @@ namespace Primer.Graph
 
             return triangles.ToArray();
         }
+        #endregion
     }
 }

@@ -15,7 +15,6 @@ namespace Primer.Shapes
 
         public DiscreteLine(int length)
         {
-            // Points default to Vector3.zero
             points = new Vector3[length];
         }
 

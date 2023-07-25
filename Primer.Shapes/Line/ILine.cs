@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 namespace Primer.Shapes
@@ -10,7 +9,6 @@ namespace Primer.Shapes
 
         ILine ChangeResolution(int newResolution);
         ILine SmoothCut(float toResolution, bool fromOrigin);
-
 
         public static ILine Lerp(ILine a, ILine b, float t) {
             var size = Mathf.Max(a.resolution, b.resolution);
@@ -31,18 +29,6 @@ namespace Primer.Shapes
         ///     Use this when resizing several grids at the same time
         ///     this ensures grids don't suffer more than one transformation
         /// </summary>
-        public static ILine[] SameResolution(params ILine[] inputs) {
-            var sameResolution = new ILine[inputs.Length];
-            var maxResolution = inputs.Select(t => t.resolution).Prepend(0).Max();
-
-            for (var i = 0; i < inputs.Length; i++) {
-                sameResolution[i] = inputs[i].ChangeResolution(maxResolution);
-            }
-
-            return sameResolution;
-        }
-
-        // For convenience
         public static (ILine, ILine) SameResolution(ILine a, ILine b) {
             var maxResolution = Mathf.Max(a.resolution, b.resolution);
             return (a.ChangeResolution(maxResolution), b.ChangeResolution(maxResolution));

@@ -38,15 +38,13 @@ namespace Primer.Graph
             }
         }
         #endregion
-        
+
         #region public float resolution;
         [ShowInInspector]
+        [MinValue(1)]
         public int resolution {
             get => renderedLine.resolution;
-            set {
-                var newILine = renderedLine.ChangeResolution(value);
-                Render(newILine);
-            }
+            set => Render(renderedLine.ChangeResolution(value));
         }
         #endregion
 
@@ -139,8 +137,8 @@ namespace Primer.Graph
 
             incomingLine = new FunctionLine(function) {
                 resolution = resolution ?? current.resolution,
-                xStart = xStart ?? current.xStart,
-                xEnd = xEnd ?? current.xEnd,
+                start = xStart ?? current.start,
+                end = xEnd ?? current.end,
             };
         }
 
@@ -150,8 +148,8 @@ namespace Primer.Graph
 
             incomingLine = new FunctionLine(function) {
                 resolution = resolution ?? current.resolution,
-                xStart = xStart ?? current.xStart,
-                xEnd = xEnd ?? current.xEnd,
+                start = xStart ?? current.start,
+                end = xEnd ?? current.end,
             };
         }
 
@@ -161,8 +159,8 @@ namespace Primer.Graph
 
             incomingLine = new FunctionLine(function) {
                 resolution = resolution ?? current.resolution,
-                xStart = xStart ?? current.xStart,
-                xEnd = xEnd ?? current.xEnd,
+                start = xStart ?? current.start,
+                end = xEnd ?? current.end,
             };
         }
         #endregion

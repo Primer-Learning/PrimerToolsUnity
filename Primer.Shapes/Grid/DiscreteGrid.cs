@@ -49,7 +49,6 @@ namespace Primer.Shapes
             return new DiscreteGrid(result);
         }
 
-        // public IGrid Crop(float newSize) => SmoothCut(newSize, false);
         public IGrid SmoothCut(Vector2 croppedResolution, bool fromOrigin) {
             if (croppedResolution == Vector2.zero)
                 return zero;
