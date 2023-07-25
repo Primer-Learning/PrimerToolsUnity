@@ -16,8 +16,10 @@ namespace Primer.Graph
             UpdateChildren();
         }
 
-        public float DomainToPosition(float domainValue) => domainValue * scale;
-
+        public float DomainToPosition(float domainValue)
+        {
+            return domainValue * scale;
+        }
 
         internal bool ListenDomainChange(Action listener)
         {
@@ -28,10 +30,10 @@ namespace Primer.Graph
             return true;
         }
 
-        public void OnValidate()
-        {
-            UpdateChildren();
-        }
+
+        public void Awake() => UpdateChildren();
+        public void OnValidate() => UpdateChildren();
+
 
         [Button(ButtonSizes.Large)]
         public void UpdateChildren()
