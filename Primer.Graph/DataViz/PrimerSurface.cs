@@ -135,11 +135,11 @@ namespace Primer.Graph
         public Tween GrowFromStart()
         {
             var targetGrid = incomingGrid ?? renderedGrid;
-            var resolution = targetGrid.resolution;
+            var res = targetGrid.resolution;
 
             return new Tween(
                 t => {
-                    var cutLength = new Vector2(resolution.x * t, resolution.y * t);
+                    var cutLength = new Vector2(res.x * t, res.y * t);
                     Render(targetGrid.SmoothCut(cutLength, fromOrigin: false));
                 }
             ).Observe(

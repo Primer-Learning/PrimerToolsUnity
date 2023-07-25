@@ -46,7 +46,7 @@ namespace Primer.Graph
         public Axis z => (zAxis != null) && zAxis.enabled && zAxis.isActiveAndEnabled ? zAxis : null;
 
         public Container<Graph> containerCache;
-        public Container<Graph> container => containerCache ??= Container.From(this);
+        public Container<Graph> container => containerCache ??= InitializeContainer();
 
         public Vector3 domain { get; private set; }
 
@@ -145,16 +145,22 @@ namespace Primer.Graph
 
         public void Reset()
         {
-            container.Reset();
-            container.Insert(xAxis);
-            container.Insert(yAxis);
-            container.Insert(zAxis);
+            containerCache = InitializeContainer();
         }
 
         public void Dispose()
         {
             Reset();
             gameObject.SetActive(false);
+        }
+
+        private Container<Graph> InitializeContainer()
+        {
+            var result = Container.From(this);
+            result.Insert(xAxis);
+            result.Insert(yAxis);
+            result.Insert(zAxis);
+            return result;
         }
     }
 }
