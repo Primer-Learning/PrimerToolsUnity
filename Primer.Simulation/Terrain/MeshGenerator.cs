@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace Primer.Simulation
 {
     internal class MeshGenerator
     {
-        public static Mesh CreateMesh(float roundness, Vector2Int size, float[,] heightMap,
+        public static Mesh CreateMesh(float roundingRadius, Vector2Int size, float[,] heightMap,
             float heightMultiplier, float elevationOffset, float edgeClampDistance)
         {
             // This code was initially copied from
@@ -15,7 +16,7 @@ namespace Primer.Simulation
             // to be static if we wanted to.
             
             var generator = new MeshGenerator {
-                roundingRadius = roundness,
+                roundingRadius = roundingRadius,
                 xSize = size.x,
                 ySize = 3,
                 zSize = size.y,
@@ -31,6 +32,10 @@ namespace Primer.Simulation
 
             generator.mesh.RecalculateNormals();
             generator.CorrectBottomEdgeNormals();
+            if (edgeClampDistance > 0 && roundingRadius > 1)
+            {
+                generator.CorrectTopEdgeNormals();
+            }
             generator.mesh.RecalculateTangents();
 
             return generator.mesh;
@@ -134,12 +139,36 @@ namespace Primer.Simulation
             }
             mesh.normals = normals;
         }
+        private void CorrectTopEdgeNormals()
+        {
+            var normals = mesh.normals;
+            for (var x = 0; x <= xSize; x++)
+            {
+                for (var z = 0; z <= zSize; z++)
+                {
+                    // Only looking at edges
+                    if (x != 0 && x != xSize && z != 0 && z != zSize) continue;
+                    var index = vertexXYZToIndex[x, ySize, z];
+                    var vertex = vertices[index];
+                    normals[index] = TopEdgeNormal(vertex);
+                }
+            }
+            mesh.normals = normals;
+        }
 
         private Vector3 BottomEdgeNormal(Vector3 vertex)
         {
             var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
             
-            return (innerDifference.normalized + Vector3.down).normalized;
+            var vertical = roundingRadius > 0 ? Vector3.down : Vector3.zero;
+            
+            return (innerDifference.normalized + vertical).normalized;
+        }
+        private Vector3 TopEdgeNormal(Vector3 vertex)
+        {
+            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            
+            return (innerDifference.normalized + Vector3.up).normalized;
         }
 
         private float EdgeElevationDamping(Vector3 vertex)
