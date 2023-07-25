@@ -202,15 +202,34 @@ namespace Primer.Simulation
         {
             triangles = new List<int>();
 
-            for (var y = 0; y < ySize; y++) {
+            for (var y = 0; y < ySize; y++)
+            {
                 for (var x = 0; x < xSize; x++)
-                    SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0), new Vector3Int(x + 1, y + 1, 0));
+                {
+                    var rotate90 = !(x < xSize / 2 ^ y < ySize / 2);;
+                    SetQuad(new Vector3Int(x, y, 0), new Vector3Int(x + 1, y, 0), new Vector3Int(x, y + 1, 0),
+                        new Vector3Int(x + 1, y + 1, 0), rotate90);
+                }
                 for (var z = 0; z < zSize; z++)
-                    SetQuad(new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1), new Vector3Int(0, y + 1, z + 1));
+                {
+                    var rotate90 = !(z < zSize / 2 ^ y < ySize / 2);
+                    SetQuad(new Vector3Int(0, y, z), new Vector3Int(0, y + 1, z), new Vector3Int(0, y, z + 1),
+                        new Vector3Int(0, y + 1, z + 1), rotate90);
+                }
+
                 for (var x = 0; x < xSize; x++)
-                    SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize), new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize));
+                {
+                    var rotate90 = !(x < xSize / 2 ^ y < ySize / 2);
+                    SetQuad(new Vector3Int(x, y, zSize), new Vector3Int(x, y + 1, zSize),
+                        new Vector3Int(x + 1, y, zSize), new Vector3Int(x + 1, y + 1, zSize), rotate90);
+                }
+
                 for (var z = 0; z < zSize; z++)
-                    SetQuad(new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1), new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1));
+                {
+                    var rotate90 = !(y < ySize / 2 ^ z < zSize / 2);
+                    SetQuad(new Vector3Int(xSize, y, z), new Vector3Int(xSize, y, z + 1),
+                        new Vector3Int(xSize, y + 1, z), new Vector3Int(xSize, y + 1, z + 1), rotate90);
+                }
             }
 
             triangles.AddRange(CreateTopFace());
