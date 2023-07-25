@@ -11,7 +11,7 @@ namespace Primer.Graph
     [ExecuteAlways]
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     [RequireComponent(typeof(GraphDomain))]
-    public class PrimerSurface : MonoBehaviour, IDisposable
+    public class PrimerSurface : MonoBehaviour, IMeshController, IDisposable
     {
         private IGrid renderedGrid = new DiscreteGrid(0);
         private IGrid incomingGrid = null;
@@ -43,6 +43,13 @@ namespace Primer.Graph
         public Vector2Int resolution {
             get => renderedGrid.resolution;
             set => Render(renderedGrid.ChangeResolution(value));
+        }
+
+        private void OnEnable()
+        {
+            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
+            domain.onDomainChange = Render;
+            meshRenderer.sharedMaterial ??= MeshRendererExtensions.defaultMaterial;
         }
 
         public void SetData(float[,] data)
@@ -159,6 +166,8 @@ namespace Primer.Graph
         {
             new Container(transform).Dispose();
         }
+
+        public MeshRenderer[] GetMeshRenderers() => new[] { meshRenderer };
 
         private FunctionGrid GetFunctionLineParams()
         {
