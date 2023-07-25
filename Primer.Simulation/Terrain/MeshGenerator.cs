@@ -225,10 +225,10 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                if (x < xSize / 2 ^ z < zSize / 2)
-                    SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1));
-                else
-                    SetQuad(new Vector3Int(x, ySize, z + 1), new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z + 1), new Vector3Int(x + 1, ySize, z));
+            {
+                var rotate90 = !(x < xSize / 2 ^ z < zSize / 2);
+                SetQuad(new Vector3Int(x, ySize, z), new Vector3Int(x + 1, ySize, z), new Vector3Int(x, ySize, z + 1), new Vector3Int(x + 1, ySize, z + 1), rotate90);
+            }
 
             return tris;
         }
@@ -238,24 +238,32 @@ namespace Primer.Simulation
             var tris = new List<int>();
             for (var z = 0; z < zSize; z++)
             for (var x = 0; x < xSize; x++)
-                if (x < xSize / 2 ^ z < zSize / 2)
-                    SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1));
-                else
-                    SetQuad(new Vector3Int(x + 1, 0, z), new Vector3Int(x, 0, z), new Vector3Int(x + 1, 0, z + 1), new Vector3Int(x, 0, z + 1));
+            {
+                var rotate90 = !(x < xSize / 2 ^ z < zSize / 2);
+                SetQuad(new Vector3Int(x, 0, z), new Vector3Int(x, 0, z + 1), new Vector3Int(x + 1, 0, z), new Vector3Int(x + 1, 0, z + 1), rotate90);
+            }
 
-                    return tris;
+            return tris;
         }
 
-        private void SetQuad(Vector3Int v00, Vector3Int v10, Vector3Int v01, Vector3Int v11)
+        private void SetQuad(Vector3Int v00, Vector3Int v01, Vector3Int v10, Vector3Int v11, bool rotate90 = false)
         {
             // Get the indices
             var i00 = vertexXYZToIndex[v00.x, v00.y, v00.z];
-            var i10 = vertexXYZToIndex[v10.x, v10.y, v10.z];
             var i01 = vertexXYZToIndex[v01.x, v01.y, v01.z];
+            var i10 = vertexXYZToIndex[v10.x, v10.y, v10.z];
             var i11 = vertexXYZToIndex[v11.x, v11.y, v11.z];
-            
-            SetTriangle(i00, i01, i10);
-            SetTriangle(i10, i01, i11);
+
+            if (!rotate90)
+            {
+                SetTriangle(i00, i10, i01);
+                SetTriangle(i01, i10, i11);
+            }
+            else
+            {
+                SetTriangle(i01, i00, i11);
+                SetTriangle(i11, i00, i10);
+            }
         }
 
         private void  SetTriangle(int i0, int i1, int i2)
