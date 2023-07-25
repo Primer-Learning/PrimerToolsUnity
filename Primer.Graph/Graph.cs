@@ -125,6 +125,13 @@ namespace Primer.Graph
             return Track(point, coords);
         }
 
+        public T AddPoint<T>(string name, T template, Vector3? coords = null) where T : Component
+        {
+            var point = container.Add(template, name);
+            Track(point, coords);
+            return point;
+        }
+
         public GraphDomain AddTracker<T>(string name, T template, Vector3? coords = null) where T : Component
         {
             var point = container.Add(template, name);

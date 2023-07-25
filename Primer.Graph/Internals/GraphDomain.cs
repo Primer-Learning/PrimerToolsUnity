@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Primer.Graph
 {
     [ExecuteAlways]
-    public class GraphDomain : MonoBehaviour
+    public class GraphDomain : MonoBehaviour, IDisposable
     {
         public enum Behaviour
         {
@@ -107,6 +107,11 @@ namespace Primer.Graph
                 transform.position = graph.DomainToPosition(point);
             else
                 transform.localPosition = graph.DomainToPosition(point);
+        }
+
+        public void Dispose()
+        {
+            new Container(transform).Dispose();
         }
     }
 }
