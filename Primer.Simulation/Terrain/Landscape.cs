@@ -172,14 +172,14 @@ namespace Primer.Simulation
             }
         }
 
-        [SerializeField, HideInInspector]
-        private float _edgeClampDistance;
+        [FormerlySerializedAs("_edgeClampDistance")] [SerializeField, HideInInspector]
+        private float _edgeClampFactor;
         [ShowInInspector]
         [PropertyRange(0, 1)]
-        public float edgeClampDistance {
-            get => _edgeClampDistance;
+        public float edgeClampFactor {
+            get => _edgeClampFactor;
             set {
-                _edgeClampDistance = value;
+                _edgeClampFactor = value;
                 GenerateMesh();
             }
         }
@@ -284,7 +284,7 @@ namespace Primer.Simulation
                 noiseMap,
                 meshHeightMultiplier,
                 elevationOffset,
-                edgeClampDistance
+                edgeClampFactor
             );
 
             meshCollider.sharedMesh = mesh;

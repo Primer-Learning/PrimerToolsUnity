@@ -8,7 +8,7 @@ namespace Primer.Simulation
     internal class MeshGenerator
     {
         public static Mesh CreateMesh(float roundingRadius, Vector2Int size, float[,] heightMap,
-            float heightMultiplier, float elevationOffset, float edgeClampDistance)
+            float heightMultiplier, float elevationOffset, float edgeClampFactor)
         {
             // This code was initially copied from
             // https://catlikecoding.com/unity/tutorials/rounded-cube/ and it was designed there
@@ -24,7 +24,7 @@ namespace Primer.Simulation
                 heightMultiplier = heightMultiplier,
                 heightMap = heightMap,
                 elevationOffset = elevationOffset,
-                edgeClampFactor = edgeClampDistance
+                edgeClampFactor = edgeClampFactor
             };
 
             generator.CreateVertices();
@@ -32,7 +32,7 @@ namespace Primer.Simulation
 
             generator.mesh.RecalculateNormals();
             generator.CorrectBottomEdgeNormals();
-            if (edgeClampDistance > 0 && roundingRadius > 1)
+            if (edgeClampFactor > 0 && roundingRadius > 1)
             {
                 generator.CorrectTopEdgeNormals();
             }
@@ -88,7 +88,7 @@ namespace Primer.Simulation
         {
             var candidate = new Vector3(x, y, z);
             
-            var innerDifference = CalculateDistanceFromInnerSurface(x, y, z, roundingRadius);
+            var innerDifference = CalculateDifferenceVectorFromInnerSurface(x, y, z, roundingRadius);
             if (innerDifference.magnitude > 0 && roundingRadius > 0)
             {
                 var factorThatExtendsToNonroundedEdge =
@@ -158,7 +158,7 @@ namespace Primer.Simulation
 
         private Vector3 BottomEdgeNormal(Vector3 vertex)
         {
-            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
             
             var vertical = roundingRadius > 0 ? Vector3.down : Vector3.zero;
             
@@ -166,7 +166,7 @@ namespace Primer.Simulation
         }
         private Vector3 TopEdgeNormal(Vector3 vertex)
         {
-            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            var innerDifference = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
             
             return (innerDifference.normalized + Vector3.up).normalized;
         }
@@ -176,17 +176,17 @@ namespace Primer.Simulation
             if (roundingRadius == 0) return 1;
             
             // Recalculate this because the position has changed since it was previously calculated
-            var innerDifference = CalculateDistanceFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            var innerDistance = CalculateDifferenceVectorFromInnerSurface(vertex.x, vertex.y, vertex.z, roundingRadius);
+            var outerDistance = roundingRadius - innerDistance.magnitude;
+            var maxDistance = roundingRadius * edgeClampFactor;
+            if (outerDistance > maxDistance) return 1;
             
-            // Ranges from 0 at the edge to 1
-            var normalizedOuterDistance = 1 - innerDifference.magnitude / roundingRadius;
-            
-            return Mathf.Clamp(normalizedOuterDistance / edgeClampFactor, 0, 1);
+            return Mathf.Sin(outerDistance / maxDistance * Mathf.PI / 2);
         }
 
         // The outer mesh is rounded by creating a virtual inner surface,
         // then moving vertices to a point within the "roundingRadius" distance of the inner surface
-        private Vector3 CalculateDistanceFromInnerSurface(float x, float y, float z, float radius)
+        private Vector3 CalculateDifferenceVectorFromInnerSurface(float x, float y, float z, float radius)
         {
             float buffer = 0.001f;
             var radiusWithBuffer = radius + buffer;
