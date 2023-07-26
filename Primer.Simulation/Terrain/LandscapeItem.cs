@@ -7,7 +7,12 @@ namespace Primer.Simulation
     {
         [SerializeField]
         private Landscape _landscape;
-        public Landscape landscape => this.FindTerrain(ref _landscape);
+
+        public Landscape landscape
+        {
+            get => _landscape ? _landscape : transform.GetComponentInParent<Landscape>();
+            set => _landscape = value;
+        } 
 
         [Button]
         public void TouchGround()

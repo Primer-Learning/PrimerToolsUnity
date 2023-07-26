@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class Food : MonoBehaviour
+    public class Food : LandscapeItem
     {
         public int amount;
         public bool hasMore => amount > 0;
@@ -24,7 +24,7 @@ namespace Simulation.GameTheory
                 food.SetScale(0.3);
                 food.GetComponent<MeshRenderer>().SetColor(Color.green);
                 var position = t.TransformPoint(i == 0 ? 0.3f : -0.3f, 0, 0);
-                food.position = sim.GetGroundAt(position) + Vector3.up * 0.15f;
+                // food.position = sim.GetGroundAt(position) + Vector3.up * 0.15f;
             }
 
             container.Purge();

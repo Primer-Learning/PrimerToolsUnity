@@ -14,7 +14,7 @@ namespace Simulation.GameTheory
         private int turn = 0;
         private readonly int foodPerTurn;
 
-        private readonly Container foodContainer;
+        // private readonly Container foodContainer;
         private readonly Container agentContainer;
 
         private readonly ConflictResolutionRule conflictResolutionRule;
@@ -24,13 +24,12 @@ namespace Simulation.GameTheory
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        public Vector2 size => new(terrain.size.x, terrain.size.y);
         private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
         public GameTheorySimulation(
             Transform transform,
             int seed,
-            int foodPerTurn,
+            // int foodPerTurn,
             int initialBlobs,
             ConflictResolutionRule conflictResolutionRule)
         {
@@ -41,8 +40,7 @@ namespace Simulation.GameTheory
             rng = new Rng(seed);
 
             var container = new Container(transform);
-            terrain = container.Add<Landscape>("Landscape");
-            foodContainer = container.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
+            // foodContainer = container.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
             agentContainer = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
 
             PlaceInitialBlobs(initialBlobs);
@@ -52,19 +50,19 @@ namespace Simulation.GameTheory
         {
             agentContainer.Reset();
 
-            var positions = GetBlobsRestingPosition(blobCount)
-                .Select(x => terrain.GetGroundAtLocal(x))
-                .ToList();
+            // var positions = GetBlobsRestingPosition(blobCount)
+            //     .Select(x => terrain.GetGroundAtLocal(x))
+            //     .ToList();
 
-            var center = positions.Average();
-
-            foreach (var position in positions) {
-                var blob = agentContainer.AddPrefab<Transform>("blob_skinned", "Initial blob");
-                var agent = blob.GetOrAddComponent<Agent>();
-                conflictResolutionRule.OnAgentCreated(agent);
-                blob.position = position;
-                blob.LookAt(center);
-            }
+            // var center = positions.Average();
+            //
+            // foreach (var position in positions) {
+            //     var blob = agentContainer.AddPrefab<Transform>("blob_skinned", "Initial blob");
+            //     var agent = blob.GetOrAddComponent<Agent>();
+            //     conflictResolutionRule.OnAgentCreated(agent);
+            //     blob.position = position;
+            //     blob.LookAt(center);
+            // }
 
             agentContainer.Purge(defer: true);
         }
@@ -72,38 +70,38 @@ namespace Simulation.GameTheory
         public async UniTask SimulateSingleCycle()
         {
             turn++;
-            await CreateFood();
-            await AgentsGatherFood();
+            // await CreateFood();
+            // await AgentsGatherFood();
             await AgentsEatFood();
-            await AgentsReturnHome();
+            // await AgentsReturnHome();
             await AgentsReproduceOrDie();
         }
 
-        private UniTask CreateFood()
-        {
-            foodContainer.Reset();
+        // private UniTask CreateFood()
+        // {
+        //     foodContainer.Reset();
+        //
+        //     foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size, rng: rng)) {
+        //         var item = foodContainer.Add<Food>();
+        //         var centered = point - size / 2;
+        //         item.transform.localPosition = terrain.GetGroundAt(centered);
+        //         item.Initialize(rng);
+        //     }
+        //
+        //     foodContainer.Purge();
+        //
+        //     // Give time for the food to be scale up
+        //     return UniTask.Delay(500);
+        // }
 
-            foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size, rng: rng)) {
-                var item = foodContainer.Add<Food>();
-                var centered = point - size / 2;
-                item.transform.localPosition = terrain.GetGroundAt(centered);
-                item.Initialize(rng);
-            }
-
-            foodContainer.Purge();
-
-            // Give time for the food to be scale up
-            return UniTask.Delay(500);
-        }
-
-        private UniTask AgentsGatherFood()
-        {
-            var food = foodContainer.ChildComponents<Food>().ToList();
-
-            return agents
-                .Select(agent => agent.GoToEat(food.RandomItem()))
-                .RunInParallel();
-        }
+        // private UniTask AgentsGatherFood()
+        // {
+        //     // var food = foodContainer.ChildComponents<Food>().ToList();
+        //
+        //     // return agents
+        //     //     .Select(agent => agent.GoToEat(food.RandomItem()))
+        //     //     .RunInParallel();
+        // }
 
         private async UniTask AgentsEatFood()
         {
@@ -113,16 +111,16 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        private UniTask AgentsReturnHome()
-        {
-            return agents
-                .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
-                .RunInParallel();
-        }
+        // private UniTask AgentsReturnHome()
+        // {
+            // return agents
+            //     .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
+            //     .RunInParallel();
+        // }
 
         private async UniTask AgentsReproduceOrDie()
         {
-            foodContainer.RemoveAllChildren();
+            // foodContainer.RemoveAllChildren();
             agentContainer.Reset();
 
             foreach (var agent in agents) {
@@ -138,7 +136,7 @@ namespace Simulation.GameTheory
             agentContainer.Purge();
 
             // Make room for new blobs and fill gaps left by dead blobs
-            await AgentsReturnHome();
+            // await AgentsReturnHome();
         }
 
         private async UniTask Eat(List<Agent> competitors, Food food)
@@ -161,23 +159,23 @@ namespace Simulation.GameTheory
             }
         }
 
-        private IEnumerable<Vector2> GetBlobsRestingPosition(int? blobCount = null)
-        {
-            const int margin = 2;
-            var offset = Vector2.one * margin;
-            var perimeter = size - offset * 2;
-            var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var agentCount = blobCount ?? agentContainer.childCount;
-            var positions = edgeLength / agentCount;
-            var centerInSlot = positions / 2;
-            var centerInTerrain = size / -2;
-
-            for (var i = 0; i < agentCount; i++) {
-                var linearPosition = positions * i + centerInSlot;
-                var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
-                yield return perimeterPosition + offset + centerInTerrain;
-            }
-        }
+        // private IEnumerable<Vector2> GetBlobsRestingPosition(int? blobCount = null)
+        // {
+        //     const int margin = 2;
+        //     var offset = Vector2.one * margin;
+        //     var perimeter = size - offset * 2;
+        //     var edgeLength = perimeter.x * 2 + perimeter.y * 2;
+        //     var agentCount = blobCount ?? agentContainer.childCount;
+        //     var positions = edgeLength / agentCount;
+        //     var centerInSlot = positions / 2;
+        //     var centerInTerrain = size / -2;
+        //
+        //     for (var i = 0; i < agentCount; i++) {
+        //         var linearPosition = positions * i + centerInSlot;
+        //         var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
+        //         yield return perimeterPosition + offset + centerInTerrain;
+        //     }
+        // }
 
         private static Vector2 PositionToPerimeter(Vector2 perimeter, float position)
         {
@@ -201,7 +199,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            foodContainer?.RemoveAllChildren();
+            // foodContainer?.RemoveAllChildren();
             agentContainer?.RemoveAllChildren();
         }
     }
