@@ -23,11 +23,10 @@ public class FruitTree : MonoBehaviour
     
     public Tween GrowFruit(int index)
     {
-        RandomlyRotateFlower(index);
-
         Transform fruit;
         if (flowers[index].childCount == 0)
         {
+            RandomlyRotateFlower(index);
             fruit = Instantiate(fruitPrefab, flowers[index]);
             fruit.localScale = Vector3.zero;
         }
