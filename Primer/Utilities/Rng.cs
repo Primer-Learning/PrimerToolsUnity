@@ -1,31 +1,54 @@
+using System;
+
 namespace Primer
 {
     public class Rng
     {
+        private static Random staticRandom;
+
+        public static void Initialize(int? seed = null)
+        {
+            if (seed is null)
+            {
+                // If seed is null, we don't care what the seed is.
+                // So if the staticRandom object already exists, we don't need to do anything.
+                // But if it doesn't, creat it and set the seed to the current time.
+                if (staticRandom is not null) return;
+                staticRandom = new Random(Environment.TickCount);
+            }
+            else
+            {
+                // If we did give a seed, we should remake the staticRandom object with that seed.
+                staticRandom = new Random(seed.Value);
+            }
+        }
+        
         public static int Range(int maxExclusive) => Range(0, maxExclusive);
 
         public static int Range(int minInclusive, int maxExclusive)
         {
-            return UnityEngine.Random.Range(minInclusive, maxExclusive);
+            Initialize();
+            return staticRandom.Next(minInclusive, maxExclusive);
         }
 
         public static float Range(float maxInclusive) => Range(0, maxInclusive);
 
-        public static float Range(float minInclusive, float maxInclusive)
+        public static float Range(float minInclusive, float maxExclusive)
         {
-            return UnityEngine.Random.Range(minInclusive, maxInclusive);
+            Initialize();
+            return (float) staticRandom.NextDouble() * (maxExclusive - minInclusive) + minInclusive;
         }
 
         // instance
 
-        public System.Random rand { get; }
+        public Random rand { get; }
 
-        public Rng(System.Random rand)
+        public Rng(Random rand)
         {
             this.rand = rand;
         }
 
-        public Rng(int seed) : this(new System.Random(seed))
+        public Rng(int seed) : this(new Random(seed))
         {
         }
     }
@@ -44,15 +67,15 @@ namespace Primer
                 : rand.Next(minInclusive, maxExclusive);
         }
 
-        public static float Range(this Rng rng, float maxInclusive) => Range(rng, 0, maxInclusive);
+        public static float Range(this Rng rng, float maxExclusive) => Range(rng, 0, maxExclusive);
 
-        public static float Range(this Rng rng, float minInclusive, float maxInclusive)
+        public static float Range(this Rng rng, float minInclusive, float maxExclusive)
         {
             var rand = rng?.rand;
 
             return rand is null
-                ? Rng.Range(minInclusive, maxInclusive)
-                : (float)(rand.NextDouble() * (maxInclusive - minInclusive) + minInclusive);
+                ? Rng.Range(minInclusive, maxExclusive)
+                : (float)(rand.NextDouble() * (maxExclusive - minInclusive) + minInclusive);
         }
     }
 }
