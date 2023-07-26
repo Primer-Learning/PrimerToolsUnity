@@ -46,6 +46,9 @@ namespace Primer.Simulation
         [DisableIf(nameof(locked))]
         public void Emplace()
         {
+            if (incrementSeed)
+                seed++;
+            
 #if UNITY_EDITOR
             if (locked) {
                 throw new Exception(
@@ -78,10 +81,6 @@ namespace Primer.Simulation
             }
 
             container.Purge();
-            
-            if (incrementSeed)
-                seed++;
-
         }
 
 #if UNITY_EDITOR
