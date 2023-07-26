@@ -22,6 +22,11 @@ namespace Primer
             if (t.parent != transform)
                 t.SetParent(transform, options.worldPositionStays);
 
+            if (options.zeroScale)
+            {
+                t.localScale = Vector3.zero;
+            }
+
             if (options.ignoreSiblingOrder) {
                 usedChildren.Add(t);
             } else {
