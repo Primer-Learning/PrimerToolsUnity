@@ -20,7 +20,7 @@ namespace Simulation.GameTheory
         [HideLabel, Title("Conflict Resolution Rule")]
         public ConflictResolutionRule conflictResolutionRule = new SimpleConflictResolution();
 
-        private GameTheorySimulation simulation;
+        private AgentBasedEvoGameTheorySim _sim;
         private int turn;
 
         private void OnValidate() => OnEnable();
@@ -29,7 +29,7 @@ namespace Simulation.GameTheory
         {
             turn = 0;
 
-            simulation = new GameTheorySimulation(
+            _sim = new AgentBasedEvoGameTheorySim(
                 transform: transform,
                 seed: seed,
                 // foodPerTurn: foodPerTurn,
@@ -42,7 +42,7 @@ namespace Simulation.GameTheory
 
         public void OnDisable()
         {
-            simulation?.Dispose();
+            _sim?.Dispose();
         }
 
         public async void Start()
@@ -51,7 +51,7 @@ namespace Simulation.GameTheory
                 return;
 
             while (true) {
-                await simulation.SimulateSingleCycle();
+                await _sim.SimulateSingleCycle();
                 await UniTask.Delay(1000);
             }
         }
@@ -62,7 +62,7 @@ namespace Simulation.GameTheory
         {
             turn++;
             this.Log($"Running turn {turn}");
-            await simulation.SimulateSingleCycle();
+            await _sim.SimulateSingleCycle();
             this.Log($"Completed turn {turn}");
         }
         

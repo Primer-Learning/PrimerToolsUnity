@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Primer.Simulation
 {
 
-    public class EvoGameTheorySim<T> where T : Enum
+    public class NumericalEvoGameTheorySim<T> where T : Enum
     {
         private static readonly Cache<SimParams, AlleleFrequency<T>[]> cache = new();
 
@@ -15,7 +15,7 @@ namespace Primer.Simulation
         private readonly float runStepSize;
         public bool logWhenEquilibrium = false;
 
-        public EvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float runStepSize = 0.1f)
+        public NumericalEvoGameTheorySim(RewardMatrix<T> rewardMatrix, float baseFitness = 1, float runStepSize = 0.1f)
         {
             this.rewardMatrix = rewardMatrix;
             this.baseFitness = baseFitness;

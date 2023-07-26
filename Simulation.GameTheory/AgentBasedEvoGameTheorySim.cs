@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class GameTheorySimulation : ISimulation, IPrimer, IDisposable
+    public class AgentBasedEvoGameTheorySim : ISimulation, IPrimer, IDisposable
     {
         private int turn = 0;
         private readonly int foodPerTurn;
@@ -29,7 +29,7 @@ namespace Simulation.GameTheory
         public Component component => transform;
         private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
 
-        public GameTheorySimulation(
+        public AgentBasedEvoGameTheorySim(
             Transform transform,
             int seed,
             // int foodPerTurn,
@@ -166,9 +166,9 @@ namespace Simulation.GameTheory
 
                     return;
 
-                // case > 1:
-                //     await conflictResolutionRule.Resolve(competitors, tree);
-                //     return;
+                case > 1:
+                    await conflictResolutionRule.Resolve(competitors, tree);
+                    return;
             }
         }
 
