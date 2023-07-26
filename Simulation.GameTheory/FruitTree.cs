@@ -21,7 +21,7 @@ public class FruitTree : MonoBehaviour
         flowers.GetChildren().SetScale(0);
     }
     
-    public Tween GrowFruit(int index, float delayRange = 0)
+    public Tween GrowFruit(int index)
     {
         RandomlyRotateFlower(index);
         
@@ -29,7 +29,7 @@ public class FruitTree : MonoBehaviour
         
         var container = new Container(flowers[index]);
         var fruit = container.Add(fruitPrefab, options: new ChildOptions{zeroScale = true});
-        return fruit.ScaleTo(1) with {delay = Rng.Range(delayRange)};
+        return fruit.ScaleTo(1);
     }
 
     public Tween GrowRandomFruits(int number = 1, float delayRange = 0)
@@ -49,7 +49,7 @@ public class FruitTree : MonoBehaviour
     {
         // Create tweens, giving each a random delay between 0 and delayRange
         return indices
-            .Select((index, i) => GrowFruit(index, delayRange))
+            .Select((index, i) => GrowFruit(index) with {delay = Rng.Range(delayRange)})
             .RunInParallel();
     }
 
