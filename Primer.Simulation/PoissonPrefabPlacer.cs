@@ -20,7 +20,7 @@ namespace Primer.Simulation
         public float minDistance = 2;
         public int amount = 30;
         public bool randomizeRotation = true;
-        public PrefabProvider prefab;
+        public Transform prefab;
 
         #region public Vector2 size;
         [SerializeField, HideInInspector]
@@ -37,30 +37,15 @@ namespace Primer.Simulation
         }
         #endregion
 
-        public void SetPrefabByName(string prefabName)
-        {
-            prefab ??= new PrefabProvider();
-            prefab.value = Prefab.Get(prefabName);
-        }
-
-        public void EmplaceIfEmpty(string prefabName = null)
-        {
-            if (prefabName is not null)
-                SetPrefabByName(prefabName);
-
-            if (transform.childCount is 0)
-                Emplace();
-        }
-
         [Title("Controls")]
+        public int seed;
+        public bool incrementSeed;
+        
         [Button(ButtonSizes.Large)]
         // [ButtonGroup]
         [DisableIf(nameof(locked))]
         public void Emplace()
         {
-            if (prefab?.value is null)
-                throw new Exception("Need a prefab to place!");
-
 #if UNITY_EDITOR
             if (locked) {
                 throw new Exception(
@@ -77,7 +62,7 @@ namespace Primer.Simulation
             if (center)
                 offset -= size / 2;
 
-            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance)) {
+            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, rng: new Rng(seed))) {
                 var instance = container.Add(prefab);
                 var pos = point + offset;
 
@@ -89,10 +74,14 @@ namespace Primer.Simulation
                 }
 
                 if (randomizeRotation)
-                    instance.localRotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
+                    instance.localRotation = Quaternion.Euler(0, new Rng(seed).Range(0, 360), 0);
             }
 
             container.Purge();
+            
+            if (incrementSeed)
+                seed++;
+
         }
 
 #if UNITY_EDITOR
