@@ -1,4 +1,5 @@
 using System;
+using Primer.Shapes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -41,7 +42,7 @@ namespace Primer.Graph
 
         #region public Vector3 point;
         [SerializeField, HideInInspector]
-        private Vector3 _point;
+        private Vector3Provider _point;
 
         [ShowInInspector]
         [ShowIf("behaviour", Behaviour.FollowPoint)]
@@ -53,6 +54,7 @@ namespace Primer.Graph
             }
         }
         #endregion
+
 
         #region public bool useGlobalPosition;
         [SerializeField, HideInInspector]
@@ -86,6 +88,18 @@ namespace Primer.Graph
         private void OnDomainChange()
         {
             onDomainChange?.Invoke();
+        }
+
+        public void Follow(Action fn)
+        {
+            behaviour = Behaviour.InvokeMethod;
+            onDomainChange = fn;
+        }
+
+        public void Follow(Vector3Provider target)
+        {
+            behaviour = Behaviour.FollowPoint;
+            _point = target;
         }
 
         private void OnEnable()
