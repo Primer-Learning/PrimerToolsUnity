@@ -77,7 +77,7 @@ namespace Simulation.GameTheory
             await CreateFood();
             // await DropFruit();
             await AgentsGoToTrees();
-            // await AgentsEatFood();
+            await AgentsEatFood();
             await AgentsReturnHome();
             // await AgentsReproduceOrDie();
         }
@@ -116,13 +116,13 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        // private async UniTask AgentsEatFood()
-        // {
-        //     await agents
-        //         .GroupBy(x => x.goingToEat)
-        //         .Select(x => Eat(competitors: x.ToList(), food: x.Key))
-        //         .RunInParallel();
-        // }
+        private async UniTask AgentsEatFood()
+        {
+            await agents
+                .GroupBy(x => x.goingToEat)
+                .Select(x => Eat(competitors: x.ToList(), tree: x.Key))
+                .RunInParallel();
+        }
 
         private UniTask AgentsReturnHome()
         {
@@ -152,23 +152,23 @@ namespace Simulation.GameTheory
             // await AgentsReturnHome();
         }
 
-        private async UniTask Eat(List<Agent> competitors, Food food)
+        private async UniTask Eat(List<Agent> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
                 case 0:
                     throw new ArgumentException("Cannot eat without agents", nameof(competitors));
 
                 case 1:
-                    await competitors[0].Eat(food);
+                    await competitors[0].Eat(tree);
 
-                    if (food.hasMore)
-                        await competitors[0].Eat(food);
+                    // if (food.hasMore)
+                    //     await competitors[0].Eat(food);
 
                     return;
 
-                case > 1:
-                    await conflictResolutionRule.Resolve(competitors, food);
-                    return;
+                // case > 1:
+                //     await conflictResolutionRule.Resolve(competitors, tree);
+                //     return;
             }
         }
 

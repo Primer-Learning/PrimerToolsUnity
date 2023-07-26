@@ -12,13 +12,13 @@ namespace Simulation.GameTheory
             // noop
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, Food food)
+        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 
             await UniTask.WhenAll(
-                first.Eat(food),
-                second.Eat(food)
+                first.Eat(tree),
+                second.Eat(tree)
             );
         }
     }

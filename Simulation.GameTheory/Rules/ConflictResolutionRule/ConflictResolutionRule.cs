@@ -8,6 +8,6 @@ namespace Simulation.GameTheory
     {
         public abstract void OnAgentCreated(Agent agent);
 
-        public abstract UniTask Resolve(IEnumerable<Agent> agents, Food food);
+        public abstract UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree);
     }
 }

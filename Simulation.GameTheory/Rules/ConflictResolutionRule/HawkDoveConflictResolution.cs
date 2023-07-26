@@ -28,15 +28,15 @@ namespace Simulation.GameTheory
                 agent.GetOrAddComponent<Dove>();
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, Food food)
+        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
             var firstBehaviour = first.GetComponent<ConflictBehaviour>();
             var secondBehaviour = second.GetComponent<ConflictBehaviour>();
 
             await UniTask.WhenAll(
-                first.Eat(food),
-                second.Eat(food)
+                first.Eat(tree),
+                second.Eat(tree)
             );
 
             switch (firstBehaviour, secondBehaviour) {

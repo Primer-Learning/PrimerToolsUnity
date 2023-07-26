@@ -1,3 +1,4 @@
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
@@ -30,14 +31,14 @@ namespace Simulation.GameTheory
             await tween;
         }
 
-        public async UniTask Eat(Food food)
+        public async UniTask Eat(FruitTree tree)
         {
             goingToEat = null;
             energy++;
             blob.animator.SetTrigger(scoop);
 
             var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
-            var bite = food.Consume();
+            var bite = DetachNearestFruit(tree);
 
             await bite.MoveTo(mouthPosition, globalSpace: true);
             await bite.ShrinkAndDispose();
@@ -64,6 +65,31 @@ namespace Simulation.GameTheory
         public void ConsumeEnergy()
         {
             energy = 0;
+        }
+
+        private Transform DetachNearestFruit(FruitTree tree)
+        {
+            // Look at flowers on the tree and return the nearest one
+            var distance = float.MaxValue;
+            Transform nearestFlowerWithFruit = null;
+            foreach (var flower in tree.flowers.Where(x => x.childCount > 0))
+            {
+                var flowerDistance = Vector3.Distance(transform.position, flower.position);
+                if (flowerDistance < distance)
+                {
+                    distance = flowerDistance;
+                    nearestFlowerWithFruit = flower;
+                }
+            }
+            
+            if (nearestFlowerWithFruit is null) {
+                Debug.LogError("No flower found on tree");
+            }
+
+            var fruit = nearestFlowerWithFruit.GetChild(0);
+            fruit.SetParent(null);
+
+            return fruit;
         }
     }
 }
