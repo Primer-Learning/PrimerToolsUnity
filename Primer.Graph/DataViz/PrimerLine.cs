@@ -212,7 +212,7 @@ namespace Primer.Graph
 
         public void Dispose()
         {
-            new Container(transform).Dispose();
+            Container.Dispose(this);
         }
 
         private DiscreteLine GetCurrentDiscreteLine()

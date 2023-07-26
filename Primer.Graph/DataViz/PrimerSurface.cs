@@ -164,7 +164,7 @@ namespace Primer.Graph
 
         public void Dispose()
         {
-            new Container(transform).Dispose();
+            Container.Dispose(this);
         }
 
         public MeshRenderer[] GetMeshRenderers() => new[] { meshRenderer };

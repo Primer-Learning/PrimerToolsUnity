@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Primer
 {
@@ -43,6 +44,14 @@ namespace Primer
         internal void RegisterChildContainer(Container container)
         {
             onPurge.Add(container.Purge);
+        }
+
+        public static void Dispose(Component component)
+        {
+            if (component == null)
+                return;
+
+            new Container(component).Dispose();
         }
     }
 }
