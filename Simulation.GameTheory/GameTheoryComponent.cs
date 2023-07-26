@@ -7,12 +7,12 @@ using UnityEngine;
 namespace Simulation.GameTheory
 {
     [ExecuteAlways]
-    public class GameTheoryComponent : MonoBehaviour, ISimulation
+    public class GameTheoryComponent : MonoBehaviour
     {
         // [Min(1)] public int foodPerTurn = 10;
         [Min(1)] public int initialBlobs = 2;
         public int seed = 0;
-        public bool _skipAnimations = false;
+        public bool skipAnimations = false;
 
         [SerializeReference]
         [Required]
@@ -65,13 +65,13 @@ namespace Simulation.GameTheory
             await simulation.SimulateSingleCycle();
             this.Log($"Completed turn {turn}");
         }
+        
+        [Button("Reset")]
+        public void Reset()
+        {
+            OnDisable();
+            OnEnable();
+        }
 
-
-        #region ISimulation implementation
-        public Rng rng => simulation.rng;
-        public Landscape terrain => simulation.terrain;
-        public bool skipAnimations => _skipAnimations;
-        public UniTask SimulateSingleCycle() => simulation.SimulateSingleCycle();
-        #endregion
     }
 }
