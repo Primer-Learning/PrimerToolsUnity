@@ -20,7 +20,7 @@ namespace Simulation.GameTheory
         private readonly ConflictResolutionRule conflictResolutionRule;
 
         public Rng rng { get; }
-        public Landscape terrain { get; }
+        // public Landscape terrain { get; }
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
@@ -33,7 +33,7 @@ namespace Simulation.GameTheory
             int initialBlobs,
             ConflictResolutionRule conflictResolutionRule)
         {
-            this.foodPerTurn = foodPerTurn;
+            // this.foodPerTurn = foodPerTurn;
             this.transform = transform;
             this.conflictResolutionRule = conflictResolutionRule;
 
@@ -70,37 +70,50 @@ namespace Simulation.GameTheory
         public async UniTask SimulateSingleCycle()
         {
             turn++;
-            // await CreateFood();
+            await CreateFood();
+            await DropFruit();
             // await AgentsGatherFood();
-            await AgentsEatFood();
+            // await AgentsEatFood();
             // await AgentsReturnHome();
-            await AgentsReproduceOrDie();
+            // await AgentsReproduceOrDie();
         }
 
-        // private UniTask CreateFood()
-        // {
-        //     foodContainer.Reset();
-        //
-        //     foreach (var point in PoissonDiscSampler.Rectangular(foodPerTurn, size, rng: rng)) {
-        //         var item = foodContainer.Add<Food>();
-        //         var centered = point - size / 2;
-        //         item.transform.localPosition = terrain.GetGroundAt(centered);
-        //         item.Initialize(rng);
-        //     }
-        //
-        //     foodContainer.Purge();
-        //
-        //     // Give time for the food to be scale up
-        //     return UniTask.Delay(500);
-        // }
+        private async UniTask CreateFood()
+        {
+            var trees = transform.GetComponentsInChildren<FruitTree>();
+            foreach (var tree in trees)
+            {
+                tree.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1).PlayAndForget();
+            }
+        
+            // Give time for the food to be scale up
+            await UniTask.Delay(500);
+        }
+
+        private UniTask DropFruit()
+        {
+            var trees = transform.GetComponentsInChildren<FruitTree>();
+            foreach (var tree in trees)
+            {
+                // Get a random flower that has a child
+                var fruit = tree.flowers.Where(x => x.childCount > 0).RandomItem().GetChild(0);
+                fruit.parent = null;
+                fruit.GetChild(0).GetComponent<Rigidbody>().isKinematic = false;
+
+                // tree.flowers.RandomItem().GetChild(0).parent = null;
+            }
+            
+            // Give time for the food to be scale up
+            return UniTask.Delay(500);
+        }
 
         // private UniTask AgentsGatherFood()
         // {
-        //     // var food = foodContainer.ChildComponents<Food>().ToList();
+        //     var food = foodContainer.ChildComponents<Food>().ToList();
         //
-        //     // return agents
-        //     //     .Select(agent => agent.GoToEat(food.RandomItem()))
-        //     //     .RunInParallel();
+        //     return agents
+        //         .Select(agent => agent.GoToEat(food.RandomItem()))
+        //         .RunInParallel();
         // }
 
         private async UniTask AgentsEatFood()
