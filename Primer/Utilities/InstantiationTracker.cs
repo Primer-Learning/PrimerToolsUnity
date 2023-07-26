@@ -19,6 +19,9 @@ namespace Primer
         public static T InstantiateAndRegister<T>(T prefab, string name)
             where T : Component
         {
+            if (prefab is null)
+                throw new System.ArgumentNullException(nameof(prefab));
+
             var target = Instantiate(prefab);
 
             if (!string.IsNullOrWhiteSpace(name))

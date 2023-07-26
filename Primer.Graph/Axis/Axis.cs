@@ -31,7 +31,7 @@ namespace Primer.Graph
         }
 
 
-        public void Awake() => UpdateChildren();
+        public void OnEnable() => UpdateChildren();
         public void OnValidate() => UpdateChildren();
 
 
