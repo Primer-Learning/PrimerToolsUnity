@@ -79,7 +79,7 @@ namespace Simulation.GameTheory
             await AgentsGoToTrees();
             await AgentsEatFood();
             await AgentsReturnHome();
-            // await AgentsReproduceOrDie();
+            await AgentsReproduceOrDie();
         }
 
         private async UniTask CreateFood()
@@ -161,8 +161,8 @@ namespace Simulation.GameTheory
                 case 1:
                     await competitors[0].Eat(tree);
 
-                    // if (food.hasMore)
-                    //     await competitors[0].Eat(food);
+                    if (tree.hasFruit)
+                        await competitors[0].Eat(tree);
 
                     return;
 

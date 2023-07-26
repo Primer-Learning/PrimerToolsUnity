@@ -12,6 +12,8 @@ public class FruitTree : MonoBehaviour
     public static float yAngleMax = 360f;
     public static float zAngleMax = 5f;
 
+    public bool hasFruit => flowers.Any(x => x.childCount > 0);
+    
     [Title("Flowers")]
     public List<Transform> flowers = new();
     [Range(1, 4)] public int fruitCount = 4;
