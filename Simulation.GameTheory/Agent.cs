@@ -6,28 +6,26 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class Agent : MonoBehaviour
+    public class Agent : LandscapeWalker
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
         // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
         // private static readonly int mouthClosed = Animator.StringToHash("MouthClosed");
 
-        private LandscapeWalker movementCache;
-        private LandscapeWalker movement => transform.GetOrAddComponent(ref movementCache);
 
         private PrimerBlob blobCache;
         private PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
 
         public float energy;
-        public Food goingToEat;
+        public FruitTree goingToEat;
 
         public bool canSurvive => energy >= 1;
         public bool canReproduce => energy >= 2;
 
-        public async UniTask GoToEat(Food food)
+        public async UniTask GoToEat(FruitTree tree)
         {
-            goingToEat = food;
-            var tween = movement.WalkTo(food.transform);
+            goingToEat = tree;
+            var tween = WalkTo(tree.transform);
             tween.duration /= 2;
             await tween;
         }
@@ -47,7 +45,7 @@ namespace Simulation.GameTheory
 
         public async UniTask ReturnHome(Vector2 position)
         {
-            await movement.WalkToLocal(position);
+            await WalkToLocal(position);
 
             if (this == null)
                 return;
