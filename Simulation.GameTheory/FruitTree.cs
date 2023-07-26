@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class FruitTree : MonoBehaviour
 {
-    public PrefabProvider fruitPrefab;
+    public Transform fruitPrefab;
     public static float xAngleMax = 5f;
     public static float yAngleMax = 360f;
     public static float zAngleMax = 5f;
@@ -24,25 +24,39 @@ public class FruitTree : MonoBehaviour
     public Tween GrowFruit(int index)
     {
         RandomlyRotateFlower(index);
-        
-        if (flowers[index].childCount == 0) {}
-        
-        var container = new Container(flowers[index]);
-        var fruit = container.Add(fruitPrefab, options: new ChildOptions{zeroScale = true});
+
+        Transform fruit;
+        if (flowers[index].childCount == 0)
+        {
+            fruit = Instantiate(fruitPrefab, flowers[index]);
+            fruit.localScale = Vector3.zero;
+        }
+        else
+        {
+            fruit = flowers[index].GetChild(0);
+        }
+
         return fruit.ScaleTo(1);
     }
-
-    public Tween GrowRandomFruits(int number = 1, float delayRange = 0)
+    public Tween GrowRandomFruitsUpToTotal(int total, float delayRange = 0)
     {
-        if (number > flowers.Count)
+        if (total > flowers.Count)
         {
-            number = flowers.Count;
-            Debug.LogWarning($"Cannot grow {number} fruit, only {flowers.Count} flowers available");
+            total = flowers.Count;
+            Debug.LogWarning($"Cannot grow {total} fruit, only {flowers.Count} flowers available");
         }
-        // Make sure not to grow the same fruit twice
-        var indices = Enumerable.Range(0, flowers.Count).Shuffle().Take(number);
+
+        // Get indices where there is already a fruit
+        var existingFruitIndices = Enumerable.Range(0, flowers.Count)
+            .Where(i => flowers[i].childCount > 0).ToArray();
         
-        return GrowSpecificFruits(indices.ToArray(), delayRange);
+        // Choose random indices where there's not already a fruit
+        var newFruitIndites = Enumerable.Range(0, flowers.Count)
+            .Where(i => flowers[i].childCount == 0)
+            .Shuffle()
+            .Take(total - existingFruitIndices.Length);
+        
+        return GrowSpecificFruits(newFruitIndites.Concat(existingFruitIndices).ToArray(), delayRange);
     }
 
     public Tween GrowSpecificFruits(int[] indices, float delayRange = 0)
