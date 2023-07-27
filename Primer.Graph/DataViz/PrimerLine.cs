@@ -244,7 +244,7 @@ namespace Primer.Graph
             if (line == null)
                 return;
 
-            var points = line.points;
+            var points = line.points.Select(domain.TransformPoint).ToArray();
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
 
@@ -269,6 +269,7 @@ namespace Primer.Graph
 
             renderedLine = line;
         }
+
 
         #region Drawing mesh
         private void CreateSegments(Vector3[] points, List<Vector3> vertices, List<int> triangles)
