@@ -11,12 +11,12 @@ namespace Simulation.GameTheory
     }
     public class SimpleStrategyRule : StrategyRule<SimpleStrategy>
     {
-        public override void OnAgentCreated(Agent<SimpleStrategy> agent)
+        public override void OnAgentCreated(Agent agent)
         {
             // noop
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent<SimpleStrategy>> agents, FruitTree tree)
+        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 

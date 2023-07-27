@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Primer.Simulation;
 
 namespace Simulation.GameTheory
 {
-    public abstract class StrategyRule<T> : IRule
+    public abstract class StrategyRule<T> : IRule where T : Enum
     {
-        public abstract void OnAgentCreated(Agent<T> agent);
+        public abstract void OnAgentCreated(Agent agent);
 
-        public abstract UniTask Resolve(IEnumerable<Agent<T>> agents, FruitTree tree);
+        public abstract UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree);
     }
 }

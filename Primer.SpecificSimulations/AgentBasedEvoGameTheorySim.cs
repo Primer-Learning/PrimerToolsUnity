@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable
+    public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
     {
         private int turn = 0;
         private readonly int foodPerTurn;
@@ -27,7 +27,7 @@ namespace Simulation.GameTheory
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        private IEnumerable<Agent<T>> agents => _agentGnome.ChildComponents<Agent<T>>();
+        private IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
@@ -68,7 +68,7 @@ namespace Simulation.GameTheory
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
                     var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
-                    var agent = blob.GetOrAddComponent<Agent<T>>();
+                    var agent = blob.GetOrAddComponent<Agent>();
                     Debug.Log(agent);
                     agent.strategy = strategy;
                     agent.landscape = terrain;
@@ -164,7 +164,7 @@ namespace Simulation.GameTheory
             // await AgentsReturnHome();
         }
 
-        private async UniTask Eat(List<Agent<T>> competitors, FruitTree tree)
+        private async UniTask Eat(List<Agent> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
                 case 0:
