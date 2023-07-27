@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Primer;
 using UnityEngine;
 
 public class AccessoryDisplay : MonoBehaviour
@@ -11,12 +12,12 @@ public class AccessoryDisplay : MonoBehaviour
     void Start()
     {   
         List<Color> blobColors = new List<Color>() {
-            PrimerColor.Blue,
-            PrimerColor.Orange,
-            PrimerColor.Yellow,
-            PrimerColor.Red,
-            PrimerColor.Green,
-            PrimerColor.Purple
+            PrimerColor.blue,
+            PrimerColor.orange,
+            PrimerColor.yellow,
+            PrimerColor.red,
+            PrimerColor.green,
+            PrimerColor.purple
         };
         var aTypes = (AccessoryType[])System.Enum.GetValues(typeof(AccessoryType));
 

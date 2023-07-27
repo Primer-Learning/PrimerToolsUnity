@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class PrimerColor2
+    public static class PrimerColor
     {
         /*
         These are the main colors I use in the vids. I don't own the colors,
@@ -19,6 +19,17 @@ namespace Primer
 
         // Defining colors as Vector4 because UnityEngine.Color stores values on a 0-1 scale
         // rather than a 0-255 scale
+        
+        // Colors with names from Coolors, for interest
+        // blue => celadonBlue
+        // orange => yellowOrangeColorWheel
+        // yellow => corn
+        // red => amaranth
+        // green => maximumGreen
+        // purple => superPink
+        // gray => onyx
+        // lightGray => blackCoral
+        // white => whiteSmoke
 
         // Main colors
         public static Color blue = ToColor(new Vector3(62, 126, 160));
@@ -92,6 +103,7 @@ namespace Primer
         }
 
         // Do we really need this?
+        // Not really, but it's currently used in the PrimerBlob class for a color picker that doesn't even work.
         public enum PrimerColors
         {
             Blue,

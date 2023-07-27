@@ -86,7 +86,7 @@ public class PrimerBlob : PrimerCharacter {
 
     private void SetColorToUIColor()
     {
-        var colorFromUI = PrimerColor.primerColorsDict[brokenPresetColor];
+        var colorFromUI = PrimerColor.ToColor(brokenPresetColor);
         transform.Find("blob_mesh").GetComponent<SkinnedMeshRenderer>().SetColor(colorFromUI);
         color = colorFromUI;
     }
@@ -506,8 +506,8 @@ public class PrimerBlob : PrimerCharacter {
 
         if (rand == null) rand = rng;
         if (options == null) options = AccessoryOptions;
-        SetColor(PrimerColor.BlobColors[
-            rand.Next(PrimerColor.BlobColors.Count)]);
+        SetColor(PrimerColor.blobColors[
+            rand.Next(PrimerColor.blobColors.Count)]);
 
         if (rand.NextDouble() < accessoryChance)
         {

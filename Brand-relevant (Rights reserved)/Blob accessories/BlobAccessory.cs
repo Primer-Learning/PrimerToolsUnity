@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Primer;
 using UnityEngine;
 
 public class BlobAccessory : PrimerObject
@@ -162,17 +163,17 @@ public class BlobAccessory : PrimerObject
                     SetTexture(textureName);
                 }
                 else {
-                    SetColor(PrimerColor.ComplementaryColorMap[blob.color]);
+                    SetColor(PrimerColor.complementaryColorMap[blob.color]);
                 }
             }
         }
         else {
             if (colorMatch) {
                 if (firstMatOnlyAccessories.Contains(accessoryType)) {
-                    base.SetColor(PrimerColor.ComplementaryColorMap[blob.color], onlyFirstMaterial: true);
+                    base.SetColor(PrimerColor.complementaryColorMap[blob.color], onlyFirstMaterial: true);
                 }
                 else {
-                    base.SetColor(PrimerColor.ComplementaryColorMap[blob.color]);
+                    base.SetColor(PrimerColor.complementaryColorMap[blob.color]);
                 }
             }
         }
@@ -202,14 +203,14 @@ public class BlobAccessory : PrimerObject
         AccessoryType.sunglasses
     };
     static Dictionary<Color, string> complementaryTextureNameExtensions = new Dictionary<Color, string>() {
-        {PrimerColor.Blue, "_orange"},
-        {PrimerColor.Orange, "_blue"},
-        {PrimerColor.Yellow, "_green"},
-        {PrimerColor.Red, "_teal"},
-        {PrimerColor.Green, "_purple"},
-        {PrimerColor.Purple, "_dark_green"},
-        {PrimerColor.White, ""},
-        {PrimerColor.Gray, ""},
+        {PrimerColor.blue, "_orange"},
+        {PrimerColor.orange, "_blue"},
+        {PrimerColor.yellow, "_green"},
+        {PrimerColor.red, "_teal"},
+        {PrimerColor.green, "_purple"},
+        {PrimerColor.purple, "_dark_green"},
+        {PrimerColor.white, ""},
+        {PrimerColor.gray, ""},
     };
     public static Dictionary<AccessoryType, float> SignHeights = new Dictionary<AccessoryType, float>() {
         {AccessoryType.froggyHat, 0.2f},

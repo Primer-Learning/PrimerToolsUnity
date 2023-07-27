@@ -12,7 +12,7 @@ namespace Primer.Graph
         public List<ILine> renderedData = new();
         public List<ILine> incomingData;
 
-        public List<Color> colors = new List<Color>(PrimerColor2.all);
+        public List<Color> colors = new List<Color>(PrimerColor.all);
 
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);

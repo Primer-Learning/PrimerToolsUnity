@@ -37,8 +37,8 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     [Title("Line rendering")]
     public float startThickness = 0.01f;
     public float endThickness = 0f;
-    public Color startColor = PrimerColor.White;
-    public Color endColor = PrimerColor.Blue;
+    public Color startColor = PrimerColor.white;
+    public Color endColor = PrimerColor.blue;
     public Material material;
 
     [Title("Controls")]
