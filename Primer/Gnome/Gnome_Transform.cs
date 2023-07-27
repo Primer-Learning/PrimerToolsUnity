@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container
+    public partial class Gnome
     {
         public Vector3 position {
             get => transform.position;
@@ -56,7 +56,7 @@ namespace Primer
                 .ToArray();
         }
 
-        public Container SetDefaults()
+        public Gnome SetDefaults()
         {
             transform.SetDefaults();
             return this;

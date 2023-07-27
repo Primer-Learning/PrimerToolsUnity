@@ -21,7 +21,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     // Ternary Plot can be set from the inspector _but_ if it hasn't been set we just create a new one and use it.
     public TernaryPlot _ternaryPlot;
     private TernaryPlot ternaryPlot => _ternaryPlot == null
-        ? _ternaryPlot = new Container<TernaryPlot>("TernaryPlot").component
+        ? _ternaryPlot = new Gnome<TernaryPlot>("TernaryPlot").component
         : _ternaryPlot;
 
     [FormerlySerializedAs("startOnValueChange")]
@@ -125,10 +125,10 @@ public class DHRBNumericalSimRunner : MonoBehaviour
         }
     }
 
-    private void PlotSim(IEnumerable<AlleleFrequency<DHRB>> result, Container container)
+    private void PlotSim(IEnumerable<AlleleFrequency<DHRB>> result, Gnome gnome)
     {
         // Use Unity's built-in line renderer to draw the line
-        var line = container.Add<LineRenderer>();
+        var line = gnome.Add<LineRenderer>();
         line.useWorldSpace = false;
         line.startWidth = startThickness / 1000;
         line.endWidth = endThickness / 1000;

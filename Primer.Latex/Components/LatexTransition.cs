@@ -136,7 +136,7 @@ namespace Primer.Latex
 
             Deactivate();
 
-            var container = new Container(root);
+            var container = new Gnome(root);
 
             foreach (var group in GroupsToRemove()) {
                 var groupTransform = container.Add(group);

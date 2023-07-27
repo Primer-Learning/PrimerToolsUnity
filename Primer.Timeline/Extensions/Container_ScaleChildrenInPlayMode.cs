@@ -6,14 +6,14 @@ namespace Primer.Timeline
 {
     public static class Container_ScaleChildrenInPlayMode
     {
-        public static T ScaleChildrenInPlayMode<T>(this T self, float duration = 0.5f) where T : Container
+        public static T ScaleChildrenInPlayMode<T>(this T self, float duration = 0.5f) where T : Gnome
         {
             self.onCreate = x => (x.ScaleUpFromZero() with { duration = duration }).PlayAndForget();
             self.onRemove = (x, defer) => x.ShrinkAndDispose(duration, defer).Forget();
             return self;
         }
 
-        public static T ScaleGrandchildrenInPlayMode<T>(this T self, float duration = 0.5f) where T : Container
+        public static T ScaleGrandchildrenInPlayMode<T>(this T self, float duration = 0.5f) where T : Gnome
         {
             self.onCreate = child => {
                 child.GetChildren()

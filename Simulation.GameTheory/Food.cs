@@ -15,7 +15,7 @@ namespace Simulation.GameTheory
 
             var t = transform;
             var sim = t.ParentComponent<ISimulation>();
-            var container = new Container(t);
+            var container = new Gnome(t);
 
             container.rotation = Quaternion.Euler(0, rng.Range(0, 180), 0);
 

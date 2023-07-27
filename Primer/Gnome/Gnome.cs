@@ -5,12 +5,12 @@ using UnityEngine.SceneManagement;
 
 namespace Primer
 {
-    public partial class Container : IDisposable, IPrimer
+    public partial class Gnome : IDisposable, IPrimer
     {
         public Transform transform { get; }
         public Component component { get; }
 
-        public Container(string name, Component parent = null, bool setActive = true)
+        public Gnome(string name, Component parent = null, bool setActive = true)
         {
             transform = parent is null
                 ? GetRootTransform(name)
@@ -24,7 +24,7 @@ namespace Primer
             Reset();
         }
 
-        public Container(Transform component, bool setActive = true)
+        public Gnome(Transform component, bool setActive = true)
         {
             this.component = component;
             transform = component;
@@ -35,7 +35,7 @@ namespace Primer
             Reset();
         }
 
-        protected Container(Component component, bool setActive = true)
+        protected Gnome(Component component, bool setActive = true)
         {
             this.component = component;
             transform = component.transform;
@@ -75,6 +75,6 @@ namespace Primer
             return child;
         }
 
-        public static implicit operator Transform(Container container) => container.transform;
+        public static implicit operator Transform(Gnome gnome) => gnome.transform;
     }
 }

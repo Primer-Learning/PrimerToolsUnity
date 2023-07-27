@@ -14,7 +14,7 @@ namespace Primer.Latex
 
         protected LatexComponent Latex(string formula, string name = null)
         {
-            var child = container.AddLatex(formula);
+            var child = _gnome.AddLatex(formula);
             child.transform.SetDefaults();
 
             lastCreatedLatex = child;
@@ -55,7 +55,7 @@ namespace Primer.Latex
             [CanBeNull] int[] groupIndexesAfter = null
         );
 
-        private Container container;
+        private Gnome _gnome;
         private LatexComponent lastCreatedLatex;
         public LatexComponent activeLatex { get; private set; }
         private Tween runningTransition;
@@ -92,7 +92,7 @@ namespace Primer.Latex
             stages.Clear();
             initial = null;
 
-            container = new Container(transform);
+            _gnome = new Gnome(transform);
 
             var enumerator = LatexStages();
             enumerator.MoveNext();
@@ -104,7 +104,7 @@ namespace Primer.Latex
                 yield return enumerator.Current;
             } while (enumerator.MoveNext());
 
-            container.Purge();
+            _gnome.Purge();
 
             yield return activeLatex.ScaleTo(0);
         }

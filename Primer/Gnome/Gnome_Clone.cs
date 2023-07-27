@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 
 namespace Primer
 {
-    public partial class Container<TComponent>
+    public partial class Gnome<TComponent>
     {
-        public static Container<T> Clone<T>(Container<T> template, string name) where T : Component
+        public static Gnome<T> Clone<T>(Gnome<T> template, string name) where T : Component
         {
             var rootObject = GetRootCloneOf(template.component, name);
-            return new Container<T>(rootObject);
+            return new Gnome<T>(rootObject);
         }
 
         public static T Clone<T>(T template, string name) where T : Component

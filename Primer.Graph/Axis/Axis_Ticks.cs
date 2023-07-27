@@ -180,13 +180,13 @@ namespace Primer.Graph
         #endregion
 
 
-        public void UpdateTicks(Container parentContainer)
+        public void UpdateTicks(Gnome parentGnome)
         {
             if (!showTicks || step <= 0 || tickPrefab.isEmpty)
                 return;
 
             var domain = this;
-            var container = parentContainer
+            var container = parentGnome
                 .AddContainer("Ticks container")
                 .ScaleGrandchildrenInPlayMode()
                 .SetDefaults();

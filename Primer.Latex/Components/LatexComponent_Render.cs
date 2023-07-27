@@ -87,7 +87,7 @@ namespace Primer.Latex
             if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
                 return;
 
-            var container = new Container(characters);
+            var container = new Gnome(characters);
             var currentMaterial = material;
             var currentColor = color;
 

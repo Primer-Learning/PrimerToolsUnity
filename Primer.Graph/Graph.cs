@@ -45,8 +45,8 @@ namespace Primer.Graph
         public Axis y => (yAxis != null) && yAxis.enabled && yAxis.isActiveAndEnabled ? yAxis : null;
         public Axis z => (zAxis != null) && zAxis.enabled && zAxis.isActiveAndEnabled ? zAxis : null;
 
-        public Container<Graph> containerCache;
-        public Container<Graph> container => containerCache ??= InitializeContainer();
+        [FormerlySerializedAs("containerCache")] public Gnome<Graph> gnomeCache;
+        public Gnome<Graph> gnome => gnomeCache ??= InitializeContainer();
 
         public Vector3 domain { get; private set; }
 
@@ -100,41 +100,41 @@ namespace Primer.Graph
 
         public PrimerLine AddLine(string name)
         {
-            return container.Add<PrimerLine>(name);
+            return gnome.Add<PrimerLine>(name);
         }
 
         public PrimerSurface AddSurface(string name)
         {
-            return container.Add<PrimerSurface>(name);
+            return gnome.Add<PrimerSurface>(name);
         }
 
         public StackedArea AddStackedArea(string name)
         {
-            return container.Add<StackedArea>(name);
+            return gnome.Add<StackedArea>(name);
         }
 
         public NewBarPlot AddBarPlot(string name)
         {
-            return container.Add<NewBarPlot>(name);
+            return gnome.Add<NewBarPlot>(name);
         }
 
         public GraphDomain AddPoint(string name, Vector3? coords = null)
         {
-            var point = container.AddPrimitive(PrimitiveType.Sphere, name);
+            var point = gnome.AddPrimitive(PrimitiveType.Sphere, name);
             point.SetScale(0.1f);
             return Track(point, coords);
         }
 
         public T AddPoint<T>(string name, T template, Vector3? coords = null) where T : Component
         {
-            var point = container.Add(template, name);
+            var point = gnome.Add(template, name);
             Track(point, coords);
             return point;
         }
 
         public GraphDomain AddTracker<T>(string name, T template, Vector3? coords = null) where T : Component
         {
-            var point = container.Add(template, name);
+            var point = gnome.Add(template, name);
             return Track(point, coords);
         }
 
@@ -152,7 +152,7 @@ namespace Primer.Graph
 
         public void Reset()
         {
-            containerCache = InitializeContainer();
+            gnomeCache = InitializeContainer();
         }
 
         public void Dispose()
@@ -161,9 +161,9 @@ namespace Primer.Graph
             gameObject.SetActive(false);
         }
 
-        private Container<Graph> InitializeContainer()
+        private Gnome<Graph> InitializeContainer()
         {
-            var result = Container.From(this);
+            var result = Gnome.From(this);
             result.Insert(xAxis);
             result.Insert(yAxis);
             result.Insert(zAxis);

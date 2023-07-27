@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container
+    public partial class Gnome
     {
         private readonly List<Transform> usedChildren = new();
         private readonly List<Transform> unusedChildren = new();
@@ -40,7 +40,7 @@ namespace Primer
 
             unusedChildren.Remove(t);
 
-            child.GetPrimer().parentContainer = this;
+            child.GetPrimer().parentGnome = this;
         }
     }
 }

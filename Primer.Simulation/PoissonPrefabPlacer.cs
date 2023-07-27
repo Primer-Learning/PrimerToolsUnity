@@ -63,7 +63,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var container = new Container(transform);
+            var container = new Gnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             var offset = Vector2.one * distanceFromBorder;
 

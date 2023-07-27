@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container
+    public partial class Gnome
     {
-        public Container AddContainer(string name, ChildOptions options = null)
+        public Gnome AddContainer(string name, ChildOptions options = null)
         {
             return Add(name, options).ToContainer(connectToParent: true);
         }
 
-        public Container<TChild> AddContainer<TChild>(string name, ChildOptions options = null) where TChild : Component
+        public Gnome<TChild> AddContainer<TChild>(string name, ChildOptions options = null) where TChild : Component
         {
             return Add<TChild>(name, options).ToContainer(connectToParent: true);
         }

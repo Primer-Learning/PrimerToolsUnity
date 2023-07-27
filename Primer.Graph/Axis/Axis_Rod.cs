@@ -20,9 +20,9 @@ namespace Primer.Graph
         }
         #endregion
 
-        public void UpdateRod(Container container)
+        public void UpdateRod(Gnome gnome)
         {
-            var rod = container.AddContainer("Rod");
+            var rod = gnome.AddContainer("Rod");
             var cylinder = rod.AddPrimitive(PrimitiveType.Cylinder);
 
             cylinder.localPosition = new Vector3(0.5f, 0, 0);

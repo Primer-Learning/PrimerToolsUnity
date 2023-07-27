@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container
+    public partial class Gnome
     {
         public bool disableWhenDisposed = true;
         private readonly List<Action> onCleanup = new();
@@ -41,9 +41,9 @@ namespace Primer
                 broomUp();
         }
 
-        internal void RegisterChildContainer(Container container)
+        internal void RegisterChildContainer(Gnome gnome)
         {
-            onPurge.Add(container.Purge);
+            onPurge.Add(gnome.Purge);
         }
 
         public static void Dispose(Component component)
@@ -51,7 +51,7 @@ namespace Primer
             if (component == null)
                 return;
 
-            new Container(component).Dispose();
+            new Gnome(component).Dispose();
         }
     }
 }

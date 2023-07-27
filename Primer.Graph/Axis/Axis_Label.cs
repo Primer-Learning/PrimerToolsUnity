@@ -83,10 +83,10 @@ namespace Primer.Graph
         }
         #endregion
 
-        public void UpdateLabel(Container container)
+        public void UpdateLabel(Gnome gnome)
         {
             var domain = this;
-            var labelTransform = container.AddLatex(label, "Label").transform;
+            var labelTransform = gnome.AddLatex(label, "Label").transform;
 
             var pos = labelPosition switch {
                 AxisLabelPosition.Along => new Vector3(domain.length / 2, 0f, 0f),

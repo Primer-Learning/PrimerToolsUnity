@@ -43,14 +43,14 @@ namespace Primer.Graph
             Clear();
         }
 
-        public Container GetContentContainer(string id = "Content")
+        public Gnome GetContentContainer(string id = "Content")
         {
             return transform.FindOrCreate(id).ToContainer();
         }
 
         public void Clear()
         {
-            var container = new Container(transform);
+            var container = new Gnome(transform);
             container.Add("Borders"); // Don't delete the borders
             container.Purge();
         }

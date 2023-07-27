@@ -42,7 +42,7 @@ namespace Primer.Graph
             if (gameObject.IsPreset())
                 return;
 
-            var container = new Container(transform)
+            var container = new Gnome(transform)
                 .ScaleChildrenInPlayMode();
 
             if (enabled && isActiveAndEnabled) {

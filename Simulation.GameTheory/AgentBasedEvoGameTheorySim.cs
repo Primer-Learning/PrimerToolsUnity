@@ -17,8 +17,8 @@ namespace Simulation.GameTheory
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
 
-        // private readonly Container foodContainer;
-        private readonly Container agentContainer;
+        // private readonly Gnome foodContainer;
+        private readonly Gnome _agentGnome;
 
         private readonly ConflictResolutionRule conflictResolutionRule;
 
@@ -27,7 +27,7 @@ namespace Simulation.GameTheory
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        private IEnumerable<Agent> agents => agentContainer.ChildComponents<Agent>();
+        private IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
@@ -42,16 +42,16 @@ namespace Simulation.GameTheory
 
             rng = new Rng(seed);
 
-            var container = new Container(transform);
-            // foodContainer = container.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
-            agentContainer = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
+            var container = new Gnome(transform);
+            // foodContainer = gnome.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
+            _agentGnome = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
 
             PlaceInitialBlobs(initialBlobs);
         }
 
         private void PlaceInitialBlobs(int blobCount)
         {
-            agentContainer.Reset();
+            _agentGnome.Reset();
 
             var positions = GetBlobsRestingPosition(blobCount)
                 .Select(x => terrain.GetGroundAtLocal(x))
@@ -60,7 +60,7 @@ namespace Simulation.GameTheory
             var center = positions.Average();
             
             foreach (var position in positions) {
-                var blob = agentContainer.AddPrefab<Transform>("blob_skinned", "Initial blob");
+                var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", "Initial blob");
                 var agent = blob.GetOrAddComponent<Agent>();
                 agent.landscape = terrain;    
                 conflictResolutionRule.OnAgentCreated(agent);
@@ -68,7 +68,7 @@ namespace Simulation.GameTheory
                 blob.LookAt(center);
             }
 
-            agentContainer.Purge(defer: true);
+            _agentGnome.Purge(defer: true);
         }
 
         public async UniTask SimulateSingleCycle()
@@ -134,19 +134,19 @@ namespace Simulation.GameTheory
         private async UniTask AgentsReproduceOrDie()
         {
             // foodContainer.RemoveAllChildren();
-            agentContainer.Reset();
+            _agentGnome.Reset();
 
             foreach (var agent in agents) {
                 if (agent.canSurvive)
-                    agentContainer.Insert(agent);
+                    _agentGnome.Insert(agent);
 
                 if (agent.canReproduce)
-                    agentContainer.Add(agent, $"Blob born in {turn}");
+                    _agentGnome.Add(agent, $"Blob born in {turn}");
 
                 agent.ConsumeEnergy();
             }
 
-            agentContainer.Purge();
+            _agentGnome.Purge();
 
             // Make room for new blobs and fill gaps left by dead blobs
             // await AgentsReturnHome();
@@ -178,7 +178,7 @@ namespace Simulation.GameTheory
             var offset = Vector2.one * margin;
             var perimeter = terrain.size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var agentCount = blobCount ?? agentContainer.childCount;
+            var agentCount = blobCount ?? _agentGnome.childCount;
             var positions = edgeLength / agentCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = terrain.size / -2;
@@ -212,7 +212,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            agentContainer?.RemoveAllChildren();
+            _agentGnome?.RemoveAllChildren();
         }
     }
 }

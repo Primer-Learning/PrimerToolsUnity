@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public partial class Container
+    public partial class Gnome
     {
         public Transform Add(string name = null, ChildOptions options = null)
         {

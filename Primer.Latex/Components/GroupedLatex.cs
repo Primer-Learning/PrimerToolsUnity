@@ -106,7 +106,7 @@ namespace Primer.Latex
             }
 
             // Groups are only used in transitions, we don't need to see them
-            var container = new Container(root, setActive: false);
+            var container = new Gnome(root, setActive: false);
             var zero = currentExpression.center;
             var currentMaterial = latex.material;
             var currentColor = latex.color;

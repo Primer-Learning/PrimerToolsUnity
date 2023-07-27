@@ -11,18 +11,18 @@ namespace Primer
         internal static Action<Transform, bool> defaultOnRemove = (x, defer) => x.Dispose(defer);
 
         /// <summary>
-        ///   If this function returns true, the container will not fire any events.
+        ///   If this function returns true, the gnome will not fire any events.
         /// </summary>
         internal static Func<bool> deactivateEventsIf = null;
 
         /// <summary>
-        ///   This component is added to a GameObject when it is being removed from the container.
+        ///   This component is added to a GameObject when it is being removed from the gnome.
         /// </summary>
         [DisallowMultipleComponent]
         internal class IsRemoving : MonoBehaviour {}
     }
 
-    public partial class Container
+    public partial class Gnome
     {
         private static bool areEventsDeactivated
             => ContainerEvents.deactivateEventsIf?.Invoke() ?? Application.isPlaying;

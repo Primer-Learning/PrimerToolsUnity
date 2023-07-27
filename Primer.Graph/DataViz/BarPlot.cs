@@ -19,12 +19,12 @@ namespace Primer.Graph
         private Graph graphCache;
         private Graph graph => transform.GetOrAddComponent(ref graphCache);
 
-        private Container _barsContainer;
-        private Container barsContainer => _barsContainer ??= new Container("Plotted bars", graph);
+        private Gnome _barsGnome;
+        private Gnome BarsGnome => _barsGnome ??= new Gnome("Plotted bars", graph);
 
-        private Container _labelsContainer;
-        public Container labelsContainer
-            => _labelsContainer ??= new Container("Plotted bars labels", graph).ScaleChildrenInPlayMode();
+        private Gnome _labelsGnome;
+        public Gnome LabelsGnome
+            => _labelsGnome ??= new Gnome("Plotted bars labels", graph).ScaleChildrenInPlayMode();
 
         public BarData this[int index] => GetBar(index);
         public BarData this[string name] => GetBar(name);
@@ -260,12 +260,12 @@ namespace Primer.Graph
         [Button]
         public void UpdateBars()
         {
-            var container = barsContainer;
+            var container = BarsGnome;
             container.Reset();
             container.localScale = Vector3.one;
             container.localPosition = Vector3.zero;
 
-            labelsContainer.Reset();
+            LabelsGnome.Reset();
 
             for (var i = 0; i < bars.Count; i++) {
                 var data = bars[i];
@@ -282,7 +282,7 @@ namespace Primer.Graph
 
             barCountForHax = bars.Count;
             
-            labelsContainer.Purge();
+            LabelsGnome.Purge();
             container.Purge();
         }
 
@@ -290,7 +290,7 @@ namespace Primer.Graph
         {
             var domain = graph.domain;
             
-            var follower = labelsContainer.AddFollower(bar);
+            var follower = LabelsGnome.AddFollower(bar);
             follower.component.useGlobalSpace = true;
             if (isNew)
             {
@@ -318,9 +318,9 @@ namespace Primer.Graph
             return label;
         }
 
-        private Rectangle CreateBar(Container container, BarData data, int i)
+        private Rectangle CreateBar(Gnome gnome, BarData data, int i)
         {
-            var bar = container.Add<Rectangle>(data.name ?? $"Bar {i}");
+            var bar = gnome.Add<Rectangle>(data.name ?? $"Bar {i}");
 
             bar.transform.localPosition = new Vector3(i, 0, 0) + offset;
 

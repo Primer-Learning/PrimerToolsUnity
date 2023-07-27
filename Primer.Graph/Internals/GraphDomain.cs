@@ -125,7 +125,7 @@ namespace Primer.Graph
 
         public void Dispose()
         {
-            Container.Dispose(this);
+            Gnome.Dispose(this);
         }
     }
 }

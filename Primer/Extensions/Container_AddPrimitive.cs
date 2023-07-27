@@ -8,13 +8,13 @@ namespace Primer
     {
         private static readonly Dictionary<PrimitiveType, GameObject> primitives = new();
 
-        public static Transform AddPrimitive(this Container self, PrimitiveType type, string name = null, ChildOptions options = null)
+        public static Transform AddPrimitive(this Gnome self, PrimitiveType type, string name = null, ChildOptions options = null)
         {
             var primitive = GetPrimitive(type);
             return self.Add(primitive.transform, name ?? Enum.GetName(typeof(PrimitiveType), type), options);
         }
 
-        public static T AddPrimitive<T>(this Container self, PrimitiveType type, string name = null, ChildOptions options = null)
+        public static T AddPrimitive<T>(this Gnome self, PrimitiveType type, string name = null, ChildOptions options = null)
             where T : Component
         {
             var primitive = GetPrimitive(type);

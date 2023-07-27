@@ -17,7 +17,7 @@ namespace Primer.Graph
         [Button(ButtonSizes.Large)]
         public void UpdateChildren()
         {
-            var container = new Container(transform);
+            var container = new Gnome(transform);
 
             for (var k = 0; k < length.z; k++)
             for (var j = 0; j < length.y; j++)
@@ -33,12 +33,12 @@ namespace Primer.Graph
             }
         }
 
-        private Cell CreateCell(Container container, string cellName)
+        private Cell CreateCell(Gnome gnome, string cellName)
         {
             if (prefab is null || prefab.isEmpty)
-                return container.Add<Cell>(cellName);
+                return gnome.Add<Cell>(cellName);
 
-            var child = container.Add(prefab, cellName);
+            var child = gnome.Add(prefab, cellName);
             return child.GetOrAddComponent<Cell>();
         }
 
