@@ -5,14 +5,18 @@ using Primer;
 
 namespace Simulation.GameTheory
 {
-    public class SimpleConflictResolution<T> : ConflictResolutionRule<T>
+    public enum SimpleStrategy
     {
-        public override void OnAgentCreated(Agent<T> agent)
+        Share
+    }
+    public class SimpleStrategyRule : StrategyRule<SimpleStrategy>
+    {
+        public override void OnAgentCreated(Agent<SimpleStrategy> agent)
         {
             // noop
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent<T>> agents, FruitTree tree)
+        public override async UniTask Resolve(IEnumerable<Agent<SimpleStrategy>> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 

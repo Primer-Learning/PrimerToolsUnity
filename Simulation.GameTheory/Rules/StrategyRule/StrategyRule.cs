@@ -4,7 +4,7 @@ using Primer.Simulation;
 
 namespace Simulation.GameTheory
 {
-    public abstract class ConflictResolutionRule<T> : IRule
+    public abstract class StrategyRule<T> : IRule
     {
         public abstract void OnAgentCreated(Agent<T> agent);
 

@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Simulation.GameTheory;
+using Sirenix.OdinInspector;
 
 public class DHRBRewardEditorComponent : RewardEditorComponent<DHRB>
 {

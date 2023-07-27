@@ -7,7 +7,14 @@ using Random = UnityEngine.Random;
 
 namespace Simulation.GameTheory
 {
-    public class HawkDoveConflictResolution : ConflictResolutionRule<DHRB>
+    public enum DHRB
+    {
+        Dove,
+        Hawk,
+        Retaliator,
+        Bully
+    }
+    public class DHRBStrategyRule : StrategyRule<DHRB>
     {
         // These classes can be moved outside if they are used in more than one place
         // to /Concepts/ folder maybe

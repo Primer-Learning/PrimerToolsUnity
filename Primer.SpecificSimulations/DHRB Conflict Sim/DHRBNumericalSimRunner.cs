@@ -6,6 +6,7 @@ using Primer.Graph;
 using Primer.Simulation;
 using Primer.Timeline;
 using Shapes;
+using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEditorInternal;
 using UnityEngine;

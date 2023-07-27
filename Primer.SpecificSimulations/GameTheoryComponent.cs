@@ -18,11 +18,11 @@ namespace Simulation.GameTheory
         public int seed = 0;
         public bool skipAnimations = false;
 
-        [SerializeReference]
+        // [SerializeReference]
         [Required]
         [PropertyOrder(10)]
         [HideLabel, Title("Conflict Resolution Rule")]
-        public ConflictResolutionRule<DHRB> conflictResolutionRule = new SimpleConflictResolution<DHRB>();
+        public StrategyRule<DHRB> strategyRule = new DHRBStrategyRule();
 
         private AgentBasedEvoGameTheorySim<DHRB> _sim;
         private int turn;
@@ -38,7 +38,7 @@ namespace Simulation.GameTheory
                 seed: seed,
                 // foodPerTurn: foodPerTurn,
                 initialBlobs: initialStrategyCount,
-                conflictResolutionRule
+                strategyRule
             ) {
                 skipAnimations = skipAnimations,
             };

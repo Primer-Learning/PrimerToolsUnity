@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Primer.Simulation;
+using Simulation.GameTheory;
 using UnityEngine;
 
 [RequireComponent(typeof(DHRBRewardEditorComponent))]

@@ -8,5 +8,7 @@
   "GUID:9f51ebb9479f54b4aa47d05cf4e2e2a7",
   "GUID:4ff74c95bf504425f893d81a5f99d0f0",
   "GUID:f51ebe6a0ceec4240a699833d6309b23",
-  "ShapesRuntime"]
+  "ShapesRuntime",
+  "Simulation.GameTheory",
+  "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"]
 }

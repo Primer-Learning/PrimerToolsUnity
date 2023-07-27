@@ -20,7 +20,7 @@ namespace Simulation.GameTheory
         // private readonly Gnome foodContainer;
         private readonly Gnome _agentGnome;
 
-        private readonly ConflictResolutionRule<T> conflictResolutionRule;
+        private readonly StrategyRule<T> _strategyRule;
 
         public Rng rng { get; }
         // public Landscape terrain { get; }
@@ -34,11 +34,11 @@ namespace Simulation.GameTheory
             int seed,
             // int foodPerTurn,
             Dictionary<T, int> initialBlobs,
-            ConflictResolutionRule<T> conflictResolutionRule)
+            StrategyRule<T> strategyRule)
         {
             // this.foodPerTurn = foodPerTurn;
             this.transform = transform;
-            this.conflictResolutionRule = conflictResolutionRule;
+            this._strategyRule = strategyRule;
 
             rng = new Rng(seed);
 
@@ -62,14 +62,17 @@ namespace Simulation.GameTheory
                 .ToList();
 
             var center = positions.Average();
+
+            if (transform is null) Debug.Log("transform is null");
             
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
                     var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
                     var agent = blob.GetOrAddComponent<Agent<T>>();
-                    agent.landscape = terrain;
+                    Debug.Log(agent);
                     agent.strategy = strategy;
-                    // conflictResolutionRule.OnAgentCreated(agent);
+                    agent.landscape = terrain;
+                    // strategyRule.OnAgentCreated(agent);
                     blob.position = positions[i];
                     blob.LookAt(center);
                 }
@@ -176,7 +179,7 @@ namespace Simulation.GameTheory
                     return;
 
                 case > 1:
-                    await conflictResolutionRule.Resolve(competitors, tree);
+                    await _strategyRule.Resolve(competitors, tree);
                     return;
             }
         }

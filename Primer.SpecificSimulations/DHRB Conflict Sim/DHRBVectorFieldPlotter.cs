@@ -1,5 +1,6 @@
 ﻿using Primer.Graph;
 using Primer.Simulation;
+using Simulation.GameTheory;
 using UnityEngine;
 
 [RequireComponent(typeof(TernaryPlot))]
