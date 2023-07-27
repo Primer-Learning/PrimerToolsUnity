@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Whenever this is ready to be removed rename Primer.PrimerColor2 to Primer.PrimerColor
+[Obsolete("Use Primer.PrimerColor2 instead")]
 public static class PrimerColor
 {   
     /*
