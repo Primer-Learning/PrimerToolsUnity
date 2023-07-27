@@ -94,7 +94,7 @@ namespace Primer.Graph
 
         private void Render(IEnumerable<ILine> data)
         {
-            var container = new Container(transform);
+            var container = new Gnome(transform);
             var lines = (data ?? new List<ILine>()).ToList();
 
             if (lines.Count is 0) {
