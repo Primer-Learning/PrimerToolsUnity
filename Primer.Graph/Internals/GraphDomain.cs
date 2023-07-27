@@ -114,7 +114,7 @@ namespace Primer.Graph
 
         private void Update()
         {
-            if (behaviour != Behaviour.FollowPoint || !graph)
+            if (behaviour != Behaviour.FollowPoint || !graph || _point is null)
                 return;
 
             if (useGlobalPosition)
