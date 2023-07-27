@@ -23,11 +23,24 @@ namespace Primer.Shapes
             this.points = points.ToArray();
         }
 
+        public DiscreteLine(IEnumerable<float> points)
+        {
+            this.points = points.Select((y, i) => new Vector3(i, y)).ToArray();
+        }
+
         public DiscreteLine Append(Vector3 point)
         {
             var newPoints = new Vector3[points.Length + 1];
             Array.Copy(points, newPoints, points.Length);
             newPoints[^1] = point;
+            return new DiscreteLine(newPoints);
+        }
+
+        public DiscreteLine Append(float y)
+        {
+            var newPoints = new Vector3[points.Length + 1];
+            Array.Copy(points, newPoints, points.Length);
+            newPoints[^1] = new Vector3(points.Length, y);
             return new DiscreteLine(newPoints);
         }
 
@@ -79,6 +92,11 @@ namespace Primer.Shapes
                 copy[lastIndex] = Vector3.Lerp(copy[lastIndex - 1], copy[lastIndex], t);
 
             return new DiscreteLine(copy);
+        }
+
+        public DiscreteLine ToDiscrete()
+        {
+            return this;
         }
 
         private Vector3[] CutToArray(int newLength, bool fromOrigin) {

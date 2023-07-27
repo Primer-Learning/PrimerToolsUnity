@@ -10,6 +10,8 @@ namespace Primer.Shapes
         ILine ChangeResolution(int newResolution);
         ILine SmoothCut(float toResolution, bool fromOrigin);
 
+        DiscreteLine ToDiscrete();
+
         public static ILine Lerp(ILine a, ILine b, float t) {
             var size = Mathf.Max(a.resolution, b.resolution);
             var length = size + 1;
