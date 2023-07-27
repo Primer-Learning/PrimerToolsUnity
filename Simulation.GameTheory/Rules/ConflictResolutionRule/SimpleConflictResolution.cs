@@ -5,14 +5,14 @@ using Primer;
 
 namespace Simulation.GameTheory
 {
-    public class SimpleConflictResolution : ConflictResolutionRule
+    public class SimpleConflictResolution<T> : ConflictResolutionRule<T>
     {
-        public override void OnAgentCreated(Agent agent)
+        public override void OnAgentCreated(Agent<T> agent)
         {
             // noop
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
+        public override async UniTask Resolve(IEnumerable<Agent<T>> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class Agent : LandscapeWalker
+    public class Agent<T> : LandscapeWalker
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
         // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
@@ -19,6 +19,7 @@ namespace Simulation.GameTheory
 
         public float energy;
         public FruitTree goingToEat;
+        public T strategy;
 
         public bool canSurvive => energy >= 1;
         public bool canReproduce => energy >= 2;

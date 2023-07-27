@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class AgentBasedEvoGameTheorySim : ISimulation, IPrimer, IDisposable
+    public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable
     {
         private int turn = 0;
         private readonly int foodPerTurn;
@@ -20,21 +20,21 @@ namespace Simulation.GameTheory
         // private readonly Gnome foodContainer;
         private readonly Gnome _agentGnome;
 
-        private readonly ConflictResolutionRule conflictResolutionRule;
+        private readonly ConflictResolutionRule<T> conflictResolutionRule;
 
         public Rng rng { get; }
         // public Landscape terrain { get; }
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        private IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
+        private IEnumerable<Agent<T>> agents => _agentGnome.ChildComponents<Agent<T>>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
             int seed,
             // int foodPerTurn,
-            int initialBlobs,
-            ConflictResolutionRule conflictResolutionRule)
+            Dictionary<T, int> initialBlobs,
+            ConflictResolutionRule<T> conflictResolutionRule)
         {
             // this.foodPerTurn = foodPerTurn;
             this.transform = transform;
@@ -49,23 +49,30 @@ namespace Simulation.GameTheory
             PlaceInitialBlobs(initialBlobs);
         }
 
-        private void PlaceInitialBlobs(int blobCount)
+        private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)
         {
             _agentGnome.Reset();
+            
+            // Add up the ints in the dictionary to get the total number of initial blobs
+            var blobCount = initialBlobs.Sum(x => x.Value);
 
             var positions = GetBlobsRestingPosition(blobCount)
                 .Select(x => terrain.GetGroundAtLocal(x))
+                .Shuffle()
                 .ToList();
 
             var center = positions.Average();
             
-            foreach (var position in positions) {
-                var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", "Initial blob");
-                var agent = blob.GetOrAddComponent<Agent>();
-                agent.landscape = terrain;    
-                conflictResolutionRule.OnAgentCreated(agent);
-                blob.position = position;
-                blob.LookAt(center);
+            foreach (var (strategy, count) in initialBlobs) {
+                for (var i = 0; i < count; i++) {
+                    var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
+                    var agent = blob.GetOrAddComponent<Agent<T>>();
+                    agent.landscape = terrain;
+                    agent.strategy = strategy;
+                    // conflictResolutionRule.OnAgentCreated(agent);
+                    blob.position = positions[i];
+                    blob.LookAt(center);
+                }
             }
 
             _agentGnome.Purge(defer: true);
@@ -118,6 +125,8 @@ namespace Simulation.GameTheory
 
         private async UniTask AgentsEatFood()
         {
+            
+            
             await agents
                 .GroupBy(x => x.goingToEat)
                 .Select(x => Eat(competitors: x.ToList(), tree: x.Key))
@@ -152,7 +161,7 @@ namespace Simulation.GameTheory
             // await AgentsReturnHome();
         }
 
-        private async UniTask Eat(List<Agent> competitors, FruitTree tree)
+        private async UniTask Eat(List<Agent<T>> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
                 case 0:

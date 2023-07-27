@@ -7,6 +7,7 @@
     "UniTask",
     "Primer.Timeline",
     "Primer.Animation",
-    "Primer.PrimerTools"
+    "Primer.PrimerTools",
+    "Primer.SpecificSimulations"
   ]
 }

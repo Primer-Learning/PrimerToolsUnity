@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace Simulation.GameTheory
 {
-    public class HawkDoveConflictResolution : ConflictResolutionRule
+    public class HawkDoveConflictResolution : ConflictResolutionRule<DHRB>
     {
         // These classes can be moved outside if they are used in more than one place
         // to /Concepts/ folder maybe
@@ -20,7 +20,7 @@ namespace Simulation.GameTheory
         public float hawkDoveBenefit = 0.5f;
         public float hawkHawkCost = 1f;
 
-        public override void OnAgentCreated(Agent agent)
+        public override void OnAgentCreated(Agent<DHRB> agent)
         {
             if (Random.value < hawkDoveRatio)
                 agent.GetOrAddComponent<Hawk>();
@@ -28,7 +28,7 @@ namespace Simulation.GameTheory
                 agent.GetOrAddComponent<Dove>();
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
+        public override async UniTask Resolve(IEnumerable<Agent<DHRB>> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
             var firstBehaviour = first.GetComponent<ConflictBehaviour>();

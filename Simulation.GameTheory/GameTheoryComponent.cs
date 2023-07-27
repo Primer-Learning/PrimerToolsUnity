@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Primer;
-using Primer.Simulation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,8 +9,12 @@ namespace Simulation.GameTheory
     [ExecuteAlways]
     public class GameTheoryComponent : MonoBehaviour
     {
-        // [Min(1)] public int foodPerTurn = 10;
-        [Min(1)] public int initialBlobs = 2;
+        [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
+        public Dictionary<DHRB, int> initialStrategyCount = new() {
+            { DHRB.Dove, 1},
+            { DHRB.Hawk, 1},
+            { DHRB.Retaliator, 1},
+        };
         public int seed = 0;
         public bool skipAnimations = false;
 
@@ -18,9 +22,9 @@ namespace Simulation.GameTheory
         [Required]
         [PropertyOrder(10)]
         [HideLabel, Title("Conflict Resolution Rule")]
-        public ConflictResolutionRule conflictResolutionRule = new SimpleConflictResolution();
+        public ConflictResolutionRule<DHRB> conflictResolutionRule = new SimpleConflictResolution<DHRB>();
 
-        private AgentBasedEvoGameTheorySim _sim;
+        private AgentBasedEvoGameTheorySim<DHRB> _sim;
         private int turn;
 
         private void OnValidate() => OnEnable();
@@ -29,11 +33,11 @@ namespace Simulation.GameTheory
         {
             turn = 0;
 
-            _sim = new AgentBasedEvoGameTheorySim(
+            _sim = new AgentBasedEvoGameTheorySim<DHRB>(
                 transform: transform,
                 seed: seed,
                 // foodPerTurn: foodPerTurn,
-                initialBlobs: initialBlobs,
+                initialBlobs: initialStrategyCount,
                 conflictResolutionRule
             ) {
                 skipAnimations = skipAnimations,

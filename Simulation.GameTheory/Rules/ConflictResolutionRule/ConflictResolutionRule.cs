@@ -4,10 +4,10 @@ using Primer.Simulation;
 
 namespace Simulation.GameTheory
 {
-    public abstract class ConflictResolutionRule : IRule
+    public abstract class ConflictResolutionRule<T> : IRule
     {
-        public abstract void OnAgentCreated(Agent agent);
+        public abstract void OnAgentCreated(Agent<T> agent);
 
-        public abstract UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree);
+        public abstract UniTask Resolve(IEnumerable<Agent<T>> agents, FruitTree tree);
     }
 }
