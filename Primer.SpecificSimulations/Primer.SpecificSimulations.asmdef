@@ -1,0 +1,12 @@
+{
+  "name": "Primer.SpecificSimulations",
+  "rootNamespace": "Primer.SpecificSimulations",
+  "references": [
+  "GUID:2d95314119a0147339cb9bfe0f43291e",
+  "GUID:f6d0939ee404c415a88a984426da0be3",
+  "GUID:fa12db3b1380a428aa2ceb49c4ac3684",
+  "GUID:9f51ebb9479f54b4aa47d05cf4e2e2a7",
+  "GUID:4ff74c95bf504425f893d81a5f99d0f0",
+  "GUID:f51ebe6a0ceec4240a699833d6309b23",
+  "ShapesRuntime"]
+}
