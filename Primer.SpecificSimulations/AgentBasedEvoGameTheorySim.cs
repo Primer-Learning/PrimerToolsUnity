@@ -69,10 +69,9 @@ namespace Simulation.GameTheory
                 for (var i = 0; i < count; i++) {
                     var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
                     var agent = blob.GetOrAddComponent<Agent>();
-                    Debug.Log(agent);
                     agent.strategy = strategy;
                     agent.landscape = terrain;
-                    // strategyRule.OnAgentCreated(agent);
+                    _strategyRule.OnAgentCreated(agent);
                     blob.position = positions[i];
                     blob.LookAt(center);
                 }
