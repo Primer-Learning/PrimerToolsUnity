@@ -28,10 +28,36 @@ namespace Primer.Graph
 
         public void AddData(params float[] newColumn)
         {
+            // first we save a copy of the data we want to extend on
             incomingData = new List<ILine>(incomingData ?? renderedData);
 
             for (var y = 0; y < newColumn.Length; y++) {
-                incomingData[y] = incomingData[y].ToDiscrete().Append(newColumn[y]);
+                // then we ALSO need to add a point to the current areas so it doesn't deform when tweening
+                var rendered = renderedData[y];
+                var hadToAddTwoPoints = false;
+
+                // FunctionLines will adapt to the new point automatically
+                if (rendered is DiscreteLine discrete) {
+                    // if the area has height at the end we need to drop straight to the bottom
+                    var last = discrete.points.Last();
+
+                    if (last.y is not 0) {
+                        hadToAddTwoPoints = true;
+                        discrete = discrete.Append(new Vector3(last.x, 0));
+                    }
+
+                    renderedData[y] = discrete.Append(new Vector3(last.x + 1, 0));
+                }
+
+                // finally we add the new column to the incoming data
+                var incoming = incomingData[y].ToDiscrete().Append(newColumn[y]);
+
+                // If we had to add two points in the current line we also need two points here
+                // just duplicate the last one
+                if (hadToAddTwoPoints)
+                    incoming = incoming.Append(incoming.points.Last());
+
+                incomingData[y] = incoming;
             }
         }
 
@@ -111,8 +137,8 @@ namespace Primer.Graph
                 var points = new List<Vector3>(prevLine);
                 var triangles = new List<int>();
                 var line = lines[i].points
-                    .Select((vec, j) => new Vector3(vec.x, vec.y + prevLine[j].y, vec.z))
                     .Select(domain.TransformPoint)
+                    .Select((vec, j) => new Vector3(vec.x, vec.y + prevLine[j].y, vec.z))
                     .ToArray();
 
                 var lineStart = points.Count;
