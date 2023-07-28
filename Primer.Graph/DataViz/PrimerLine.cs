@@ -80,7 +80,7 @@ namespace Primer.Graph
         {
             domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
             domain.onDomainChange = Render;
-            meshRenderer.sharedMaterial ??= MeshRendererExtensions.defaultMaterial;
+            meshRenderer.sharedMaterial ??= RendererExtensions.defaultMaterial;
         }
 
         /// <summary>

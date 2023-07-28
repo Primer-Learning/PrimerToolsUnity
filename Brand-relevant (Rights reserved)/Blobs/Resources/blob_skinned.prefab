@@ -797,6 +797,7 @@ GameObject:
   - component: {fileID: 5937726088034954747}
   - component: {fileID: 7222739926456098793}
   - component: {fileID: 7222739926456098794}
+  - component: {fileID: 7749797900816838461}
   m_Layer: 0
   m_Name: blob_skinned
   m_TagString: Untagged
@@ -855,7 +856,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66165ed5a2781ba49b8a6526b0dafb36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
   brokenPresetColor: 0
   color: {r: 0.24313726, g: 0.49411765, b: 0.627451, a: 1}
   accessories: []
@@ -865,6 +865,59 @@ MonoBehaviour:
   highPolyMesh: {fileID: 4300000, guid: 4ea75393267e8d2428a7128c3a18df4f, type: 2}
   lowPolyMesh: {fileID: 4300000, guid: fcc9b046f49dcf54dba28ef45b1137a8, type: 2}
   staticMesh: {fileID: 4300000, guid: 92708d1acde90e24b8280715576efcd8, type: 2}
+--- !u!137 &7749797900816838461
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7222739926456098792}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 3
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_SkinnedMotionVectors: 1
+  m_Mesh: {fileID: 0}
+  m_Bones: []
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 0}
+  m_AABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  m_DirtyAABB: 0
 --- !u!1 &7538004976239834687
 GameObject:
   m_ObjectHideFlags: 0

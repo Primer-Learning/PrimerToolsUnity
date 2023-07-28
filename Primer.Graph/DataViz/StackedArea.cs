@@ -169,7 +169,7 @@ namespace Primer.Graph
                 }
 
                 var area = container.Add<MeshRenderer>($"Area {i}");
-                area.material = MeshRendererExtensions.defaultMaterial;
+                area.material = RendererExtensions.defaultMaterial;
                 area.SetColor(colors[i]);
 
                 area.GetOrAddComponent<MeshFilter>().mesh = new Mesh {

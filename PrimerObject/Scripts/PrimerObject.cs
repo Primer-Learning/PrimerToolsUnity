@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Primer;
 using Primer.Animation;
 using UnityEngine;
 
@@ -609,12 +610,12 @@ public class PrimerObject : MonoBehaviour
         ChangeColor(oldColor, duration: decay, ease: ease);
     }
     public virtual void SetColor(Color newColor, Renderer r) {
-        r.material.color = newColor;
+        r.SetColor(newColor);
     }
     public virtual void SetColor(Color newColor, bool onlyFirstMaterial = false) {
         Renderer[] mrs = GetComponentsInChildren<Renderer>();
         if (onlyFirstMaterial) {
-            mrs[0].material.color = newColor;
+            mrs[0].SetColor(newColor);
         }
         else {
             SetColor(newColor);

@@ -38,7 +38,7 @@ namespace Primer.Latex
             var presets = Preset.GetDefaultPresetsForObject(this);
 
             if (material is null || presets.All(preset => preset.excludedProperties.Contains("material"))) {
-                material = MeshRendererExtensions.defaultMaterial;
+                material = RendererExtensions.defaultMaterial;
             }
         }
 
