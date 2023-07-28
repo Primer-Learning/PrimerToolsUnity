@@ -103,16 +103,28 @@ namespace Simulation.GameTheory
 
         private UniTask AgentsGoToTrees()
         {
+            // return agents
+            //     .Select(agent => agent.GoToEat(trees.RandomItem()))
+            //     .RunInParallel();
+            
+            // Make agents go to trees, but a maximum of two per tree
+            var agentsPerTree = 2;
             return agents
-                .Select(agent => agent.GoToEat(trees.RandomItem()))
+                .Shuffle()
+                .Take(agentsPerTree * trees.Length)
+                .Select((agent, index) => (agent, index))
+                .GroupBy(x => x.index / agentsPerTree)
+                .Select(x => x.Select(y => y.agent).ToList())
+                .Zip(trees, (agentsAtTree, tree) => agentsAtTree.Select(agent => agent.GoToEat(tree)))
+                .SelectMany(x => x)
                 .RunInParallel();
         }
 
         private async UniTask AgentsEatFood()
         {
-            
-            
+            // Make agents eat food, but only agents where gointToEat is not null
             await agents
+                .Where(agent => agent.goingToEat != null)
                 .GroupBy(x => x.goingToEat)
                 .Select(x => Eat(competitors: x.ToList(), tree: x.Key))
                 .RunInParallel();

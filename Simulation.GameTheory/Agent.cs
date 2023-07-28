@@ -27,7 +27,7 @@ namespace Simulation.GameTheory
         public async UniTask GoToEat(FruitTree tree)
         {
             goingToEat = tree;
-            var tween = WalkTo(tree.transform);
+            var tween = WalkTo(tree.transform, stopDistance: 1);
             tween.duration /= 2;
             await tween;
         }
