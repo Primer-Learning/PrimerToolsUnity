@@ -41,23 +41,23 @@ public class DHRBRewardEditorComponent : RewardEditorComponent<DHRB>
     }
     
     public float doveVsDove = 1;
-    public float doveVsHawk = 0;
+    public float doveVsHawk = 0.5f;
     public float doveVsRetaliator = 1;
-    public float doveVsBully = 0;
+    public float doveVsBully = 0.5f;
 
-    public float hawkVsDove = 2;
-    public float hawkVsHawk = -1;
-    public float hawkVsRetaliator = -1;
-    public float hawkVsBully = 2;
+    public float hawkVsDove = 1.5f;
+    public float hawkVsHawk = 0;
+    public float hawkVsRetaliator = 0;
+    public float hawkVsBully = 1.5f;
 
     public float retaliatorVsDove = 1;
-    public float retaliatorVsHawk = -1;
+    public float retaliatorVsHawk = 0;
     public float retaliatorVsRetaliator = 1;
-    public float retaliatorVsBully = 2;
+    public float retaliatorVsBully = 1.5f;
     
-    public float bullyVsDove = 2;
-    public float bullyVsHawk = 0;
-    public float bullyVsRetaliator = 0;
+    public float bullyVsDove = 1.5f;
+    public float bullyVsHawk = 0.5f;
+    public float bullyVsRetaliator = 0.5f;
     public float bullyVsBully = 1;
 
     [Title("Modifiers")]
