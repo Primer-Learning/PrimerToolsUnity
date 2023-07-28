@@ -10,6 +10,17 @@ namespace Simulation.GameTheory
     [RequireComponent(typeof(DHRBRewardEditorComponent))]
     public class GameTheoryComponent : MonoBehaviour
     {
+        private void Update()
+        {
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.RightArrow))
+                Time.timeScale *= 2;
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.LeftArrow))
+                Time.timeScale /= 2;
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.Space))
+                Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+        }
+        
+        
         [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
         public Dictionary<DHRB, int> initialStrategyCount = new() {
             { DHRB.Dove, 1},
