@@ -12,29 +12,30 @@ public class DHRBRewardEditorComponent : RewardEditorComponent<DHRB>
     [TableMatrix]
     [InfoBox("0 = Dove, 1 = Hawk, 2 = Retaliator, 3 = Bully")]
     [PropertyOrder(-1)]
+    // This matrix is transposed compared to the one in PutValuesInMatrix(), because of how TableMatrix works
     public float[,] baseFitnessMatrix {
         get => new [,] {
-            { doveVsDove, doveVsHawk, doveVsRetaliator, doveVsBully },
-            { hawkVsDove, hawkVsHawk, hawkVsRetaliator, hawkVsBully },
-            { retaliatorVsDove, retaliatorVsHawk, retaliatorVsRetaliator, retaliatorVsBully },
-            { bullyVsDove, bullyVsHawk, bullyVsRetaliator, bullyVsBully },
+            { doveVsDove, hawkVsDove, retaliatorVsDove, bullyVsDove },
+            { doveVsHawk, hawkVsHawk, retaliatorVsHawk, bullyVsHawk },
+            { doveVsRetaliator, hawkVsRetaliator, retaliatorVsRetaliator, bullyVsRetaliator },
+            { doveVsBully, hawkVsBully, retaliatorVsBully, bullyVsBully },
         };
         set {
             doveVsDove = value[0, 0];
-            doveVsHawk = value[0, 1];
-            doveVsRetaliator = value[0, 2];
-            doveVsBully = value[0, 3];
-            hawkVsDove = value[1, 0];
+            doveVsHawk = value[1, 0];
+            doveVsRetaliator = value[2, 0];
+            doveVsBully = value[3, 0];
+            hawkVsDove = value[0, 1];
             hawkVsHawk = value[1, 1];
-            hawkVsRetaliator = value[1, 2];
-            hawkVsBully = value[1, 3];
-            retaliatorVsDove = value[2, 0];
-            retaliatorVsHawk = value[2, 1];
+            hawkVsRetaliator = value[2, 1];
+            hawkVsBully = value[3, 1];
+            retaliatorVsDove = value[0, 2];
+            retaliatorVsHawk = value[1, 2];
             retaliatorVsRetaliator = value[2, 2];
-            retaliatorVsBully = value[2, 3];
-            bullyVsDove = value[3, 0];
-            bullyVsHawk = value[3, 1];
-            bullyVsRetaliator = value[3, 2];
+            retaliatorVsBully = value[3, 2];
+            bullyVsDove = value[0, 3];
+            bullyVsHawk = value[1, 3];
+            bullyVsRetaliator = value[2, 3];
             bullyVsBully = value[3, 3];
         }
     }
