@@ -44,6 +44,18 @@ namespace Primer.Shapes
             return new DiscreteLine(newPoints);
         }
 
+        public DiscreteLine RemoveRedundantPoints()
+        {
+            var newPoints = new List<Vector3> { points[0] };
+
+            for (var i = 1; i < points.Length; i++) {
+                if (points[i] != newPoints[^1])
+                    newPoints.Add(points[i]);
+            }
+
+            return new DiscreteLine(newPoints);
+        }
+
         public ILine ChangeResolution(int newResolution) {
             if (newResolution == resolution)
                 return this;

@@ -17,6 +17,12 @@ namespace Primer.Graph
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
+        private void OnEnable()
+        {
+            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
+            domain.onDomainChange = Render;
+        }
+
         public void SetData(params IEnumerable<float>[] data)
         {
             incomingData = new List<ILine>(data.Length);
@@ -123,6 +129,7 @@ namespace Primer.Graph
             Gnome.Dispose(this);
         }
 
+        private void Render() => Render(renderedData);
         private void Render(IEnumerable<ILine> data)
         {
             var container = new Gnome(transform);
@@ -173,7 +180,7 @@ namespace Primer.Graph
                 prevLine = line;
             }
 
-            renderedData = lines;
+            renderedData = RemoveRedundantPoints(lines);
             container.Purge();
         }
 
@@ -184,6 +191,16 @@ namespace Primer.Graph
                 .ToArray();
 
             return new DiscreteLine(points);
+        }
+
+        /// <summary>
+        ///   We add redundant points for the tweening to work properly, but we don't want to keep them
+        /// </summary>
+        private static List<ILine> RemoveRedundantPoints(IEnumerable<ILine> lines)
+        {
+            return lines
+                .Select(line => line is DiscreteLine discrete ? discrete.RemoveRedundantPoints() : line)
+                .ToList();
         }
     }
 }
