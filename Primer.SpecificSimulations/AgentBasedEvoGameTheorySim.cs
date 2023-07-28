@@ -84,7 +84,6 @@ namespace Simulation.GameTheory
         {
             turn++;
             await CreateFood();
-            // await DropFruit();
             await AgentsGoToTrees();
             await AgentsEatFood();
             await AgentsReturnHome();
@@ -100,22 +99,6 @@ namespace Simulation.GameTheory
         
             // Give time for the food to be scale up
             await UniTask.Delay(500);
-        }
-
-        private UniTask DropFruit()
-        {
-            foreach (var tree in trees)
-            {
-                // Get a random flower that has a child
-                var fruit = tree.flowers.Where(x => x.childCount > 0).RandomItem().GetChild(0);
-                fruit.parent = null;
-                fruit.GetChild(0).GetComponent<Rigidbody>().isKinematic = false;
-
-                // tree.flowers.RandomItem().GetChild(0).parent = null;
-            }
-            
-            // Give time for the food to be scale up
-            return UniTask.Delay(500);
         }
 
         private UniTask AgentsGoToTrees()
