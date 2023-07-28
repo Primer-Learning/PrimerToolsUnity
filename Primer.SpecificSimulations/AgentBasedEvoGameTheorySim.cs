@@ -147,7 +147,10 @@ namespace Simulation.GameTheory
                     _agentGnome.Insert(agent);
 
                 if (agent.canReproduce)
-                    _agentGnome.Add(agent, $"Blob born in {turn}");
+                {
+                    var child = _agentGnome.Add(agent, $"Blob born in {turn}");
+                    child.ConsumeEnergy();
+                }
 
                 agent.ConsumeEnergy();
             }
