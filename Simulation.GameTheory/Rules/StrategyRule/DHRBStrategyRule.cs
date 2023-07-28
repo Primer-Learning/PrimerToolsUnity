@@ -19,25 +19,17 @@ namespace Simulation.GameTheory
         // These classes can be moved outside if they are used in more than one place
         // to /Concepts/ folder maybe
         // as long as it's only used inside this class, let's keep it here
-        public abstract class ConflictBehaviour : MonoBehaviour {}
-
-        // public float hawkDoveRatio = 0.5f;
-        // public float hawkDoveBenefit = 0.5f;
-        // public float hawkHawkCost = 1f;
 
         public override void OnAgentCreated(Agent agent)
         {
             switch (agent.strategy) {
                 case DHRB.Dove:
-                    Debug.Log("Dove created");
                     agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.blue);
                     break;
                 case DHRB.Hawk:
-                    Debug.Log("Hawk created");
                     agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.red);
                     break;
                 case DHRB.Retaliator:
-                    Debug.Log("Retaliator created");
                     agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.green);
                     break;
                 case DHRB.Bully:
@@ -56,32 +48,30 @@ namespace Simulation.GameTheory
                 first.Eat(tree),
                 second.Eat(tree)
             );
-            
-            first.energy+= 1;
-            second.energy+= 1;
 
-            // switch (firstBehaviour, secondBehaviour) {
-            //     case (DHRB.Hawk, DHRB.Hawk):
-            //         // energy wasted on fighting
-            //         first.energy -= hawkHawkCost.hawkVsHawk;
-            //         second.energy -= hawkHawkCost;
-            //         return;
-            //
-            //     case (DHRB.Hawk, DHRB.Dove):
-            //         // first steals from second
-            //         first.energy += hawkDoveBenefit;
-            //         second.energy -= hawkDoveBenefit;
-            //         return;
-            //
-            //     case (DHRB.Dove, DHRB.Hawk):
-            //         // second steals from first
-            //         first.energy -= hawkDoveBenefit;
-            //         second.energy += hawkDoveBenefit;
-            //         return;
-            //
-            //     case (DHRB.Dove, DHRB.Dove):
-            //         return;
-            // }
+            switch (firstBehaviour, secondBehaviour) {
+                case (DHRB.Hawk, DHRB.Hawk):
+                    // energy wasted on fighting
+                    first.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Hawk);
+                    second.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Hawk);
+                    return;
+            
+                case (DHRB.Hawk, DHRB.Dove):
+                    first.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Dove);
+                    second.energy += rewardMatrix.Get(DHRB.Dove, DHRB.Hawk);
+                    return;
+            
+                case (DHRB.Dove, DHRB.Hawk):
+                    // second steals from first
+                    first.energy += rewardMatrix.Get(DHRB.Dove, DHRB.Hawk);
+                    second.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Dove);
+                    return;
+            
+                case (DHRB.Dove, DHRB.Dove):
+                    first.energy = rewardMatrix.Get(DHRB.Dove, DHRB.Dove);
+                    second.energy = rewardMatrix.Get(DHRB.Dove, DHRB.Dove);
+                    return;
+            }
         }
     }
 }

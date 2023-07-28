@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Simulation.GameTheory
 {
     [ExecuteAlways]
+    [RequireComponent(typeof(DHRBRewardEditorComponent))]
     public class GameTheoryComponent : MonoBehaviour
     {
         [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
@@ -32,6 +33,7 @@ namespace Simulation.GameTheory
         public void OnEnable()
         {
             turn = 0;
+            strategyRule.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
 
             _sim = new AgentBasedEvoGameTheorySim<DHRB>(
                 transform: transform,
