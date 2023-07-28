@@ -31,20 +31,6 @@ namespace Simulation.GameTheory
             { DHRB.Hawk, 1},
             { DHRB.Retaliator, 1},
         };
-        // public Dictionary<DHRB, int> initialStrategyCount
-        // {
-        //     get => ConstructInitialStrategiesDictionary();
-        //     set {
-        //         Debug.Log("setter");
-        //         _initialStrategyList.Clear();
-        //         _initialStrategyCountList.Clear();
-        //         foreach (var (strategy, count) in value)
-        //         {
-        //             _initialStrategyList.Add(strategy);
-        //             _initialStrategyCountList.Add(count);
-        //         }
-        //     }
-        // }
 
         private void UpdateInitialLists()
         {
@@ -75,9 +61,19 @@ namespace Simulation.GameTheory
         private AgentBasedEvoGameTheorySim<DHRB> _sim;
         private int turn;
 
-        private void OnValidate() => OnEnable();
+        private void OnValidate() => InitializeSim();
 
         public void OnEnable()
+        {
+            InitializeSim();
+        }
+
+        public void OnDisable()
+        {
+            DisposeSim();
+        }
+
+        private void InitializeSim()
         {
             turn = 0;
             strategyRule.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
@@ -94,7 +90,7 @@ namespace Simulation.GameTheory
             };
         }
 
-        public void OnDisable()
+        private void DisposeSim()
         {
             _sim?.Dispose();
         }
@@ -123,8 +119,8 @@ namespace Simulation.GameTheory
         [Button("Reset")]
         public void Reset()
         {
-            OnDisable();
-            OnEnable();
+            DisposeSim();
+            InitializeSim();
         }
 
     }
