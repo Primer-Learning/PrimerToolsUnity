@@ -19,14 +19,50 @@ namespace Simulation.GameTheory
             if (Application.isPlaying && Input.GetKeyDown(KeyCode.Space))
                 Time.timeScale = Time.timeScale == 0 ? 1 : 0;
         }
-        
-        
+
+        [SerializeField, HideInInspector]
+        private List<DHRB> _initialStrategyList;
+        [SerializeField, HideInInspector]
+        private List<int> _initialStrategyCountList;
+
         [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
         public Dictionary<DHRB, int> initialStrategyCount = new() {
             { DHRB.Dove, 1},
             { DHRB.Hawk, 1},
             { DHRB.Retaliator, 1},
         };
+        // public Dictionary<DHRB, int> initialStrategyCount
+        // {
+        //     get => ConstructInitialStrategiesDictionary();
+        //     set {
+        //         Debug.Log("setter");
+        //         _initialStrategyList.Clear();
+        //         _initialStrategyCountList.Clear();
+        //         foreach (var (strategy, count) in value)
+        //         {
+        //             _initialStrategyList.Add(strategy);
+        //             _initialStrategyCountList.Add(count);
+        //         }
+        //     }
+        // }
+
+        private void UpdateInitialLists()
+        {
+            _initialStrategyList = new List<DHRB>(initialStrategyCount.Keys);
+            _initialStrategyCountList = new List<int>(initialStrategyCount.Values);
+        }
+        
+        private Dictionary<DHRB, int> ConstructInitialStrategiesDictionary()
+        {
+            Debug.Log("arstoien");
+            var dict = new Dictionary<DHRB, int>();
+            for (var i = 0; i < _initialStrategyList.Count; i++)
+            {
+                dict.Add(_initialStrategyList[i], _initialStrategyCountList[i]);
+            }
+            return dict;
+        }
+
         public int seed = 0;
         public bool skipAnimations = false;
 
@@ -45,12 +81,13 @@ namespace Simulation.GameTheory
         {
             turn = 0;
             strategyRule.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
+            if (!Application.isPlaying) UpdateInitialLists();
 
             _sim = new AgentBasedEvoGameTheorySim<DHRB>(
                 transform: transform,
                 seed: seed,
                 // foodPerTurn: foodPerTurn,
-                initialBlobs: initialStrategyCount,
+                initialBlobs: ConstructInitialStrategiesDictionary(),
                 strategyRule
             ) {
                 skipAnimations = skipAnimations,
