@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    public class StackedArea : MonoBehaviour
+    public class StackedArea : MonoBehaviour, IDisposable
     {
         public List<ILine> renderedData = new();
         public List<ILine> incomingData;
@@ -116,6 +116,11 @@ namespace Primer.Graph
             ).Observe(
                 onComplete: () => gameObject.SetActive(false)
             );
+        }
+
+        public void Dispose()
+        {
+            Gnome.Dispose(this);
         }
 
         private void Render(IEnumerable<ILine> data)
