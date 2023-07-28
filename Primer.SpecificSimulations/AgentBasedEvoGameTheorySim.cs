@@ -107,16 +107,12 @@ namespace Simulation.GameTheory
             //     .Select(agent => agent.GoToEat(trees.RandomItem()))
             //     .RunInParallel();
             
-            // Make agents go to trees, but a maximum of two per tree
-            var agentsPerTree = 2;
+            // Make agents each go to a random tree, but a maximum of two per tree
+            var treeSlots = trees.Concat(trees).Shuffle();
             return agents
                 .Shuffle()
-                .Take(agentsPerTree * trees.Length)
-                .Select((agent, index) => (agent, index))
-                .GroupBy(x => x.index / agentsPerTree)
-                .Select(x => x.Select(y => y.agent).ToList())
-                .Zip(trees, (agentsAtTree, tree) => agentsAtTree.Select(agent => agent.GoToEat(tree)))
-                .SelectMany(x => x)
+                .Take(treeSlots.Count)
+                .Zip(treeSlots, (agent, tree) => agent.GoToEat(tree))
                 .RunInParallel();
         }
 
