@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Simulation.GameTheory
 {
@@ -10,20 +11,22 @@ namespace Simulation.GameTheory
     [RequireComponent(typeof(DHRBRewardEditorComponent))]
     public class GameTheoryComponent : MonoBehaviour
     {
-        private void Update()
-        {
-            if (Application.isPlaying && Input.GetKeyDown(KeyCode.RightArrow))
-                Time.timeScale *= 2;
-            if (Application.isPlaying && Input.GetKeyDown(KeyCode.LeftArrow))
-                Time.timeScale /= 2;
-            if (Application.isPlaying && Input.GetKeyDown(KeyCode.Space))
-                Time.timeScale = Time.timeScale == 0 ? 1 : 0;
-        }
+        public int seed = 0;
+        public bool skipAnimations = false;
 
+        [Required]
+        [PropertyOrder(10)]
+        [HideLabel, Title("Conflict Resolution Rule")]
+        private StrategyRule<DHRB> strategyRule = new DHRBStrategyRule();
+
+        private AgentBasedEvoGameTheorySim<DHRB> _sim;
+        private int turn;
+        
+        #region Initial population handling 
         [SerializeField, HideInInspector]
-        private List<DHRB> _initialStrategyList;
+        private List<DHRB> initialStrategyList;
         [SerializeField, HideInInspector]
-        private List<int> _initialStrategyCountList;
+        private List<int> initialStrategyCountList;
 
         [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
         public Dictionary<DHRB, int> initialStrategyCount = new() {
@@ -34,33 +37,32 @@ namespace Simulation.GameTheory
 
         private void UpdateInitialLists()
         {
-            _initialStrategyList = new List<DHRB>(initialStrategyCount.Keys);
-            _initialStrategyCountList = new List<int>(initialStrategyCount.Values);
+            initialStrategyList = new List<DHRB>(initialStrategyCount.Keys);
+            initialStrategyCountList = new List<int>(initialStrategyCount.Values);
         }
         
         private Dictionary<DHRB, int> ConstructInitialStrategiesDictionary()
         {
-            Debug.Log("arstoien");
             var dict = new Dictionary<DHRB, int>();
-            for (var i = 0; i < _initialStrategyList.Count; i++)
+            for (var i = 0; i < initialStrategyList.Count; i++)
             {
-                dict.Add(_initialStrategyList[i], _initialStrategyCountList[i]);
+                dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
             }
             return dict;
         }
+        #endregion
 
-        public int seed = 0;
-        public bool skipAnimations = false;
-
-        // [SerializeReference]
-        [Required]
-        [PropertyOrder(10)]
-        [HideLabel, Title("Conflict Resolution Rule")]
-        public StrategyRule<DHRB> strategyRule = new DHRBStrategyRule();
-
-        private AgentBasedEvoGameTheorySim<DHRB> _sim;
-        private int turn;
-
+        #region MonoBehaviour method implementations
+        private void Update()
+        {
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.RightArrow))
+                Time.timeScale *= 2;
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.LeftArrow))
+                Time.timeScale /= 2;
+            if (Application.isPlaying && Input.GetKeyDown(KeyCode.Space))
+                Time.timeScale = Time.timeScale == 0 ? 1 : 0;
+        }
+        
         private void OnValidate() => InitializeSim();
 
         public void OnEnable()
@@ -72,7 +74,9 @@ namespace Simulation.GameTheory
         {
             DisposeSim();
         }
+        #endregion
 
+        #region Sim lifecycle
         private void InitializeSim()
         {
             turn = 0;
@@ -122,6 +126,7 @@ namespace Simulation.GameTheory
             DisposeSim();
             InitializeSim();
         }
+        #endregion
 
     }
 }
