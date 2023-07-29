@@ -21,8 +21,8 @@ namespace Simulation.GameTheory
         public FruitTree goingToEat;
         public System.Enum strategy;
 
-        public bool canSurvive => energy >= 1;
-        public bool canReproduce => energy >= 2;
+        public bool canSurvive => energy >= 1 || Rng.staticRandom.NextDouble() < energy;
+        public bool canReproduce => energy >= 2 || Rng.staticRandom.NextDouble() < energy - 1;
 
         public async UniTask GoToEat(FruitTree tree)
         {

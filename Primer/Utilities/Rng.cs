@@ -4,7 +4,7 @@ namespace Primer
 {
     public class Rng
     {
-        private static Random staticRandom;
+        public static Random staticRandom;
 
         public static void Initialize(int? seed = null)
         {
