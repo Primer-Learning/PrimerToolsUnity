@@ -103,10 +103,6 @@ namespace Simulation.GameTheory
 
         private UniTask AgentsGoToTrees()
         {
-            // return agents
-            //     .Select(agent => agent.GoToEat(trees.RandomItem()))
-            //     .RunInParallel();
-            
             // Make agents each go to a random tree, but a maximum of two per tree
             var treeSlots = trees.Concat(trees).Shuffle();
             return agents
@@ -118,7 +114,7 @@ namespace Simulation.GameTheory
 
         private async UniTask AgentsEatFood()
         {
-            // Make agents eat food, but only agents where gointToEat is not null
+            // Make agents eat food, but only agents where goingToEat is not null
             await agents
                 .Where(agent => agent.goingToEat != null)
                 .GroupBy(x => x.goingToEat)
@@ -146,6 +142,7 @@ namespace Simulation.GameTheory
                 {
                     var child = _agentGnome.Add(agent, $"Blob born in {turn}");
                     child.ConsumeEnergy();
+                    child.strategy = agent.strategy;
                 }
 
                 agent.ConsumeEnergy();
