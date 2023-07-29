@@ -186,11 +186,13 @@ namespace Primer.Graph
             if (grid is null)
                 return;
 
-            meshFilter.mesh = new Mesh {
+            var mesh = new Mesh {
                 vertices = DefinePoints(grid),
                 triangles = DefineTriangles(grid.resolution + Vector2Int.one),
             };
 
+            mesh.RecalculateNormals();
+            meshFilter.mesh = mesh;
             renderedGrid = grid;
         }
 
