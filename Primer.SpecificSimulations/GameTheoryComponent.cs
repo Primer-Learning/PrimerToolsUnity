@@ -41,6 +41,7 @@ namespace Simulation.GameTheory
         {
             initialStrategyList = new List<DHRB>(initialAlleleCounts.Keys);
             initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
+            InitializeSim();
         }
         
         private Dictionary<DHRB, int> ConstructInitialStrategiesDictionary()
