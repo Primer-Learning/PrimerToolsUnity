@@ -1,7 +1,8 @@
 using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Primer.Graph
+namespace Primer.Shapes
 {
     public enum RectPivot
     {
@@ -13,10 +14,19 @@ namespace Primer.Graph
     [RequireComponent(typeof(MeshFilter))]
     [RequireComponent(typeof(MeshRenderer))]
     [ExecuteAlways]
-    public class Rectangle : MonoBehaviour
+    public class Rectangle : MonoBehaviour, IMeshController
     {
+        private MeshRenderer meshRendererCache;
+        private MeshRenderer meshRenderer => transform.GetOrAddComponent(ref meshRendererCache);
+
+        private MeshFilter meshFilterCache;
+        private MeshFilter meshFilter => transform.GetOrAddComponent(ref meshFilterCache);
+
         #region public Color color;
+        [SerializeField, HideInInspector]
         private Color _color;
+
+        [ShowInInspector]
         public Color color {
             get => _color;
             set {
@@ -26,8 +36,11 @@ namespace Primer.Graph
         }
         #endregion
 
-        #region public RectPivot pivot = RectPivot.Center;
+        #region public RectPivot pivot;
+        [SerializeField, HideInInspector]
         private RectPivot _pivot = RectPivot.Center;
+
+        [ShowInInspector]
         public RectPivot pivot {
             get => _pivot;
             set {
@@ -38,7 +51,10 @@ namespace Primer.Graph
         #endregion
 
         #region public float width;
+        [SerializeField, HideInInspector]
         private float _width = 1;
+
+        [ShowInInspector]
         public float width {
             get => _width;
             set {
@@ -49,7 +65,10 @@ namespace Primer.Graph
         #endregion
 
         #region public float height;
+        [SerializeField, HideInInspector]
         private float _height = 2;
+
+        [ShowInInspector]
         public float height {
             get => _height;
             set {
@@ -59,22 +78,15 @@ namespace Primer.Graph
         }
         #endregion
 
-        private Mesh _mesh;
-        private Mesh mesh {
-            get => _mesh;
-            set {
-                _mesh = value;
-                GetComponent<MeshFilter>().mesh = value;
-            }
-        }
+        // private Mesh mesh {
+        //     get => meshFilter.sharedMesh;
+        //     set => meshFilter.sharedMesh = value;
+        // }
 
-        private Material _material;
+        [ShowInInspector]
         private Material material {
-            get => _material;
-            set {
-                _material = value;
-                GetComponent<MeshRenderer>().material = value;
-            }
+            get => meshRenderer.sharedMaterial;
+            set => meshRenderer.sharedMaterial = value;
         }
 
         private void Awake()
@@ -82,8 +94,7 @@ namespace Primer.Graph
             if (material is null)
                 OnMaterialChange();
 
-            if (mesh is null)
-                OnMeshChange();
+            OnMeshChange();
         }
 
         private void OnMaterialChange()
@@ -95,19 +106,19 @@ namespace Primer.Graph
         private void OnMeshChange()
         {
             var vertices = pivot switch {
-                RectPivot.BottomLeft => new [] {
+                RectPivot.BottomLeft => new[] {
                     new Vector3(0, 0),
                     new Vector3(width, 0),
                     new Vector3(0, height),
                     new Vector3(width, height),
                 },
-                RectPivot.BottomCenter => new [] {
+                RectPivot.BottomCenter => new[] {
                     new Vector3(-width / 2, 0),
                     new Vector3(width / 2, 0),
                     new Vector3(-width / 2, height),
                     new Vector3(width / 2, height),
                 },
-                RectPivot.Center =>  new [] {
+                RectPivot.Center => new[] {
                     new Vector3(-width / 2, -height / 2),
                     new Vector3(width / 2, -height / 2),
                     new Vector3(-width / 2, height / 2),
@@ -116,23 +127,21 @@ namespace Primer.Graph
                 _ => throw new ArgumentOutOfRangeException(),
             };
 
-            if (mesh is null) {
-                mesh = new Mesh {
-                    vertices = vertices,
-                    triangles = new [] {
-                        0, 1, 2, // First triangle
-                        1, 3, 2, // Second triangle
-                    },
-                };
-            }
-            else {
-                mesh.vertices = vertices;
-            }
+            var mesh = new Mesh {
+                vertices = vertices,
+                triangles = new[] {
+                    0, 1, 2, // First triangle
+                    0, 2, 1, // First triangle backside
+                    1, 2, 3, // Second triangle
+                    1, 3, 2, // Second triangle backside
+                },
+            };
 
             mesh.RecalculateNormals();
+            meshFilter.mesh = mesh;
         }
 
-        // GPT-4 suggestion for rounded corners
+        #region GPT-4 suggestion for rounded corners
         // public int CornerVertices = 10; // number of vertices to use to draw the rounded corner
         // public float CornerRadius = 0.1f; // radius of the rounded corner
 
@@ -163,5 +172,8 @@ namespace Primer.Graph
         //     triangles[6 + i * 3 + 1] = 4 + i;
         //     triangles[6 + i * 3 + 2] = 4 + i + 1;
         // }
+        #endregion
+
+        public MeshRenderer[] GetMeshRenderers() => new [] { meshRenderer };
     }
 }
