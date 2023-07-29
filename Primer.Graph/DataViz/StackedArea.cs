@@ -40,30 +40,16 @@ namespace Primer.Graph
             for (var y = 0; y < newColumn.Length; y++) {
                 // then we ALSO need to add a point to the current areas so it doesn't deform when tweening
                 var rendered = renderedData[y];
-                var hadToAddTwoPoints = false;
 
                 // FunctionLines will adapt to the new point automatically
                 if (rendered is DiscreteLine discrete) {
                     // if the area has height at the end we need to drop straight to the bottom
                     var last = discrete.points.Last();
-
-                    if (last.y is not 0) {
-                        hadToAddTwoPoints = true;
-                        discrete = discrete.Append(new Vector3(last.x, 0));
-                    }
-
-                    renderedData[y] = discrete.Append(new Vector3(last.x + 1, 0));
+                    renderedData[y] = discrete.Append(new Vector3(last.x, 0));
                 }
 
                 // finally we add the new column to the incoming data
-                var incoming = incomingData[y].ToDiscrete().Append(newColumn[y]);
-
-                // If we had to add two points in the current line we also need two points here
-                // just duplicate the last one
-                if (hadToAddTwoPoints)
-                    incoming = incoming.Append(incoming.points.Last());
-
-                incomingData[y] = incoming;
+                incomingData[y] = incomingData[y].ToDiscrete().Append(newColumn[y]);
             }
         }
 
