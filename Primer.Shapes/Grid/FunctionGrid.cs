@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Primer.Shapes
 {
-    public class FunctionGrid : IGrid
+    public readonly struct FunctionGrid : IGrid
     {
         public static readonly Vector2Int defaultResolution = Vector2Int.one * 10;
         public static readonly Vector2 defaultStart = Vector2.zero;
