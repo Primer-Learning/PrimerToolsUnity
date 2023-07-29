@@ -70,7 +70,9 @@ namespace Primer.Simulation
             if (center)
                 offset -= size / 2;
 
-            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, rng: new Rng(seed))) {
+            var rng = new Rng(seed);
+
+            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, rng: rng)) {
                 var instance = container.Add(prefab);
                 var pos = point + offset;
 
@@ -82,7 +84,7 @@ namespace Primer.Simulation
                 }
 
                 if (randomizeRotation)
-                    instance.localRotation = Quaternion.Euler(0, new Rng(seed).Range(0, 360), 0);
+                    instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
             }
 
             container.Purge();
