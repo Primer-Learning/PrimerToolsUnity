@@ -40,38 +40,15 @@ namespace Simulation.GameTheory
 
         public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
-            var (first, second) = agents.Shuffle().Take(2).ToList();
-            var firstBehaviour = first.strategy;
-            var secondBehaviour = second.strategy;
+            var (first, second) = agents.Shuffle().ToList();
 
             await UniTask.WhenAll(
                 first.Eat(tree),
                 second.Eat(tree)
             );
-
-            switch (firstBehaviour, secondBehaviour) {
-                case (DHRB.Hawk, DHRB.Hawk):
-                    // energy wasted on fighting
-                    first.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Hawk);
-                    second.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Hawk);
-                    return;
             
-                case (DHRB.Hawk, DHRB.Dove):
-                    first.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Dove);
-                    second.energy += rewardMatrix.Get(DHRB.Dove, DHRB.Hawk);
-                    return;
-            
-                case (DHRB.Dove, DHRB.Hawk):
-                    // second steals from first
-                    first.energy += rewardMatrix.Get(DHRB.Dove, DHRB.Hawk);
-                    second.energy += rewardMatrix.Get(DHRB.Hawk, DHRB.Dove);
-                    return;
-            
-                case (DHRB.Dove, DHRB.Dove):
-                    first.energy = rewardMatrix.Get(DHRB.Dove, DHRB.Dove);
-                    second.energy = rewardMatrix.Get(DHRB.Dove, DHRB.Dove);
-                    return;
-            }
+            first.energy += rewardMatrix.Get((DHRB) first.strategy, (DHRB) second.strategy);
+            second.energy += rewardMatrix.Get((DHRB) second.strategy, (DHRB) first.strategy);
         }
     }
 }
