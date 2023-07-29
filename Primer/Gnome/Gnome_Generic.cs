@@ -4,6 +4,8 @@ namespace Primer
 {
     public partial class Gnome
     {
+        // TODO: Rename to "For"
+        // Now that it's called Gnome it makes more sense Gnome.For(this) than Gnome.From(this)
         public static Gnome<TComponent> From<TComponent>(TComponent component, bool setActive = true)
             where TComponent : Component
         {
