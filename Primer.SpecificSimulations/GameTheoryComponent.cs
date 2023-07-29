@@ -29,17 +29,18 @@ namespace Simulation.GameTheory
         [SerializeField, HideInInspector]
         private List<int> initialStrategyCountList;
 
-        [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        public Dictionary<DHRB, int> initialStrategyCount = new() {
+        [FormerlySerializedAs("initialStrategyCount")] [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
+        public Dictionary<DHRB, int> initialAlleleCounts = new() {
             { DHRB.Dove, 1},
             { DHRB.Hawk, 1},
             { DHRB.Retaliator, 1},
         };
 
-        private void UpdateInitialLists()
+        [Button]
+        private void SaveInitialPopulation()
         {
-            initialStrategyList = new List<DHRB>(initialStrategyCount.Keys);
-            initialStrategyCountList = new List<int>(initialStrategyCount.Values);
+            initialStrategyList = new List<DHRB>(initialAlleleCounts.Keys);
+            initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
         }
         
         private Dictionary<DHRB, int> ConstructInitialStrategiesDictionary()
@@ -49,6 +50,7 @@ namespace Simulation.GameTheory
             {
                 dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
             }
+            initialAlleleCounts = dict;
             return dict;
         }
         #endregion
@@ -64,22 +66,11 @@ namespace Simulation.GameTheory
                 Time.timeScale = Time.timeScale == 0 ? 1 : 0;
         }
 
-        private void OnValidate()
-        {
-        Debug.Log("OnValidate");    
-        InitializeSim();
-        } 
+        private void OnValueChange() => InitializeSim();
 
-        public void OnEnable()
-        {
-            Debug.Log("OnEnable");
-            InitializeSim();
-        }
+        public void OnEnable() => InitializeSim();
 
-        public void OnDisable()
-        {
-            DisposeSim();
-        }
+        public void OnDisable() => DisposeSim();
         #endregion
 
         #region Sim lifecycle
@@ -87,12 +78,10 @@ namespace Simulation.GameTheory
         {
             turn = 0;
             strategyRule.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
-            if (!Application.isPlaying) UpdateInitialLists();
 
             _sim = new AgentBasedEvoGameTheorySim<DHRB>(
                 transform: transform,
                 seed: seed,
-                // foodPerTurn: foodPerTurn,
                 initialBlobs: ConstructInitialStrategiesDictionary(),
                 strategyRule
             ) {
