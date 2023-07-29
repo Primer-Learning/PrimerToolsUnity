@@ -163,7 +163,7 @@ namespace Primer.Graph
 
         private Gnome<Graph> InitializeContainer()
         {
-            var result = Gnome.From(this);
+            var result = Gnome.For(this);
             result.Insert(xAxis);
             result.Insert(yAxis);
             result.Insert(zAxis);

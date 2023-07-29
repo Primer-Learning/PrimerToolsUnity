@@ -136,7 +136,7 @@ namespace Primer.Graph
         private void Render() => Render(renderedData);
         private void Render(BarPlotData data)
         {
-            var gnome = Gnome.From(this);
+            var gnome = Gnome.For(this);
             var width = domain.TransformPoint(new Vector3(barWidth, 0)).x;
             var gap = domain.TransformPoint(barGap);
             var offset = domain.TransformPoint(new Vector3(this.offset, 0)).x;
