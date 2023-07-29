@@ -42,7 +42,7 @@ namespace Primer.Graph
 
         #region public Vector3 point;
         [SerializeField, HideInInspector]
-        private Vector3Provider _point;
+        private Vector3Provider _point = Vector3.zero;
 
         [ShowInInspector]
         [ShowIf("behaviour", Behaviour.FollowPoint)]
@@ -54,7 +54,6 @@ namespace Primer.Graph
             }
         }
         #endregion
-
 
         #region public bool useGlobalPosition;
         [SerializeField, HideInInspector]
