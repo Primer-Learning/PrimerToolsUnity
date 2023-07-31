@@ -12,7 +12,7 @@ namespace Simulation.GameTheory
         private static readonly int scoop = Animator.StringToHash("Scoop");
         // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
         // private static readonly int mouthClosed = Animator.StringToHash("MouthClosed");
-
+        public Rng rng;
 
         private PrimerBlob blobCache;
         private PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
@@ -21,8 +21,8 @@ namespace Simulation.GameTheory
         public FruitTree goingToEat;
         public System.Enum strategy;
 
-        public bool canSurvive => energy >= 1 || Rng.staticRandom.NextDouble() < energy;
-        public bool canReproduce => energy >= 2 || Rng.staticRandom.NextDouble() < energy - 1;
+        public bool canSurvive => energy >= 1 || rng.rand.NextDouble() < energy;
+        public bool canReproduce => energy >= 2 || rng.rand.NextDouble() < energy - 1;
 
         public async UniTask GoToEat(FruitTree tree)
         {

@@ -1,4 +1,5 @@
 using System;
+using Random = System.Random;
 
 namespace Primer
 {
@@ -12,7 +13,7 @@ namespace Primer
             {
                 // If seed is null, we don't care what the seed is.
                 // So if the staticRandom object already exists, we don't need to do anything.
-                // But if it doesn't, creat it and set the seed to the current time.
+                // But if it doesn't, create it and set the seed to the current time.
                 if (staticRandom is not null) return;
                 staticRandom = new Random(Environment.TickCount);
             }

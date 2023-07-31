@@ -32,11 +32,9 @@ namespace Simulation.GameTheory
         public AgentBasedEvoGameTheorySim(
             Transform transform,
             int seed,
-            // int foodPerTurn,
             Dictionary<T, int> initialBlobs,
             StrategyRule<T> strategyRule)
         {
-            // this.foodPerTurn = foodPerTurn;
             this.transform = transform;
             this._strategyRule = strategyRule;
 
@@ -58,7 +56,7 @@ namespace Simulation.GameTheory
 
             var positions = GetBlobsRestingPosition(blobCount)
                 .Select(x => terrain.GetGroundAtLocal(x))
-                .Shuffle()
+                .Shuffle(rng)
                 .ToList();
 
             var center = positions.Average();
@@ -71,6 +69,7 @@ namespace Simulation.GameTheory
                     var agent = blob.GetOrAddComponent<Agent>();
                     agent.strategy = strategy;
                     agent.landscape = terrain;
+                    agent.rng = rng;
                     _strategyRule.OnAgentCreated(agent);
                     blob.position = positions[i];
                     blob.LookAt(center);
@@ -104,9 +103,9 @@ namespace Simulation.GameTheory
         private UniTask AgentsGoToTrees()
         {
             // Make agents each go to a random tree, but a maximum of two per tree
-            var treeSlots = trees.Concat(trees).Shuffle();
+            var treeSlots = trees.Concat(trees).Shuffle(rng);
             return agents
-                .Shuffle()
+                .Shuffle(rng)
                 .Take(treeSlots.Count)
                 .Zip(treeSlots, (agent, tree) => agent.GoToEat(tree))
                 .RunInParallel();
@@ -142,6 +141,7 @@ namespace Simulation.GameTheory
                 {
                     var child = _agentGnome.Add(agent, $"Blob born in {turn}");
                     child.ConsumeEnergy();
+                    child.rng = rng;
                     child.strategy = agent.strategy;
                 }
 
