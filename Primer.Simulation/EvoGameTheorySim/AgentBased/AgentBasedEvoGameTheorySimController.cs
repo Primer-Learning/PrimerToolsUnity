@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Primer;
+using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Simulation.GameTheory
+namespace Primer.Simulation
 {
     [ExecuteAlways]
-    [RequireComponent(typeof(DHRBRewardEditorComponent))]
-    public class AgentBasedEvoGameTheorySimController : MonoBehaviour
+    public class AgentBasedEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
     {
         public int seed = 0;
         public bool skipAnimations = false;
@@ -18,35 +18,32 @@ namespace Simulation.GameTheory
         [Required]
         [PropertyOrder(10)]
         [HideLabel, Title("Conflict Resolution Rule")]
-        private StrategyRule<DHRB> strategyRule = new DHRBStrategyRule();
+        protected StrategyRule<T> strategyRule;
 
-        private AgentBasedEvoGameTheorySim<DHRB> _sim;
+        private AgentBasedEvoGameTheorySim<T> _sim;
         private int turn;
         
         #region Initial population handling 
         [SerializeField, HideInInspector]
-        private List<DHRB> initialStrategyList;
+        private List<T> initialStrategyList;
         [SerializeField, HideInInspector]
         private List<int> initialStrategyCountList;
 
         [FormerlySerializedAs("initialStrategyCount")] [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        public Dictionary<DHRB, int> initialAlleleCounts = new() {
-            { DHRB.Dove, 1},
-            { DHRB.Hawk, 1},
-            { DHRB.Retaliator, 1},
+        public Dictionary<T, int> initialAlleleCounts = new() {
         };
 
         [Button]
         private void SaveInitialPopulation()
         {
-            initialStrategyList = new List<DHRB>(initialAlleleCounts.Keys);
+            initialStrategyList = new List<T>(initialAlleleCounts.Keys);
             initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
             InitializeSim();
         }
         
-        private Dictionary<DHRB, int> ConstructInitialStrategiesDictionary()
+        private Dictionary<T, int> ConstructInitialStrategiesDictionary()
         {
-            var dict = new Dictionary<DHRB, int>();
+            var dict = new Dictionary<T, int>();
             for (var i = 0; i < initialStrategyList.Count; i++)
             {
                 dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
@@ -75,12 +72,15 @@ namespace Simulation.GameTheory
         #endregion
 
         #region Sim lifecycle
+        
+        protected virtual void SetStrategyRule() {}
+        
         private void InitializeSim()
         {
             turn = 0;
-            strategyRule.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
+            SetStrategyRule();
 
-            _sim = new AgentBasedEvoGameTheorySim<DHRB>(
+            _sim = new AgentBasedEvoGameTheorySim<T>(
                 transform: transform,
                 seed: seed,
                 initialBlobs: ConstructInitialStrategiesDictionary(),
