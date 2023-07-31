@@ -21,7 +21,9 @@ namespace Primer.Simulation
             }
         }
 
+        [SerializeField, HideInInspector]
         private int _width = 50;
+        [SerializeField, HideInInspector]
         private int _depth = 50;
         
         [ShowInInspector]
