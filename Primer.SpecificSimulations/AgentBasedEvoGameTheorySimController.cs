@@ -10,7 +10,7 @@ namespace Simulation.GameTheory
 {
     [ExecuteAlways]
     [RequireComponent(typeof(DHRBRewardEditorComponent))]
-    public class GameTheoryComponent : MonoBehaviour
+    public class AgentBasedEvoGameTheorySimController : MonoBehaviour
     {
         public int seed = 0;
         public bool skipAnimations = false;
