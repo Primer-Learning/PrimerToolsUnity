@@ -22,7 +22,7 @@ namespace Primer.Graph
 
         #region public float barGap;
         [SerializeField, HideInInspector]
-        private Vector2 _barGap = new Vector2(1, 0.5f);
+        private Vector2 _barGap = new Vector2(1, 0);
 
         [ShowInInspector]
         public Vector2 barGap {
