@@ -9,9 +9,20 @@ namespace Primer.Graph
     [RequireComponent(typeof(MultipleAxesController))]
     public class Graph : MonoBehaviour, IDisposable
     {
+        #region public bool enableZAxis;
+        [SerializeField, HideInInspector]
+        private bool _enableZAxis;
+
         [Title("Graph controls")]
-        [OnValueChanged(nameof(EnsureDomainDimensions))]
-        public bool enableZAxis = true;
+        [ShowInInspector]
+        public bool enableZAxis {
+            get => _enableZAxis;
+            set {
+                _enableZAxis = value;
+                UpdateAxes();
+            }
+        }
+        #endregion
 
         [EnableIf(nameof(enableZAxis))]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
@@ -41,11 +52,12 @@ namespace Primer.Graph
         [ChildGameObjectsOnly]
         private Axis zAxis;
 
-        public Axis x => (xAxis != null) && xAxis.enabled && xAxis.isActiveAndEnabled ? xAxis : null;
-        public Axis y => (yAxis != null) && yAxis.enabled && yAxis.isActiveAndEnabled ? yAxis : null;
-        public Axis z => (zAxis != null) && zAxis.enabled && zAxis.isActiveAndEnabled ? zAxis : null;
+        public Axis x => xAxis != null ? xAxis : null;
+        public Axis y => yAxis != null ? yAxis : null;
+        public Axis z => zAxis != null ? zAxis : null;
 
-        [FormerlySerializedAs("containerCache")] public Gnome<Graph> gnomeCache;
+        [FormerlySerializedAs("containerCache")]
+        public Gnome<Graph> gnomeCache;
         public Gnome<Graph> gnome => gnomeCache ??= InitializeContainer();
 
         public Vector3 domain { get; private set; }
@@ -86,9 +98,9 @@ namespace Primer.Graph
         private void EnsureDomainDimensions()
         {
             var scale = new Vector3(
-                xAxis?.DomainToPosition(1) ?? 1,
-                yAxis?.DomainToPosition(1) ?? 1,
-                zAxis?.DomainToPosition(1) ?? 1
+                x?.DomainToPosition(1) ?? 1,
+                y?.DomainToPosition(1) ?? 1,
+                z?.DomainToPosition(1) ?? 1
             );
 
             if (scale == domain)
