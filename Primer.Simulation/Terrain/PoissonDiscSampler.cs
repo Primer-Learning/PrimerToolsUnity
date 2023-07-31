@@ -112,22 +112,29 @@ namespace Primer.Simulation
             var storedMinDistance = minDistance;
 
             // Squeeze mode doesn't seem to properly respect the new min distance
-            if (points.Count < numPoints && overflowMode != OverflowMode.None) {
+            if (points.Count < numPoints && overflowMode != OverflowMode.None)
+            {
+                var numBeforeSqueezing = points.Count;
                 Initialize(minDistance / 2, sampleRegionSize);
 
                 for (var i = points.Count; i < numPoints; i++) {
                     AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
                 }
+                Debug.Log($"Squeezed {points.Count - numBeforeSqueezing} points into the grid.");
             }
 
-            if (overflowMode == OverflowMode.Force) {
+            if (overflowMode == OverflowMode.Force)
+            {
+                var numForced = numPoints - points.Count;
                 while (points.Count < numPoints) {
                     Initialize(minDistance / 2, sampleRegionSize);
-
+                
                     for (var i = points.Count; i < numPoints; i++) {
                         AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
                     }
                 }
+                if (numForced > 0)
+                   Debug.Log($"Forced {numForced} points into the grid.");
             }
 
             Initialize(storedMinDistance, sampleRegionSize);

@@ -24,6 +24,7 @@ namespace Primer.Simulation
         [Title("Spawn items")]
         public float minDistance = 2;
         public int amount = 30;
+        public PoissonDiscSampler.OverflowMode overflowMode = PoissonDiscSampler.OverflowMode.None;
         public bool randomizeRotation = true;
         public Transform prefab;
 
@@ -72,7 +73,7 @@ namespace Primer.Simulation
 
             var rng = new Rng(seed);
 
-            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, rng: rng)) {
+            foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, overflowMode: overflowMode, rng: rng)) {
                 var instance = container.Add(prefab);
                 var pos = point + offset;
 
