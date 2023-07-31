@@ -61,12 +61,18 @@ namespace Primer.Graph
 
         public float min {
             get => _range.min;
-            set => _range.min = value;
+            set {
+                _range.min = value;
+                UpdateChildren();
+            }
         }
 
         public float max {
             get => _range.max;
-            set => _range.max = value;
+            set {
+                _range.max = value;
+                UpdateChildren();
+            }
         }
 
 
