@@ -20,7 +20,7 @@ namespace Primer.Simulation
         [HideLabel, Title("Conflict Resolution Rule")]
         protected StrategyRule<T> strategyRule;
 
-        private AgentBasedEvoGameTheorySim<T> _sim;
+        protected AgentBasedEvoGameTheorySim<T> _sim;
         private int turn;
         
         #region Initial population handling 
@@ -68,12 +68,14 @@ namespace Primer.Simulation
 
         public void OnEnable() => InitializeSim();
 
-        public void OnDisable() => DisposeSim();
+        public async void OnDisable() => DisposeSim();
         #endregion
 
         #region Sim lifecycle
         
         protected virtual void SetStrategyRule() {}
+        protected virtual async UniTask OnSimStart() {}
+        protected virtual async UniTask OnCycleCompleted() {}
         
         private void InitializeSim()
         {
@@ -100,9 +102,12 @@ namespace Primer.Simulation
             if (!Application.isPlaying)
                 return;
 
+            await OnSimStart();
+            
             while (true) {
                 await _sim.SimulateSingleCycle();
                 await UniTask.Delay(1000);
+                await OnCycleCompleted();
             }
         }
 

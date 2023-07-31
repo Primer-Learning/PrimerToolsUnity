@@ -16,18 +16,16 @@ namespace Simulation.GameTheory
         
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
-
-        // private readonly Gnome foodContainer;
+        
         private readonly Gnome _agentGnome;
 
         private readonly StrategyRule<T> _strategyRule;
 
         public Rng rng { get; }
-        // public Landscape terrain { get; }
         public bool skipAnimations { get; init; }
         public Transform transform { get; }
         public Component component => transform;
-        private IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
+        public IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
