@@ -12,6 +12,8 @@ public class FruitTree : MonoBehaviour
     public static float yAngleMax = 360f;
     public static float zAngleMax = 5f;
 
+    [HideInInspector] public bool skipAnimations = false;
+    
     public bool hasFruit => flowers.Any(x => x.childCount > 0);
     
     [Title("Flowers")]
@@ -37,7 +39,7 @@ public class FruitTree : MonoBehaviour
             fruit = flowers[index].GetChild(0);
         }
 
-        return fruit.ScaleTo(1);
+        return fruit.ScaleTo(1) with {duration = skipAnimations ? 0 : 0.5f};
     }
     public Tween GrowRandomFruitsUpToTotal(int total, float delayRange = 0)
     {
@@ -52,19 +54,19 @@ public class FruitTree : MonoBehaviour
             .Where(i => flowers[i].childCount > 0).ToArray();
         
         // Choose random indices where there's not already a fruit
-        var newFruitIndites = Enumerable.Range(0, flowers.Count)
+        var newFruitIndices = Enumerable.Range(0, flowers.Count)
             .Where(i => flowers[i].childCount == 0)
             .Shuffle()
             .Take(total - existingFruitIndices.Length);
         
-        return GrowSpecificFruits(newFruitIndites.Concat(existingFruitIndices).ToArray(), delayRange);
+        return GrowSpecificFruits(newFruitIndices.Concat(existingFruitIndices).ToArray(), delayRange);
     }
 
     public Tween GrowSpecificFruits(int[] indices, float delayRange = 0)
     {
         // Create tweens, giving each a random delay between 0 and delayRange
         return indices
-            .Select((index, i) => GrowFruit(index) with {delay = Rng.Range(delayRange)})
+            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : Rng.Range(delayRange)})
             .RunInParallel();
     }
 

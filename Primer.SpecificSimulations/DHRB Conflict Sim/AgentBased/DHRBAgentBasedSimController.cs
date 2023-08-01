@@ -44,7 +44,7 @@ namespace Primer.SpecificSimulations
                     new float [] {numBullies}
                 );
                 
-                await stackedArea.GrowFromStart();
+                await (stackedArea.GrowFromStart() with { duration = skipAnimations ? 0 : 0.5f });
             }
 
             if (ternaryPlot is not null)
@@ -88,7 +88,7 @@ namespace Primer.SpecificSimulations
                     new List<Color>() {PrimerColor.blue, PrimerColor.red, PrimerColor.green, PrimerColor.yellow};
                 stackedArea.AddData(numDoves, numHawks, numRetaliators, numBullies);
 
-                await stackedArea.Transition();
+                await (stackedArea.Transition() with { duration = skipAnimations ? 0 : 0.5f });
             }
             
             if (ternaryPlot is not null)
@@ -104,7 +104,7 @@ namespace Primer.SpecificSimulations
                     (float)numRetaliators / total
                 );
                 
-                await point.transform.MoveTo(newPosition);
+                await (point.transform.MoveTo(newPosition) with { duration = skipAnimations ? 0 : 0.5f });
                 
                 
                 // Use Unity's built-in line renderer to draw the line
@@ -125,7 +125,7 @@ namespace Primer.SpecificSimulations
         protected override async UniTask OnReset()
         {
             var gnome = ternaryPlot.GetContentGnome();
-            await gnome.GetChildren().Select(x => x.ShrinkAndDispose()).RunInParallel();
+            await gnome.GetChildren().Select(x => x.ScaleTo(0) with { duration = skipAnimations ? 0 : 0.5f }).RunInParallel();
             gnome.Purge();
             Debug.Log("Reset sim");
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer;
+using Primer.Animation;
 using Primer.Simulation;
 using Primer.Timeline;
 using UnityEngine;
@@ -31,7 +32,8 @@ namespace Simulation.GameTheory
             Transform transform,
             int seed,
             Dictionary<T, int> initialBlobs,
-            StrategyRule<T> strategyRule)
+            StrategyRule<T> strategyRule,
+            bool skipAnimations = false)
         {
             this.transform = transform;
             this._strategyRule = strategyRule;
@@ -41,6 +43,10 @@ namespace Simulation.GameTheory
             var container = new Gnome(transform);
             // foodContainer = gnome.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
             _agentGnome = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
+
+            this.skipAnimations = skipAnimations;
+            foreach (var tree in trees) tree.skipAnimations = skipAnimations;
+            foreach (var agent in agents) agent.skipAnimations = skipAnimations;
 
             PlaceInitialBlobs(initialBlobs);
         }
@@ -89,13 +95,7 @@ namespace Simulation.GameTheory
 
         private async UniTask CreateFood()
         {
-            foreach (var tree in trees)
-            {
-                tree.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1).PlayAndForget();
-            }
-        
-            // Give time for the food to be scale up
-            await UniTask.Delay(500);
+            await trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
         }
 
         private UniTask AgentsGoToTrees()

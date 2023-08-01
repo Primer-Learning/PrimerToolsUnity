@@ -13,6 +13,8 @@ namespace Simulation.GameTheory
         // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
         // private static readonly int mouthClosed = Animator.StringToHash("MouthClosed");
         public Rng rng;
+        [HideInInspector]
+        public bool skipAnimations;
 
         private PrimerBlob blobCache;
         private PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
@@ -27,7 +29,7 @@ namespace Simulation.GameTheory
         public async UniTask GoToEat(FruitTree tree)
         {
             goingToEat = tree;
-            var tween = WalkTo(tree.transform, stopDistance: 1);
+            var tween = WalkTo(tree.transform, stopDistance: 1, forcedDuration: skipAnimations ? 0 : -1);
             tween.duration /= 2;
             await tween;
         }
@@ -36,18 +38,20 @@ namespace Simulation.GameTheory
         {
             goingToEat = null;
             energy++;
-            blob.animator.SetTrigger(scoop);
+            if (!skipAnimations) blob.animator.SetTrigger(scoop);
 
             var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
             var bite = DetachNearestFruit(tree);
 
-            await bite.MoveTo(mouthPosition, globalSpace: true);
-            await bite.ShrinkAndDispose();
+            var moveToMouthTween = bite.MoveTo(mouthPosition, globalSpace: true) with {duration = skipAnimations ? 0 : 0.5f};
+            var shrinkTween = bite.ScaleTo(0) with {duration = skipAnimations ? 0 : 0.5f};
+            await Tween.Parallel(moveToMouthTween, shrinkTween);
+            bite.Dispose();
         }
 
         public async UniTask ReturnHome(Vector2 position)
         {
-            await WalkToLocal(position);
+            await WalkToLocal(position, forcedDuration: skipAnimations ? 0 : -1);
 
             if (this == null)
                 return;
@@ -60,7 +64,8 @@ namespace Simulation.GameTheory
                 return;
 
             transform.rotation = originalRotation;
-            await transform.RotateTo(targetRotation);
+            var rotateTween = transform.RotateTo(targetRotation) with {duration = skipAnimations ? 0 : 0.5f};
+            await rotateTween;
         }
 
         public void ConsumeEnergy()

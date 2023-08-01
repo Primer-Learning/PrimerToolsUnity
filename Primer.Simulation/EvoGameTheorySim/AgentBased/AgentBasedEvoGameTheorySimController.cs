@@ -87,10 +87,9 @@ namespace Primer.Simulation
                 transform: transform,
                 seed: seed,
                 initialBlobs: ConstructInitialStrategiesDictionary(),
-                strategyRule
-            ) {
-                skipAnimations = skipAnimations,
-            };
+                strategyRule,
+                skipAnimations: skipAnimations
+            );
         }
 
         private void DisposeSim()
@@ -107,8 +106,8 @@ namespace Primer.Simulation
             
             while (true) {
                 await _sim.SimulateSingleCycle();
-                await UniTask.Delay(1000);
                 await OnCycleCompleted();
+                await UniTask.Delay(1);
             }
         }
 
