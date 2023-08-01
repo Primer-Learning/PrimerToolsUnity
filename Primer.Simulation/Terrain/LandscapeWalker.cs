@@ -6,7 +6,7 @@ namespace Primer.Simulation
 {
     public class LandscapeWalker : LandscapeItem
     {
-        private const float DEFAULT_SPEED = 8;
+        private const float DEFAULT_SPEED = 20;
         private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
         public Tween WalkTo(Vector2 to, float stopDistance = 0, float forcedDuration = -1)
