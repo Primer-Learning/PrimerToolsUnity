@@ -166,10 +166,12 @@ namespace Simulation.GameTheory
                     throw new ArgumentException("Cannot eat without agents", nameof(competitors));
 
                 case 1:
-                    await competitors[0].Eat(tree);
+                    competitors[0].energy++;
+                    await competitors[0].EatAnimation(tree);
 
-                    if (tree.hasFruit)
-                        await competitors[0].Eat(tree);
+                    if (!tree.hasFruit) return;
+                    competitors[0].energy++;
+                    await competitors[0].EatAnimation(tree);
 
                     return;
 

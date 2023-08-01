@@ -34,7 +34,7 @@ namespace Simulation.GameTheory
             await tween;
         }
 
-        public async UniTask Eat(FruitTree tree)
+        public async UniTask EatAnimation(FruitTree tree)
         {
             goingToEat = null;
             if (!skipAnimations) blob.animator.SetTrigger(scoop);

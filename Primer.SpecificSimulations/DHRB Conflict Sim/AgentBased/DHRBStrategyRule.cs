@@ -43,8 +43,8 @@ namespace Simulation.GameTheory
             var (first, second) = agents.Shuffle().ToList();
 
             await UniTask.WhenAll(
-                first.Eat(tree),
-                second.Eat(tree)
+                first.EatAnimation(tree),
+                second.EatAnimation(tree)
             );
             
             first.energy += rewardMatrix.Get((DHRB) first.strategy, (DHRB) second.strategy);

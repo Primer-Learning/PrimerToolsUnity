@@ -21,8 +21,8 @@ namespace Simulation.GameTheory
             var (first, second) = agents.Shuffle().Take(2).ToList();
 
             await UniTask.WhenAll(
-                first.Eat(tree),
-                second.Eat(tree)
+                first.EatAnimation(tree),
+                second.EatAnimation(tree)
             );
         }
     }
