@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
@@ -70,7 +71,6 @@ namespace Primer.SpecificSimulations
                 line.positionCount = positions.Length;
                 line.SetPositions(positions);
             }
-            Debug.Log("Sim started");
         }
 
         protected override async UniTask OnCycleCompleted()
@@ -120,7 +120,14 @@ namespace Primer.SpecificSimulations
                 line.positionCount = positions.Length;
                 line.SetPositions(positions);
             }
-            Debug.Log("Cycle completed");
+        }
+
+        protected override async UniTask OnReset()
+        {
+            var gnome = ternaryPlot.GetContentGnome();
+            await gnome.GetChildren().Select(x => x.ShrinkAndDispose()).RunInParallel();
+            gnome.Purge();
+            Debug.Log("Reset sim");
         }
     }
 }

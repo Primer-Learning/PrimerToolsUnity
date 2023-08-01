@@ -76,6 +76,7 @@ namespace Primer.Simulation
         protected virtual void SetStrategyRule() {}
         protected virtual async UniTask OnSimStart() {}
         protected virtual async UniTask OnCycleCompleted() {}
+        protected virtual async UniTask OnReset() {}
         
         private void InitializeSim()
         {
@@ -115,19 +116,23 @@ namespace Primer.Simulation
         [Button]
         public async void RunTurn()
         {
+            if (turn == 0)
+                await OnSimStart();
+            
             turn++;
             this.Log($"Running turn {turn}");
             await _sim.SimulateSingleCycle();
+            await OnCycleCompleted();
             this.Log($"Completed turn {turn}");
         }
         
         [Button("Reset")]
-        public void Reset()
+        public async void Reset()
         {
+            await OnReset();
             DisposeSim();
             InitializeSim();
         }
         #endregion
-
     }
 }
