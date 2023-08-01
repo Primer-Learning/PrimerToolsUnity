@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer;
+using Primer.Animation;
 
 namespace Simulation.GameTheory
 {
@@ -16,11 +17,11 @@ namespace Simulation.GameTheory
             // noop
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
+        public override Tween Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 
-            await UniTask.WhenAll(
+            return Tween.Series(
                 first.EatAnimation(tree),
                 second.EatAnimation(tree)
             );

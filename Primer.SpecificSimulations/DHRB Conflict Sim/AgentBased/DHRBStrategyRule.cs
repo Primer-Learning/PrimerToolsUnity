@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using Primer;
-using UnityEngine;
-using Random = UnityEngine.Random;
+using Primer.Animation;
 
 namespace Simulation.GameTheory
 {
@@ -38,17 +36,17 @@ namespace Simulation.GameTheory
             }
         }
 
-        public override async UniTask Resolve(IEnumerable<Agent> agents, FruitTree tree)
+        public override Tween Resolve(IEnumerable<Agent> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().ToList();
 
-            await UniTask.WhenAll(
+            first.energy += rewardMatrix.Get((DHRB) first.strategy, (DHRB) second.strategy);
+            second.energy += rewardMatrix.Get((DHRB) second.strategy, (DHRB) first.strategy);
+            
+            return Tween.Parallel(
                 first.EatAnimation(tree),
                 second.EatAnimation(tree)
             );
-            
-            first.energy += rewardMatrix.Get((DHRB) first.strategy, (DHRB) second.strategy);
-            second.energy += rewardMatrix.Get((DHRB) second.strategy, (DHRB) first.strategy);
         }
     }
 }

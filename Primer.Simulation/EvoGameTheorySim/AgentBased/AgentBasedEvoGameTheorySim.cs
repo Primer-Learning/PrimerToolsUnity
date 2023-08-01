@@ -98,14 +98,16 @@ namespace Simulation.GameTheory
             await AgentsEatFood();
             await AgentsReturnHome();
             await AgentsReproduceOrDie();
+            
+            CleanUp();
         }
 
-        private async UniTask CreateFood()
+        private Tween CreateFood()
         {
-            await trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
+            return trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
         }
 
-        private UniTask AgentsGoToTrees()
+        private Tween AgentsGoToTrees()
         {
             // Make agents each go to a random tree, but a maximum of two per tree
             var treeSlots = trees.Concat(trees).Shuffle(rng);
@@ -116,24 +118,24 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        private async UniTask AgentsEatFood()
+        private Tween AgentsEatFood()
         {
             // Make agents eat food, but only agents where goingToEat is not null
-            await agents
+            return agents
                 .Where(agent => agent.goingToEat != null)
                 .GroupBy(x => x.goingToEat)
                 .Select(x => Eat(competitors: x.ToList(), tree: x.Key))
                 .RunInParallel();
         }
 
-        private UniTask AgentsReturnHome()
+        private Tween AgentsReturnHome()
         {
             return agents
                 .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
                 .RunInParallel();
         }
 
-        private async UniTask AgentsReproduceOrDie()
+        private Tween AgentsReproduceOrDie()
         {
             // foodContainer.RemoveAllChildren();
             _agentGnome.Reset();
@@ -157,27 +159,34 @@ namespace Simulation.GameTheory
 
             // Make room for new blobs and fill gaps left by dead blobs
             // await AgentsReturnHome();
+            return Tween.noop;
+        }
+        
+        private void CleanUp()
+        {
+            foreach (var agent in agents) agent.DisposeDetachedFruit();
         }
 
-        private async UniTask Eat(List<Agent> competitors, FruitTree tree)
+        private Tween Eat(List<Agent> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
-                case 0:
-                    throw new ArgumentException("Cannot eat without agents", nameof(competitors));
-
                 case 1:
+                {
+                    var eatTweens = new List<Tween>();
                     competitors[0].energy++;
-                    await competitors[0].EatAnimation(tree);
+                    eatTweens.Add(competitors[0].EatAnimation(tree));
 
-                    if (!tree.hasFruit) return;
+                    if (!tree.hasFruit) return eatTweens.RunInParallel();
                     competitors[0].energy++;
-                    await competitors[0].EatAnimation(tree);
-
-                    return;
-
+                    eatTweens.Add(competitors[0].EatAnimation(tree));
+                    return Tween.Series(eatTweens);
+                }
+                
                 case > 1:
-                    await _strategyRule.Resolve(competitors, tree);
-                    return;
+                    return _strategyRule.Resolve(competitors, tree);
+                
+                default:
+                    throw new ArgumentException("Cannot eat without agents", nameof(competitors));
             }
         }
 
