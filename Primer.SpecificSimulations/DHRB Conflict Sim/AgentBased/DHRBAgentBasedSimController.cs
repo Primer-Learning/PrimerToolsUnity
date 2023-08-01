@@ -49,7 +49,7 @@ namespace Primer.SpecificSimulations
 
             if (ternaryPlot is not null)
             {
-                var gnome = ternaryPlot.GetContentGnome();
+                var gnome = ternaryPlot.GetContentGnome("Agent-based");
 
                 var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
                 point.transform.localScale = Vector3.zero;
@@ -93,7 +93,7 @@ namespace Primer.SpecificSimulations
             
             if (ternaryPlot is not null)
             {
-                var gnome = ternaryPlot.GetContentGnome();
+                var gnome = ternaryPlot.GetContentGnome("Agent-based");
 
                 var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
                 point.transform.localScale = Vector3.one / ternaryPlot.transform.localScale.x;
@@ -124,7 +124,7 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnReset()
         {
-            var gnome = ternaryPlot.GetContentGnome();
+            var gnome = ternaryPlot.GetContentGnome("Agent-based");
             await gnome.GetChildren().Select(x => x.ScaleTo(0) with { duration = skipAnimations ? 0 : 0.5f }).RunInParallel();
             gnome.Purge();
             Debug.Log("Reset sim");

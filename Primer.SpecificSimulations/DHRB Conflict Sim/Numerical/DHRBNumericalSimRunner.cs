@@ -35,8 +35,6 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     public float minDelta = 0.01f;
 
     [Title("Line rendering")]
-    public float startThickness = 0.01f;
-    public float endThickness = 0f;
     public Color startColor = PrimerColor.white;
     public Color endColor = PrimerColor.blue;
     public Material material;
@@ -86,7 +84,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     [Button]
     public void Clear()
     {
-        ternaryPlot.GetContentGnome().Purge();
+        ternaryPlot.GetContentGnome("Numerical Simulations").Purge();
     }
 
     private async UniTask RunSimulations(CancellationToken cancellationToken)
@@ -97,7 +95,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
             stepSize
         );
 
-        var container = ternaryPlot.GetContentGnome();
+        var container = ternaryPlot.GetContentGnome("Numerical Simulations");
         container.Purge();
 
         // Create evenly distributed initial conditions and insert the manually defined initial condition.
@@ -129,8 +127,8 @@ public class DHRBNumericalSimRunner : MonoBehaviour
         // Use Unity's built-in line renderer to draw the line
         var line = gnome.Add<LineRenderer>();
         line.useWorldSpace = false;
-        line.startWidth = startThickness / 1000;
-        line.endWidth = endThickness / 1000;
+        line.startWidth = 0.001f * ternaryPlot.transform.localScale.x;
+        line.endWidth = 0.001f * ternaryPlot.transform.localScale.x;
         line.material = material ? material : new Material(Shader.Find("Sprites/Default"));
 
         line.colorGradient = new Gradient {
@@ -157,7 +155,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
 
         // Second loop to set color, thickness based on total distance
         var currentDistance = 0f;
-        var points = new List<PolylinePoint>();
+        var points = new List<Vector3>();
 
         for (var i = 0; i < pointPositions.Count; i++) {
             if (i > 0)
@@ -165,8 +163,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
 
             var t = totalDistance == 0f ? 0f : currentDistance / totalDistance;
             var color = Color.Lerp(startColor, endColor, t);
-            var thickness = Mathf.Lerp(startThickness, endThickness, t);
-            points.Add(new PolylinePoint(pointPositions[i], color, thickness));
+            points.Add(pointPositions[i]);
 
             line.positionCount = points.Count;
             line.SetPositions(pointPositions.ToArray());
