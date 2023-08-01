@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Primer;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,11 +12,24 @@ namespace Primer.Simulation
     public class AgentBasedEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
     {
         public int seed = 0;
-        public bool skipAnimations = false;
+        
+        [SerializeField, HideInInspector]
+        private bool _skipAnimations = false;
+        [PropertyOrder(-1)]
+        [ShowInInspector]
+        public bool skipAnimations
+        {
+            get => _skipAnimations;
+            set
+            {
+                _skipAnimations = value;
+                if (_sim != null)
+                    _sim.skipAnimations = value;
+            }
+        }
 
-        [Required]
-        [PropertyOrder(10)]
-        [HideLabel, Title("Conflict Resolution Rule")]
+        // [Required]
+        // [HideLabel, Title("Conflict Resolution Rule")]
         protected StrategyRule<T> strategyRule;
 
         protected AgentBasedEvoGameTheorySim<T> _sim;

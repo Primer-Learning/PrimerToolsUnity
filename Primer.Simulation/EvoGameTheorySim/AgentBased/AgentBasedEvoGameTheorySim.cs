@@ -23,7 +23,17 @@ namespace Simulation.GameTheory
         private readonly StrategyRule<T> _strategyRule;
 
         public Rng rng { get; }
-        public bool skipAnimations { get; init; }
+        
+        private bool _skipAnimations; 
+        public bool skipAnimations { 
+            get => _skipAnimations;
+            set
+            {
+                _skipAnimations = value;
+                foreach (var tree in trees) tree.skipAnimations = skipAnimations;
+                foreach (var agent in agents) agent.skipAnimations = skipAnimations;
+            }
+        }
         public Transform transform { get; }
         public Component component => transform;
         public IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
@@ -45,8 +55,6 @@ namespace Simulation.GameTheory
             _agentGnome = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
 
             this.skipAnimations = skipAnimations;
-            foreach (var tree in trees) tree.skipAnimations = skipAnimations;
-            foreach (var agent in agents) agent.skipAnimations = skipAnimations;
 
             PlaceInitialBlobs(initialBlobs);
         }
