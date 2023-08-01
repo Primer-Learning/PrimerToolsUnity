@@ -99,7 +99,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
             stepSize
         );
 
-        var container = ternaryPlot.GetContentContainer();
+        var container = ternaryPlot.GetContentGnome();
         container.Purge();
 
         // Create evenly distributed initial conditions and insert the manually defined initial condition.

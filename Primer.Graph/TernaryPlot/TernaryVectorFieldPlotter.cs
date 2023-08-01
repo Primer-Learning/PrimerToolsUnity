@@ -33,7 +33,7 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
     private void PlotArrows()
     {
         SetUp();
-        var container = ternaryPlot.GetContentContainer("VectorFieldArrows");
+        var container = ternaryPlot.GetContentGnome("VectorFieldArrows");
 
         List<float[]> points;
         if (ternaryPlot.isQuaternary) points = TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements);

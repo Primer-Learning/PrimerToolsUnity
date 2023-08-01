@@ -43,7 +43,7 @@ namespace Primer.Graph
             Clear();
         }
 
-        public Gnome GetContentContainer(string id = "Content")
+        public Gnome GetContentGnome(string id = "Content")
         {
             return transform.FindOrCreate(id).ToContainer();
         }

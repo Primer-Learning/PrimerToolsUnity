@@ -22,7 +22,7 @@ namespace Primer.Graph
         private void PlotPoints()
         {
             var ternaryPlot = GetComponent<TernaryPlot>();
-            var container = ternaryPlot.GetContentContainer("Points");
+            var container = ternaryPlot.GetContentGnome("Points");
 
             var points = ternaryPlot.isQuaternary
                 ? TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements)
