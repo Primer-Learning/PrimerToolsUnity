@@ -4,7 +4,7 @@ using Primer.Animation;
 
 namespace Primer.Timeline
 {
-    public static class Container_ScaleChildrenInPlayMode
+    public static class Gnome_ScaleChildrenInPlayMode
     {
         public static T ScaleChildrenInPlayMode<T>(this T self, float duration = 0.5f) where T : Gnome
         {

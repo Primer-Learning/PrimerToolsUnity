@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
-    public static class Container_AddSequenceExtensions
+    public static class Gnome_AddSequenceExtensions
     {
         public static SequenceRunner AddSequence<TSequence>(this Gnome gnome, string name = null,
             ChildOptions options = null)

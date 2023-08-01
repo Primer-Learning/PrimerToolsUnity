@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Primer.Shapes
 {
-    public static class ContainerExtensions
+    public static class GnomeExtensions
     {
         public static PrimerArrow2 AddArrow(this Gnome children, string name = null)
         {

@@ -2,15 +2,15 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class IPrimer_ToContainerExtensions
+    public static class IPrimer_ToGnomeExtensions
     {
-        public static Gnome ToContainer(this IPrimer self, bool connectToParent = false)
+        public static Gnome ToGnome(this IPrimer self, bool connectToParent = false)
         {
-            return self.transform.ToContainer(connectToParent);
+            return self.transform.ToGnome(connectToParent);
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
-        public static Gnome ToContainer(this Transform self, bool connectToParent = false)
+        public static Gnome ToGnome(this Transform self, bool connectToParent = false)
         {
             var container = new Gnome<Transform>(self);
 
@@ -26,7 +26,7 @@ namespace Primer
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
-        public static Gnome<T> ToContainer<T>(this T self, bool connectToParent = false) where T : Component
+        public static Gnome<T> ToGnome<T>(this T self, bool connectToParent = false) where T : Component
         {
             var container = new Gnome<T>(self);
 

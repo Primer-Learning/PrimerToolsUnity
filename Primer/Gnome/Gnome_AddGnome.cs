@@ -6,12 +6,12 @@ namespace Primer
     {
         public Gnome AddContainer(string name, ChildOptions options = null)
         {
-            return Add(name, options).ToContainer(connectToParent: true);
+            return Add(name, options).ToGnome(connectToParent: true);
         }
 
         public Gnome<TChild> AddContainer<TChild>(string name, ChildOptions options = null) where TChild : Component
         {
-            return Add<TChild>(name, options).ToContainer(connectToParent: true);
+            return Add<TChild>(name, options).ToGnome(connectToParent: true);
         }
     }
 }

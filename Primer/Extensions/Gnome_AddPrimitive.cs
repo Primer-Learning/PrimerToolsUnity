@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    public static class Container_AddPrimitiveExtensions
+    public static class Gnome_AddPrimitiveExtensions
     {
         private static readonly Dictionary<PrimitiveType, GameObject> primitives = new();
 

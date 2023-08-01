@@ -1,6 +1,6 @@
 namespace Primer.Latex
 {
-    public static class Container_AddLatexExtensions
+    public static class Gnome_AddLatexExtensions
     {
         public static LatexComponent AddLatex(this Gnome gnome, string formula, string name = null)
         {

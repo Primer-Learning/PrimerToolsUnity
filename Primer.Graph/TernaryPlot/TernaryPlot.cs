@@ -45,7 +45,7 @@ namespace Primer.Graph
 
         public Gnome GetContentGnome(string id = "Content")
         {
-            return transform.FindOrCreate(id).ToContainer();
+            return transform.FindOrCreate(id).ToGnome();
         }
 
         public void Clear()
@@ -119,7 +119,7 @@ namespace Primer.Graph
 
             var edgeScale = new Vector3(edgeThickness, 0.5f, edgeThickness);
             var vertexScale = Vector3.one * (edgeThickness * 1.02f);
-            var borders = transform.FindOrCreate("Borders").ToContainer();
+            var borders = transform.FindOrCreate("Borders").ToGnome();
 
             var bottom = borders.AddPrimitive(PrimitiveType.Cylinder, "Bottom line");
             bottom.localPosition = CoordinatesToPosition(0.5f, 0.5f, 0);
