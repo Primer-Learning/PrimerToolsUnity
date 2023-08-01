@@ -27,7 +27,6 @@ namespace Primer.Simulation
             var simParams = new SimParams(rewardMatrix, baseFitness, runStepSize, initial, maxIterations, minDelta);
 
             if (cache.Peek(simParams, out var cached)) {
-                Debug.Log("Cache hit!");
                 return cached.ToList();
             }
 

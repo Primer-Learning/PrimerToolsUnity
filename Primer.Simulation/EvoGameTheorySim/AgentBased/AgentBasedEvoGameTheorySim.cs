@@ -51,7 +51,6 @@ namespace Simulation.GameTheory
             rng = new Rng(seed);
 
             var container = new Gnome(transform);
-            // foodContainer = gnome.AddContainer("Food").ScaleGrandchildrenInPlayMode(1);
             _agentGnome = container.AddContainer("Blobs").ScaleChildrenInPlayMode(1);
 
             this.skipAnimations = skipAnimations;
