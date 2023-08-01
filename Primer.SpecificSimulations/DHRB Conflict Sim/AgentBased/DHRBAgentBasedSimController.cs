@@ -63,8 +63,8 @@ namespace Primer.SpecificSimulations
                 
                 var line = gnome.Add<LineRenderer>("line");
                 line.useWorldSpace = false;
-                line.startWidth = 0.1f;
-                line.endWidth = 0.1f;
+                line.startWidth = 0.001f * ternaryPlot.transform.localScale.x;
+                line.endWidth = 0.001f * ternaryPlot.transform.localScale.x;
                 line.material = new Material(Shader.Find("Sprites/Default"));
                 
                 var positions = new [] {newPosition};
@@ -110,8 +110,8 @@ namespace Primer.SpecificSimulations
                 // Use Unity's built-in line renderer to draw the line
                 var line = gnome.Add<LineRenderer>("line");
                 line.useWorldSpace = false;
-                line.startWidth = 0.1f;
-                line.endWidth = 0.1f;
+                line.startWidth = 0.001f * ternaryPlot.transform.localScale.x;
+                line.endWidth = 0.001f * ternaryPlot.transform.localScale.x;
                 line.material =  new Material(Shader.Find("Sprites/Default"));
                 
                 var positions = new Vector3[line.positionCount + 1];
