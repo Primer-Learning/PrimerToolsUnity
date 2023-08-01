@@ -50,14 +50,14 @@ namespace Primer.SpecificSimulations
             {
                 var gnome = ternaryPlot.GetContentGnome();
 
-                var blob = gnome.AddPrefab<PrimerBlob>("blob_skinned", "blob");
-                blob.transform.localScale = Vector3.zero;
-                blob.transform.localPosition = TernaryPlot.CoordinatesToPosition(
+                var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
+                point.transform.localScale = Vector3.zero;
+                point.transform.localPosition = TernaryPlot.CoordinatesToPosition(
                     (float) numDoves / total,
                     (float) numHawks / total,
                     (float) numRetaliators / total
                 );
-                await blob.transform.ScaleTo(Vector3.one / ternaryPlot.transform.localScale.x);
+                await point.transform.ScaleTo(Vector3.one / ternaryPlot.transform.localScale.x);
             }
             Debug.Log("Sim started");
         }
@@ -84,10 +84,10 @@ namespace Primer.SpecificSimulations
             {
                 var gnome = ternaryPlot.GetContentGnome();
 
-                var blob = gnome.AddPrefab<PrimerBlob>("blob_skinned", "blob");
-                blob.transform.localScale = Vector3.one / ternaryPlot.transform.localScale.x;
+                var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
+                point.transform.localScale = Vector3.one / ternaryPlot.transform.localScale.x;
                 
-                await blob.transform.MoveTo(
+                await point.transform.MoveTo(
                     TernaryPlot.CoordinatesToPosition(
                         (float) numDoves / total,
                         (float) numHawks / total,
