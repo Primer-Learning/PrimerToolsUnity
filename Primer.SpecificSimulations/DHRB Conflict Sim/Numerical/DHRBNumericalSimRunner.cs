@@ -13,10 +13,10 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 [HelpURL("https://www.desmos.com/calculator/zddbdfhfnc")]
-[RequireComponent(typeof(DHRBRewardEditorComponent))]
 public class DHRBNumericalSimRunner : MonoBehaviour
 {
-    public DHRBStrategyManager strategyManager => FindObjectOfType<DHRBStrategyManager>();
+    public DHRBNumericalSimStrategyManager NumericalSimStrategyManager => FindObjectOfType<DHRBNumericalSimStrategyManager>();
+    public DHRBRewardEditorComponent rewardEditorComponent;
 
     // Self-healing property
     // Ternary Plot can be set from the inspector _but_ if it hasn't been set we just create a new one and use it.
@@ -66,9 +66,9 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     [HideIf(nameof(cancellationTokenSource))]
     public async void Start()
     {
-        if (strategyManager.strategyList.Count == 4) ternaryPlot.isQuaternary = true;
-        else if (strategyManager.strategyList.Count == 3) ternaryPlot.isQuaternary = false;
-        else Debug.LogError($"The sim runner expects 3 or 4 strategies, but there are {strategyManager.strategyList.Count}");
+        if (NumericalSimStrategyManager.strategyList.Count == 4) ternaryPlot.isQuaternary = true;
+        else if (NumericalSimStrategyManager.strategyList.Count == 3) ternaryPlot.isQuaternary = false;
+        else Debug.LogError($"The sim runner expects 3 or 4 strategies, but there are {NumericalSimStrategyManager.strategyList.Count}");
 
         cancellationTokenSource = new CancellationTokenSource();
         await PrimerTimeline.RegisterOperation(RunSimulations(cancellationTokenSource.Token));
@@ -86,13 +86,11 @@ public class DHRBNumericalSimRunner : MonoBehaviour
     [Button]
     public void Clear()
     {
-        ternaryPlot.Clear();
+        ternaryPlot.GetContentGnome().Purge();
     }
 
     private async UniTask RunSimulations(CancellationToken cancellationToken)
     {
-        var rewardEditorComponent = GetComponent<DHRBRewardEditorComponent>();
-
         var sim = new NumericalEvoGameTheorySim<DHRB>(
             rewardEditorComponent.rewardMatrix,
             rewardEditorComponent.baseFitness,
@@ -103,7 +101,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
         container.Purge();
 
         // Create evenly distributed initial conditions and insert the manually defined initial condition.
-        var initialConditions = strategyManager.strategyList.Count == 3
+        var initialConditions = NumericalSimStrategyManager.strategyList.Count == 3
             ? TernaryPlotUtility.EvenlyDistributedPoints(
                 automaticInitialConditionIncrements,
                 nudgeAwayFromZero: nudgeInitialConditionsAwayFromZero
@@ -116,7 +114,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
 
         // Run all sims
         foreach (var ic in initialConditions) {
-            var result = sim.Simulate(strategyManager.AlleleFrequencyFromFloatArray(ic), maxIterations, minDelta);
+            var result = sim.Simulate(NumericalSimStrategyManager.AlleleFrequencyFromFloatArray(ic), maxIterations, minDelta);
 
             // If result is a list and not only a IEnumerable<> that means it's a completed simulation, we don't need to wait
             if (result is not List<AlleleFrequency<DHRB>>)
@@ -148,7 +146,7 @@ public class DHRBNumericalSimRunner : MonoBehaviour
 
         // First loop to generate points and calculate total distance
         foreach (var frequencies in result) {
-            var newPoint = TernaryPlot.CoordinatesToPosition(strategyManager.ToFloatArray(frequencies));
+            var newPoint = TernaryPlot.CoordinatesToPosition(NumericalSimStrategyManager.ToFloatArray(frequencies));
 
             if (lastPoint.HasValue)
                 totalDistance += Vector3.Distance(lastPoint.Value, newPoint);

@@ -4,10 +4,9 @@ using Primer.Simulation;
 using Simulation.GameTheory;
 using UnityEngine;
 
-[RequireComponent(typeof(DHRBRewardEditorComponent))]
-public class DHRBStrategyManager : MonoBehaviour
+public class DHRBNumericalSimStrategyManager : MonoBehaviour
 {
-    public DHRBRewardEditorComponent rewardEditor => GetComponent<DHRBRewardEditorComponent>();
+    public DHRBRewardEditorComponent rewardEditor;
 
     public List<DHRB> strategyList = new() {
         DHRB.Dove,

@@ -50,9 +50,8 @@ namespace Primer.Graph
 
         public void Clear()
         {
-            var container = new Gnome(transform);
-            container.Add("Borders"); // Don't delete the borders
-            container.Purge();
+            var contentGnome = GetContentGnome();
+            contentGnome.Purge();
         }
 
         public Vector3 CoordinatesToLocalPosition(float a, float b, float c)

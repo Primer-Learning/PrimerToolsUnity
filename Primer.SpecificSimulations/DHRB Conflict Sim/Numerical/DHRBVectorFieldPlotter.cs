@@ -6,24 +6,23 @@ using UnityEngine;
 [RequireComponent(typeof(TernaryPlot))]
 public class DHRBVectorFieldPlotter : TernaryVectorFieldPlotter
 {
-    public DHRBStrategyManager strategyManager => FindObjectOfType<DHRBStrategyManager>();
-
+    public DHRBNumericalSimStrategyManager NumericalSimStrategyManager => FindObjectOfType<DHRBNumericalSimStrategyManager>();
     private NumericalEvoGameTheorySim<DHRB> sim;
 
     protected override void SetUp()
     {
-        if (strategyManager.strategyList.Count == 4) ternaryPlot.isQuaternary = true;
-        else if (strategyManager.strategyList.Count == 3) ternaryPlot.isQuaternary = false;
-        else Debug.LogError($"The sim runner expects 3 or 4 strategies, but there are {strategyManager.strategyList.Count}");
-        sim = new NumericalEvoGameTheorySim<DHRB>(strategyManager.rewardEditor.rewardMatrix, strategyManager.rewardEditor.baseFitness, 0);
+        if (NumericalSimStrategyManager.strategyList.Count == 4) ternaryPlot.isQuaternary = true;
+        else if (NumericalSimStrategyManager.strategyList.Count == 3) ternaryPlot.isQuaternary = false;
+        else Debug.LogError($"The sim runner expects 3 or 4 strategies, but there are {NumericalSimStrategyManager.strategyList.Count}");
+        sim = new NumericalEvoGameTheorySim<DHRB>(NumericalSimStrategyManager.rewardEditor.rewardMatrix, NumericalSimStrategyManager.rewardEditor.baseFitness, 0);
     }
     
     protected override float[] TernaryDifferential(float[] point)
     {
         // Figure out what the result would be for a single step of the sim.
-        var pointAsAlleleFrequency = strategyManager.AlleleFrequencyFromFloatArray(point);
+        var pointAsAlleleFrequency = NumericalSimStrategyManager.AlleleFrequencyFromFloatArray(point);
         var result = sim.SingleIteration(pointAsAlleleFrequency, stepSize: 1);
         
-        return TernaryPlotUtility.SubtractFloatArrays(strategyManager.ToFloatArray(result), point);
+        return TernaryPlotUtility.SubtractFloatArrays(NumericalSimStrategyManager.ToFloatArray(result), point);
     }
 }
