@@ -37,7 +37,6 @@ namespace Simulation.GameTheory
         public async UniTask Eat(FruitTree tree)
         {
             goingToEat = null;
-            energy++;
             if (!skipAnimations) blob.animator.SetTrigger(scoop);
 
             var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
