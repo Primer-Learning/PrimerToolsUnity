@@ -52,12 +52,23 @@ namespace Primer.SpecificSimulations
 
                 var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
                 point.transform.localScale = Vector3.zero;
-                point.transform.localPosition = TernaryPlot.CoordinatesToPosition(
-                    (float) numDoves / total,
-                    (float) numHawks / total,
-                    (float) numRetaliators / total
+                var newPosition = TernaryPlot.CoordinatesToPosition(
+                    (float)numDoves / total,
+                    (float)numHawks / total,
+                    (float)numRetaliators / total
                 );
+                point.transform.localPosition = newPosition;
                 await point.transform.ScaleTo(Vector3.one / ternaryPlot.transform.localScale.x);
+                
+                var line = gnome.Add<LineRenderer>("line");
+                line.useWorldSpace = false;
+                line.startWidth = 0.1f;
+                line.endWidth = 0.1f;
+                line.material = new Material(Shader.Find("Sprites/Default"));
+                
+                var positions = new [] {newPosition};
+                line.positionCount = positions.Length;
+                line.SetPositions(positions);
             }
             Debug.Log("Sim started");
         }
@@ -86,14 +97,28 @@ namespace Primer.SpecificSimulations
 
                 var point = gnome.AddPrimitive(PrimitiveType.Sphere, "population point");
                 point.transform.localScale = Vector3.one / ternaryPlot.transform.localScale.x;
-                
-                await point.transform.MoveTo(
-                    TernaryPlot.CoordinatesToPosition(
-                        (float) numDoves / total,
-                        (float) numHawks / total,
-                        (float) numRetaliators / total
-                    )
+
+                var newPosition = TernaryPlot.CoordinatesToPosition(
+                    (float)numDoves / total,
+                    (float)numHawks / total,
+                    (float)numRetaliators / total
                 );
+                
+                await point.transform.MoveTo(newPosition);
+                
+                
+                // Use Unity's built-in line renderer to draw the line
+                var line = gnome.Add<LineRenderer>("line");
+                line.useWorldSpace = false;
+                line.startWidth = 0.1f;
+                line.endWidth = 0.1f;
+                line.material =  new Material(Shader.Find("Sprites/Default"));
+                
+                var positions = new Vector3[line.positionCount + 1];
+                line.GetPositions(positions);
+                positions[^1] = newPosition;
+                line.positionCount = positions.Length;
+                line.SetPositions(positions);
             }
             Debug.Log("Cycle completed");
         }
