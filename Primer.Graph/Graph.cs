@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,7 +30,7 @@ namespace Primer.Graph
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
 
-        private MultipleAxesController axes;
+        private MultipleAxesController axesController;
 
         [Title("Axes references")]
         [FormerlySerializedAs("x")]
@@ -64,11 +66,42 @@ namespace Primer.Graph
 
         public Action onDomainChanged;
 
+        private Axis[] axes => enableZAxis && z?.transform.localScale.z is not 0
+            ? new [] { x, y, z }
+            : new [] { x, y };
+
 
         private void OnEnable() => UpdateAxes();
 
         private void OnValidate() => UpdateAxes();
 
+
+        public Tween GrowZAxis(float newMax) => GrowZAxis(0, newMax);
+        public Tween GrowZAxis(float newMin, float newMax)
+        {
+            enableZAxis = true;
+            return z.GrowFromOrigin(newMax, newMax);
+        }
+
+        public Tween ShrinkZAxis()
+        {
+            return z.ShrinkToOrigin().Observe(onComplete: () => enableZAxis = false);
+        }
+
+        public Tween GrowFromOrigin(float newMax)
+        {
+            return axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
+        }
+
+        public Tween GrowFromOrigin(float newMin, float newMax)
+        {
+            return axes.Select(axis => axis.GrowFromOrigin(newMin, newMax)).RunInParallel();
+        }
+
+        public Tween ShrinkToOrigin()
+        {
+            return axes.Select(axis => axis.ShrinkToOrigin()).RunInParallel();
+        }
 
         private void UpdateAxes()
         {
@@ -82,8 +115,8 @@ namespace Primer.Graph
                 }
             }
 
-            axes ??= GetComponent<MultipleAxesController>();
-            axes.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
+            axesController ??= GetComponent<MultipleAxesController>();
+            axesController.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
         }
 
         public Vector3 DomainToPosition(Vector3 value)
