@@ -41,8 +41,8 @@ namespace Primer.Graph
         }
         #endregion
         
-        #region public bool rotateQuads;
-        [FormerlySerializedAs("_rotateTriangles")] [FormerlySerializedAs("_invertTriangles")] [SerializeField, HideInInspector]
+        #region public bool doubleSided;
+        [SerializeField, HideInInspector]
         private bool _doubleSided = true;
 
         [ShowInInspector]

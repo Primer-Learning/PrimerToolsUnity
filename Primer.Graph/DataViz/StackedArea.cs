@@ -152,7 +152,7 @@ namespace Primer.Graph
                     var c = lineStart + j - 1;
                     var d = lineStart + j;
 
-                    triangles.AddTriangle(a, b, d);
+                    triangles.AddTriangle(a, d, b);
                     triangles.AddTriangle(a, c, d);
                 }
 
@@ -160,11 +160,14 @@ namespace Primer.Graph
                 area.material = RendererExtensions.defaultMaterial;
                 area.SetColor(colors[i]);
 
-                area.GetOrAddComponent<MeshFilter>().mesh = new Mesh {
+                var mesh = new Mesh {
                     vertices = points.ToArray(),
                     triangles = triangles.ToArray(),
                 };
+                mesh.RecalculateNormals();
 
+                area.GetOrAddComponent<MeshFilter>().mesh = mesh;
+                
                 prevLine = line;
             }
 
