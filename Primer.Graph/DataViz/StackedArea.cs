@@ -120,11 +120,11 @@ namespace Primer.Graph
         private void Render() => Render(renderedData);
         private void Render(IEnumerable<ILine> data)
         {
-            var container = new Gnome(transform);
+            var gnome = new Gnome(transform);
             var lines = (data ?? new List<ILine>()).ToList();
 
             if (lines.Count is 0) {
-                container.Purge();
+                gnome.Purge();
                 return;
             }
 
@@ -156,7 +156,7 @@ namespace Primer.Graph
                     triangles.AddTriangle(a, c, d);
                 }
 
-                var area = container.Add<MeshRenderer>($"Area {i}");
+                var area = gnome.Add<MeshRenderer>($"Area {i}");
                 area.material = RendererExtensions.defaultMaterial;
                 area.SetColor(colors[i]);
 
@@ -169,7 +169,7 @@ namespace Primer.Graph
             }
 
             renderedData = RemoveRedundantPoints(lines);
-            container.Purge();
+            gnome.Purge();
         }
 
         private static DiscreteLine FlatLine(ILine sample)

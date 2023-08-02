@@ -33,34 +33,34 @@ public abstract class TernaryVectorFieldPlotter : MonoBehaviour
     private void PlotArrows()
     {
         SetUp();
-        var container = ternaryPlot.GetContentGnome("VectorFieldArrows");
+        var gnome = ternaryPlot.GetContentGnome("VectorFieldArrows");
 
-        List<float[]> points;
-        if (ternaryPlot.isQuaternary) points = TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements);
-        else points = TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
+        var points = ternaryPlot.isQuaternary
+            ? TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements)
+            : TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
 
         foreach (var point in points)
         {
             var difference = TernaryDifferential(point);
-            
+
             // Get the difference between start and end result as a normalized vector
             var pointAsVector = TernaryPlot.CoordinatesToPosition(point);
             var differenceVector = TernaryPlot.CoordinatesToPosition(difference);
-            
-            if (differenceVector.sqrMagnitude > 0.000001f)
-            {
-                differenceVector /= differenceVector.magnitude;
-                var adjustedDifferenceVector = baseArrowLength * differenceVector / automaticPointIncrements;
-                
-                // Draw the arrow
-                var arrow = container.AddArrow();
-                arrow.thickness = baseArrowThickness / automaticPointIncrements;
-                arrow.tail = pointAsVector - adjustedDifferenceVector / 2;
-                arrow.head = pointAsVector + adjustedDifferenceVector / 2;
-            }
+
+            if (!(differenceVector.sqrMagnitude > 0.000001f))
+                continue;
+
+            differenceVector /= differenceVector.magnitude;
+            var adjustedDifferenceVector = baseArrowLength * differenceVector / automaticPointIncrements;
+
+            // Draw the arrow
+            var arrow = gnome.AddArrow();
+            arrow.thickness = baseArrowThickness / automaticPointIncrements;
+            arrow.tail = pointAsVector - adjustedDifferenceVector / 2;
+            arrow.head = pointAsVector + adjustedDifferenceVector / 2;
         }
 
-        container.Purge(defer: true);
+        gnome.Purge(defer: true);
     }
 
     protected abstract void SetUp();

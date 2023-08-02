@@ -87,16 +87,16 @@ namespace Primer.Latex
             if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
                 return;
 
-            var container = new Gnome(characters);
+            var gnome = new Gnome(characters);
             var currentMaterial = material;
             var currentColor = color;
 
             foreach (var (index, character) in expression.WithIndex()) {
-                var charTransform = container.Add($"LatexChar {index}").SetDefaults();
+                var charTransform = gnome.Add($"LatexChar {index}").SetDefaults();
                 character.RenderTo(charTransform, currentMaterial, currentColor);
             }
 
-            container.Purge();
+            gnome.Purge();
 
             // Just make sure all shadows are off for now. Could make this an option in the future if needed.
             SetCastShadows(false);

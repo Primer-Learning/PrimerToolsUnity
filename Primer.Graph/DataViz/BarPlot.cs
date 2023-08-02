@@ -20,7 +20,7 @@ namespace Primer.Graph
         private Graph graph => transform.GetOrAddComponent(ref graphCache);
 
         private Gnome _barsGnome;
-        private Gnome BarsGnome => _barsGnome ??= new Gnome("Plotted bars", graph);
+        private Gnome barsGnome => _barsGnome ??= new Gnome("Plotted bars", graph);
 
         private Gnome _labelsGnome;
         public Gnome LabelsGnome
@@ -260,16 +260,16 @@ namespace Primer.Graph
         [Button]
         public void UpdateBars()
         {
-            var container = BarsGnome;
-            container.Reset();
-            container.localScale = Vector3.one;
-            container.localPosition = Vector3.zero;
+            var gnome = barsGnome;
+            gnome.Reset();
+            gnome.localScale = Vector3.one;
+            gnome.localPosition = Vector3.zero;
 
             LabelsGnome.Reset();
 
             for (var i = 0; i < bars.Count; i++) {
                 var data = bars[i];
-                var bar = CreateBar(container, data, i);
+                var bar = CreateBar(gnome, data, i);
                 var label = barLabels is null ? null : CreateBarLabel(bar, data, i >= barCountForHax || barCountForHax == 0);
 
                 data.onNameChange = UpdateIfError<string>(newName => bar.gameObject.name = newName);
@@ -281,9 +281,9 @@ namespace Primer.Graph
             }
 
             barCountForHax = bars.Count;
-            
+
             LabelsGnome.Purge();
-            container.Purge();
+            gnome.Purge();
         }
 
         private LatexComponent CreateBarLabel(Rectangle bar, BarData data, bool isNew = false)

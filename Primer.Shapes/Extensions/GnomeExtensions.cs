@@ -22,7 +22,7 @@ namespace Primer.Shapes
         public static Gnome<Follower> AddFollower<T>(this Gnome gnome, T follow, string name = null)
             where T : Component
         {
-            var follower = gnome.AddContainer<Follower>(name ?? $"Follower({follow.name})");
+            var follower = gnome.AddGnome<Follower>(name ?? $"Follower({follow.name})");
             var transform = follow.transform;
             var component = follower.component;
             component.getter = () => component.useGlobalSpace ? transform.position : transform.localPosition;

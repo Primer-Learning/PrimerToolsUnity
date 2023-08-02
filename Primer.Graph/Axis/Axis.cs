@@ -76,17 +76,17 @@ namespace Primer.Graph
             if (gameObject.IsPreset())
                 return;
 
-            var container = new Gnome(transform)
+            var gnome = new Gnome(transform)
                 .ScaleChildrenInPlayMode();
 
             if (enabled && isActiveAndEnabled) {
-                UpdateRod(container);
-                UpdateLabel(container);
-                UpdateArrows(container);
-                UpdateTicks(container);
+                UpdateRod(gnome);
+                UpdateLabel(gnome);
+                UpdateArrows(gnome);
+                UpdateTicks(gnome);
             }
 
-            container.Purge(defer: true);
+            gnome.Purge(defer: true);
         }
     }
 }

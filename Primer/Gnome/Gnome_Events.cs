@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Primer
 {
     // We need a non-generic class to contain the static values
-    internal static class ContainerEvents
+    internal static class GnomeEvents
     {
         internal static Action<Transform, bool> defaultOnRemove = (x, defer) => x.Dispose(defer);
 
@@ -25,7 +25,7 @@ namespace Primer
     public partial class Gnome
     {
         private static bool areEventsDeactivated
-            => ContainerEvents.deactivateEventsIf?.Invoke() ?? Application.isPlaying;
+            => GnomeEvents.deactivateEventsIf?.Invoke() ?? Application.isPlaying;
 
         public Action<Transform> onCreate;
         public Action<Transform, bool> onRemove;
@@ -49,21 +49,21 @@ namespace Primer
                 return;
             }
 
-            child.GetOrAddComponent<ContainerEvents.IsRemoving>();
+            child.GetOrAddComponent<GnomeEvents.IsRemoving>();
             onRemove.Invoke(child.transform, defer);
         }
 
         private static List<Transform> ReadExistingChildren(Transform transform)
         {
             return transform.GetChildren()
-                .Where(x => !x.HasComponent<ContainerEvents.IsRemoving>())
+                .Where(x => !x.HasComponent<GnomeEvents.IsRemoving>())
                 .ToList();
         }
 
         private static IEnumerable<Transform> GetChildrenBeingRemoved(Transform transform)
         {
             return transform.GetChildren()
-                .Where(x => x.HasComponent<ContainerEvents.IsRemoving>());
+                .Where(x => x.HasComponent<GnomeEvents.IsRemoving>());
         }
     }
 }

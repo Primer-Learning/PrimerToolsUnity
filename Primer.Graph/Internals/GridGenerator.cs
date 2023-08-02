@@ -17,14 +17,14 @@ namespace Primer.Graph
         [Button(ButtonSizes.Large)]
         public void UpdateChildren()
         {
-            var container = new Gnome(transform);
+            var gnome = new Gnome(transform);
 
             for (var k = 0; k < length.z; k++)
             for (var j = 0; j < length.y; j++)
             for (var i = 0; i < length.x; i++) {
                 var coordinates = new Vector3Int(i, j, k);
 
-                var child = CreateCell(container, $"Cell {coordinates}");
+                var child = CreateCell(gnome, $"Cell {coordinates}");
                 child.coordinates = coordinates;
 
                 var position = Vector3.Scale(coordinates, cellSize);

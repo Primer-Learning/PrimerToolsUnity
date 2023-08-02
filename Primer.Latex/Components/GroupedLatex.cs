@@ -106,7 +106,7 @@ namespace Primer.Latex
             }
 
             // Groups are only used in transitions, we don't need to see them
-            var container = new Gnome(root, setActive: false);
+            var gnome = new Gnome(root, setActive: false);
             var zero = currentExpression.center;
             var currentMaterial = latex.material;
             var currentColor = latex.color;
@@ -116,7 +116,7 @@ namespace Primer.Latex
             foreach (var (groupIndex, (start, end)) in CalculateRanges().WithIndex()) {
                 var chunk = currentExpression.Slice(start, end);
                 var center = chunk.center;
-                var group = container.AddContainer($"Group {groupIndex} ({start} to {end - 1})");
+                var group = gnome.AddGnome($"Group {groupIndex} ({start} to {end - 1})");
 
                 group.transform.localPosition = Vector3.Scale(center - zero, new Vector3(1, -1, 1));
                 group.transform.localScale = Vector3.one;
@@ -131,7 +131,7 @@ namespace Primer.Latex
                 groups.Add(group.transform);
             }
 
-            container.Purge();
+            gnome.Purge();
             onGroupsChange?.Invoke();
         }
 

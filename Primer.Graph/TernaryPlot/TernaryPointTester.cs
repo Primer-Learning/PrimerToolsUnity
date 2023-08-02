@@ -22,19 +22,19 @@ namespace Primer.Graph
         private void PlotPoints()
         {
             var ternaryPlot = GetComponent<TernaryPlot>();
-            var container = ternaryPlot.GetContentGnome("Points");
+            var gnome = ternaryPlot.GetContentGnome("Points");
 
             var points = ternaryPlot.isQuaternary
                 ? TernaryPlotUtility.EvenlyDistributedPoints3D(automaticPointIncrements)
                 : TernaryPlotUtility.EvenlyDistributedPoints(automaticPointIncrements);
 
             foreach (var point in points) {
-                var sphere = container.AddPrimitive(PrimitiveType.Sphere);
+                var sphere = gnome.AddPrimitive(PrimitiveType.Sphere);
                 sphere.localScale = Vector3.one * sphereSize / 10; // Arbitrary, but 1 is way too big
                 sphere.localPosition = ternaryPlot.CoordinatesToLocalPosition(point);
             }
 
-            container.Purge(defer: true);
+            gnome.Purge(defer: true);
         }
     }
 }

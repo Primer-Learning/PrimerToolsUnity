@@ -52,7 +52,7 @@ namespace Primer
         public T[] ChildComponents<T>() where T : Component
         {
             return transform.GetComponentsInChildren<T>()
-                .Where(x => x.GetComponent<ContainerEvents.IsRemoving>() is null)
+                .Where(x => x.GetComponent<GnomeEvents.IsRemoving>() is null)
                 .ToArray();
         }
 

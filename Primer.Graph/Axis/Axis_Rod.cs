@@ -22,7 +22,7 @@ namespace Primer.Graph
 
         public void UpdateRod(Gnome gnome)
         {
-            var rod = gnome.AddContainer("Rod");
+            var rod = gnome.AddGnome("Rod");
             var cylinder = rod.AddPrimitive(PrimitiveType.Cylinder);
 
             cylinder.localPosition = new Vector3(0.5f, 0, 0);

@@ -186,8 +186,8 @@ namespace Primer.Graph
                 return;
 
             var domain = this;
-            var container = parentGnome
-                .AddContainer("Ticks container")
+            var gnome = parentGnome
+                .AddGnome("Ticks container")
                 .ScaleGrandchildrenInPlayMode()
                 .SetDefaults();
 
@@ -196,7 +196,7 @@ namespace Primer.Graph
                 : CalculateTics();
 
             foreach (var data in CropTicksCount(expectedTicks)) {
-                var tick = container.Add(tickPrefab, $"Tick {data.label}");
+                var tick = gnome.Add(tickPrefab, $"Tick {data.label}");
                 tick.value = data.value;
                 tick.label = data.label;
                 tick.transform.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, tickOffset, 0);
@@ -205,12 +205,12 @@ namespace Primer.Graph
                     lockTickOrientation.value.ApplyTo(tick.latex);
             }
 
-            foreach (var removing in container.removing) {
+            foreach (var removing in gnome.removing) {
                 var data = removing.GetComponent<AxisTick>();
                 removing.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, tickOffset, 0);
             }
 
-            container.Purge();
+            gnome.Purge();
         }
 
         private List<TickData> CropTicksCount(List<TickData> ticks)

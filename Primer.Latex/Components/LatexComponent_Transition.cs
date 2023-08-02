@@ -127,9 +127,9 @@ namespace Primer.Latex
         private void RemovePreviousTransitions()
         {
             // Remove all children except for the characters gnome
-            var container = new Gnome(transform);
-            container.Insert(characters);
-            container.Purge();
+            var gnome = new Gnome(transform);
+            gnome.Insert(characters);
+            gnome.Purge();
 
             GetComponent<LatexTransition>()?.DisposeComponent();
 

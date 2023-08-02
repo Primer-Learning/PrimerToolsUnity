@@ -64,7 +64,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var container = new Gnome(transform);
+            var gnome = new Gnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             var offset = Vector2.one * distanceFromBorder;
 
@@ -74,7 +74,7 @@ namespace Primer.Simulation
             var rng = new Rng(seed);
 
             foreach (var point in PoissonDiscSampler.Rectangular(amount, spawnSpace, minDistance, overflowMode: overflowMode, rng: rng)) {
-                var instance = container.Add(prefab);
+                var instance = gnome.Add(prefab);
                 var pos = point + offset;
 
                 if (hasLandscape) {
@@ -88,7 +88,7 @@ namespace Primer.Simulation
                     instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
             }
 
-            container.Purge();
+            gnome.Purge();
         }
 
 #if UNITY_EDITOR

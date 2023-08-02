@@ -136,27 +136,27 @@ namespace Primer.Latex
 
             Deactivate();
 
-            var container = new Gnome(root);
+            var gnome = new Gnome(root);
 
             foreach (var group in GroupsToRemove()) {
-                var groupTransform = container.Add(group);
+                var groupTransform = gnome.Add(group);
                 remove.Add((groupTransform, group));
             }
 
 
             foreach (var group in GroupsToAdd()) {
-                var groupTransform = container.Add(group);
+                var groupTransform = gnome.Add(group);
                 groupTransform.localPosition += offset;
                 add.Add((groupTransform, group));
             }
 
             foreach (var (before, after) in GetCommonGroups()) {
-                var groupTransform = container.Add(before);
+                var groupTransform = gnome.Add(before);
                 transition.Add((groupTransform, before, after));
             }
 
             foreach (var (before, after) in GroupToReplace()) {
-                var group = container.AddContainer("Replace");
+                var group = gnome.AddGnome("Replace");
                 var scaleDown = group.Add(before);
                 scaleDown.localPosition = Vector3.zero;
                 var scaleUp = group.Add(after);
@@ -167,7 +167,7 @@ namespace Primer.Latex
                 add.Add((scaleUp, after));
             }
 
-            container.Purge();
+            gnome.Purge();
         }
 
         public void RegenerateChildren()
