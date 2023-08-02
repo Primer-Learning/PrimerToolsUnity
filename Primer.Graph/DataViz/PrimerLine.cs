@@ -288,7 +288,7 @@ namespace Primer.Graph
 
                 // Add the indices of the two triangles to the list
                 var index = i * 4;
-                triangles.AddTriangle(index, index + 1, index + 2);
+                triangles.AddTriangle(index, index + 2, index + 1);
                 triangles.AddTriangle(index + 1, index + 2, index + 3);
             }
         }
@@ -305,8 +305,8 @@ namespace Primer.Graph
                 var center = vertices.Count;
                 vertices.Add(b);
 
-                var cross = Vector3.Cross(b - a, c - b);
-                var (leftIndex, rightIndex) = cross.z < 0
+                var flip = Vector3.Cross(b - a, c - b).z < 0 ;
+                var (leftIndex, rightIndex) = flip
                     ? (quadIndex + 2, quadIndex + 4)
                     : (quadIndex + 3, quadIndex + 5);
 
@@ -317,7 +317,7 @@ namespace Primer.Graph
                 // miterVertices = Vector3.Angle(left - b, right - b) / degreesPerVertex
 
                 if (miterVertices <= 0) {
-                    triangles.AddTriangle(center, leftIndex, rightIndex);
+                    triangles.AddTriangle(center, rightIndex, leftIndex, flip);
                     continue;
                 }
 
@@ -326,10 +326,10 @@ namespace Primer.Graph
                     vertices.Add(Vector3.Slerp(left - b, right - b, t) + b);
 
                     var corner = j == 0 ? leftIndex : center + j;
-                    triangles.AddTriangle(center, corner, center + j + 1);
+                    triangles.AddTriangle(corner, center, center + j + 1, flip);
                 }
 
-                triangles.AddTriangle(center, center + miterVertices, rightIndex);
+                triangles.AddTriangle(center + miterVertices, center, rightIndex, flip);
             }
         }
 
