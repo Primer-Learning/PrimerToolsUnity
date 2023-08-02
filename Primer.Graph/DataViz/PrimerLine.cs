@@ -27,7 +27,7 @@ namespace Primer.Graph
 
         #region public float width;
         [SerializeField, HideInInspector]
-        private float _width = 0.2f;
+        private float _width = 0.1f;
 
         [ShowInInspector]
         public float width {

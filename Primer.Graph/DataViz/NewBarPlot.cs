@@ -10,6 +10,8 @@ using BarPlotData = System.Collections.Generic.List<System.Collections.Generic.L
 
 namespace Primer.Graph
 {
+    [ExecuteAlways]
+    [RequireComponent(typeof(GraphDomain))]
     public class NewBarPlot : MonoBehaviour, IDisposable
     {
         public BarPlotData renderedData = new BarPlotData();
@@ -50,7 +52,7 @@ namespace Primer.Graph
 
         #region public float barWidth;
         [SerializeField, HideInInspector]
-        private float _barWidth = 1;
+        private float _barWidth = 1.5f;
 
         [ShowInInspector]
         public float barWidth {
@@ -157,6 +159,7 @@ namespace Primer.Graph
                 }
             }
 
+            gnome.Purge();
             renderedData = data;
         }
 

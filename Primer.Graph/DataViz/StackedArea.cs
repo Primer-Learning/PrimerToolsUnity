@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
+    [ExecuteAlways]
+    [RequireComponent(typeof(GraphDomain))]
     public class StackedArea : MonoBehaviour, IDisposable
     {
         public List<ILine> renderedData = new();

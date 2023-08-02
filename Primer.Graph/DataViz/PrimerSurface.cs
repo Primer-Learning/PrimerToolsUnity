@@ -197,7 +197,7 @@ namespace Primer.Graph
         }
 
         #region Drawing mesh
-        private static Vector3[] DefinePoints(IGrid grid)
+        private Vector3[] DefinePoints(IGrid grid)
         {
             var points2D = grid.points;
             var colCount = points2D.GetLength(0);
@@ -206,7 +206,7 @@ namespace Primer.Graph
 
             for (var y = 0; y < rowCount; y++) {
                 for (var x = 0; x < colCount; x++) {
-                    var p = points2D[x, y];
+                    var p = domain.TransformPoint(points2D[x, y]);
                     points[y * colCount + x] = new Vector3(p.x, p.y, -p.z);
                 }
             }
