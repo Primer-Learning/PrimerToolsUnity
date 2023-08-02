@@ -27,7 +27,7 @@ namespace Primer.Graph
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
         #region public bool rotateQuads;
-        [FormerlySerializedAs("_rotateTriangles")] [FormerlySerializedAs("_invertTriangles")] [SerializeField, HideInInspector]
+        [FormerlySerializedAs("_invertTriangles")] [SerializeField, HideInInspector]
         private bool _rotateQuads;
 
         [ShowInInspector]
@@ -35,6 +35,20 @@ namespace Primer.Graph
             get => _rotateQuads;
             set {
                 _rotateQuads = value;
+                Render();
+            }
+        }
+        #endregion
+        
+        #region public bool rotateQuads;
+        [FormerlySerializedAs("_rotateTriangles")] [FormerlySerializedAs("_invertTriangles")] [SerializeField, HideInInspector]
+        private bool _doubleSided = true;
+
+        [ShowInInspector]
+        public bool doubleSided {
+            get => _doubleSided;
+            set {
+                _doubleSided = value;
                 Render();
             }
         }
@@ -193,23 +207,26 @@ namespace Primer.Graph
             int[] triangles = DefineTriangles(grid.resolution + Vector2Int.one);
 
             // Prepare arrays to contain vertices and triangles for both sides
+            // If doubleSided is false, the empty entries won't matter
             var verticesDouble = new Vector3[vertices.Length * 2];
             var trianglesDouble = new int[triangles.Length * 2];
             
-            // Fill the doubled vertex array
+            // Fill the vertices and triangles for the first side
             vertices.CopyTo(verticesDouble, 0);
-            vertices.CopyTo(verticesDouble, vertices.Length);
-
-            
-            // Add the first set of triangles
             triangles.CopyTo(trianglesDouble, 0);
-            // Add the copied set of triangles, but reverse the order of the vertices for each one
-            // so that the normals point in the opposite direction.
-            for (var i = 0; i < triangles.Length; i += 3)
+
+            if (_doubleSided)
             {
-                trianglesDouble[i + triangles.Length] = triangles[i + 2] + vertices.Length;
-                trianglesDouble[i + 1 + triangles.Length] = triangles[i + 1] + vertices.Length;
-                trianglesDouble[i + 2 + triangles.Length] = triangles[i] + vertices.Length;
+                // Add the copied set of vertices
+                vertices.CopyTo(verticesDouble, vertices.Length);
+                // Add the copied set of triangles, but reverse the order of the vertices for each one
+                // so that the normals point in the opposite direction.
+                for (var i = 0; i < triangles.Length; i += 3)
+                {
+                    trianglesDouble[i + triangles.Length] = triangles[i + 2] + vertices.Length;
+                    trianglesDouble[i + 1 + triangles.Length] = triangles[i + 1] + vertices.Length;
+                    trianglesDouble[i + 2 + triangles.Length] = triangles[i] + vertices.Length;
+                }
             }
 
             var mesh = new Mesh {
