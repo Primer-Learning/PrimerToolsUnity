@@ -76,6 +76,20 @@ namespace Primer.Graph
         }
         #endregion
 
+        #region public bool doubleSided;
+        [SerializeField, HideInInspector]
+        private bool _doubleSided = false;
+
+        [ShowInInspector]
+        public bool doubleSided {
+            get => _doubleSided;
+            set {
+                _doubleSided = value;
+                Render();
+            }
+        }
+        #endregion
+        
         private void OnEnable()
         {
             domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
@@ -262,9 +276,17 @@ namespace Primer.Graph
                 }
             }
 
+            var vertexArray = vertices.ToArray();
+            var triangleArray = triangles.ToArray();
+            
+            if (_doubleSided)
+            {
+                MeshUtilities.MakeDoubleSided(ref vertexArray, ref triangleArray);
+            }
+
             var mesh = new Mesh {
-                vertices = vertices.ToArray(),
-                triangles = triangles.ToArray(),
+                vertices = vertexArray,
+                triangles = triangleArray,
             };
             mesh.RecalculateNormals();
 
