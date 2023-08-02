@@ -44,6 +44,8 @@ namespace Primer.Animation
         public float totalDuration => duration + delay;
         internal float tStart => 1 / totalDuration * delay;
 
+        public void Apply() => Evaluate(1);
+
         public virtual void Evaluate(float t)
         {
             if (delay is not 0) {

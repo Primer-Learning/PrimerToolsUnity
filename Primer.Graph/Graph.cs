@@ -60,7 +60,7 @@ namespace Primer.Graph
 
         [FormerlySerializedAs("containerCache")]
         public Gnome<Graph> gnomeCache;
-        public Gnome<Graph> gnome => gnomeCache ??= InitializeContainer();
+        public Gnome<Graph> gnome => gnomeCache ??= InitializeGnome();
 
         public Vector3 domain { get; private set; }
 
@@ -80,7 +80,7 @@ namespace Primer.Graph
         public Tween GrowZAxis(float newMin, float newMax)
         {
             enableZAxis = true;
-            return z.GrowFromOrigin(newMax, newMax);
+            return z.GrowFromOrigin(newMin, newMax);
         }
 
         public Tween ShrinkZAxis()
@@ -197,7 +197,7 @@ namespace Primer.Graph
 
         public void Reset()
         {
-            gnomeCache = InitializeContainer();
+            gnomeCache = InitializeGnome();
         }
 
         public void Dispose()
@@ -206,7 +206,7 @@ namespace Primer.Graph
             gameObject.SetActive(false);
         }
 
-        private Gnome<Graph> InitializeContainer()
+        private Gnome<Graph> InitializeGnome()
         {
             var result = Gnome.For(this);
             result.Insert(xAxis);
