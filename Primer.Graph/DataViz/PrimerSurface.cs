@@ -5,6 +5,7 @@ using Primer.Animation;
 using Primer.Shapes;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
@@ -25,15 +26,15 @@ namespace Primer.Graph
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
-        #region public bool invertTriangles;
-        [SerializeField, HideInInspector]
-        private bool _invertTriangles;
+        #region public bool rotateQuads;
+        [FormerlySerializedAs("_rotateTriangles")] [FormerlySerializedAs("_invertTriangles")] [SerializeField, HideInInspector]
+        private bool _rotateQuads;
 
         [ShowInInspector]
-        public bool invertTriangles {
-            get => _invertTriangles;
+        public bool rotateQuads {
+            get => _rotateQuads;
             set {
-                _invertTriangles = value;
+                _rotateQuads = value;
                 Render();
             }
         }
@@ -250,7 +251,7 @@ namespace Primer.Graph
                     var bottomLeft = (y + 1) * size.x + x;
                     var bottomRight = (y + 1) * size.x + x + 1;
 
-                    if (invertTriangles) {
+                    if (rotateQuads) {
                         triangles.AddTriangle(topRight, topLeft, bottomLeft);
                         triangles.AddTriangle(topRight, bottomLeft, bottomRight);
                     }
