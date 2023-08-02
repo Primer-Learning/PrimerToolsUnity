@@ -262,11 +262,13 @@ namespace Primer.Graph
                 }
             }
 
-            meshFilter.mesh = new Mesh {
+            var mesh = new Mesh {
                 vertices = vertices.ToArray(),
                 triangles = triangles.ToArray(),
             };
+            mesh.RecalculateNormals();
 
+            meshFilter.mesh = mesh;
             renderedLine = line;
         }
 
