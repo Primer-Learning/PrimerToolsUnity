@@ -7,7 +7,7 @@ namespace Primer
     {
         public Transform Add(string name = null, ChildOptions options = null)
         {
-            var child = FindChild<Transform>(name) ?? OnCreate(new GameObject(name).transform);
+            var child = FindChild<Transform>(name) ?? OnCreate(CreateObject(name).transform);
             Insert(child, options);
             return child;
         }
@@ -15,7 +15,7 @@ namespace Primer
         public TChild Add<TChild>(string name = null, ChildOptions options = null)
             where TChild : Component
         {
-            var child = FindChild<TChild>(name) ?? OnCreate(new GameObject(name).AddComponent<TChild>());
+            var child = FindChild<TChild>(name) ?? OnCreate(CreateObject(name).AddComponent<TChild>());
             Insert(child, options);
             return child;
         }
@@ -42,6 +42,13 @@ namespace Primer
             Insert(child, options);
             provider.Initialize(child);
             return child;
+        }
+
+        private GameObject CreateObject(string name)
+        {
+            var go = new GameObject(name);
+            go.SetActive(false);
+            return go;
         }
 
         private TChild FindChild<TChild>(string childName) where TChild : Component

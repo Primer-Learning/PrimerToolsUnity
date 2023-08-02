@@ -48,10 +48,8 @@ namespace Primer
 
         public static void Dispose(Component component)
         {
-            if (component == null)
-                return;
-
-            new Gnome(component).Dispose();
+            if (component != null)
+                new Gnome(component, setActive: false).Dispose();
         }
     }
 }

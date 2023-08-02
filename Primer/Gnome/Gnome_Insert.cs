@@ -16,16 +16,14 @@ namespace Primer
             options ??= new ChildOptions();
             var t = child.transform;
 
-            if (options.enable)
-                t.SetActive(true);
-
             if (t.parent != transform)
                 t.SetParent(transform, options.worldPositionStays);
 
+            if (options.enable)
+                t.SetActive(true);
+
             if (options.zeroScale)
-            {
                 t.localScale = Vector3.zero;
-            }
 
             if (options.ignoreSiblingOrder) {
                 usedChildren.Add(t);

@@ -35,8 +35,6 @@ namespace Primer
         // ReSharper disable Unity.PerformanceAnalysis
         private TChild OnCreate<TChild>(TChild child) where TChild : Component
         {
-            child.SetActive(false);
-
             if (onCreate is null || areEventsDeactivated)
                 return child;
 
