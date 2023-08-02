@@ -263,7 +263,7 @@ namespace Primer.Graph
             }
 
             meshFilter.mesh = new Mesh {
-                vertices = vertices.Select(domain.TransformPoint).ToArray(),
+                vertices = vertices.ToArray(),
                 triangles = triangles.ToArray(),
             };
 
