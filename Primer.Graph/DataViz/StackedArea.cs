@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Primer.Shapes;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Primer.Graph
@@ -19,6 +20,20 @@ namespace Primer.Graph
         private GraphDomain domainCache;
         private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
+        #region public bool doubleSided;
+        [SerializeField, HideInInspector]
+        private bool _doubleSided = true;
+
+        [ShowInInspector]
+        public bool doubleSided {
+            get => _doubleSided;
+            set {
+                _doubleSided = value;
+                Render();
+            }
+        }
+        #endregion
+        
         private void OnEnable()
         {
             domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
@@ -159,10 +174,18 @@ namespace Primer.Graph
                 var area = gnome.Add<MeshRenderer>($"Area {i}");
                 area.material = RendererExtensions.defaultMaterial;
                 area.SetColor(colors[i]);
+                
+                var vertexArray = points.ToArray();
+                var triangleArray = triangles.ToArray();
+
+                if (doubleSided)
+                {
+                    MeshUtilities.MakeDoubleSided(ref vertexArray, ref triangleArray);
+                }
 
                 var mesh = new Mesh {
-                    vertices = points.ToArray(),
-                    triangles = triangles.ToArray(),
+                    vertices = vertexArray,
+                    triangles = triangleArray
                 };
                 mesh.RecalculateNormals();
 
