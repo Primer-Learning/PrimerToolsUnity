@@ -185,10 +185,35 @@ namespace Primer.Graph
         {
             if (grid is null)
                 return;
+            
+            
+            // Create vertices and triangles for one side
+            Vector3[] vertices = DefinePoints(grid);
+            int[] triangles = DefineTriangles(grid.resolution + Vector2Int.one);
+
+            // Prepare arrays to contain vertices and triangles for both sides
+            var verticesDouble = new Vector3[vertices.Length * 2];
+            var trianglesDouble = new int[triangles.Length * 2];
+            
+            // Fill the doubled vertex array
+            vertices.CopyTo(verticesDouble, 0);
+            vertices.CopyTo(verticesDouble, vertices.Length);
+
+            
+            // Add the first set of triangles
+            triangles.CopyTo(trianglesDouble, 0);
+            // Add the copied set of triangles, but reverse the order of the vertices for each one
+            // so that the normals point in the opposite direction.
+            for (var i = 0; i < triangles.Length; i += 3)
+            {
+                trianglesDouble[i + triangles.Length] = triangles[i + 2] + vertices.Length;
+                trianglesDouble[i + 1 + triangles.Length] = triangles[i + 1] + vertices.Length;
+                trianglesDouble[i + 2 + triangles.Length] = triangles[i] + vertices.Length;
+            }
 
             var mesh = new Mesh {
-                vertices = DefinePoints(grid),
-                triangles = DefineTriangles(grid.resolution + Vector2Int.one),
+                vertices = verticesDouble,
+                triangles = trianglesDouble
             };
 
             mesh.RecalculateNormals();
@@ -227,11 +252,11 @@ namespace Primer.Graph
 
                     if (invertTriangles) {
                         triangles.AddTriangle(topRight, topLeft, bottomLeft);
-                        triangles.AddTriangle(topRight, bottomRight, bottomLeft);
+                        triangles.AddTriangle(topRight, bottomLeft, bottomRight);
                     }
                     else {
                         triangles.AddTriangle(topLeft, topRight, bottomRight);
-                        triangles.AddTriangle(topLeft, bottomLeft, bottomRight);
+                        triangles.AddTriangle(topLeft, bottomRight, bottomLeft);
                     }
                 }
             }

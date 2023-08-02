@@ -9,9 +9,6 @@ namespace Primer.Shapes
             triangles.Add(a);
             triangles.Add(b);
             triangles.Add(c);
-            triangles.Add(a);
-            triangles.Add(c);
-            triangles.Add(b);
         }
     }
 }
