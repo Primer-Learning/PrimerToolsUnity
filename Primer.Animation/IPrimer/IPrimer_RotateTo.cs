@@ -142,16 +142,34 @@ namespace Primer.Animation
         // Only in Transform, all other overloads redirect here
         public static Tween RotateTo(this Transform self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
-            var initial = initialRotation ?? self.localRotation;
+            // var initial = initialRotation ?? self.localRotation;
             var hasFailed = false;
 
-            return new Tween(
-                t => {
+            // return new Tween(
+            //     t => {
+            //         if (hasFailed)
+            //             return;
+            //
+            //         try {
+            //             self.localRotation = Quaternion.Lerp(initial, newRotation, t);
+            //         }
+            //         catch {
+            //             // GPT 4 says quaternion equality check is unreliable, and that Unity does not allow lerping of quaternions
+            //             // that are very close together, for some reason.
+            //             Debug.LogWarning("Tween failed in RotateTo. Quaternions may be too close.");
+            //             hasFailed = true;
+            //             self.localRotation = newRotation;
+            //         }
+            //     }
+            // );
+
+            return Tween.Value(
+                q => {
                     if (hasFailed)
                         return;
-
+                
                     try {
-                        self.localRotation = Quaternion.Lerp(initial, newRotation, t);
+                        self.localRotation = q;
                     }
                     catch {
                         // GPT 4 says quaternion equality check is unreliable, and that Unity does not allow lerping of quaternions
@@ -160,7 +178,9 @@ namespace Primer.Animation
                         hasFailed = true;
                         self.localRotation = newRotation;
                     }
-                }
+                },
+                () => initialRotation ?? self.localRotation,
+                () => newRotation
             );
         }
     }

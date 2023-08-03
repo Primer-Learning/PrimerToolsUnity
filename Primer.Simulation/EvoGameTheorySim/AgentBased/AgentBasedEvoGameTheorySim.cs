@@ -90,16 +90,17 @@ namespace Simulation.GameTheory
             _agentGnome.Purge(defer: true);
         }
 
-        public async UniTask SimulateSingleCycle()
+        public Tween SimulateSingleCycle()
         {
             turn++;
-            await CreateFood();
-            await AgentsGoToTrees();
-            await AgentsEatFood();
-            await AgentsReturnHome();
-            await AgentsReproduceOrDie();
-            
-            CleanUp();
+
+            return Tween.Series(
+                CreateFood(),
+                AgentsGoToTrees(),
+                AgentsEatFood(),
+                AgentsReturnHome(),
+                AgentsReproduceOrDie()
+            ).Observe(onComplete: CleanUp);
         }
 
         private Tween CreateFood()

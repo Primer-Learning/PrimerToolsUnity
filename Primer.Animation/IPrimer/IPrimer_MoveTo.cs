@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -139,21 +140,29 @@ namespace Primer.Animation
 
         // Actual implementation
         // Only in Transform, all other overloads redirect here
-        public static Tween MoveTo(this Transform self, Vector3 newPosition, Vector3? initialPosition = null,
+        public static Tween MoveTo(this Transform self, Vector3 newPosition,
             bool globalSpace = false)
         {
-            var initial = initialPosition ?? (globalSpace ? self.position : self.localPosition);
-
-            // This was removed because if initialPosition is different from self.position (or localPosition)
-            // we want to set it when the tween starts running
-            //
-            // if (initial == newPosition)
-            //     return Tween.noop;
-
-            return new Tween(
-                globalSpace
-                    ? t => self.position = Vector3.Lerp(initial, newPosition, t)
-                    : t => self.localPosition = Vector3.Lerp(initial, newPosition, t)
+            return globalSpace
+                ? Tween.Value(() => self.position, newPosition) 
+                : Tween.Value(() => self.localPosition, newPosition);
+        }
+        
+        // This one lets you use a Func<Vector3> instead of a Vector3, so the target can be dynamic
+        public static Tween MoveTo(this Transform self, Func<Vector3> to,
+            bool globalSpace = false)
+        {
+            if (globalSpace)
+                return Tween.Value(
+                    v => self.position = v,
+                    () => self.position,
+                    to
+                );
+            
+            return Tween.Value(
+                v => self.localPosition = v,
+                () => self.localPosition,
+                to
             );
         }
     }

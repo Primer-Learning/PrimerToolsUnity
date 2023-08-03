@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Primer.Simulation
 {
@@ -41,9 +40,8 @@ namespace Primer.Simulation
         [SerializeField, HideInInspector]
         private List<int> initialStrategyCountList;
 
-        [FormerlySerializedAs("initialStrategyCount")] [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        public Dictionary<T, int> initialAlleleCounts = new() {
-        };
+        [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
+        public Dictionary<T, int> initialAlleleCounts = new();
 
         [Button]
         private void SaveInitialPopulation()

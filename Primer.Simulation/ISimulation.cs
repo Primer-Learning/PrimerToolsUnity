@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Primer.Animation;
 using UnityEngine;
 
 namespace Primer.Simulation
@@ -7,7 +8,7 @@ namespace Primer.Simulation
     {
         public Rng rng { get; }
         public bool skipAnimations { get; }
-        public UniTask SimulateSingleCycle();
+        public Tween SimulateSingleCycle();
     }
 
     public static class ISimulationExtensions

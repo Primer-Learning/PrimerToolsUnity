@@ -119,14 +119,20 @@ namespace Primer.Animation
                 return Tween.empty;
 
             var transform = self.transform;
-
+            
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
                 : transform.localScale;
 
-            return self is IPrimer_CustomScaleTo custom
-                ? custom.ScaleTo(Vector3.one * newScale, initial)
-                : transform.ScaleTo(Vector3.one * newScale, initial);
+            if (self is IPrimer_CustomScaleTo custom)
+            {
+                return custom.ScaleTo(Vector3.one * newScale, initial);
+            }
+            
+            if (initialScale.HasValue)
+                return transform.ScaleTo(Vector3.one * newScale, initial);
+
+            return transform.ScaleTo(Vector3.one * newScale);
         }
 
         public static Tween ScaleTo(this Component self, Vector3 newScale, Vector3? initialScale = null)
@@ -145,11 +151,14 @@ namespace Primer.Animation
         // Only in Transform, all other overloads redirect here
         public static Tween ScaleTo(this Transform self, Vector3 newScale, Vector3? initialScale = null)
         {
-            var from = initialScale.HasValue
-                ? initialScale.Value
-                : self.GetIntrinsicScale();
-
-            return new Tween(t => self.localScale = Vector3.Lerp(from, newScale, t));
+            if (initialScale.HasValue) return new Tween(t => self.localScale = Vector3.Lerp(initialScale.Value, newScale, t));
+            
+            // If initialScale hasn't been given, allow the initial value to be determined later.
+            return Tween.Value(
+                v => self.localScale = v,
+                () => self.localScale,
+                () => newScale
+            );
         }
     }
 }

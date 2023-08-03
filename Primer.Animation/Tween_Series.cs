@@ -45,7 +45,13 @@ namespace Primer.Animation
                     while (t > cursorEndT) {
                         tweenList[cursor].Evaluate(1);
                         cursor++;
+                        
+                        // Debug.Log($"Failed to evaluate tween {cursor + 1} of {tweenList.Length}");
+                        // Debug.Log($"t: {t}\n cursorEndT : {cursorEndT}\n cursor : {cursor}\n cursorEnd : {cursorEnd}\n cursorStartT : {cursorStartT}\n fullDuration : {fullDuration}");
+                        
                         tweenList[cursor].Evaluate(0);
+                        
+
 
                         var cursorStart = cursorEnd;
                         cursorEnd += tweenList[cursor].duration;
