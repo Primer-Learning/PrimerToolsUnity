@@ -127,18 +127,19 @@ namespace Primer.Graph
         #endregion
 
         #region AddPoint(float | Vector2 | Vector3)
-        public void AddPoint(float data)
+        public void AddPoint(params float[] data)
         {
             var addTo = GetCurrentDiscreteLine();
-            incomingLine = GetCurrentDiscreteLine().Append(new Vector3(addTo.points.Length, data, 0));
+            var points = data.Select((y, i) => new Vector3(addTo.points.Length + i, y, 0));
+            incomingLine = GetCurrentDiscreteLine().Append(points.ToArray());
         }
 
-        public void AddPoint(Vector2 data)
+        public void AddPoint(params Vector2[] data)
         {
-            incomingLine = GetCurrentDiscreteLine().Append(data);
+            incomingLine = GetCurrentDiscreteLine().Append(data.Cast<Vector3>().ToArray());
         }
 
-        public void AddPoint(Vector3 data)
+        public void AddPoint(params Vector3[] data)
         {
             incomingLine = GetCurrentDiscreteLine().Append(data);
         }
