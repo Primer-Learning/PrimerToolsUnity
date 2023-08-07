@@ -7,8 +7,10 @@ namespace Primer.Animation
 {
     public partial record Tween(Action<float> lerp) : IDisposable
     {
-        public static Tween empty = new(_ => {});
-        public static Tween noop = empty with { duration = 0 };
+        public const int DEFAULT_DURATION_MS = 500;
+        public const float DEFAULT_DURATION = DEFAULT_DURATION_MS / 1000f;
+
+        public static Tween noop = new Tween(_ => {}) with { duration = 0 };
 
         public IEasing easing { get; init; } = IEasing.defaultMethod;
 
@@ -16,7 +18,7 @@ namespace Primer.Animation
 
         #region public float duration;
         internal bool isCalculated { get; set; } = false;
-        internal int ms { get; set; } = 500;
+        internal int ms { get; set; } = DEFAULT_DURATION_MS;
 
         public int milliseconds {
             get => ms;
