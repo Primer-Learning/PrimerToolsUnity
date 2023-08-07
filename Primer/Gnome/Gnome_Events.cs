@@ -30,11 +30,24 @@ namespace Primer
         public Action<Transform> onCreate;
         public Action<Transform, bool> onRemove;
 
+        private readonly List<Transform> created = new();
         public IEnumerable<Transform> removing => GetChildrenBeingRemoved(transform);
+
+        public bool IsCreated(Component child)
+        {
+            return created.Contains(child.transform);
+        }
+
+        public IReadOnlyList<Transform> GetCreatedChildren()
+        {
+            return created;
+        }
 
         // ReSharper disable Unity.PerformanceAnalysis
         private TChild OnCreate<TChild>(TChild child) where TChild : Component
         {
+            created.Add(child.transform);
+
             if (onCreate is null || areEventsDeactivated)
                 return child;
 

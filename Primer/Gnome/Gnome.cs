@@ -49,6 +49,7 @@ namespace Primer
 
         public void Reset()
         {
+            created.Clear();
             usedChildren.Clear();
             unusedChildren.Clear();
             unusedChildren.AddRange(ReadExistingChildren(transform));
