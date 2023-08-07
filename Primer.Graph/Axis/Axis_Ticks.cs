@@ -226,13 +226,13 @@ namespace Primer.Graph
                 .Select(x => x.GetComponent<AxisTick>())
                 .OrderByDescending(x => Mathf.Abs(x.value))
                 .Select(
-                    tick => Tween.Parallel(
-                        tick.ScaleTo(0, 1),
-                        tick.MoveTo(GetPosition(tick))
-                    )
-                    .Observe(onDispose: tick.Dispose)
-                )
-                .ToList();
+                    tick => {
+                        updateTweens.Add(tick.MoveTo(GetPosition(tick)));
+
+                        return tick.ScaleTo(0, 1)
+                            .Observe(onDispose: tick.Dispose);
+                    }
+                );
 
             return (
                 addTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION),
