@@ -1,3 +1,4 @@
+using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -35,23 +36,25 @@ namespace Primer.Graph
         }
         #endregion
 
-        private void UpdateArrows(Gnome gnome)
+        private Tween TransitionArrows(Gnome gnome)
         {
-            var domain = this;
-
             if (arrowPresence == ArrowPresence.Neither)
-                return;
+                return null;
 
             var endArrow = gnome.Add(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
-            endArrow.localPosition = new Vector3(domain.rodEnd, 0f, 0f);
+            var endArrowPos = new Vector3(rodEnd, 0f, 0f);
+            var endArrowTween = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
 
             if (arrowPresence != ArrowPresence.Both)
-                return;
+                return endArrowTween;
 
             var originArrow = gnome.Add(arrowPrefab, "Origin Arrow");
             originArrow.localRotation = Quaternion.Euler(0f, -90f, 0f);
-            originArrow.localPosition = new Vector3(domain.rodStart, 0f, 0f);
+            var originArrowPos = new Vector3(rodStart, 0f, 0f);
+            var originArrowTween = originArrowPos == originArrow.localPosition ? null : originArrow.MoveTo(originArrowPos);
+
+            return Tween.Parallel(endArrowTween, originArrowTween);
         }
     }
 }

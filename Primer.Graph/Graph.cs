@@ -11,20 +11,9 @@ namespace Primer.Graph
     [RequireComponent(typeof(MultipleAxesController))]
     public class Graph : MonoBehaviour, IDisposable
     {
-        #region public bool enableZAxis;
-        [SerializeField, HideInInspector]
-        private bool _enableZAxis;
-
         [Title("Graph controls")]
-        [ShowInInspector]
-        public bool enableZAxis {
-            get => _enableZAxis;
-            set {
-                _enableZAxis = value;
-                UpdateAxes();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_enableZAxis")]
+        public bool enableZAxis;
 
         [EnableIf(nameof(enableZAxis))]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
@@ -90,17 +79,24 @@ namespace Primer.Graph
 
         public Tween GrowFromOrigin(float newMax)
         {
+            z?.SetActive(enableZAxis);
             return axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
         }
 
         public Tween GrowFromOrigin(float newMin, float newMax)
         {
+            z?.SetActive(enableZAxis);
             return axes.Select(axis => axis.GrowFromOrigin(newMin, newMax)).RunInParallel();
         }
 
         public Tween ShrinkToOrigin()
         {
             return axes.Select(axis => axis.ShrinkToOrigin()).RunInParallel();
+        }
+
+        public Tween Transition()
+        {
+            return axes.Select(axis => axis.Transition()).RunInParallel();
         }
 
         private void UpdateAxes()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Animation;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -180,37 +181,64 @@ namespace Primer.Graph
         #endregion
 
 
-        public void UpdateTicks(Gnome parentGnome)
+        private List<TickData> PrepareTicks()
         {
             if (!showTicks || step <= 0 || tickPrefab.isEmpty)
-                return;
-
-            var domain = this;
-            var gnome = parentGnome
-                .AddGnome("Ticks container")
-                .ScaleGrandchildrenInPlayMode()
-                .SetDefaults();
+                return new List<TickData>();
 
             var expectedTicks = manualTicks.Count != 0
                 ? manualTicks
                 : CalculateTics();
 
-            foreach (var data in CropTicksCount(expectedTicks)) {
+            return CropTicksCount(expectedTicks);
+        }
+
+        private (Tween add, Tween update, Tween remove) TransitionTicks(Gnome parentGnome)
+        {
+            var gnome = parentGnome
+                .AddGnome("Ticks container")
+                .SetDefaults();
+
+            var addTweens = new List<Tween>();
+            var updateTweens = new List<Tween>();
+
+            Vector3 GetPosition(AxisTick tick) => new((tick.value + valuePositionOffset) * scale, tickOffset, 0);
+
+            foreach (var data in PrepareTicks()) {
                 var tick = gnome.Add(tickPrefab, $"Tick {data.label}");
                 tick.value = data.value;
                 tick.label = data.label;
-                tick.transform.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, tickOffset, 0);
+
+                if (gnome.IsCreated(tick)) {
+                    tick.transform.localPosition = GetPosition(tick);
+                    tick.transform.SetScale(0);
+                    addTweens.Add(tick.ScaleTo(1, 0));
+                }
+                else {
+                    updateTweens.Add(tick.MoveTo(GetPosition(tick)));
+                }
 
                 if (lockTickOrientation.enabled)
                     lockTickOrientation.value.ApplyTo(tick.latex);
             }
 
-            foreach (var removing in gnome.removing) {
-                var data = removing.GetComponent<AxisTick>();
-                removing.localPosition = new Vector3((data.value + valuePositionOffset) * domain.scale, tickOffset, 0);
-            }
+            var removeTweens = gnome.ManualPurge(defer: true)
+                .Select(x => x.GetComponent<AxisTick>())
+                .OrderByDescending(x => Mathf.Abs(x.value))
+                .Select(
+                    tick => Tween.Parallel(
+                        tick.ScaleTo(0, 1),
+                        tick.MoveTo(GetPosition(tick))
+                    )
+                    .Observe(onDispose: tick.Dispose)
+                )
+                .ToList();
 
-            gnome.Purge();
+            return (
+                addTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION),
+                updateTweens.RunInParallel(),
+                removeTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION)
+            );
         }
 
         private List<TickData> CropTicksCount(List<TickData> ticks)

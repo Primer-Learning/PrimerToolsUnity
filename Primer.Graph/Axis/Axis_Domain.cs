@@ -19,7 +19,7 @@ namespace Primer.Graph
                     return;
 
                 _range = value;
-                DomainChanged();
+                hasDomainChanged = true;
             }
         }
         #endregion
@@ -33,8 +33,11 @@ namespace Primer.Graph
         public float scale {
             get => _scale;
             set {
+                if (_scale == value)
+                    return;
+
                 _scale = value;
-                DomainChanged();
+                hasDomainChanged = true;
             }
         }
         #endregion
@@ -61,18 +64,12 @@ namespace Primer.Graph
 
         public float min {
             get => _range.min;
-            set {
-                _range.min = value;
-                UpdateChildren();
-            }
+            set => _range.min = value;
         }
 
         public float max {
             get => _range.max;
-            set {
-                _range.max = value;
-                UpdateChildren();
-            }
+            set => _range.max = value;
         }
 
 

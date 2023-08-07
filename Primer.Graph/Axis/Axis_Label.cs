@@ -1,3 +1,4 @@
+using Primer.Animation;
 using Primer.Latex;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -83,19 +84,20 @@ namespace Primer.Graph
         }
         #endregion
 
-        public void UpdateLabel(Gnome gnome)
+        private Tween TransitionLabel(Gnome gnome)
         {
-            var domain = this;
             var labelTransform = gnome.AddLatex(label, "Label").transform;
 
-            var pos = labelPosition switch {
-                AxisLabelPosition.Along => new Vector3(domain.length / 2, 0f, 0f),
-                AxisLabelPosition.End => new Vector3(domain.rodEnd + X_OFFSET, 0f, 0f),
+            var pos = labelOffset + (labelPosition switch {
+                AxisLabelPosition.Along => new Vector3(length / 2, 0f, 0f),
+                AxisLabelPosition.End => new Vector3(rodEnd + X_OFFSET, 0f, 0f),
                 _ => Vector3.zero,
-            };
+            });
 
-            labelTransform.localPosition = pos + labelOffset;
-            labelTransform.localRotation = labelRotation;
+            return Tween.Parallel(
+                pos == labelTransform.localPosition ? null : labelTransform.MoveTo(pos),
+                labelRotation == labelTransform.localRotation ? null : labelTransform.RotateTo(labelRotation)
+            );
         }
     }
 }
