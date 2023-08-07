@@ -191,6 +191,9 @@ namespace Primer.Timeline
             if (ct.IsCancellationRequested)
                 return true;
 
+            if (currentTween is not null)
+                currentTween.Dispose();
+
             activeClip = clip;
             currentTween = hasMore ? enumerator.Current : null;
 
