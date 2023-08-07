@@ -48,12 +48,18 @@ namespace Primer.Graph
 
         public static Tween Shrink(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
-            return self.axes.Select(axis => axis.Shrink(amount, amountNegative)).RunInParallel();
+            return self.axes.Select(axis => axis.Grow(-amount, -amountNegative)).RunInParallel();
         }
 
         public static Tween GrowInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
             return self.axes.Select(axis => axis.GrowInSameSpace(amount, amountNegative)).RunInParallel();
+        }
+
+
+        public static Tween ShrinkInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
+        {
+            return self.axes.Select(axis => axis.GrowInSameSpace(-amount, -amountNegative)).RunInParallel();
         }
     }
 }

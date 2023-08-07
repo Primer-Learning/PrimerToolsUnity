@@ -48,7 +48,6 @@ namespace Primer.Graph
             return Transition();
         }
 
-        public Tween Shrink(float amount = 1, float amountNegative = 0) => Grow(-amount, -amountNegative);
         public Tween Grow(float amount = 1, float amountNegative = 0)
         {
             min -= amountNegative;
