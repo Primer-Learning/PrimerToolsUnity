@@ -10,7 +10,6 @@
     "Primer.Animation",
     "Primer.Timeline",
     "Primer.Latex",
-    "Primer.Shapes",
-    "Primer.Axis"
+    "Primer.Shapes"
   ]
 }
