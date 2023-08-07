@@ -11,11 +11,12 @@ namespace Primer.Graph
     {
         private bool hasDomainChanged = false;
         private Action onDomainChange;
+        private float? lastReportedScale = null;
 
         public float DomainToPosition(float domainValue)
         {
             return isActiveAndEnabled
-                ? domainValue * scale
+                ? domainValue * (lastReportedScale ?? scale)
                 : 0;
         }
 
@@ -32,34 +33,6 @@ namespace Primer.Graph
         public void OnEnable() => UpdateChildren();
         public void OnValidate() => UpdateChildren();
 
-
-        public Tween GrowFromOrigin() => GrowFromOrigin(min, max);
-        public Tween GrowFromOrigin(float newMax) => GrowFromOrigin(min, newMax);
-        public Tween GrowFromOrigin(float newMin, float newMax)
-        {
-            range = new MinMax { min = 0, max = 0 };
-            UpdateChildren();
-
-            range = new MinMax { min = newMin, max = newMax };
-            this.SetActive(true);
-
-            return Tween.Parallel(
-                delayBetweenStarts: 0.1f,
-                this.ScaleTo(1, initialScale: 0),
-                Transition()
-            );
-        }
-
-        public Tween ShrinkToOrigin()
-        {
-            range = new MinMax { min = 0, max = 0 };
-
-            return Tween.Parallel(
-                delayBetweenStarts: 0.1f,
-                Transition(),
-                this.ScaleTo(0, initialScale: 1)
-            );
-        }
 
         public Tween Transition()
         {
@@ -92,8 +65,16 @@ namespace Primer.Graph
             );
 
             if (hasDomainChanged) {
-                update = update.Observe(afterUpdate: t => onDomainChange?.Invoke());
                 hasDomainChanged = false;
+                lastReportedScale ??= scale;
+                var prevScale = lastReportedScale.Value;
+
+                update = update.Observe(
+                    afterUpdate: t => {
+                        lastReportedScale = Mathf.Lerp(prevScale, scale, t);
+                        onDomainChange?.Invoke();
+                    }
+                );
             }
 
             return Tween.Parallel(

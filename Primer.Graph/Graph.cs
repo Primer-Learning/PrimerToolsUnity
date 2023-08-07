@@ -9,7 +9,7 @@ namespace Primer.Graph
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph : MonoBehaviour, IDisposable
+    public class Graph : MonoBehaviour, IDisposable, IAxisController
     {
         [Title("Graph controls")]
         [FormerlySerializedAs("_enableZAxis")]
@@ -55,7 +55,15 @@ namespace Primer.Graph
 
         public Action onDomainChanged;
 
-        private Axis[] axes => enableZAxis && z?.transform.localScale.z is not 0
+        public float scale {
+            set {
+                x.scale = value;
+                y.scale = value;
+                z.scale = value;
+            }
+        }
+
+        public Axis[] axes => enableZAxis && z?.transform.localScale.z is not 0
             ? new [] { x, y, z }
             : new [] { x, y };
 
@@ -75,23 +83,6 @@ namespace Primer.Graph
         public Tween ShrinkZAxis()
         {
             return z.ShrinkToOrigin().Observe(onComplete: () => enableZAxis = false);
-        }
-
-        public Tween GrowFromOrigin(float newMax)
-        {
-            z?.SetActive(enableZAxis);
-            return axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
-        }
-
-        public Tween GrowFromOrigin(float newMin, float newMax)
-        {
-            z?.SetActive(enableZAxis);
-            return axes.Select(axis => axis.GrowFromOrigin(newMin, newMax)).RunInParallel();
-        }
-
-        public Tween ShrinkToOrigin()
-        {
-            return axes.Select(axis => axis.ShrinkToOrigin()).RunInParallel();
         }
 
         public Tween Transition()
