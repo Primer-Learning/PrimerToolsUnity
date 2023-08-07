@@ -22,11 +22,14 @@ namespace Primer
         public List<Transform> ManualPurge(bool defer = false)
         {
             var toRemove = new List<Transform>(unusedChildren);
+            unusedChildren.Clear();
+
+            foreach (var child in toRemove)
+                child.GetOrAddComponent<GnomeEvents.IsRemoving>();
 
             foreach (var listener in onPurge)
                 listener(defer);
 
-            unusedChildren.Clear();
             return toRemove;
         }
 
