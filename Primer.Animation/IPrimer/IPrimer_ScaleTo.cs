@@ -80,7 +80,7 @@ namespace Primer.Animation
 
         public static Tween ScaleTo(this IPrimer self, Vector3 newScale, Vector3? initialScale = null)
         {
-            var initial = initialScale ?? self.GetIntrinsicScale();
+            var initial = initialScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(newScale, initial)
@@ -96,7 +96,7 @@ namespace Primer.Animation
         public static Tween ScaleUpFromZero(this Component self, Vector3? targetScale = null)
         {
             var initial = Vector3.zero;
-            var target = targetScale ?? self.GetIntrinsicScale();
+            var target = targetScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
@@ -105,7 +105,7 @@ namespace Primer.Animation
 
         public static Tween ScaleDownToZero(this Component self, Vector3? initialScale = null)
         {
-            var initial = initialScale ?? self.GetIntrinsicScale();
+            var initial = initialScale ?? self.transform.localScale;
             var target = Vector3.zero;
 
             return self is IPrimer_CustomScaleTo custom
