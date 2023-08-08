@@ -1,25 +1,13 @@
 using Primer.Animation;
-using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     public partial class Axis
     {
-        #region public float thickness;
-        [SerializeField, HideInInspector]
-        private float _thickness = 1;
-
-        [Title("Rod")]
-        [ShowInInspector]
-        public float thickness {
-            get => _thickness;
-            set {
-                _thickness = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_thickness")]
+        public float thickness = 1;
 
         private Tween TransitionRod(Gnome gnome)
         {

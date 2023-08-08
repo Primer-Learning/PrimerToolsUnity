@@ -1,40 +1,18 @@
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     public partial class Axis
     {
-        #region public ArrowPresence arrowPresence;
-        [SerializeField, HideInInspector]
-        private ArrowPresence _arrowPresence = ArrowPresence.Both;
-
         [Title("Arrows")]
-        [ShowInInspector]
-        public ArrowPresence arrowPresence {
-            get => _arrowPresence;
-            set {
-                _arrowPresence = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_arrowPresence")]
+        public ArrowPresence arrowPresence = ArrowPresence.Both;
 
-        #region public PrefabProvider arrowPrefab;
-        [RequiredIn(PrefabKind.PrefabAsset)]
-        [SerializeField, HideInInspector]
-        private PrefabProvider _arrowPrefab;
-
-        [ShowInInspector]
-        public PrefabProvider arrowPrefab {
-            get => _arrowPrefab;
-            set {
-                _arrowPrefab = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_arrowPrefab")] [RequiredIn(PrefabKind.PrefabAsset)]
+        public PrefabProvider arrowPrefab;
 
         private Tween TransitionArrows(Gnome gnome)
         {

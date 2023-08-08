@@ -1,6 +1,7 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
@@ -42,19 +43,8 @@ namespace Primer.Graph
         }
         #endregion
 
-        #region public Vector2 padding;
-        [SerializeField, HideInInspector]
-        private Vector2 _padding = Vector2.zero;
-
-        [ShowInInspector]
-        public Vector2 padding {
-            get => _padding;
-            set {
-                _padding = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_padding")]
+        public Vector2 padding = Vector2.zero;
 
         internal float start => range.min * scale;
         internal float end => range.max * scale;

@@ -5,180 +5,60 @@ using Primer.Animation;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     public partial class Axis
     {
-        #region public bool showTicks;
-        [SerializeField, HideInInspector]
-        private bool _showTicks = true;
-
         [Title("Ticks")]
-        [ShowInInspector]
-        public bool showTicks {
-            get => _showTicks;
-            set {
-                _showTicks = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_showTicks")]
+        public bool showTicks = true;
 
-        #region public bool showZero;
-        [SerializeField, HideInInspector]
-        private bool _showZero;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public bool showZero {
-            get => _showZero;
-            set {
-                _showZero = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_showZero")]
+        public bool showZero;
 
-        #region public Optional<Direction> lockTickOrientation;
-        [SerializeField, HideInInspector]
-        private Optional<Direction> _lockTickOrientation = Direction.Front;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public Optional<Direction> lockTickOrientation {
-            get => _lockTickOrientation;
-            set {
-                _lockTickOrientation = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_lockTickOrientation")]
+        public Optional<Direction> lockTickOrientation = Direction.Front;
 
-        #region public float step;
-        [SerializeField, HideInInspector]
-        private float _step = 2;
-
-        [ShowInInspector]
         [MinValue(0.1f)]
         [EnableIf(nameof(showTicks))]
         [DisableIf("@manualTicks.Count != 0")]
-        public float step {
-            get => _step;
-            set {
-                _step = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_step")]
+        public float step = 2;
 
-        #region public int maxTicks;
-        [SerializeField, HideInInspector]
-        private int _maxTicks = 50;
-
-        [ShowInInspector]
         [PropertyRange(1, 100)]
         [EnableIf(nameof(showTicks))]
-        public int maxTicks {
-            get => _maxTicks;
-            set {
-                _maxTicks = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_maxTicks")]
+        public int maxTicks = 50;
 
-        #region public int maxDecimals;
-        [SerializeField, HideInInspector]
-        private int _maxDecimals = 2;
-
-        [ShowInInspector]
         [PropertyRange(0, 10)]
         [EnableIf(nameof(showTicks))]
-        public int maxDecimals {
-            get => _maxDecimals;
-            set {
-                _maxDecimals = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_maxDecimals")]
+        public int maxDecimals = 2;
 
-        #region public float tickOffset;
-        [SerializeField, HideInInspector]
-        private float _tickOffset;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public float tickOffset {
-            get => _tickOffset;
-            set {
-                _tickOffset = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_tickOffset")]
+        public float tickOffset;
 
-        #region public int labelNumberOffset;
-        [SerializeField, HideInInspector]
-        private int _labelNumberOffset;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public int labelNumberOffset {
-            get => _labelNumberOffset;
-            set {
-                _labelNumberOffset = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_labelNumberOffset")]
+        public int labelNumberOffset;
 
-        #region public float valuePositionOffset;
-        [SerializeField, HideInInspector]
-        private float _valuePositionOffset;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public float valuePositionOffset {
-            get => _valuePositionOffset;
-            set {
-                _valuePositionOffset = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_valuePositionOffset")]
+        public float valuePositionOffset;
 
-        #region public List<TickData> manualTicks;
-        [SerializeField, HideInInspector]
-        private List<TickData> _manualTicks;
-
-        [ShowInInspector]
         [EnableIf(nameof(showTicks))]
-        public List<TickData> manualTicks {
-            get => _manualTicks;
-            set {
-                _manualTicks = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_manualTicks")]
+        public List<TickData> manualTicks;
 
-        #region public PrefabProvider<AxisTick> tickPrefab;
-        [SerializeField, HideInInspector]
-        private PrefabProvider<AxisTick> _tickPrefab;
-
-        [ShowInInspector]
         [RequiredIn(PrefabKind.PrefabAsset)]
         [EnableIf(nameof(showTicks))]
-        public PrefabProvider<AxisTick> tickPrefab {
-            get => _tickPrefab;
-            set {
-                _tickPrefab = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_tickPrefab")]
+        public PrefabProvider<AxisTick> tickPrefab;
 
 
         private List<TickData> PrepareTicks()

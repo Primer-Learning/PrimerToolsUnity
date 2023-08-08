@@ -2,6 +2,7 @@ using Primer.Animation;
 using Primer.Latex;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
@@ -9,80 +10,25 @@ namespace Primer.Graph
     {
         public const float X_OFFSET = 0.4f;
 
-        #region public bool showLabel;
-        [SerializeField, HideInInspector]
-        private bool _showLabel = true;
-
         [Title("Label")]
-        [ShowInInspector]
-        public bool showLabel {
-            get => _showLabel;
-            set {
-                _showLabel = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_showLabel")]
+        public bool showLabel = true;
 
-        #region public string label;
-        [SerializeField, HideInInspector]
-        private string _label = "Label";
-
-        [ShowInInspector]
         [EnableIf(nameof(showLabel))]
-        public string label {
-            get => _label;
-            set {
-                _label = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_label")]
+        public string label = "Label";
 
-        #region public Vector3 labelOffset;
-        [SerializeField, HideInInspector]
-        private Vector3 _labelOffset = Vector3.zero;
-
-        [ShowInInspector]
         [EnableIf(nameof(showLabel))]
-        public Vector3 labelOffset {
-            get => _labelOffset;
-            set {
-                _labelOffset = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_labelOffset")]
+        public Vector3 labelOffset = Vector3.zero;
 
-        #region public Quaternion labelRotation;
-        [SerializeField, HideInInspector]
-        private Quaternion _labelRotation = Quaternion.identity;
-
-        [ShowInInspector]
         [EnableIf(nameof(showLabel))]
-        public Quaternion labelRotation {
-            get => _labelRotation;
-            set {
-                _labelRotation = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_labelRotation")]
+        public Quaternion labelRotation = Quaternion.identity;
 
-        #region public AxisLabelPosition labelPosition;
-        [SerializeField, HideInInspector]
-        private AxisLabelPosition _labelPosition = AxisLabelPosition.End;
-
-        [ShowInInspector]
         [EnableIf(nameof(showLabel))]
-        public AxisLabelPosition labelPosition {
-            get => _labelPosition;
-            set {
-                _labelPosition = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_labelPosition")]
+        public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
         private Tween TransitionLabel(Gnome gnome)
         {
