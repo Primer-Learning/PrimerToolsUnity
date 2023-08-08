@@ -40,6 +40,19 @@ namespace Primer.Timeline.Editor
 
             while (runner.hasMoreClips) {
                 var tween = await runner.NextClip();
+
+                // HACK: We don't know if we reached the end until after we call .NextClip()
+                //
+                // This is because I designed SequenceRunner to be like Javascript's enumerators
+                //   where .Next() returns { value: T, done: boolean }
+                // But C# enumerators work the other way around and I didn't see this until it was too late
+                // I'm sorry 🥲
+                // It can be solved if we change sequenceRunner.NextClip() return a bool instead of a Tween
+                //   and add sequenceRunner.current to get the current Tween
+                // But it's too big of a change to make at this point and this hack may only be needed here
+                if (!runner.hasMoreClips)
+                    break;
+
                 var clip = clips.Count is 0
                     ? track.CreateClip<SequenceClip>()
                     : clips.Pop();
