@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,8 +7,7 @@ using UnityEngine.Serialization;
 namespace Primer.Graph
 {
     [ExecuteAlways]
-    [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph : MonoBehaviour, IDisposable, IAxisController
+    public class Graph : MonoBehaviour, IAxisController, IDisposable
     {
         [Title("Graph controls")]
         [FormerlySerializedAs("_enableZAxis")]
@@ -18,8 +16,6 @@ namespace Primer.Graph
         [EnableIf(nameof(enableZAxis))]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
-
-        private MultipleAxesController axesController;
 
         [Title("Axes references")]
         [FormerlySerializedAs("x")]
@@ -117,8 +113,7 @@ namespace Primer.Graph
                 }
             }
 
-            axesController ??= GetComponent<MultipleAxesController>();
-            axesController.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
+            EnsureDomainDimensions();
         }
 
         public Vector3 DomainToPosition(Vector3 value)
@@ -160,9 +155,9 @@ namespace Primer.Graph
             return gnome.Add<StackedArea>(name);
         }
 
-        public NewBarPlot AddBarPlot(string name)
+        public BarPlot AddBarPlot(string name)
         {
-            return gnome.Add<NewBarPlot>(name);
+            return gnome.Add<BarPlot>(name);
         }
 
         public GraphDomain AddPoint(string name, Vector3? coords = null)
