@@ -32,7 +32,7 @@ namespace Primer.Animation
 
             if (fullDuration is 0) {
                 Debug.LogWarning("Series tween list is empty");
-                return noop with { milliseconds = 0 };
+                return noop;
             }
 
             var cursor = 0;

@@ -9,7 +9,7 @@ namespace Primer.Animation
         public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
         {
             var tweens = tweenList
-                .Where(x => x is not null)
+                .RemoveEmptyTweens()
                 .Select((tween, i) => tween with { delay = delayBetweenStarts * i })
                 .ToArray();
 
@@ -18,19 +18,19 @@ namespace Primer.Animation
 
         public static Tween Parallel(IEnumerable<Tween> tweenList)
         {
-            return Parallel_Internal(tweenList.Where(x => x is not null).ToArray());
+            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
         }
 
         public static Tween Parallel(params Tween[] tweenList)
         {
-            return Parallel_Internal(tweenList.Where(x => x is not null).ToArray());
+            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
         private static Tween Parallel_Internal(Tween[] tweenList)
         {
             if (tweenList.Length is 0)
-                return null;
+                return noop;
 
             if (tweenList.Length is 1)
                 return tweenList[0];
@@ -39,7 +39,7 @@ namespace Primer.Animation
 
             if (fullDuration is 0) {
                 Debug.LogWarning("Parallel tween list is empty");
-                return noop with { milliseconds = 0 };
+                return noop;
             }
 
             var result = new Tween(

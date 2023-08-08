@@ -6,6 +6,11 @@ namespace Primer.Animation
 {
     public static class TweenEnumerableExtensions
     {
+        public static IEnumerable<Tween> RemoveEmptyTweens(this IEnumerable<Tween> tweens)
+        {
+            return tweens.Where(x => x is not null && x != Tween.noop);
+        }
+
         public static Tween RunInParallel(this IEnumerable<Tween> tweens)
         {
             return Tween.Parallel(tweens);
