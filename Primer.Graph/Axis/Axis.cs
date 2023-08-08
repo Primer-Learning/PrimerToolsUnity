@@ -78,14 +78,54 @@ namespace Primer.Graph
             }
 
             return Tween.Parallel(
-                delayBetweenStarts: 0.25f,
+                delayBetweenStarts: 0.1f,
                 // This may be null which will immediately start the tween below
                 removeTicks,
                 update,
                 addTicks
+            )
+            .Observe(
+                afterUpdate: EnsureOnlyOneTransitionAtATime()
             );
         }
 
+        private int lastTransitionId = 0;
+        private Action<float> EnsureOnlyOneTransitionAtATime()
+        {
+            lastTransitionId++;
+            var currentTransition = lastTransitionId;
+
+            return t => {
+                if (currentTransition == lastTransitionId)
+                    return;
+
+                throw new Exception(
+                    @"Two axis.Transition() running at the same time.
+there are two axis.Transition() trying to modify axis {name} as the same time
+this can happen if you combine two graph.Something() operations in a single tween
+you won't like what will happen if we continue this path
+
+If you need to modify multiple properties of a axis (or graph) change them directly
+and call to .Transition() only once after that
+
+    graph.min = 0;
+    graph.max = 10;
+    graph.scale = 1;
+    graph.Transition();
+
+instead of
+
+    // BAD! 👎
+    Tween.Parallel(
+      graph.SetDomain(10, 0)
+      graph.SetScale(1)
+    );
+
+END OF PRIMER MESSAGES
+"
+                );
+            };
+        }
 
         [Button(ButtonSizes.Large)]
         public void UpdateChildren()
