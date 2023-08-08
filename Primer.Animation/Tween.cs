@@ -15,6 +15,7 @@ namespace Primer.Animation
         public IEasing easing { get; init; } = IEasing.defaultMethod;
 
         public float delay = 0f;
+        public string name = "";
 
         #region public float duration;
         internal bool isCalculated { get; set; } = false;

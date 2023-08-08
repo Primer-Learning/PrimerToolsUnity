@@ -59,8 +59,9 @@ namespace Primer.Timeline.Editor
 
                 clip.start = time;
                 clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
-                time = (float)clip.end + gap;
+                clip.displayName = tween?.name ?? "";
 
+                time = (float)clip.end + gap;
                 tween?.Apply();
             }
 

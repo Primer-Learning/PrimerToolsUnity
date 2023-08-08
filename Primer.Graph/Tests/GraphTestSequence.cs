@@ -26,8 +26,8 @@ public class GraphTestSequence : Sequence
         graph.scale = 0.2f;
         graph.enableZAxis = false;
 
-        yield return graph.GrowFromOrigin(10);
-        yield return graph.SetDomain(5);
+        yield return graph.GrowFromOrigin(10) with { name = "Graph appears" };
+        yield return graph.SetDomain(5) with { name = "Graph shrink to 5" };
 
         foreach (var _ in TestLine(graph))
             yield return _;
@@ -44,7 +44,7 @@ public class GraphTestSequence : Sequence
         foreach (var _ in TestBars(graph))
             yield return _;
 
-        yield return graph.ShrinkToOrigin();
+        yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
     }
 
     private static IEnumerable<Tween> TestLine(Graph graph)
@@ -54,7 +54,7 @@ public class GraphTestSequence : Sequence
         blue.width = 0.05f;
         blue.SetColor(PrimerColor.blue);
         blue.SetFunction(x => Mathf.Cos(x * 2) * 5, resolution: 100, xEnd: 5);
-        yield return blue.GrowFromStart();
+        yield return blue.GrowFromStart() with { name = "Blue line" };
 
         // Red is disabled when this method ends
         using var red = graph.AddLine("Red line");
@@ -62,10 +62,10 @@ public class GraphTestSequence : Sequence
         red.SetColor(PrimerColor.red);
         red.SetZIndex(1);
         red.SetData(new float[] { 0, 1, 2, 3 });
-        yield return red.GrowFromStart();
+        yield return red.GrowFromStart() with { name = "Red line" };
 
         blue.SetFunction(x => Mathf.Sin(x * 2) * 5);
-        yield return blue.Transition();
+        yield return blue.Transition() with { name = "Blue transition" };
 
         blue.SetFunction(x => Mathf.Pow(x, 2));
         red.AddPoint(4, 5);
@@ -73,13 +73,15 @@ public class GraphTestSequence : Sequence
         yield return Parallel(
             blue.Transition(),
             red.Transition()
-        );
+        ) with { name = "Lines transition" };
 
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
 
-        yield return blue.ShrinkToEnd();
-        yield return red.ShrinkToEnd();
+        yield return Parallel(
+            blue.ShrinkToEnd(),
+            red.ShrinkToEnd()
+        ) with { name = "Lines go" };
     }
 
     private static IEnumerable<Tween> TestSurface(Graph graph, CameraRig cam)
@@ -91,7 +93,7 @@ public class GraphTestSequence : Sequence
                 distance: 4,
                 swivel: new Vector3(15f, -25f, 0f)
             )
-        );
+        ) with { name = "Adjust camera" };
 
         using var surface = graph.AddSurface("Surface");
 
@@ -101,7 +103,7 @@ public class GraphTestSequence : Sequence
             end: Vector2.one * 5
         );
 
-        yield return surface.GrowFromStart();
+        yield return surface.GrowFromStart() with { name = "Surface appears" };
 
         surface.SetData(new float[,] {
             { 0, 1, 2, 3, 4 },
@@ -111,13 +113,13 @@ public class GraphTestSequence : Sequence
             { 4, 5, 6, 6, 5 },
         });
         // Transition will replace the function points with the data leaving resolution at 2x2
-        yield return surface.Transition();
+        yield return surface.Transition() with { name = "Surface transition" };
 
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
 
         // But we don't care because transitions don't use resolution, they are able smoothly to cut meshes of any resolution
-        yield return surface.ShrinkToEnd();
+        yield return surface.ShrinkToEnd() with { name = "Surfac goes" };
 
         yield return Parallel(
             delayBetweenStarts: 0.1f,
@@ -127,7 +129,7 @@ public class GraphTestSequence : Sequence
                 swivelOrigin: new Vector3(1.1f, 1.1f, 0f),
                 swivel: new Vector3(0f, 0f, 0f)
             )
-        );
+        ) with { name = "Restore camera" };
     }
 
     private static IEnumerable<Tween> TestPoint(Graph graph)
@@ -138,15 +140,15 @@ public class GraphTestSequence : Sequence
 
         // Use `AddPoint()` to get the PrimerBlob back instead of the GraphDomain component
         using var pointA = graph.AddTracker("Point A", blob, new Vector3(2, 5));
-        yield return pointA.ScaleTo(0.1f, 0);
+        yield return pointA.ScaleTo(0.1f, 0) with { name = "Point A" };
 
         using var pointB = graph.AddTracker("Point B", blob, new Vector3(5, 3));
-        yield return pointB.ScaleTo(0.1f, 0);
+        yield return pointB.ScaleTo(0.1f, 0) with { name = "Point B" };
 
         yield return Parallel(
             Tween.Value(() => pointA.point, new Vector3(6, 1)),
             Tween.Value(() => pointB.point, new Vector3(1, 1))
-        );
+        ) with { name = "Move points" };
 
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
@@ -154,7 +156,7 @@ public class GraphTestSequence : Sequence
         yield return Parallel(
             pointA.ScaleTo(0),
             pointB.ScaleTo(0)
-        );
+        ) with { name = "Points go" };
     }
 
     private static IEnumerable<Tween> TestArea(Graph graph)
@@ -166,25 +168,25 @@ public class GraphTestSequence : Sequence
             new float[] { 1, 2, 3, 4 }
         );
 
-        yield return stackedArea.GrowFromStart();
+        yield return stackedArea.GrowFromStart() with { name = "Area appears" };
 
         stackedArea.SetData(
             new float[] { 1, 1.5f, 1, 1.5f },
             new float[] { 4, 3, 2, 1 }
         );
 
-        yield return stackedArea.Transition();
+        yield return stackedArea.Transition() with { name = "Area transition" };
 
         stackedArea.AddArea(0.25f, 0.5f, 0.75f, 1);
-        yield return stackedArea.Transition();
+        yield return stackedArea.Transition() with { name = "Add area" };
 
         stackedArea.AddData(1, 0.25f, 2);
-        yield return stackedArea.Transition();
+        yield return stackedArea.Transition() with { name = "Add data" };
 
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
 
-        yield return stackedArea.ShrinkToEnd();
+        yield return stackedArea.ShrinkToEnd() with { name = "Area goes" };
     }
 
     private static IEnumerable<Tween> TestBars(Graph graph)
@@ -196,25 +198,25 @@ public class GraphTestSequence : Sequence
             { 1, 2, 3, 4 },
         });
 
-        yield return barData.GrowFromStart();
+        yield return barData.GrowFromStart() with { name = "Bars appear" };
 
         barData.SetData(
             new float[] { 1, 1.5f, 1, 1.5f },
             new float[] { 4, 3, 2, 1 }
         );
 
-        yield return barData.Transition();
+        yield return barData.Transition() with { name = "Bars transition" };
 
         barData.AddStack(0.25f, 0.5f);
-        yield return barData.Transition();
+        yield return barData.Transition() with { name = "Add stack" };
 
         barData.AddData(1, 0.25f, 2);
-        yield return barData.Transition();
+        yield return barData.Transition() with { name = "Add data" };
 
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
 
-        yield return barData.ShrinkToEnd();
+        yield return barData.ShrinkToEnd() with { name = "Bars go" };
     }
 
     private static IEnumerable<Tween> RunGraphDeformations(Graph graph)
@@ -222,22 +224,22 @@ public class GraphTestSequence : Sequence
         // Domain grows but graph doesn't take more space
         // - ticks shrink together, some are added
         // - dataviz has to shrink
-        yield return graph.GrowDomainInSameSpace(5);
+        yield return graph.GrowDomainInSameSpace(5) with { name = "Grow domain in same space" };
         // - ticks walk into the abyss
-        yield return graph.ShrinkDomainInSameSpace(5);
+        yield return graph.ShrinkDomainInSameSpace(5) with { name = "Restore" };
 
         // Domain remains while graph grows
         // - ticks untouched
         // - dataviz has to grow accordingly
-        yield return graph.SetGraphScale(1);
+        yield return graph.SetGraphScale(1) with { name = "Scale graph" };
         // - ticks untouched
-        yield return graph.SetGraphScale(0.2f);
+        yield return graph.SetGraphScale(0.2f) with { name = "Restore" };
 
         // Domain grows and graph size grows proportionally
         // - ticks stay in place while some are added
         // - dataviz untouched
-        yield return graph.GrowDomain(5);
+        yield return graph.GrowDomain(5) with { name = "Grow domain" };
         // - ticks are eaten by the graph's arrow
-        yield return graph.ShrinkDomain(5);
+        yield return graph.ShrinkDomain(5) with { name = "Restore" };
     }
 }
