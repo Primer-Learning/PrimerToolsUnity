@@ -85,10 +85,25 @@ namespace Primer.Graph
             return z.ShrinkToOrigin().Observe(onComplete: () => enableZAxis = false);
         }
 
-        public Tween Transition()
+        // We override this IAxisController extension method to ensure that the z axis is enabled/disabled
+        public Tween GrowFromOrigin()
         {
-            return axes.Select(axis => axis.Transition()).RunInParallel();
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this);
         }
+
+        public Tween GrowFromOrigin(float newMax)
+        {
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this, newMax);
+        }
+
+        public Tween GrowFromOrigin(float newMin, float newMax)
+        {
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this, newMin, newMax);
+        }
+
 
         private void UpdateAxes()
         {

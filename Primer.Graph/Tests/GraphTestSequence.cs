@@ -86,7 +86,7 @@ public class GraphTestSequence : Sequence
     {
         yield return Parallel(
             delayBetweenStarts: 0.1f,
-            graph.GrowZAxis(10),
+            graph.GrowZAxis(5),
             cam.Travel(
                 distance: 4,
                 swivel: new Vector3(15f, -25f, 0f)
@@ -113,8 +113,8 @@ public class GraphTestSequence : Sequence
         // Transition will replace the function points with the data leaving resolution at 2x2
         yield return surface.Transition();
 
-        yield return Tween.Value(() => graph.x.scale, 0.4f);
-        yield return Tween.Value(() => graph.x.scale, 0.2f);
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
 
         // But we don't care because transitions don't use resolution, they are able smoothly to cut meshes of any resolution
         yield return surface.ShrinkToEnd();
@@ -143,14 +143,13 @@ public class GraphTestSequence : Sequence
         using var pointB = graph.AddTracker("Point B", blob, new Vector3(5, 3));
         yield return pointB.ScaleTo(0.1f, 0);
 
-        yield return Tween.Value(() => graph.x.scale, 1);
-
         yield return Parallel(
             Tween.Value(() => pointA.point, new Vector3(6, 1)),
             Tween.Value(() => pointB.point, new Vector3(1, 1))
         );
 
-        yield return Tween.Value(() => graph.x.scale, 0.2f);
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
 
         yield return Parallel(
             pointA.ScaleTo(0),
@@ -182,8 +181,8 @@ public class GraphTestSequence : Sequence
         stackedArea.AddData(1, 0.25f, 2);
         yield return stackedArea.Transition();
 
-        yield return Tween.Value(() => graph.x.scale, 0.4f);
-        yield return Tween.Value(() => graph.x.scale, 0.2f);
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
 
         yield return stackedArea.ShrinkToEnd();
     }
@@ -212,27 +211,33 @@ public class GraphTestSequence : Sequence
         barData.AddData(1, 0.25f, 2);
         yield return barData.Transition();
 
-        yield return Tween.Value(() => graph.y.scale, 0.4f);
-        yield return Tween.Value(() => graph.y.scale, 0.2f);
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
 
         yield return barData.ShrinkToEnd();
     }
 
     private static IEnumerable<Tween> RunGraphDeformations(Graph graph)
     {
-        yield return graph.GrowInSameSpace(5);
-        yield return graph.ShrinkInSameSpace(5);
+        // Domain grows but graph doesn't take more space
+        // - ticks shrink together, some are added
+        // - dataviz has to shrink
+        yield return graph.GrowDomainInSameSpace(5);
+        // - ticks walk into the abyss
+        yield return graph.ShrinkDomainInSameSpace(5);
 
-        // TODO:
-        // - Domain remains while graph grows
-        //     ticks untouched
-        //     dataviz has to grow
-        // - Domain remains while graph is restored
-        //     ticks untouched
-        // - Domain grows and graph size grows proportionally
-        //     ticks stay in place while some are added
-        //     dataviz untouched
-        // - Domain and graph are restored
-        //     ticks are eaten by the graph's arrow
+        // Domain remains while graph grows
+        // - ticks untouched
+        // - dataviz has to grow accordingly
+        yield return graph.SetGraphScale(1);
+        // - ticks untouched
+        yield return graph.SetGraphScale(0.2f);
+
+        // Domain grows and graph size grows proportionally
+        // - ticks stay in place while some are added
+        // - dataviz untouched
+        yield return graph.GrowDomain(5);
+        // - ticks are eaten by the graph's arrow
+        yield return graph.ShrinkDomain(5);
     }
 }

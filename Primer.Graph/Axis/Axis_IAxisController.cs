@@ -48,14 +48,14 @@ namespace Primer.Graph
             return Transition();
         }
 
-        public Tween Grow(float amount = 1, float amountNegative = 0)
+        public Tween GrowDomain(float amount = 1, float amountNegative = 0)
         {
             min -= amountNegative;
             max += amount;
             return Transition();
         }
 
-        public Tween GrowInSameSpace(float amount = 1, float amountNegative = 0)
+        public Tween GrowDomainInSameSpace(float amount = 1, float amountNegative = 0)
         {
             var newMax = max + amount;
             var newMin = min - amountNegative;

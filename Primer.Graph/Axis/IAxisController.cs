@@ -11,7 +11,7 @@ namespace Primer.Graph
     public static class IAxisControllerExtensions
     {
 
-        public static Tween SetScale(this IAxisController self, float newScale)
+        public static Tween SetGraphScale(this IAxisController self, float newScale)
         {
             return self.axes.Select(axis => axis.SetScale(newScale)).RunInParallel();
         }
@@ -41,25 +41,25 @@ namespace Primer.Graph
             return self.axes.Select(axis => axis.ShrinkToOrigin()).RunInParallel();
         }
 
-        public static Tween Grow(this IAxisController self, float amount = 1, float amountNegative = 0)
+        public static Tween GrowDomain(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
-            return self.axes.Select(axis => axis.Grow(amount, amountNegative)).RunInParallel();
+            return self.axes.Select(axis => axis.GrowDomain(amount, amountNegative)).RunInParallel();
         }
 
-        public static Tween Shrink(this IAxisController self, float amount = 1, float amountNegative = 0)
+        public static Tween ShrinkDomain(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
-            return self.axes.Select(axis => axis.Grow(-amount, -amountNegative)).RunInParallel();
+            return self.axes.Select(axis => axis.GrowDomain(-amount, -amountNegative)).RunInParallel();
         }
 
-        public static Tween GrowInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
+        public static Tween GrowDomainInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
-            return self.axes.Select(axis => axis.GrowInSameSpace(amount, amountNegative)).RunInParallel();
+            return self.axes.Select(axis => axis.GrowDomainInSameSpace(amount, amountNegative)).RunInParallel();
         }
 
 
-        public static Tween ShrinkInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
+        public static Tween ShrinkDomainInSameSpace(this IAxisController self, float amount = 1, float amountNegative = 0)
         {
-            return self.axes.Select(axis => axis.GrowInSameSpace(-amount, -amountNegative)).RunInParallel();
+            return self.axes.Select(axis => axis.GrowDomainInSameSpace(-amount, -amountNegative)).RunInParallel();
         }
     }
 }
