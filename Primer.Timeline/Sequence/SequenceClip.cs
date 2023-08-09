@@ -16,14 +16,60 @@ namespace Primer.Timeline
 
         #region Editor buttons
 #if UNITY_EDITOR
+        // When we press one of these buttons the C# scripts get re-compiled
+        //  any running function gets interrupted and awaits are cancelled.
+        // This is why we need to use the `connector` enum to resume the function
+        //  after the re-compile.
+        // And we also save the parameters for the functions
+        //  this is ugly and painful but it does the job.
+
+        [SerializeField]
+        private ViewInPlayModeConnector connector = ViewInPlayModeConnector.None;
+        [SerializeField]
+        private float secondsBeforeArg;
+        [SerializeField]
+        private float frameRateArg;
+
+        private enum ViewInPlayModeConnector
+        {
+            None,
+            AndPauseBefore,
+            AndFastForward,
+            AndScrub,
+        }
+
+        private void OnEnable()
+        {
+            if (connector is ViewInPlayModeConnector.None)
+                return;
+
+            if (connector == ViewInPlayModeConnector.AndPauseBefore)
+                AndPauseBefore(secondsBeforeArg);
+            else if (connector == ViewInPlayModeConnector.AndFastForward)
+                AndFastForward(secondsBeforeArg, frameRateArg);
+            else if (connector == ViewInPlayModeConnector.AndScrub)
+                AndScrub(secondsBeforeArg);
+
+            connector = ViewInPlayModeConnector.None;
+        }
+
+        private static PlayableDirector foundDirector => FindObjectOfType<PlayableDirector>();
+
         [Title("View in play mode...")]
         [PropertySpace(32)]
 
         [Button]
         [DetailedInfoBox("Slow and reliable", "Enter play mode at regular speed and pause before this clip starts.")]
-        private async void AndPauseBefore(float secondsBefore = 1)
+        private void AndPauseBefore_Starter(float secondsBefore = 1)
         {
-            var director = await EnterPlayMode();
+            connector = ViewInPlayModeConnector.AndPauseBefore;
+            secondsBeforeArg = secondsBefore;
+            EnterPlayMode();
+        }
+
+        private async void AndPauseBefore(float secondsBefore)
+        {
+            var director = foundDirector;
 
             if (director is null)
                 return;
@@ -41,14 +87,22 @@ namespace Primer.Timeline
             "Midpoint",
             "Enter play mode and run all frames at max speed until before this clip starts.\nIf frameRate is 0, Time.captureFramerate is used."
         )]
-        private async void AndFastForward(float secondsBefore = 2, float frameRate = 60)
+        private void AndFastForward_Starter(float secondsBefore = 2, float frameRate = 60)
+        {
+            connector = ViewInPlayModeConnector.AndFastForward;
+            secondsBeforeArg = secondsBefore;
+            frameRateArg = frameRate;
+            EnterPlayMode();
+        }
+
+        private async void AndFastForward(float secondsBefore, float frameRate)
         {
             var fps = frameRate > 0 ? frameRate : Time.captureFramerate;
 
             if (fps <= 0)
                 throw new Exception("Can't fast forward because frameRate is 0 and Time.captureFramerate is 0.");
 
-            var director = await EnterPlayMode();
+            var director = foundDirector;
 
             if (director is null)
                 return;
@@ -73,25 +127,25 @@ namespace Primer.Timeline
         [Button]
         [PropertySpace(16)]
         [DetailedInfoBox("Fast and unreliable", "Enter play mode and scrub to the start of this clip.")]
-        private async void AndScrub(float secondsBefore = 2)
+        private void AndScrub_Starter(float secondsBefore = 2)
         {
-            var director = await EnterPlayMode();
-
-            if (director is null)
-                return;
-
-            await PrimerTimeline.ScrubTo(director, start - secondsBefore);
+            connector = ViewInPlayModeConnector.AndScrub;
+            secondsBeforeArg = secondsBefore;
+            EnterPlayMode();
         }
 
-        private static async UniTask<PlayableDirector> EnterPlayMode()
+        private async void AndScrub(float secondsBefore)
         {
-            var director = FindObjectOfType<PlayableDirector>();
+            var director = foundDirector;
 
-            if (Application.isPlaying || director == null)
-                return null;
+            if (director is not null)
+                await PrimerTimeline.ScrubTo(director, start - secondsBefore);
+        }
 
-            await PrimerTimeline.EnterPlayMode();
-            return director;
+        private static void EnterPlayMode()
+        {
+            if (!Application.isPlaying && foundDirector is not null)
+                PrimerTimeline.EnterPlayMode();
         }
 #endif
         #endregion

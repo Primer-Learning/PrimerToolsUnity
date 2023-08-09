@@ -59,7 +59,7 @@ namespace Primer.Timeline
         }
 
         public float start {
-            get => template.start;
+            get => lastPlayable?.start ?? template.start;
             set {
                 template.start = value;
 
