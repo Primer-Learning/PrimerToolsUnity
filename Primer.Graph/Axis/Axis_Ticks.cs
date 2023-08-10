@@ -117,7 +117,10 @@ namespace Primer.Graph
             return (
                 addTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION),
                 updateTweens.RunInParallel(),
-                removeTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION)
+                removeTweens
+                    .RunInParallel(delayBetweenStarts: 0.05f)
+                    .WithDuration(Tween.DEFAULT_DURATION)
+                    .Observe(onDispose: () => gnome.Purge(defer))
             );
         }
 
