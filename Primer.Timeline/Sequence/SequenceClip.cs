@@ -43,14 +43,20 @@ namespace Primer.Timeline
             if (connector is ViewInPlayModeConnector.None)
                 return;
 
-            if (connector == ViewInPlayModeConnector.AndPauseBefore)
-                AndPauseBefore(secondsBeforeArg);
-            else if (connector == ViewInPlayModeConnector.AndFastForward)
-                AndFastForward(secondsBeforeArg, frameRateArg);
-            else if (connector == ViewInPlayModeConnector.AndScrub)
-                AndScrub(secondsBeforeArg);
+            PatchPlayMode.OnEnterPlayMode(
+                () => {
+                    if (connector == ViewInPlayModeConnector.AndPauseBefore)
+                        AndPauseBefore(secondsBeforeArg);
+                    else if (connector == ViewInPlayModeConnector.AndFastForward)
+                        AndFastForward(secondsBeforeArg, frameRateArg);
+                    else if (connector == ViewInPlayModeConnector.AndScrub)
+                        AndScrub(secondsBeforeArg);
 
-            connector = ViewInPlayModeConnector.None;
+                    connector = ViewInPlayModeConnector.None;
+                    secondsBeforeArg = default(float);
+                    frameRateArg = default(float);
+                }
+            );
         }
 
         private static PlayableDirector foundDirector => FindObjectOfType<PlayableDirector>();
