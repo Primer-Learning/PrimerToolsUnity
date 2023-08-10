@@ -64,9 +64,8 @@ namespace Primer.Graph
             : new [] { x, y };
 
 
-        private void OnEnable() => UpdateAxes();
-
         private void OnValidate() => UpdateAxes();
+        private void Update() => EnsureDomainDimensions();
 
 
         public Tween GrowZAxis(float newMax) => GrowZAxis(0, newMax);

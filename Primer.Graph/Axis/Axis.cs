@@ -20,16 +20,6 @@ namespace Primer.Graph
                 : 0;
         }
 
-        internal bool ListenDomainChange(Action listener)
-        {
-            if (onDomainChange == listener)
-                return false;
-
-            onDomainChange = listener;
-            return true;
-        }
-
-
         public void OnEnable() => UpdateChildren();
         public void OnValidate() => UpdateChildren();
 
