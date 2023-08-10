@@ -17,6 +17,9 @@ namespace Primer.Timeline.Editor
             clipAsset.resolver ??= TimelineEditor.inspectedDirector;
             CodeEditorLink();
             ExpectedDuration();
+
+            // View in play mode buttons are implemented in SequenceClip.cs
+
             base.OnInspectorGUI();
         }
 
