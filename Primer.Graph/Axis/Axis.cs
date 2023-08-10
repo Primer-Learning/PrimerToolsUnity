@@ -24,7 +24,7 @@ namespace Primer.Graph
         public void OnValidate() => UpdateChildren();
 
 
-        public Tween Transition()
+        public Tween Transition(bool defer = false)
         {
             // We don't want to run this on prefabs
             if (gameObject.IsPreset())
@@ -41,7 +41,7 @@ namespace Primer.Graph
                 .Select(x => x.ScaleUpFromZero())
                 .RunInParallel();
 
-            var (addTicks, updateTicks, removeTicks) = TransitionTicks(gnome);
+            var (addTicks, updateTicks, removeTicks) = TransitionTicks(gnome, defer);
 
             var removeParts = gnome.ManualPurge(defer: true)
                 .Select(x => x.ScaleDownToZero().Observe(onDispose: x.Dispose))
@@ -118,9 +118,11 @@ END OF PRIMER MESSAGES
         }
 
         [Button(ButtonSizes.Large)]
-        public void UpdateChildren()
+        public void UpdateChildren() => UpdateChildren(defer: false);
+
+        public void UpdateChildren(bool defer)
         {
-            using var tween = Transition();
+            using var tween = Transition(defer);
             tween?.Apply();
         }
     }

@@ -73,7 +73,7 @@ namespace Primer.Graph
             return CropTicksCount(expectedTicks);
         }
 
-        private (Tween add, Tween update, Tween remove) TransitionTicks(Gnome parentGnome)
+        private (Tween add, Tween update, Tween remove) TransitionTicks(Gnome parentGnome, bool defer)
         {
             var gnome = parentGnome
                 .AddGnome("Ticks container")
@@ -110,7 +110,7 @@ namespace Primer.Graph
                         updateTweens.Add(tick.MoveTo(GetPosition(tick)));
 
                         return tick.ScaleTo(0, 1)
-                            .Observe(onDispose: tick.Dispose);
+                            .Observe(onDispose: () => tick.Dispose(defer));
                     }
                 );
 
