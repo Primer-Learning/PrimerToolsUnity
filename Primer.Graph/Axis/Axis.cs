@@ -21,7 +21,7 @@ namespace Primer.Graph
         }
 
         public void OnEnable() => UpdateChildren();
-        public void OnValidate() => UpdateChildren();
+        public void OnValidate() => UpdateChildren(defer: true);
 
 
         public Tween Transition(bool defer = false)
