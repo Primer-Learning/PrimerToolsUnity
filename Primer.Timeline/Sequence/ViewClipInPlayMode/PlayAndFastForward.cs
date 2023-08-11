@@ -1,39 +1,30 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Serialization;
 
 namespace Primer.Timeline
 {
-    [Serializable]
-    internal class PlayAndFastForward : ViewInPlayModeBehaviour
+    internal class PlayAndFastForward : PlayModeBehaviour
     {
-        [SerializeField] private float at;
-        [SerializeField] private float frameRate;
+        public PlayableDirector director;
+        [FormerlySerializedAs("at")] public float to;
+        public float frameRate;
 
-        public PlayAndFastForward(float at, float frameRate)
-        {
-            this.at = at;
-            this.frameRate = frameRate;
-        }
-
-        public override async void Execute()
+        protected override async void Action()
         {
             var fps = frameRate > 0 ? frameRate : Time.captureFramerate;
 
             if (fps <= 0)
                 throw new Exception("Can't fast forward because frameRate is 0 and Time.captureFramerate is 0.");
 
-            var director = FindDirector();
-
-            if (director is null)
-                return;
-
             var secondsPerFrame = 1f / fps;
 
             director.Pause();
             PatchPlayMode.isPlaying = false;
 
-            while (director.time < at) {
+            while (director.time < to) {
                 await PrimerTimeline.ScrubTo(director, director.time + secondsPerFrame);
             }
 

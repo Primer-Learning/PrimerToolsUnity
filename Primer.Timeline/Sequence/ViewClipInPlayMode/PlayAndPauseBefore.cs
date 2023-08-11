@@ -2,26 +2,18 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     [Serializable]
-    internal class PlayAndPauseBefore : ViewInPlayModeBehaviour
+    internal class PlayAndPauseBefore : PlayModeBehaviour
     {
-        [SerializeField] private float at;
+        public PlayableDirector director;
+        public float at;
 
-        public PlayAndPauseBefore(float at)
+        protected override async void Action()
         {
-            this.at = at;
-        }
-
-        public override async void Execute()
-        {
-            var director = FindDirector();
-
-            if (director is null)
-                return;
-
             PatchPlayMode.isPlaying = false;
 
             await UniTask.WaitWhile(() => director.time <= at);

@@ -1,24 +1,18 @@
 using System;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
     [Serializable]
-    internal class PlayAndScrub : ViewInPlayModeBehaviour
+    internal class PlayAndScrub : PlayModeBehaviour
     {
-        [SerializeField] private float to;
+        public PlayableDirector director;
+        public float to;
 
-        public PlayAndScrub(float to)
+        protected override async void Action()
         {
-            this.to = to;
-        }
-
-        public override async void Execute()
-        {
-            var director = FindDirector();
-
-            if (director is not null)
-                await PrimerTimeline.ScrubTo(director, to);
+            await PrimerTimeline.ScrubTo(director, to);
         }
     }
 }

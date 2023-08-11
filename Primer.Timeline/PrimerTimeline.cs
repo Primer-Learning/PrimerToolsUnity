@@ -12,6 +12,11 @@ namespace Primer.Timeline
         public static bool isPlaying => PatchPlayMode.isPlaying;
         public static bool isPreloading => PatchPlayMode.isPreloading;
 
+        public static event Action onEnterPlayMode {
+            add => PatchPlayMode.whenReady += value;
+            remove => PatchPlayMode.whenReady -= value;
+        }
+
         static PrimerTimeline()
         {
             GnomeEvents.deactivateEventsIf = () => !isPlaying;
@@ -27,15 +32,18 @@ namespace Primer.Timeline
             return TimelineAsynchrony.RegisterOperation(request);
         }
 
-        public static UniTask EnterPlayMode()
+        public static void EnterPlayMode()
         {
             if (Application.isPlaying)
                 throw new InvalidOperationException("PrimerTimeline.EnterPlayMode() can only be called in Edit Mode.");
 
-            var tcs = new UniTaskCompletionSource();
-            PatchPlayMode.OnEnterPlayMode(() => tcs.TrySetResult());
+            // This doesn't work because Unity re-compiles the scripts when we call EditorApplication.EnterPlaymode()
+            //   so the callback never gets called and the returned Task never completes.
+            //
+            // var tcs = new UniTaskCompletionSource();
+            // PatchPlayMode.OnEnterPlayMode(() => tcs.TrySetResult());
             EditorApplication.EnterPlaymode();
-            return tcs.Task;
+            // return tcs.Task;
         }
 
         public static async UniTask ScrubTo(PlayableDirector director, double time)
