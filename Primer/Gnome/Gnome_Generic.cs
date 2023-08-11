@@ -1,18 +1,9 @@
-using System;
 using UnityEngine;
 
 namespace Primer
 {
     public partial class Gnome
     {
-        // Now that it's called Gnome it makes more sense Gnome.For(this) than Gnome.From(this)
-        [Obsolete("Use Gnome.For(this) instead")]
-        public static Gnome<TComponent> From<TComponent>(TComponent component, bool setActive = true)
-            where TComponent : Component
-        {
-            return new Gnome<TComponent>(component, setActive);
-        }
-
         public static Gnome<TComponent> For<TComponent>(TComponent component, bool setActive = true)
             where TComponent : Component
         {
