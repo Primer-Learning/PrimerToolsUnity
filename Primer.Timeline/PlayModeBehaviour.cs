@@ -10,6 +10,14 @@ namespace Primer.Timeline
     /// </summary>
     public abstract class PlayModeBehaviour : MonoBehaviour
     {
+        public static T Create<T>(string name, bool persistent = false) where T: PlayModeBehaviour
+        {
+            var go = new GameObject(name);
+            var component = go.AddComponent<T>();
+            component.runOnlyOnce = !persistent;
+            return component;
+        }
+
         public bool runOnlyOnce = true;
 
         public void EnterPlayMode()

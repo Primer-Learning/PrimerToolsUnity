@@ -18,8 +18,7 @@ namespace Primer.Timeline
         [DetailedInfoBox("Slow and reliable", "Enter play mode at regular speed and pause before this clip starts.")]
         private void AndPauseBefore(float secondsBefore = 1)
         {
-            var component = new GameObject().AddComponent<PlayAndPauseBefore>();
-            component.name = "Pause before clip";
+            var component = PlayModeBehaviour.Create<PlayAndPauseBefore>("Pause before clip");
             component.at = start - secondsBefore;
             component.director = FindDirector();
             component.EnterPlayMode();
@@ -33,8 +32,7 @@ namespace Primer.Timeline
         )]
         private void AndFastForward(float secondsBefore = 2, float frameRate = 60)
         {
-            var component = new GameObject().AddComponent<PlayAndFastForward>();
-            component.name = "Pause before clip";
+            var component = PlayModeBehaviour.Create<PlayAndFastForward>("Fast forward to clip");
             component.to = start - secondsBefore;
             component.frameRate = frameRate;
             component.director = FindDirector();
@@ -46,8 +44,7 @@ namespace Primer.Timeline
         [DetailedInfoBox("Fast and unreliable", "Enter play mode and scrub to the start of this clip.")]
         private void AndScrub(float secondsBefore = 2)
         {
-            var component = new GameObject().AddComponent<PlayAndScrub>();
-            component.name = "Pause before clip";
+            var component = PlayModeBehaviour.Create<PlayAndFastForward>("Scrub to clip");
             component.to = start - secondsBefore;
             component.director = FindDirector();
             component.EnterPlayMode();

@@ -30,9 +30,8 @@ namespace Primer.Timeline
             }
 
             var director = Object.FindObjectOfType<PlayableDirector>();
-            if (director) {
+            if (director)
                 await HandlePlayMode(director);
-            }
 
             isPlaying = true;
             whenReady?.Invoke();

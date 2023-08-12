@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
+using Object = UnityEngine.Object;
 
 namespace Primer.Timeline
 {
@@ -11,6 +12,7 @@ namespace Primer.Timeline
     {
         public static bool isPlaying => PatchPlayMode.isPlaying;
         public static bool isPreloading => PatchPlayMode.isPreloading;
+        public static PlayableDirector director => Object.FindObjectOfType<PlayableDirector>();
 
         public static event Action onEnterPlayMode {
             add => PatchPlayMode.whenReady += value;
@@ -36,6 +38,9 @@ namespace Primer.Timeline
         {
             if (Application.isPlaying)
                 throw new InvalidOperationException("PrimerTimeline.EnterPlayMode() can only be called in Edit Mode.");
+
+            if (director == null)
+                throw new InvalidOperationException("PrimerTimeline.EnterPlayMode() requires a PlayableDirector in the scene.");
 
             // This doesn't work because Unity re-compiles the scripts when we call EditorApplication.EnterPlaymode()
             //   so the callback never gets called and the returned Task never completes.
