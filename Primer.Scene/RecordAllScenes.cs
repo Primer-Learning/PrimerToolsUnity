@@ -8,6 +8,9 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
+/// <summary>
+///   Implement this interface to specify which scenes to record.
+/// </summary>
 public interface RecordAllScenes
 {
     public string[] scenes { get; }
