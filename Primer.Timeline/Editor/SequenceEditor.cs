@@ -33,7 +33,7 @@ namespace Primer.Timeline.Editor
             if (track == null)
                 return;
 
-            var clips = new Stack<TimelineClip>(track.GetClips().Where(x => x.asset is SequenceClip));
+            var clips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
             var runner = sequence.Run();
             const float gap = 0.5f;
             var time = gap;
@@ -53,13 +53,18 @@ namespace Primer.Timeline.Editor
                 if (!runner.hasMoreClips)
                     break;
 
-                var clip = clips.Count is 0
-                    ? track.CreateClip<SequenceClip>()
-                    : clips.Pop();
+                var clip = clips.FirstOrDefault(
+                        x => string.IsNullOrEmpty(tween?.name)
+                            ? x.IsNameAutomated()
+                            : x.displayName == tween.name
+                    )
+                    ?? track.CreateClip<SequenceClip>();
 
-                clip.start = time;
-                clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
-                clip.displayName = tween?.name ?? "";
+                if (!clip.IsLocked()) {
+                    clip.start = time;
+                    clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
+                    clip.displayName = tween?.name ?? "";
+                }
 
                 time = (float)clip.end + gap;
                 tween?.Apply();
