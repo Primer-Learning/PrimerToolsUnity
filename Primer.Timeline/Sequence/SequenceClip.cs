@@ -47,7 +47,7 @@ namespace Primer.Timeline
         [DetailedInfoBox("Fast and unreliable", "Enter play mode and scrub to the start of this clip.")]
         private void AndScrub(float secondsBefore = 2)
         {
-            var component = PlayModeBehaviour.Create<PlayAndFastForward>("Scrub to clip");
+            var component = PlayModeBehaviour.Create<PlayAndScrub>("Scrub to clip");
             component.to = start - secondsBefore;
             component.director = FindDirector();
             component.EnterPlayMode();
