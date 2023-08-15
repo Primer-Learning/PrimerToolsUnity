@@ -47,8 +47,10 @@ public class GraphTestSequence : Sequence
         yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
     }
 
-    private static IEnumerable<Tween> TestLine(Graph graph)
+    private IEnumerable<Tween> TestLine(Graph graph)
     {
+        PushClipColor(PrimerColor.red);
+
         // Blue is disabled when this method ends
         using var blue = graph.AddLine("Blue line");
         blue.width = 0.05f;
@@ -82,10 +84,14 @@ public class GraphTestSequence : Sequence
             blue.ShrinkToEnd(),
             red.ShrinkToEnd()
         ) with { name = "Lines go" };
+
+        PopClipColor();
     }
 
-    private static IEnumerable<Tween> TestSurface(Graph graph, CameraRig cam)
+    private IEnumerable<Tween> TestSurface(Graph graph, CameraRig cam)
     {
+        PushClipColor(PrimerColor.green);
+
         yield return Parallel(
             delayBetweenStarts: 0.1f,
             graph.GrowZAxis(5),
@@ -130,10 +136,14 @@ public class GraphTestSequence : Sequence
                 swivel: new Vector3(0f, 0f, 0f)
             )
         ) with { name = "Restore camera" };
+
+        PopClipColor();
     }
 
-    private static IEnumerable<Tween> TestPoint(Graph graph)
+    private IEnumerable<Tween> TestPoint(Graph graph)
     {
+        PushClipColor(PrimerColor.blue);
+
         var prefab = Prefab.Get("blob_skinned");
         var blob = prefab.GetOrAddComponent<PrimerBlob>();
         blob.GetOrAddComponent<SkinnedMeshRenderer>().sharedMaterial ??= Primer.RendererExtensions.defaultMaterial;
@@ -157,10 +167,14 @@ public class GraphTestSequence : Sequence
             pointA.ScaleTo(0),
             pointB.ScaleTo(0)
         ) with { name = "Points go" };
+
+        PopClipColor();
     }
 
-    private static IEnumerable<Tween> TestArea(Graph graph)
+    private IEnumerable<Tween> TestArea(Graph graph)
     {
+        PushClipColor(PrimerColor.purple);
+
         using var stackedArea = graph.AddStackedArea("Stacked");
 
         stackedArea.SetData(
@@ -187,10 +201,14 @@ public class GraphTestSequence : Sequence
             yield return _;
 
         yield return stackedArea.ShrinkToEnd() with { name = "Area goes" };
+
+        PopClipColor();
     }
 
-    private static IEnumerable<Tween> TestBars(Graph graph)
+    private IEnumerable<Tween> TestBars(Graph graph)
     {
+        PushClipColor(PrimerColor.yellow);
+
         using var barData = graph.AddBarPlot("Bar data");
 
         barData.SetData(new float [,] {
@@ -217,10 +235,14 @@ public class GraphTestSequence : Sequence
             yield return _;
 
         yield return barData.ShrinkToEnd() with { name = "Bars go" };
+
+        PopClipColor();
     }
 
-    private static IEnumerable<Tween> RunGraphDeformations(Graph graph)
+    private IEnumerable<Tween> RunGraphDeformations(Graph graph)
     {
+        PushClipColor(PrimerColor.orange);
+
         // Domain grows but graph doesn't take more space
         // - ticks shrink together, some are added
         // - dataviz has to shrink
@@ -241,5 +263,7 @@ public class GraphTestSequence : Sequence
         yield return graph.GrowDomain(5) with { name = "Grow domain" };
         // - ticks are eaten by the graph's arrow
         yield return graph.ShrinkDomain(5) with { name = "Restore" };
+
+        PopClipColor();
     }
 }

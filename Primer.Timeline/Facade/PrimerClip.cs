@@ -15,6 +15,9 @@ namespace Primer.Timeline
 
         public virtual string clipName => "";
 
+        [SerializeField]
+        public Color clipColor = Color.clear;
+
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Primer.Timeline.FakeUnityEngine;
@@ -6,7 +5,6 @@ using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
-using UnityEngine.Timeline;
 
 namespace Primer.Timeline.Editor
 {
@@ -33,7 +31,7 @@ namespace Primer.Timeline.Editor
             if (track == null)
                 return;
 
-            var clips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
+            var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
             var runner = sequence.Run();
             const float gap = 0.5f;
             var time = gap;
@@ -53,24 +51,31 @@ namespace Primer.Timeline.Editor
                 if (!runner.hasMoreClips)
                     break;
 
-                var clip = clips.FirstOrDefault(
-                        x => string.IsNullOrEmpty(tween?.name)
-                            ? x.IsNameAutomated()
-                            : x.displayName == tween.name
-                    )
-                    ?? track.CreateClip<SequenceClip>();
+                var clip = existingClips.FirstOrDefault(
+                    x => string.IsNullOrEmpty(tween?.name)
+                        ? x.IsNameAutomated()
+                        : x.displayName == tween.name
+                );
+
+                if (clip is null)
+                    clip = track.CreateClip<SequenceClip>();
+                else
+                    existingClips.Remove(clip);
 
                 if (!clip.IsLocked()) {
                     clip.start = time;
                     clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
                     clip.displayName = tween?.name ?? "";
+
+                    if (clip.asset is PrimerClip primerClip)
+                        primerClip.clipColor = sequence.clipColor;
                 }
 
                 time = (float)clip.end + gap;
                 tween?.Apply();
             }
 
-            foreach (var clip in clips)
+            foreach (var clip in existingClips)
                 track.DeleteClip(clip);
 
             TimelineEditor.Refresh(RefreshReason.ContentsModified);
