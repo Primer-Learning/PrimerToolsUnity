@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part defines the methods to create children and wrap them into Gnomes
     public partial class Gnome
     {
         public Gnome AddGnome(string name, ChildOptions options = null)

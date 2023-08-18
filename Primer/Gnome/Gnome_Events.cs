@@ -5,23 +5,7 @@ using UnityEngine;
 
 namespace Primer
 {
-    // We need a non-generic class to contain the static values
-    internal static class GnomeEvents
-    {
-        internal static Action<Transform, bool> defaultOnRemove = (x, defer) => x.Dispose(defer);
-
-        /// <summary>
-        ///   If this function returns true, the gnome will not fire any events.
-        /// </summary>
-        internal static Func<bool> deactivateEventsIf = null;
-
-        /// <summary>
-        ///   This component is added to a GameObject when it is being removed from the gnome.
-        /// </summary>
-        [DisallowMultipleComponent]
-        internal class IsRemoving : MonoBehaviour {}
-    }
-
+    // This part handles events like child creation and removal
     public partial class Gnome
     {
         private static bool areEventsDeactivated
@@ -78,5 +62,22 @@ namespace Primer
             return transform.GetChildren()
                 .Where(x => x.HasComponent<GnomeEvents.IsRemoving>());
         }
+    }
+
+    // We need a non-generic class to contain the static values
+    internal static class GnomeEvents
+    {
+        internal static Action<Transform, bool> defaultOnRemove = (x, defer) => x.Dispose(defer);
+
+        /// <summary>
+        ///   If this function returns true, the gnome will not fire any events.
+        /// </summary>
+        internal static Func<bool> deactivateEventsIf = null;
+
+        /// <summary>
+        ///   This component is added to a GameObject when it is being removed from the gnome.
+        /// </summary>
+        [DisallowMultipleComponent]
+        internal class IsRemoving : MonoBehaviour {}
     }
 }

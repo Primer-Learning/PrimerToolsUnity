@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part defines the static .For() that will return a Gnome<TComponent>
     public partial class Gnome
     {
         public static Gnome<TComponent> For<TComponent>(TComponent component, bool setActive = true)
@@ -11,7 +12,7 @@ namespace Primer
         }
     }
 
-    public partial class Gnome<TComponent> : Gnome
+    public class Gnome<TComponent> : Gnome
         where TComponent : Component
     {
         public new TComponent component { get; }

@@ -5,6 +5,16 @@ using UnityEngine.SceneManagement;
 
 namespace Primer
 {
+    /// <summary>
+    ///     Wrap a Unity component into a Gnome to manipulate it's children.
+    ///     The gnome will look at the children of the component and keep track of them.
+    ///     When you add a child, it will look for an unused child and use that if it exists.
+    ///     After you're doing you can use .Purge() to remove all unused children.
+    /// </summary>
+    /// <remarks>
+    ///     The idea behind this class is to be able to define the children of a GameObject in code again and again
+    ///     without having to re-create them each time.
+    /// </remarks>
     public partial class Gnome : IDisposable, IPrimer
     {
         public Transform transform { get; }

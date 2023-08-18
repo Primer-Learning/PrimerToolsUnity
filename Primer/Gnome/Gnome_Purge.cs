@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part defines how children are removed when purging.
     public partial class Gnome
     {
         public bool disableWhenDisposed = true;

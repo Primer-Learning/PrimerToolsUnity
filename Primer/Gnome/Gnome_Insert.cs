@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part defines the .Insert() method. It has it's own partial class because EVERY children passes through it.
     public partial class Gnome
     {
         private readonly List<Transform> usedChildren = new();
