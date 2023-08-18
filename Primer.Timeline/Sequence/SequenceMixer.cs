@@ -5,6 +5,19 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    /*
+     *  Receives a call to `ProcessFrame(Playable playable)`
+     *  for each clip in the track
+     *
+     *  This is where we convert all those calls
+     *  ProcessFrame(Playable playable)
+     *  into a single call to
+     *  SequenceOrchestrator.PlayAt(SequencePlayable[] allBehaviours, float time)
+     *
+     *  The way we do that is not nice
+     *  but we need it to process the sequences in the right order
+     */
+
     // For this track mixer in particular we skip the PrimerBehaviour and just use PlayableBehaviour
     //  because this is a special case where we want to execute past clips and explore future ones.
     internal class SequenceMixer : PrimerMixer

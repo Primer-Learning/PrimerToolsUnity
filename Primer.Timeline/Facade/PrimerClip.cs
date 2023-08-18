@@ -4,6 +4,7 @@ using UnityEngine.Timeline;
 
 namespace Primer.Timeline
 {
+    /// <summary>Base class for all clips.</summary>
     public abstract class PrimerClip : PlayableAsset, ITimelineClipAsset
     {
         public float? expectedDuration = null;

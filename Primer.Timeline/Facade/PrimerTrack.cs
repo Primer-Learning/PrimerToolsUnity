@@ -6,6 +6,7 @@ using Debug = UnityEngine.Debug;
 
 namespace Primer.Timeline
 {
+    /// <summary>Base class for all tracks.</summary>
     public abstract class PrimerTrack : TrackAsset
     {
         protected virtual float defaultDuration => 1;

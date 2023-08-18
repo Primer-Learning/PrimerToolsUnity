@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
+    /// <summary>
+    ///     Represents a sequential execution of Tweens
+    /// </summary>
     [DisallowMultipleComponent]
     public abstract class Sequence : AsyncMonoBehaviour
     {
