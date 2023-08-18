@@ -25,6 +25,8 @@ namespace Primer.Animation
         // );
         //
         // public static Tween Series(params System.Func<Tween>[] tweenList)
+        // {
+        // }
 
         public static Tween Series(params Tween[] tweenList)
         {

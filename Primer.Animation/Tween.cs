@@ -5,6 +5,14 @@ using UnityEngine;
 
 namespace Primer.Animation
 {
+    /// <summary>
+    ///     This class represent an animation over time.
+    ///     The function `lerp` is called every frame with a value between 0 and 1.
+    /// </summary>
+    /// <remarks>
+    ///     It can be awaited, in which case it will `.Play()` and wait for the animation to finish.
+    ///     Invoke .Play() directly if you want to pass a cancellation token.
+    /// </remarks>
     public partial record Tween(Action<float> lerp) : IDisposable
     {
         public const int DEFAULT_DURATION_MS = 500;
@@ -47,6 +55,7 @@ namespace Primer.Animation
         public float totalDuration => duration + delay;
         internal float tStart => 1 / totalDuration * delay;
 
+        /// <summary>Applies the final state of the animation.</summary>
         public void Apply() => Evaluate(1);
 
         public virtual void Evaluate(float t)
@@ -64,7 +73,7 @@ namespace Primer.Animation
         #region public void Play();
         public async void PlayAndForget(CancellationToken ct = default) => await Play_Internal(ct);
 
-        public  UniTask Play(CancellationToken ct) => Play_Internal(ct);
+        public UniTask Play(CancellationToken ct) => Play_Internal(ct);
 
         private async UniTask Play_Internal(CancellationToken ct = default)
         {
@@ -108,7 +117,12 @@ namespace Primer.Animation
         }
         #endregion
 
-        public virtual void Dispose() {}
+        public virtual void Dispose()
+        {
+            // Tween.Dispose() does nothing,
+            // but this is extended in ObservableTween
+            // where it will trigger onDispose event
+        }
 
         // This method makes the class awaitable
         public UniTask.Awaiter GetAwaiter()
