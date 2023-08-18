@@ -7,6 +7,14 @@ using UnityEngine;
 
 namespace Primer
 {
+    /// <summary>
+    ///   A simple logger that prints the name of the component and the message.
+    /// </summary>
+    /// <remarks>
+    ///   This class is not really necessary, I used it because it allowed me to pass several arguments to the
+    ///   `Log()` method and not worry about concatenation but can be removed and replaced with `Debug.Log()`
+    ///   - Matias
+    /// </remarks>
     public static class PrimerLogger
     {
         private const int BREAK_IF_LONGER_THAN = 100;

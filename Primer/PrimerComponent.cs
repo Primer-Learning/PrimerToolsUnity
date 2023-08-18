@@ -3,9 +3,15 @@ using UnityEngine;
 
 namespace Primer
 {
+    /// <summary>
+    ///     We use this class to store state that we may use from extension methods.
+    ///     Does your extension method need to save a value in a component?
+    ///     Extension methods can do that but they can do `component.GetPrimer()` and save it there.
+    /// </summary>
     [DisallowMultipleComponent]
     public class PrimerComponent : MonoBehaviour
     {
+        // Used by IPrimer.ToGnome()
         internal Gnome parentGnome;
 
         #region Vector3? intrinsicScale

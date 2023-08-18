@@ -6,6 +6,10 @@ namespace Primer
     public static class Prefab
     {
         private static readonly Dictionary<string, Component> cachedPrefabs = new();
+
+        // This didn't work as expected
+        // As a result we may not be unloading the assets properly :(
+        //
         // private static readonly Cleaner cleaner = new Cleaner();
 
         public static Transform Get(string prefabName)

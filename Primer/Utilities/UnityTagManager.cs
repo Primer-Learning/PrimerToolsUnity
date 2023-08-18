@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This was used historically to create tags from code, but it's used necessary anymore.
+    // Could be removed safely
+
     public static class UnityTagManager
     {
         // from
