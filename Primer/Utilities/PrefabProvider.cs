@@ -12,6 +12,21 @@ namespace Primer
     public class PrefabProvider : PrefabProvider<Transform> {}
 
 
+    /// <summary>
+    ///     This class is used to get a prefab with a modified position, rotation and scale.
+    ///     Instead of adding `Transform` fields to your component, you can use PrefabProvider&lt;Transform&gt;.
+    ///     This will add fields in the inspector so the user can specify a rotation or a scale for
+    ///         this usage of the prefab only.
+    /// </summary>
+    /// <remarks>
+    ///     To get the prefab instance use the `Instantiate(parent)` method.
+    ///     If you instantiated the prefab with your own method, you can use the `Initialize(child)` method to apply the
+    ///         position, rotation and scale to the child.
+    /// </remarks>
+    /// <typeparam name="T">
+    ///     A component the prefab must contain.
+    ///     Use Transform if you don't care.
+    /// </typeparam>
     [Serializable]
     [InlineProperty]
     [HideReferenceObjectPicker]
@@ -137,7 +152,7 @@ namespace Primer
         }
         #endregion
 
-
+        /// <summary>Creates a new instance of the prefab in the given parent.</summary>
         public T Instantiate(Transform parent)
         {
             var child = UnityEngine.Object.Instantiate(value, parent);
@@ -145,6 +160,9 @@ namespace Primer
             return child;
         }
 
+        /// <summary>
+        ///     Applies the position, rotation and scale to the child. This is used internally by `Instantiate(parent)`
+        /// </summary>
         public void Initialize(T child)
         {
             var transform = child.transform;

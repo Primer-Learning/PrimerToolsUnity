@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using Primer.Animation;
-using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,84 +9,121 @@ namespace Primer.Graph
     [ExecuteAlways]
     public partial class Axis : MonoBehaviour
     {
+        private bool hasDomainChanged = false;
         private Action onDomainChange;
-
-        private void DomainChanged()
-        {
-            onDomainChange?.Invoke();
-            UpdateChildren();
-        }
+        private float? lastReportedScale = null;
 
         public float DomainToPosition(float domainValue)
         {
             return isActiveAndEnabled
-                ? domainValue * scale
+                ? domainValue * (lastReportedScale ?? scale)
                 : 0;
         }
 
-        internal bool ListenDomainChange(Action listener)
-        {
-            if (onDomainChange == listener)
-                return false;
-
-            onDomainChange = listener;
-            return true;
-        }
-
-
         public void OnEnable() => UpdateChildren();
-        public void OnValidate() => UpdateChildren();
+        public void OnValidate() => UpdateChildren(defer: true);
 
 
-        public Tween GrowFromOrigin(float newMax) => GrowFromOrigin(min, newMax);
-        public Tween GrowFromOrigin(float newMin, float newMax)
-        {
-            min = 0;
-            max = 0;
-
-            this.SetActive(true);
-
-            return Tween.Parallel(
-                delayBetweenStarts: 0.1f,
-                this.ScaleTo(1, initialScale: 0),
-                Tween.Parallel(
-                    Tween.Value(() => min, from: 0, to: newMin),
-                    Tween.Value(() => max, from: 0, to: newMax)
-                )
-            );
-        }
-
-        public Tween ShrinkToOrigin()
-        {
-            return Tween.Parallel(
-                delayBetweenStarts: 0.1f,
-                Tween.Parallel(
-                    Tween.Value(() => min, from: min, to: 0),
-                    Tween.Value(() => max, from: max, to: 0)
-                ),
-                this.ScaleTo(0, initialScale: 1)
-            );
-        }
-
-
-        [Button(ButtonSizes.Large)]
-        public void UpdateChildren()
+        public Tween Transition(bool defer = false)
         {
             // We don't want to run this on prefabs
             if (gameObject.IsPreset())
-                return;
+                return Tween.noop;
 
-            var gnome = new Gnome(transform)
-                .ScaleChildrenInPlayMode();
+            var gnome = Gnome.For(this);
+            var updateParts = Tween.Parallel(
+                TransitionRod(gnome),
+                TransitionLabel(gnome),
+                TransitionArrows(gnome)
+            );
 
-            if (enabled && isActiveAndEnabled) {
-                UpdateRod(gnome);
-                UpdateLabel(gnome);
-                UpdateArrows(gnome);
-                UpdateTicks(gnome);
+            var addParts = gnome.GetCreatedChildren()
+                .Select(x => x.ScaleUpFromZero())
+                .RunInParallel();
+
+            var (addTicks, updateTicks, removeTicks) = TransitionTicks(gnome, defer);
+
+            var removeParts = gnome.ManualPurge(defer: true)
+                .Select(x => x.ScaleDownToZero().Observe(onDispose: x.Dispose))
+                .RunInParallel();
+
+            var update = Tween.Parallel(
+                updateTicks,
+                removeParts,
+                updateParts,
+                addParts
+            );
+
+            if (hasDomainChanged) {
+                hasDomainChanged = false;
+                lastReportedScale ??= scale;
+                var prevScale = lastReportedScale.Value;
+
+                update = update.Observe(
+                    afterUpdate: t => {
+                        lastReportedScale = Mathf.Lerp(prevScale, scale, t);
+                        onDomainChange?.Invoke();
+                    }
+                );
             }
 
-            gnome.Purge(defer: true);
+            return Tween.Parallel(
+                delayBetweenStarts: 0.1f,
+                // This may be null which will immediately start the tween below
+                removeTicks,
+                update,
+                addTicks
+            )
+            .Observe(
+                afterUpdate: EnsureOnlyOneTransitionAtATime()
+            );
+        }
+
+        private int lastTransitionId = 0;
+        private Action<float> EnsureOnlyOneTransitionAtATime()
+        {
+            lastTransitionId++;
+            var currentTransition = lastTransitionId;
+
+            return t => {
+                if (currentTransition == lastTransitionId)
+                    return;
+
+                throw new Exception(
+                    @"Two axis.Transition() running at the same time.
+there are two axis.Transition() trying to modify axis {name} as the same time
+this can happen if you combine two graph.Something() operations in a single tween
+you won't like what will happen if we continue this path
+
+If you need to modify multiple properties of a axis (or graph) change them directly
+and call to .Transition() only once after that
+
+    graph.min = 0;
+    graph.max = 10;
+    graph.scale = 1;
+    graph.Transition();
+
+instead of
+
+    // BAD! 👎
+    Tween.Parallel(
+      graph.SetDomain(10, 0)
+      graph.SetScale(1)
+    );
+
+END OF PRIMER MESSAGES
+"
+                );
+            };
+        }
+
+        [Button(ButtonSizes.Large)]
+        public void UpdateChildren() => UpdateChildren(defer: false);
+
+        public void UpdateChildren(bool defer)
+        {
+            using var tween = Transition(defer);
+            tween?.Apply();
         }
     }
 }

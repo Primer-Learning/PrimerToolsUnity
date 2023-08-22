@@ -6,6 +6,7 @@ using Debug = UnityEngine.Debug;
 
 namespace Primer.Timeline
 {
+    /// <summary>Base class for all tracks.</summary>
     public abstract class PrimerTrack : TrackAsset
     {
         protected virtual float defaultDuration => 1;
@@ -39,11 +40,7 @@ namespace Primer.Timeline
                 asset.duration = (float)clip.duration;
                 asset.clipIndex = clipCount++;
 
-                var canReplaceClipName = string.IsNullOrWhiteSpace(clip.displayName)
-                    || clip.displayName == nameof(SequenceClip)
-                    || clip.displayName[0] == '[';
-
-                if (canReplaceClipName && !string.IsNullOrWhiteSpace(asset.clipName))
+                if (clip.IsNameAutomated() && !string.IsNullOrWhiteSpace(asset.clipName))
                     clip.displayName = asset.clipName;
             }
 

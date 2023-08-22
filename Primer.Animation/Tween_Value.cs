@@ -4,6 +4,14 @@ using System.Runtime.CompilerServices;
 
 namespace Primer.Animation
 {
+    // Tween.Value() allows to tween an arbitrary field, property or variable from A to B.
+    //
+    //    var tween = Tween.Value(() => transform.position, Vector3.zero, Vector3.one);
+    //
+    // Be aware:
+    // If the value we're trying to tween is a readonly field or a property with only a getter but no setter
+    // we'll get a runtime error. Since we have no way detecting that at compile time.
+    //
     public partial record Tween
     {
         public static Tween Value<T>(Expression<Func<T>> expression, T to, Func<T, T, float, T> lerp = null,

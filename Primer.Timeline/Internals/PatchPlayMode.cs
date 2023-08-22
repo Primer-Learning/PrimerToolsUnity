@@ -15,15 +15,11 @@ namespace Primer.Timeline
     {
         public static bool isPreloading = false;
         public static bool isPlaying = false;
-        private static Action whenReady;
+        internal static Action whenReady;
 
         static PatchPlayMode()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChange;
-        }
-
-        public static void OnEnterPlayMode(Action listener) {
-            whenReady += listener;
         }
 
         private static async void OnPlayModeStateChange(PlayModeStateChange state)
@@ -34,9 +30,8 @@ namespace Primer.Timeline
             }
 
             var director = Object.FindObjectOfType<PlayableDirector>();
-            if (director) {
+            if (director)
                 await HandlePlayMode(director);
-            }
 
             isPlaying = true;
             whenReady?.Invoke();

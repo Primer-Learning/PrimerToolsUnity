@@ -3,15 +3,8 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    [RequireComponent(typeof(MultipleAxesController))]
-    public class Table : MonoBehaviour
+    public class Table : MonoBehaviour, IAxisController
     {
-        private MultipleAxesController axes;
-
-        [InlineEditor]
-        [ChildGameObjectsOnly]
-        public GridGenerator grid;
-
         [Title("Axes references")]
         [SerializeField]
         [Required]
@@ -25,20 +18,6 @@ namespace Primer.Graph
         [ChildGameObjectsOnly]
         public Axis y;
 
-        private void OnEnable() => UpdateAxes();
-
-        private void OnValidate() => UpdateAxes();
-
-
-        private void UpdateAxes()
-        {
-            axes ??= GetComponent<MultipleAxesController>();
-            axes.SetAxes(UpdateDomain, x, y);
-        }
-
-        private void UpdateDomain()
-        {
-            // noop
-        }
+        public Axis[] axes => new[] { x, y };
     }
 }

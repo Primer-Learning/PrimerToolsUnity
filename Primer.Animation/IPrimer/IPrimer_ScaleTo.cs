@@ -1,6 +1,6 @@
-
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Primer.Animation
@@ -67,7 +67,8 @@ namespace Primer.Animation
                 : self.component.ScaleTo(target, initial);
         }
 
-        public static Tween ScaleTo(this IPrimer self, float newScale, float? initialScale = null)
+        public static Tween ScaleTo(this IPrimer self, float newScale, float? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             var initial = initialScale.HasValue
                 ? Vector3.one * initialScale.Value
@@ -75,16 +76,17 @@ namespace Primer.Animation
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(Vector3.one * newScale, initial)
-                : self.component.ScaleTo(Vector3.one * newScale, initial);
+                : self.component.ScaleTo(Vector3.one * newScale, initial, filePath, lineNumber);
         }
 
-        public static Tween ScaleTo(this IPrimer self, Vector3 newScale, Vector3? initialScale = null)
+        public static Tween ScaleTo(this IPrimer self, Vector3 newScale, Vector3? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
-            var initial = initialScale ?? self.GetIntrinsicScale();
+            var initial = initialScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(newScale, initial)
-                : self.component.ScaleTo(newScale, initial);
+                : self.component.ScaleTo(newScale, initial, filePath, lineNumber);
         }
         #endregion
 
@@ -93,30 +95,33 @@ namespace Primer.Animation
         // These are copies of "Overloads" above but with
         // - Component instead of IPrimer
 
-        public static Tween ScaleUpFromZero(this Component self, Vector3? targetScale = null)
+        public static Tween ScaleUpFromZero(this Component self, Vector3? targetScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             var initial = Vector3.zero;
-            var target = targetScale ?? self.GetIntrinsicScale();
+            var target = targetScale ?? self.transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.transform.ScaleTo(target, initial);
+                : self.transform.ScaleTo(target, initial, filePath, lineNumber);
         }
 
-        public static Tween ScaleDownToZero(this Component self, Vector3? initialScale = null)
+        public static Tween ScaleDownToZero(this Component self, Vector3? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
-            var initial = initialScale ?? self.GetIntrinsicScale();
+            var initial = initialScale ?? self.transform.localScale;
             var target = Vector3.zero;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(target, initial)
-                : self.transform.ScaleTo(target, initial);
+                : self.transform.ScaleTo(target, initial, filePath, lineNumber);
         }
 
-        public static Tween ScaleTo(this Component self, float newScale, float? initialScale = null)
+        public static Tween ScaleTo(this Component self, float newScale, float? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (self == null)
-                return Tween.empty;
+                return null;
 
             var transform = self.transform;
             
@@ -135,21 +140,23 @@ namespace Primer.Animation
             return transform.ScaleTo(Vector3.one * newScale);
         }
 
-        public static Tween ScaleTo(this Component self, Vector3 newScale, Vector3? initialScale = null)
+        public static Tween ScaleTo(this Component self, Vector3 newScale, Vector3? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             var transform = self.transform;
             var initial = initialScale ?? transform.localScale;
 
             return self is IPrimer_CustomScaleTo custom
                 ? custom.ScaleTo(newScale, initial)
-                : transform.ScaleTo(newScale, initial);
+                : transform.ScaleTo(newScale, initial, filePath, lineNumber);
         }
         #endregion
 
 
         // Actual implementation
         // Only in Transform, all other overloads redirect here
-        public static Tween ScaleTo(this Transform self, Vector3 newScale, Vector3? initialScale = null)
+        public static Tween ScaleTo(this Transform self, Vector3 newScale, Vector3? initialScale = null,
+            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
             if (initialScale.HasValue) return new Tween(t => self.localScale = Vector3.Lerp(initialScale.Value, newScale, t));
             

@@ -1,5 +1,6 @@
 namespace Primer
 {
+    /// <summary>Options to be passed to Gnome when creating a child.</summary>
     public record ChildOptions
     {
         public bool worldPositionStays { get; init; } = false;

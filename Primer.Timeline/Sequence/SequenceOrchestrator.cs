@@ -5,6 +5,16 @@ using UnityEngine;
 
 namespace Primer.Timeline
 {
+    /*
+     *  Whenever we move the time cursor in the editor
+     *  we compress all that noise and function invocations Unity do
+     *  into a single call to SequenceOrchestrator.PlayAt(clips, float time)
+     *
+     *  This class creates a SequencePlayer for each sequence
+     *  (reuses if already created)
+     *  and calls PlayAt on it
+     */
+
     internal static class SequenceOrchestrator
     {
         private static readonly SingleExecutionGuarantee executionGuarantee = new();

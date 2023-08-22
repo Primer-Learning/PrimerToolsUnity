@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This is defined as extension methods because they doesn't need access to the internals of Gnome
+    // But can become another _Partial class
     public static class Gnome_AddPrimitiveExtensions
     {
         private static readonly Dictionary<PrimitiveType, GameObject> primitives = new();

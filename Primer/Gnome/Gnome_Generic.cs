@@ -1,18 +1,10 @@
-using System;
 using UnityEngine;
 
 namespace Primer
 {
+    // This part defines the static .For() that will return a Gnome<TComponent>
     public partial class Gnome
     {
-        // Now that it's called Gnome it makes more sense Gnome.For(this) than Gnome.From(this)
-        [Obsolete("Use Gnome.For(this) instead")]
-        public static Gnome<TComponent> From<TComponent>(TComponent component, bool setActive = true)
-            where TComponent : Component
-        {
-            return new Gnome<TComponent>(component, setActive);
-        }
-
         public static Gnome<TComponent> For<TComponent>(TComponent component, bool setActive = true)
             where TComponent : Component
         {
@@ -20,7 +12,7 @@ namespace Primer
         }
     }
 
-    public partial class Gnome<TComponent> : Gnome
+    public class Gnome<TComponent> : Gnome
         where TComponent : Component
     {
         public new TComponent component { get; }

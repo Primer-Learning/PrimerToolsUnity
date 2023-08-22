@@ -29,15 +29,12 @@ namespace Primer.Shapes.Tests
             arrow.Recalculate();
         }
 
-        public override void Prepare()
+        public override async IAsyncEnumerator<Tween> Define()
         {
             arrow = GetComponent<PrimerArrow2>();
             startInitial = arrow.tail;
             endInitial = arrow.head;
-        }
 
-        public override async IAsyncEnumerator<Tween> Define()
-        {
             yield return arrow.Animate(start, end);
         }
     }

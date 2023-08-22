@@ -1,18 +1,16 @@
-using System;
 using System.Collections.Generic;
 using Primer.Animation;
 using UnityEngine;
 
 namespace Primer.Timeline
 {
+    /// <summary>
+    ///     Represents a sequential execution of Tweens
+    /// </summary>
     [DisallowMultipleComponent]
     public abstract class Sequence : AsyncMonoBehaviour
     {
         private readonly List<Transform> disposeOnCleanup = new();
-
-        // TODO: Remove
-        [Obsolete("Code that used to be in Prepare() can be added at the beginning of Define(), before the first yield return, instead.")]
-        public virtual void Prepare() {}
 
         public virtual void Cleanup()
         {
@@ -26,9 +24,28 @@ namespace Primer.Timeline
             SequenceOrchestrator.EnsureDisposal(child);
         }
 
-        public SequenceRunner Run() => new(this);
+        public SequenceRunner Run()
+        {
+            ClearClipColor();
+            return new SequenceRunner(this);
+        }
 
         // TODO: Make protected
         public abstract IAsyncEnumerator<Tween> Define();
+
+        #region Clip color
+        internal Stack<Color> clipColors = new();
+        public Color clipColor => clipColors.Count > 0 ? clipColors.Peek() : Color.clear;
+
+        protected void PushClipColor(Color newColor) => clipColors.Push(newColor);
+        protected void PopClipColor() => clipColors.Pop();
+
+        protected void ClearClipColor() => clipColors.Clear();
+        protected void SetClipColor(Color newColor)
+        {
+            ClearClipColor();
+            PushClipColor(newColor);
+        }
+        #endregion
     }
 }

@@ -6,7 +6,8 @@ namespace Primer
 
     /// <summary>
     ///   Extend this interface to inherit all the Primer magic
-    ///   Only a .component getter is required to be implemented
+    ///   Only .component and .transform getters are required to be implemented
+    ///   Both can return the same Transform instance
     /// </summary>
     public interface IPrimer
     {

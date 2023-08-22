@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace Primer
 {
+    /// <summary>
+    ///     Stores WeakReferences&lt;T&gt;.
+    ///     Allows the garbage collector to collect the items if there this is the only reference to them.
+    /// </summary>
     public class WeakSet<T> : IEnumerable<T> where T : class
     {
         private readonly HashSet<WeakReference<T>> set = new();

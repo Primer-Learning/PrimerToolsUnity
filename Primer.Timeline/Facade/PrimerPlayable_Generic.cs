@@ -4,6 +4,13 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    /// <summary>
+    ///   Extension of <code>PrimerPlayable</code> that includes <code>TTrackBind trackTarget</code> property
+    ///   containing the Component is bound to the track of this playable
+    ///   this is set before <code>Start()</code> is invoked so it's safe to use
+    ///   from <code>Start()</code>, <code>Stop()</code> and after invoking <code>base.ProcessFrame()</code>
+    /// </summary>
+    /// <typeparam name="TTrackBind">Type of the object expected to be bound to the track</typeparam>
     public class PrimerPlayable<TTrackBind> : PrimerPlayable
         where TTrackBind : Component
     {

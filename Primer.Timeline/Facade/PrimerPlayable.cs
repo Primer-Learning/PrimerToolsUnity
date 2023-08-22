@@ -4,6 +4,13 @@ using UnityEngine.Playables;
 
 namespace Primer.Timeline
 {
+    /// <summary>
+    ///   Provides virtual <code>Start()</code> and <code>Stop()</code> methods
+    ///   that are much simpler to understand than the various <code>PlayableBehaviour</code> virtual methods.
+    /// </summary>
+    /// <remarks>
+    ///   `ProcessFrame` must be overriden and `base.ProcessFrame()` invoked inside.
+    /// </remarks>
     [Serializable]
     public class PrimerPlayable : PlayableBehaviour
     {

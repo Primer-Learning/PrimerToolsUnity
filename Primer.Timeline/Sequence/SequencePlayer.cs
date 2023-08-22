@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -46,8 +45,6 @@ namespace Primer.Timeline
         }
 
         /// <summary>Executed immediately before any clip is executed</summary>
-        // TODO: Remove
-        [Obsolete("Code that used to be in Prepare() can be added at the beginning of Define(), before the first yield return, instead.")]
         public void Prepare()
         {
             if (status == Status.Playing)
@@ -55,7 +52,6 @@ namespace Primer.Timeline
 
             Log("Prepare");
             status = Status.Playing;
-            sequence.Prepare();
         }
 
         /// <summary>Rolls back the sequence execution to the beginning</summary>
@@ -190,6 +186,9 @@ namespace Primer.Timeline
 
             if (ct.IsCancellationRequested)
                 return true;
+
+            if (currentTween is not null)
+                currentTween.Dispose();
 
             activeClip = clip;
             currentTween = hasMore ? enumerator.Current : null;

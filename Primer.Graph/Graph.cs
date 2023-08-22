@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,29 +7,15 @@ using UnityEngine.Serialization;
 namespace Primer.Graph
 {
     [ExecuteAlways]
-    [RequireComponent(typeof(MultipleAxesController))]
-    public class Graph : MonoBehaviour, IDisposable
+    public class Graph : MonoBehaviour, IAxisController, IDisposable
     {
-        #region public bool enableZAxis;
-        [SerializeField, HideInInspector]
-        private bool _enableZAxis;
-
         [Title("Graph controls")]
-        [ShowInInspector]
-        public bool enableZAxis {
-            get => _enableZAxis;
-            set {
-                _enableZAxis = value;
-                UpdateAxes();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_enableZAxis")]
+        public bool enableZAxis;
 
         [EnableIf(nameof(enableZAxis))]
         [OnValueChanged(nameof(EnsureDomainDimensions))]
         public bool isRightHanded = true;
-
-        private MultipleAxesController axesController;
 
         [Title("Axes references")]
         [FormerlySerializedAs("x")]
@@ -66,14 +51,21 @@ namespace Primer.Graph
 
         public Action onDomainChanged;
 
-        private Axis[] axes => enableZAxis && z?.transform.localScale.z is not 0
+        public float scale {
+            set {
+                x.scale = value;
+                y.scale = value;
+                z.scale = value;
+            }
+        }
+
+        public Axis[] axes => enableZAxis && z?.transform.localScale.z is not 0
             ? new [] { x, y, z }
             : new [] { x, y };
 
 
-        private void OnEnable() => UpdateAxes();
-
         private void OnValidate() => UpdateAxes();
+        private void Update() => EnsureDomainDimensions();
 
 
         public Tween GrowZAxis(float newMax) => GrowZAxis(0, newMax);
@@ -88,20 +80,25 @@ namespace Primer.Graph
             return z.ShrinkToOrigin().Observe(onComplete: () => enableZAxis = false);
         }
 
+        // We override this IAxisController extension method to ensure that the z axis is enabled/disabled
+        public Tween GrowFromOrigin()
+        {
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this);
+        }
+
         public Tween GrowFromOrigin(float newMax)
         {
-            return axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this, newMax);
         }
 
         public Tween GrowFromOrigin(float newMin, float newMax)
         {
-            return axes.Select(axis => axis.GrowFromOrigin(newMin, newMax)).RunInParallel();
+            z?.SetActive(enableZAxis);
+            return IAxisControllerExtensions.GrowFromOrigin(this, newMin, newMax);
         }
 
-        public Tween ShrinkToOrigin()
-        {
-            return axes.Select(axis => axis.ShrinkToOrigin()).RunInParallel();
-        }
 
         private void UpdateAxes()
         {
@@ -115,8 +112,7 @@ namespace Primer.Graph
                 }
             }
 
-            axesController ??= GetComponent<MultipleAxesController>();
-            axesController.SetAxes(EnsureDomainDimensions, xAxis, yAxis, zAxis);
+            EnsureDomainDimensions();
         }
 
         public Vector3 DomainToPosition(Vector3 value)
@@ -158,9 +154,9 @@ namespace Primer.Graph
             return gnome.Add<StackedArea>(name);
         }
 
-        public NewBarPlot AddBarPlot(string name)
+        public BarPlot AddBarPlot(string name)
         {
-            return gnome.Add<NewBarPlot>(name);
+            return gnome.Add<BarPlot>(name);
         }
 
         public GraphDomain AddPoint(string name, Vector3? coords = null)

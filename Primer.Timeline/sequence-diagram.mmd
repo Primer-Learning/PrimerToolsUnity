@@ -1,0 +1,125 @@
+%% Paste me at https://mermaid.live/
+
+classDiagram
+  direction TB
+
+namespace Unity {
+    class PlayableAsset {
+        represents the "asset" for clips, timelines
+        what gets serialized and stored
+    }
+
+    class TrackAsset
+
+    class Playable
+    class PlayableBehaviour {
+        from Unity Timeline API
+        representation of "something" in the timeline
+        clips, tracks _called mixers_, the whole timeline asset...
+        represents the same as our Tween
+        with more events
+        and a difficult usage
+    }
+}
+
+namespace Facade {
+    class PrimerMixer
+    class PrimerPlayable
+    class PrimerTrack
+    class PrimerClip
+}
+
+namespace Internal {
+    %% Extend Unity
+    class SequenceMixer {
+        Unty creates one per each SequenceTrack
+        void ProcessFrame(Playable playable)
+    }
+
+    class SequencePlayable {
+        Unity creates one per each SequenceClip
+    }
+
+    %% Actual sequence management
+    class SequenceOrchestrator {
+        creates one SequencePlayer
+        per Sequence found
+        and calls PlayAt on them
+        -void PlayTo(SequencePlayable[] clips, float time)
+    }
+}
+
+    class SequencePlayer {
+        Internal representation of a Sequence
+        -void Clean()
+        -void Prepare()
+        -void Reset()
+        -void PlayTo(float time)
+    }
+
+namespace what_we_see_in_editor {
+    class SequenceClip
+    class SequenceTrack
+
+    class Sequence {
+        <<Component>>
+        -SequenceRunner Run();
+    }
+
+    class SequenceRunner {
+        <<IPrimer>>
+        -readonly Sequence sequence
+        -bool hasMoreClips
+        -UniTask~Tween~ NextClip()
+    }
+}
+
+    class Tween
+
+    PlayableAsset --|> TrackAsset
+    TrackAsset --|> PrimerTrack
+    Playable --|> PlayableBehaviour
+    PlayableBehaviour --|> PrimerMixer
+    PlayableBehaviour --|> PrimerPlayable
+    PlayableAsset --|> PrimerClip
+
+    PrimerClip --|> SequenceClip
+    SequenceClip .. SequencePlayable
+    PrimerPlayable --|> SequencePlayable
+
+    PrimerTrack --|> SequenceTrack
+    SequenceTrack .. SequenceMixer
+    PrimerMixer --|> SequenceMixer
+    SequenceMixer ..> SequenceOrchestrator : Invokes SequenceOrchestrator.PlayTo(clips, time)
+
+    Sequence ..> SequenceRunner : creates
+    SequenceRunner "*" ..> "1" Sequence : contains
+    SequenceRunner ..> Tween : returns
+
+    SequencePlayer "1" .. "1" Sequence
+    SequenceTrack "1" .. "1" Sequence : Linked through PlayableDirector component
+
+    SequenceOrchestrator ..> SequencePlayer : creates
+
+    note for SequenceMixer "
+        Receives a call to `ProcessFrame(Playable playable)`
+        for each clip in the track
+
+        This is where we convert all those calls
+        `ProcessFrame(Playable playable)`
+        into a single call to
+        `SequenceOrchestrator.PlayAt(SequencePlayable[] allBehaviours, float time)`
+
+        The way we do that is not nice
+        but we need it to process the sequences in the right order
+    "
+
+    note for SequenceOrchestrator "
+        Whenever we move the time cursor in the editor
+        we compress all that noise and function invocations Unity do
+        into a single call to SequenceOrchestrator.PlayAt(clips, float time)
+
+        This class creates a SequencePlayer for each sequence
+        (reuses if already created)
+        and calls PlayAt on it
+    "

@@ -4,6 +4,7 @@ using UnityEngine.Timeline;
 
 namespace Primer.Timeline
 {
+    /// <summary>Base class for all clips.</summary>
     public abstract class PrimerClip : PlayableAsset, ITimelineClipAsset
     {
         public float? expectedDuration = null;
@@ -14,6 +15,9 @@ namespace Primer.Timeline
         public ClipCaps clipCaps => ClipCaps.Extrapolation;
 
         public virtual string clipName => "";
+
+        [SerializeField]
+        public Color clipColor = Color.clear;
 
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
@@ -59,7 +63,7 @@ namespace Primer.Timeline
         }
 
         public float start {
-            get => template.start;
+            get => lastPlayable?.start ?? template.start;
             set {
                 template.start = value;
 

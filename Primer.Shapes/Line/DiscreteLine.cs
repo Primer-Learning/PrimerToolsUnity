@@ -28,19 +28,22 @@ namespace Primer.Shapes
             this.points = points.Select((y, i) => new Vector3(i, y)).ToArray();
         }
 
-        public DiscreteLine Append(Vector3 point)
+        public DiscreteLine Append(params Vector3[] data)
         {
-            var newPoints = new Vector3[points.Length + 1];
+            var newPoints = new Vector3[points.Length + data.Length];
             Array.Copy(points, newPoints, points.Length);
-            newPoints[^1] = point;
+            Array.Copy(data, 0, newPoints, points.Length, data.Length);
             return new DiscreteLine(newPoints);
         }
 
-        public DiscreteLine Append(float y)
+        public DiscreteLine Append(params float[] data)
         {
-            var newPoints = new Vector3[points.Length + 1];
+            var newPoints = new Vector3[points.Length + data.Length];
             Array.Copy(points, newPoints, points.Length);
-            newPoints[^1] = new Vector3(points.Length, y);
+
+            for (var i = 0; i < data.Length; i++)
+                newPoints[points.Length + i] = new Vector3(points.Length + i, data[i]);
+
             return new DiscreteLine(newPoints);
         }
 

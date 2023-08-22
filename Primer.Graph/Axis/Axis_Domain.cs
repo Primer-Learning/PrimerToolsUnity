@@ -1,6 +1,7 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
@@ -19,7 +20,7 @@ namespace Primer.Graph
                     return;
 
                 _range = value;
-                DomainChanged();
+                hasDomainChanged = true;
             }
         }
         #endregion
@@ -33,25 +34,17 @@ namespace Primer.Graph
         public float scale {
             get => _scale;
             set {
+                if (_scale == value)
+                    return;
+
                 _scale = value;
-                DomainChanged();
+                hasDomainChanged = true;
             }
         }
         #endregion
 
-        #region public Vector2 padding;
-        [SerializeField, HideInInspector]
-        private Vector2 _padding = Vector2.zero;
-
-        [ShowInInspector]
-        public Vector2 padding {
-            get => _padding;
-            set {
-                _padding = value;
-                UpdateChildren();
-            }
-        }
-        #endregion
+        [FormerlySerializedAs("_padding")]
+        public Vector2 padding = Vector2.zero;
 
         internal float start => range.min * scale;
         internal float end => range.max * scale;
@@ -61,18 +54,12 @@ namespace Primer.Graph
 
         public float min {
             get => _range.min;
-            set {
-                _range.min = value;
-                UpdateChildren();
-            }
+            set => _range.min = value;
         }
 
         public float max {
             get => _range.max;
-            set {
-                _range.max = value;
-                UpdateChildren();
-            }
+            set => _range.max = value;
         }
 
 
@@ -87,6 +74,12 @@ namespace Primer.Graph
             [HorizontalGroup]
             [MinValue("$min")]
             public float max;
+
+            public MinMax(float min, float max)
+            {
+                this.min = min;
+                this.max = max;
+            }
         }
     }
 }

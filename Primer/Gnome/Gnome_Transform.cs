@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part attempts to mimic the properties of a transform so we can replace a Transform with a Gnome
+    // without changing the rest of the code.
     public partial class Gnome
     {
         public Vector3 position {

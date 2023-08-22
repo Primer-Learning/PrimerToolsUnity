@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part defines how children are removed when purging.
     public partial class Gnome
     {
         public bool disableWhenDisposed = true;
@@ -14,6 +15,23 @@ namespace Primer
         {
             Reset();
             Purge(defer);
+        }
+
+        /// <summary>Use this to remove children manually.</summary>
+        /// <remark>This will not trigger onRemove callback</remark>
+        /// <returns>List of children to be removed</returns>
+        public List<Transform> ManualPurge(bool defer = false)
+        {
+            var toRemove = new List<Transform>(unusedChildren);
+            unusedChildren.Clear();
+
+            foreach (var child in toRemove)
+                child.GetOrAddComponent<GnomeEvents.IsRemoving>();
+
+            foreach (var listener in onPurge)
+                listener(defer);
+
+            return toRemove;
         }
 
         public void Purge(bool defer = false)

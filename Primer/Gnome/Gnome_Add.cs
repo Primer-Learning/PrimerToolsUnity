@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Primer
 {
+    // This part contains the methods to define new children
     public partial class Gnome
     {
         public Transform Add(string name = null, ChildOptions options = null)

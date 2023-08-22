@@ -8,28 +8,41 @@ namespace Primer.Animation
     {
         public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
         {
-            return Parallel(tweenList.Select((tween, i) => tween with { delay = delayBetweenStarts * i }));
+            var tweens = tweenList
+                .RemoveEmptyTweens()
+                .Select((tween, i) => tween with { delay = delayBetweenStarts * i })
+                .ToArray();
+
+            return Parallel_Internal(tweens);
         }
 
         public static Tween Parallel(IEnumerable<Tween> tweenList)
         {
-            return Parallel(tweenList.ToArray());
+            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
+        }
+
+        public static Tween Parallel(params Tween[] tweenList)
+        {
+            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
-        public static Tween Parallel(params Tween[] tweenList)
+        private static Tween Parallel_Internal(Tween[] tweenList)
         {
-            if (tweenList.Length == 0)
-                return noop with { milliseconds = 0 };
+            if (tweenList.Length is 0)
+                return noop;
+
+            if (tweenList.Length is 1)
+                return tweenList[0];
 
             var fullDuration = tweenList.Max(x => x.totalDuration);
 
             if (fullDuration is 0) {
                 Debug.LogWarning("Parallel tween list is empty");
-                return noop with { milliseconds = 0 };
+                return noop;
             }
 
-            return new Tween(
+            var result = new Tween(
                 t => {
                     for (var i = 0; i < tweenList.Length; i++) {
                         var tween = tweenList[i];
@@ -41,6 +54,21 @@ namespace Primer.Animation
                 duration = fullDuration,
                 isCalculated = true,
             };
+
+            var observed = tweenList
+                .Select(x => x as ObservableTween)
+                .Where(x => x?.onDispose != null)
+                .ToList();
+
+            if (observed.Count is 0)
+                return result;
+
+            return result.Observe(
+                onDispose: () => {
+                    foreach (var tween in observed)
+                        tween.onDispose();
+                }
+            );
         }
     }
 }

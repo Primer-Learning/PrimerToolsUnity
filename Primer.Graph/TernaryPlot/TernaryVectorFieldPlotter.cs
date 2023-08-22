@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Primer.Graph;
+﻿using Primer.Graph;
 using Primer.Shapes;
-using Primer.Simulation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

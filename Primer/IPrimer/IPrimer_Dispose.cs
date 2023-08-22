@@ -18,13 +18,15 @@ namespace Primer
                 item.Dispose(defer);
         }
 
-        public static void Dispose(this IPrimer self, bool defer = false)
+        public static void Dispose(this IPrimer self) => self.Dispose(false);
+        public static void Dispose(this IPrimer self, bool defer)
         {
             if (self != null)
                 self.transform.gameObject.Dispose(defer);
         }
 
-        public static void Dispose(this Component self, bool defer = false)
+        public static void Dispose(this Component self) => self.Dispose(false);
+        public static void Dispose(this Component self, bool defer)
         {
             if (self != null)
                 self.gameObject.Dispose(defer);

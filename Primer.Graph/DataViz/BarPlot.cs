@@ -2,347 +2,209 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
-using Primer.Latex;
 using Primer.Shapes;
-using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+using BarPlotData = System.Collections.Generic.List<System.Collections.Generic.List<float>>;
+
 namespace Primer.Graph
 {
-    [RequireComponent(typeof(Graph))]
-    public class BarPlot : MonoBehaviour
+    [ExecuteAlways]
+    [RequireComponent(typeof(GraphDomain))]
+    public class BarPlot : MonoBehaviour, IDisposable
     {
-        public static Color defaultColor = new Vector4(62, 126, 160, 255) / 255;
-        private int barCountForHax;
+        public BarPlotData renderedData = new BarPlotData();
+        public BarPlotData incomingData;
 
-        private Graph graphCache;
-        private Graph graph => transform.GetOrAddComponent(ref graphCache);
+        public List<Color> colors = new List<Color>(PrimerColor.all);
 
-        private Gnome _barsGnome;
-        private Gnome barsGnome => _barsGnome ??= new Gnome("Plotted bars", graph);
+        private GraphDomain domainCache;
+        private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
 
-        private Gnome _labelsGnome;
-        public Gnome LabelsGnome
-            => _labelsGnome ??= new Gnome("Plotted bars labels", graph).ScaleChildrenInPlayMode();
-
-        public BarData this[int index] => GetBar(index);
-        public BarData this[string name] => GetBar(name);
-
-        public Func<BarData, string> barLabels = null;
-
-        #region float barWidth;
+        #region public float barGap;
         [SerializeField, HideInInspector]
-        private float _barWidth = 1f;
+        private Vector2 _barGap = new Vector2(1, 0);
+
+        [ShowInInspector]
+        public Vector2 barGap {
+            get => _barGap;
+            set {
+                _barGap = value;
+                Render();
+            }
+        }
+        #endregion
+
+        #region public float offset;
+        [SerializeField, HideInInspector]
+        private float _offset = 1;
+
+        [ShowInInspector]
+        public float offset {
+            get => _offset;
+            set {
+                _offset = value;
+                Render();
+            }
+        }
+        #endregion
+
+        #region public float barWidth;
+        [SerializeField, HideInInspector]
+        private float _barWidth = 1.5f;
+
         [ShowInInspector]
         public float barWidth {
             get => _barWidth;
-            set => Meta.ReactiveProp(ref _barWidth, value, UpdateBars);
+            set {
+                _barWidth = value;
+                Render();
+            }
         }
         #endregion
 
-        #region float cornerRadius;
-        [SerializeField, HideInInspector]
-        private float _cornerRadius = 0.25f;
-        [ShowInInspector]
-        public float cornerRadius {
-            get => _cornerRadius;
-            set => Meta.ReactiveProp(ref _cornerRadius, value, UpdateBars);
-        }
-        #endregion
-
-        #region Vector3 offset;
-        [SerializeField, HideInInspector]
-        private Vector3 _offset = Vector3.zero;
-        [ShowInInspector]
-        public Vector3 offset {
-            get => _offset;
-            set => Meta.ReactiveProp(ref _offset, value, UpdateBars);
-        }
-        #endregion
-
-        #region Vector3 labelOffset;
-        [SerializeField, HideInInspector]
-        private Vector3 _labelOffset = Vector3.zero;
-        [ShowInInspector]
-        public Vector3 labelOffset {
-            get => _labelOffset;
-            set => Meta.ReactiveProp(ref _labelOffset, value, UpdateBars);
-        }
-        #endregion
-
-        #region Vector3 labelScale;
-        [SerializeField, HideInInspector]
-        private Vector3 _labelScale = Vector3.one;
-        [ShowInInspector]
-        public Vector3 labelScale {
-            get => _labelScale;
-            set => Meta.ReactiveProp(ref _labelScale, value, UpdateBars);
-        }
-        #endregion
-
-
-        #region List<BarData> bars;
-        [SerializeField, HideInInspector]
-        private List<BarData> _bars = new();
-        [ShowInInspector]
-        [HorizontalGroup("Data")]
-        [HideReferenceObjectPicker]
-        [ListDrawerSettings(AlwaysAddDefaultValue = true)]
-        private List<BarData> bars {
-            get => _bars;
-            set => Meta.ReactiveProp(ref _bars, value, UpdateBars);
-        }
-        #endregion
-
-
-        public void SetDefaults()
+        private void OnEnable()
         {
-            _barWidth = 0.8f;
-            _cornerRadius = 0.25f;
-            _offset = Vector3.right * 0.5f;
-            _bars.Clear();
+            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
+            domain.onDomainChange = Render;
         }
 
-
-        #region Unity events
-        public void OnEnable()
+        public void SetData(params float[] bars)
         {
-            graph.onDomainChanged += UpdateBars;
-            UpdateBars();
+            incomingData = ToLists(bars.Select(x => new List<float> { x }));
         }
 
-        public void OnDisable()
+        public void SetData(float[,] data)
         {
-            graph.onDomainChanged -= UpdateBars;
-        }
-        #endregion
-
-
-        #region Bar management
-        public BarData AddBar(string name, float value = 0) => AddBar(name, value, defaultColor);
-        public BarData AddBar(string name, float value, Color color)
-        {
-            var bar = new BarData {
-                name = name,
-                value = value,
-                color = color,
-            };
-
-            bars.Add(bar);
-            UpdateBars();
-            return bar;
+            incomingData = ToLists(data);
         }
 
-        public BarData GetBar(int index, bool createIfMissing = false)
+        public void SetData(params IEnumerable<float>[] data)
         {
-            if (createIfMissing)
-                EnsureBarCount(index);
-            else if (bars.Count <= index)
-                throw new IndexOutOfRangeException($"There is no bar in the graph at index {index}");
-
-            return bars[index];
+            incomingData = ToLists(data);
         }
 
-        public BarData GetBar(string name, bool createIfMissing = false)
+        public void AddStack(params float[] data)
         {
-            var bar = bars.FirstOrDefault(x => x.name == name);
+            // We create a copy so we can mutate it
+            incomingData = ToLists(incomingData ?? renderedData ?? new BarPlotData());
 
-            if (bar is not null)
-                return bar;
+            for (var i = 0; i < data.Length; i++) {
+                if (incomingData.Count <= i)
+                    incomingData.Add(new List<float>());
 
-            if (createIfMissing)
-                return AddBar(name);
-
-            throw new IndexOutOfRangeException($"There is no bar in the graph called {name}");
+                incomingData[i].Add(data[i]);
+            }
         }
 
-        public void Clear()
+        public void AddData(params float[] data)
         {
-            bars.Clear();
-            UpdateBars();
+            incomingData = ToLists(incomingData ?? renderedData);
+            incomingData.Add(new List<float>(data));
         }
 
-        private T[] EnsureBarCount<T>(IEnumerable<T> input)
+        public Tween Transition()
         {
-            var array = input.ToArray();
-            EnsureBarCount(array.Length);
-            return array;
+            if (incomingData is null)
+                return Tween.noop;
+
+            var initial = ToLists(renderedData);
+            var target = ToLists(incomingData);
+
+            incomingData = null;
+            return new Tween(t => Render(Lerp(initial, target, t)));
         }
 
-        private void EnsureBarCount(int inputCount)
+        public Tween GrowFromStart()
         {
-            if (bars.Count == inputCount) return;
-
-            for (var i = bars.Count; i < inputCount; i++)
-                bars.Add(new BarData { color = defaultColor });
-
-            UpdateBars();
-        }
-        #endregion
-
-
-        #region Set / tween properties
-        public void SetNames(IEnumerable<string> names) => SetNames(names.ToArray());
-        public void SetNames(params string[] names)
-        {
-            var input = EnsureBarCount(names);
-
-            for (var i = 0; i < input.Length; i++)
-                bars[i].name = input[i];
+            var initial = new BarPlotData();
+            var target = ToLists(incomingData ?? renderedData);
+            return new Tween(t => Render(Lerp(initial, target, t)));
         }
 
-        public void SetValues(IEnumerable<int> values) => SetValues(values.ToFloatArray());
-        public void SetValues(int[] values) => SetValues(values.ToFloatArray());
-        public void SetValues(IEnumerable<float> values) => SetValues(values.ToArray());
-        public void SetValues(params float[] values)
+        public Tween ShrinkToEnd()
         {
-            var input = EnsureBarCount(values);
-
-            for (var i = 0; i < input.Length; i++)
-                bars[i].value = input[i];
+            var initial = renderedData;
+            var target = new BarPlotData();
+            return new Tween(t => Render(Lerp(initial, target, t)));
         }
 
-        public Tween TweenValues(IEnumerable<int> values) => TweenValues(values.ToFloatArray());
-        public Tween TweenValues(params int[] values) => TweenValues(values.ToFloatArray());
-        public Tween TweenValues(IEnumerable<float> values) => TweenValues(values.ToArray());
-        public Tween TweenValues(params float[] values)
+        public void Dispose()
         {
-            var to = EnsureBarCount(values);
-            var from = to.Select((x, i) => bars[i].value).ToArray();
+            Gnome.Dispose(this);
+        }
 
-            return new Tween(t => {
-                for (var i = 0; i < to.Length; i++) {
-                    bars[i].value = Mathf.Lerp(from[i], to[i], t);
+        private void Render() => Render(renderedData);
+        private void Render(BarPlotData data)
+        {
+            var gnome = Gnome.For(this);
+            var width = domain.TransformPoint(new Vector3(barWidth, 0)).x;
+            var gap = domain.TransformPoint(barGap);
+            var offset = domain.TransformPoint(new Vector3(this.offset, 0)).x;
+
+            for (var x = 0; x < data.Count; x++) {
+                var bar = data[x];
+                var bottom = domain.TransformPoint(new Vector3(x, 0));
+                var coords = bar.Select(y => domain.TransformPoint(new Vector3(x, y))).ToList();
+
+                for (var j = 0; j < data[x].Count; j++) {
+                    var rect = gnome.Add<Rectangle>($"Bar {x} stack {j}");
+                    rect.transform.localPosition = new Vector3(bottom.x + (gap.x * x) + offset, bottom.y);
+                    rect.pivot = RectPivot.BottomCenter;
+                    rect.width = width;
+                    rect.height = coords[j].y;
+                    rect.color = colors[j % colors.Count];
+                    bottom = new Vector3(bottom.x, bottom.y + coords[j].y + gap.y);
                 }
-            });
-        }
-
-        public void SetColors(IEnumerable<Color> colors) => SetColors(colors.ToArray());
-        public void SetColors(params Color[] colors)
-        {
-            var input = EnsureBarCount(colors);
-
-            for (var i = 0; i < input.Length; i++)
-                bars[i].color = input[i];
-        }
-
-        public Tween TweenColors(IEnumerable<Color> newColors) => TweenColors(newColors.ToArray());
-        public Tween TweenColors(params Color[] newColors)
-        {
-            var to = EnsureBarCount(newColors);
-            var from = to.Select((x, i) => bars[i].color).ToArray();
-
-            return new Tween(t => {
-                for (var i = 0; i < to.Length; i++)
-                    bars[i].color = Color.Lerp(from[i], to[i], t);
-            });
-        }
-
-        // /* can be done with */ barPlot[index].color = color;
-        [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void SetBarColor(int index, Color color) => this[index].color = color;
-
-        // /* can be done with */ barPlot[name].color = color;
-        [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void SetBarColor(string name, Color color) => this[name].color = color;
-
-        // /* can be done with */ barPlot[index].Tween("color", color);
-        [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void TweenColor(int index, Color color) => Tween.Value(() => this[index].color, color);
-
-        // /* can be done with */ barPlot[name].Tween("color", color);
-        [Obsolete("This method may not be necessary, if you use it please remove this attribute and the comment above")]
-        public void TweenColor(string name, Color color) => Tween.Value(() => this[name].color, color);
-        #endregion
-
-
-        [Button]
-        public void UpdateBars()
-        {
-            var gnome = barsGnome;
-            gnome.Reset();
-            gnome.localScale = Vector3.one;
-            gnome.localPosition = Vector3.zero;
-
-            LabelsGnome.Reset();
-
-            for (var i = 0; i < bars.Count; i++) {
-                var data = bars[i];
-                var bar = CreateBar(gnome, data, i);
-                var label = barLabels is null ? null : CreateBarLabel(bar, data, i >= barCountForHax || barCountForHax == 0);
-
-                data.onNameChange = UpdateIfError<string>(newName => bar.gameObject.name = newName);
-                data.onColorChange = UpdateIfError<Color>(newColor => bar.color = newColor);
-                data.onValueChange = UpdateIfError<float>(newValue => {
-                    bar.height = newValue;
-                    label?.Process(barLabels(data));
-                });
             }
 
-            barCountForHax = bars.Count;
-
-            LabelsGnome.Purge();
             gnome.Purge();
+            renderedData = data;
         }
 
-        private LatexComponent CreateBarLabel(Rectangle bar, BarData data, bool isNew = false)
+        private static BarPlotData ToLists(IEnumerable<IEnumerable<float>> data)
         {
-            var domain = graph.domain;
-            
-            var follower = LabelsGnome.AddFollower(bar);
-            follower.component.useGlobalSpace = true;
-            if (isNew)
-            {
-                follower.localScale = Vector3.zero;
+            return data.Select(x => x.ToList()).ToList();
+        }
+
+        private static BarPlotData ToLists(float[,] data)
+        {
+            var lists = new List<List<float>>();
+
+            for (var x = 0; x < data.GetLength(0); x++) {
+                var list = new List<float>();
+
+                for (var y = 0; y < data.GetLength(1); y++)
+                    list.Add(data[x, y]);
+
+                lists.Add(list);
             }
 
-            follower.component.getter = () => {
-                if (bar == null) {
-                    follower.component.Dispose();
-                    return Vector3.zero;
-                }
-
-                var barMiddleTop = new Vector3(barWidth / 2, data.value);
-                var domainPosition = bar.transform.localPosition + barMiddleTop;
-                // return domain.TransformPoint(domainPosition);
-                var graphSpace = domain.ElementWiseMultiply(domainPosition);
-                return graph.transform.TransformPoint(graphSpace + labelOffset);
-            };
-
-            var label = follower.AddLatex(barLabels(data), $"{bar.name} label");
-            label.transform.localPosition = Vector3.zero;
-            label.transform.localScale = labelScale;
-            // Puts the label in the right place on the first frame, rather than at the origin
-            follower.transform.position = follower.component.getter();
-            return label;
+            return lists;
         }
 
-        private Rectangle CreateBar(Gnome gnome, BarData data, int i)
+        private static BarPlotData Lerp(BarPlotData a, BarPlotData b, float t)
         {
-            var bar = gnome.Add<Rectangle>(data.name ?? $"Bar {i}");
+            var result = new BarPlotData();
+            var barsCount = Mathf.Max(a.Count, b.Count);
 
-            bar.transform.localPosition = new Vector3(i, 0, 0) + offset;
+            for (var i = 0; i < barsCount; i++) {
+                var from = i < a.Count ? a[i] : new List<float>();
+                var to = i < b.Count ? b[i] : new List<float>();
+                var stackCount = Mathf.Max(from.Count, to.Count);
+                var lerpedBar = new List<float>();
 
-            bar.pivot = RectPivot.BottomLeft;
-            bar.color = data.color;
-            bar.width = barWidth;
-            bar.height = data.value;
-
-            return bar;
-        }
-
-        private Action<T> UpdateIfError<T>(Action<T> handler)
-        {
-            return x => {
-                try {
-                    handler(x);
+                for (var j = 0; j < stackCount; j++) {
+                    var fromValue = j < from.Count ? from[j] : 0;
+                    var toValue = j < to.Count ? to[j] : 0;
+                    lerpedBar.Add(Mathf.Lerp(fromValue, toValue, t));
                 }
-                catch {
-                    Debug.LogWarning("Error updating bar plot, updating all bars");
-                    UpdateBars();
-                }
-            };
+
+                result.Add(lerpedBar);
+            }
+
+            return result;
         }
     }
 }

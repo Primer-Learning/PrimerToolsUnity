@@ -6,7 +6,8 @@
     "GUID:02f771204943f4a40949438e873e3eff",
     "GUID:f51ebe6a0ceec4240a699833d6309b23",
     "Primer",
-    "Primer.Timeline"
+    "Primer.Timeline",
+    "GUID:c9bf5d8a4ebe4c95bb6e5113166534c5"
   ],
   "includePlatforms": ["Editor"]
 }
