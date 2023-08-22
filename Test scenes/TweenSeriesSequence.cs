@@ -10,10 +10,15 @@ namespace Scenes.Intro_Scene_Sources
     {
         public Transform testObject;
 
+        public override void Cleanup()
+        {
+            base.Cleanup();
+            testObject.transform.localScale = Vector3.zero;
+            testObject.transform.localPosition = Vector3.zero;
+        }
+
         public override async IAsyncEnumerator<Tween> Define()
         {
-            testObject.transform.localScale = Vector3.zero;
-            testObject.transform.localPosition = Vector3.zero; 
             
             yield return testObject.ScaleTo(1);
 
@@ -25,6 +30,13 @@ namespace Scenes.Intro_Scene_Sources
             yield return Tween.Series(
                 testObject.ScaleTo(Vector3.one * 2),
                 testObject.ScaleTo(Vector3.one)
+            );
+
+            yield return Tween.Value(
+                x => testObject.transform.localPosition = x,
+                () => testObject.transform.localPosition,
+                () => Vector3.one * 2,
+                () => 3
             );
         }
     }
