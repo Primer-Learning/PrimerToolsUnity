@@ -163,8 +163,8 @@ namespace Simulation.GameTheory
 
             // Make room for new blobs and fill gaps left by dead blobs
             // await AgentsReturnHome();
-            // return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
-            return Tween.noop;
+            return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
+            // return Tween.noop;
         }
         
         private void CleanUp()
