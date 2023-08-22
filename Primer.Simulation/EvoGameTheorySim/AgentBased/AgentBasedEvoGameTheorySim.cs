@@ -100,7 +100,7 @@ namespace Simulation.GameTheory
                 AgentsEatFood(),
                 AgentsReturnHome(),
                 AgentsReproduceOrDie()
-            ).Observe(onComplete: CleanUp);
+            ).Observe(afterComplete: CleanUp);
         }
 
         private Tween CreateFood()
@@ -141,6 +141,7 @@ namespace Simulation.GameTheory
             // foodContainer.RemoveAllChildren();
             _agentGnome.Reset();
 
+            var newAgents = new List<Agent>();
             foreach (var agent in agents) {
                 if (agent.canSurvive)
                     _agentGnome.Insert(agent);
@@ -151,8 +152,10 @@ namespace Simulation.GameTheory
                     child.ConsumeEnergy();
                     child.rng = rng;
                     child.strategy = agent.strategy;
+                    child.transform.localScale = Vector3.zero;
+                    newAgents.Add(child);
                 }
-
+                
                 agent.ConsumeEnergy();
             }
 
@@ -160,6 +163,7 @@ namespace Simulation.GameTheory
 
             // Make room for new blobs and fill gaps left by dead blobs
             // await AgentsReturnHome();
+            // return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             return Tween.noop;
         }
         
