@@ -33,7 +33,7 @@ namespace Primer.Animation
             get => ms;
             set {
                 if (isCalculated) {
-                    Debug.LogWarning("Forcing the duration of a calculated tween");
+                    // Debug.LogWarning("Forcing the duration of a calculated tween");
                     isCalculated = false;
                 }
 
