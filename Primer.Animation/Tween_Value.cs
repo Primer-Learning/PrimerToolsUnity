@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using Sirenix.OdinInspector;
 
 namespace Primer.Animation
 {
@@ -67,6 +68,35 @@ namespace Primer.Animation
 
                     set(lerp(from, to, t));
                 }
+            );
+        }
+        
+        // These overloads allow duration to be determined when the tween is first evaluated.
+        public static Tween Value<T>(Action<T> set, Func<T> from, Func<T> to, Func<float> duration, Func<T, T, float, T> lerp = null)
+        {
+            return CreateTween(set, from, to, duration, lerp);
+        }
+
+        /// <summary>The actual implementation of the tween operation</summary>
+        private static Tween CreateTween<T>(Action<T> set, Func<T> getFrom, Func<T> getTo, Func<float> getDuration, Func<T, T, float, T> lerp)
+        {
+            lerp ??= LerpMethods.GetLerpMethod<T>();
+
+            var initialized = false;
+            var from = default(T);
+            var to = default(T);
+
+            return new SetDurationAtEvaluateTween(
+                t => {
+                    if (!initialized) {
+                        from = getFrom();
+                        to = getTo();
+                        initialized = true;
+                    }
+                    
+                    set(lerp(from, to, t));
+                },
+                getDuration
             );
         }
     }

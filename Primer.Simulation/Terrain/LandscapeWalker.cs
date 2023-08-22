@@ -1,4 +1,5 @@
 using System.Globalization;
+using System;
 using Primer.Animation;
 using Primer.Shapes;
 using UnityEngine;
@@ -58,6 +59,11 @@ namespace Primer.Simulation
             // we want to walk _to_ the target, no walk over it
             var directionVector = targetPosition - initialPosition;
             var destination = targetPosition - directionVector.normalized * stopDistance;
+
+            // Func<float> durationCalculation = () => forcedDuration > 0
+            //     ? forcedDuration
+            //     : Vector3.Distance(myTransform.position, to.value) / DEFAULT_SPEED;
+            
             var moveTween = Tween.Value(
                 v =>
                 {
@@ -65,6 +71,7 @@ namespace Primer.Simulation
                 },
                 () => myTransform.position,
                 () => destination
+                // durationCalculation
             );
 
             var rotateTween = Tween.noop;
@@ -79,10 +86,7 @@ namespace Primer.Simulation
                 );
             }
 
-            return Tween.Series(moveTween, rotateTween) with
-            {
-                duration = forcedDuration < 0 ? Vector3.Distance(initialPosition, to.value) / DEFAULT_SPEED : forcedDuration
-            };
+            return Tween.Parallel(moveTween, rotateTween);
         }
         
     }
