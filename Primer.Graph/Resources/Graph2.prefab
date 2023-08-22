@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2390685873607332846}
   - component: {fileID: 2390685873607332847}
-  - component: {fileID: 7466920532668496819}
   m_Layer: 0
   m_Name: Graph2
   m_TagString: Untagged
@@ -53,48 +52,6 @@ MonoBehaviour:
   xAxis: {fileID: 1168500524678457913}
   yAxis: {fileID: 2408658000268484787}
   zAxis: {fileID: 6709040623969359777}
---- !u!114 &7466920532668496819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2390685873607332833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68e48d7d394b4cdd9763085c907e1d22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _scale: 0.2
-  _padding: {x: 0.1, y: 0.1}
-  _rodThickness: 1
-  _arrowPresence: 2
-  _arrowPrefab:
-    stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
-    _position: {x: 0, y: 0, z: 0}
-    hasPosition: 0
-    _rotation: {x: 0, y: 0, z: 0, w: 0}
-    hasRotation: 0
-    _scale: {x: 1, y: 1, z: 1}
-    hasScale: 0
-  _showTicks: 1
-  _showZero: 0
-  _lockTickOrientation:
-    _enabled: 1
-    _value: 4
-  _tickSteps: 2
-  _maxTicks: 50
-  _maxDecimals: 2
-  _offset: 0
-  _manualTicks: []
-  _ticksPrefab:
-    stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
-    _position: {x: 0, y: 0, z: 0}
-    hasPosition: 0
-    _rotation: {x: 0, y: 0, z: 0, w: 0}
-    hasRotation: 0
-    _scale: {x: 1, y: 1, z: 1}
-    hasScale: 0
 --- !u!1001 &2088966744532642439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -105,6 +62,14 @@ PrefabInstance:
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _scale
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.y
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
@@ -228,6 +193,14 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
       value: 0.1
       objectReference: {fileID: 0}
@@ -327,6 +300,14 @@ PrefabInstance:
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _scale
       value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: padding.y
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
