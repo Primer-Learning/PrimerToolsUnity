@@ -144,7 +144,7 @@ namespace Primer.Graph
             ).Observe(
                 // After the transition is complete, we ensure we store the line we got
                 // instead of the result of IGrid.Lerp() which is always a DiscreteGrid.
-                onComplete: () => Render(targetGrid)
+                afterComplete: () => Render(targetGrid)
             );
         }
 
@@ -161,7 +161,7 @@ namespace Primer.Graph
             ).Observe(
                 // After the transition is complete, we ensure we store the line we got
                 // instead of the result of SmoothCut() which is always a DiscreteGrid.
-                onComplete: () => Render(targetGrid)
+                afterComplete: () => Render(targetGrid)
             );
         }
 

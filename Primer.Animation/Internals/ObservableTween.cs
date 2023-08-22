@@ -8,12 +8,12 @@ namespace Primer.Animation
         private State state = State.Idle;
         private bool isDisposed = false;
 
-        public Action whenZero { get; init; }
-        public Action whenOne { get; init; }
-        public Action beforePlay { get; init; }
+        public Action beforeStart { get; init; }
+        public Action onStart { get; init; }
         public Action onComplete { get; init; }
+        public Action afterComplete { get; init; }
         public Action onDispose { get; init; }
-        public Action<float> afterUpdate { get; init; }
+        public Action<float> onUpdate { get; init; }
 
         ~ObservableTween()
         {
@@ -35,31 +35,38 @@ namespace Primer.Animation
                 return;
 
             if (state != State.Playing) {
-                beforePlay?.Invoke();
+                beforeStart?.Invoke();
                 state = State.Playing;
             }
 
-            if (t <= 0 && whenZero is not null) {
-                whenZero.Invoke();
+            if (t <= 0 && onStart is not null) {
+                onStart.Invoke();
+
+                if (t == 0)
+                {
+                    base.Evaluate(t);
+                    onUpdate?.Invoke(t);
+                }
+                
                 return;
             }
 
-            if (t >= 1 && whenOne is not null) {
-                whenOne?.Invoke();
+            base.Evaluate(t);
+            onUpdate?.Invoke(t);
+            
+            if (t >= 1 && onComplete is not null) {
+                onComplete?.Invoke();
 
                 if (state != State.Completed) {
-                    onComplete?.Invoke();
+                    afterComplete?.Invoke();
                     state = State.Completed;
                 }
 
                 return;
             }
 
-            base.Evaluate(t);
-            afterUpdate?.Invoke(t);
-
             if (t >= 1) {
-                onComplete?.Invoke();
+                afterComplete?.Invoke();
                 state = State.Completed;
             }
         }
@@ -69,20 +76,20 @@ namespace Primer.Animation
     {
         public static ObservableTween Observe(
             this Tween tween,
-            Action beforePlay = null,
+            Action beforeStart = null,
+            Action afterComplete = null,
+            Action onStart = null,
             Action onComplete = null,
-            Action whenZero = null,
-            Action whenOne = null,
             Action onDispose = null,
             Action<float> afterUpdate = null)
         {
             if (tween is ObservableTween observableTween) {
                 return ExtendObservable(
                     observableTween,
-                    beforePlay,
+                    beforeStart,
+                    afterComplete,
+                    onStart,
                     onComplete,
-                    whenZero,
-                    whenOne,
                     onDispose,
                     afterUpdate
                 );
@@ -96,12 +103,12 @@ namespace Primer.Animation
                 ms = tween.ms,
 
                 // listeners
-                whenZero = whenZero,
-                whenOne = whenOne,
-                beforePlay = beforePlay,
+                beforeStart = beforeStart,
+                onStart = onStart,
+                onUpdate = afterUpdate,
                 onComplete = onComplete,
+                afterComplete = afterComplete,
                 onDispose = onDispose,
-                afterUpdate = afterUpdate,
             };
         }
 
@@ -115,12 +122,12 @@ namespace Primer.Animation
             Action<float> afterUpdate)
         {
             return tween with {
-                whenZero = tween.whenZero + whenZero,
-                whenOne = tween.whenOne + whenOne,
-                beforePlay = tween.beforePlay + beforePlay,
-                onComplete = tween.onComplete + onComplete,
+                beforeStart = tween.beforeStart + beforePlay,
+                onStart = tween.onStart + whenZero,
+                onUpdate = tween.onUpdate + afterUpdate,
+                onComplete = tween.onComplete + whenOne,
+                afterComplete = tween.afterComplete + onComplete,
                 onDispose = tween.onDispose + onDispose,
-                afterUpdate = tween.afterUpdate + afterUpdate,
             };
         }
     }

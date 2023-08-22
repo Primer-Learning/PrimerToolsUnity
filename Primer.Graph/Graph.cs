@@ -77,7 +77,7 @@ namespace Primer.Graph
 
         public Tween ShrinkZAxis()
         {
-            return z.ShrinkToOrigin().Observe(onComplete: () => enableZAxis = false);
+            return z.ShrinkToOrigin().Observe(afterComplete: () => enableZAxis = false);
         }
 
         // We override this IAxisController extension method to ensure that the z axis is enabled/disabled

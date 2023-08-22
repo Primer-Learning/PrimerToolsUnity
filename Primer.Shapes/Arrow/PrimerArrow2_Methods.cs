@@ -57,8 +57,8 @@ namespace Primer.Shapes
             tailPoint.CopyTo(headPoint);
 
             var growTween = Animate(headEnd: originalHeadPosition).Observe(
-                beforePlay: () => gameObject.SetActive(true),
-                onComplete: () => originalHeadPosition.ApplyTo(headPoint)
+                beforeStart: () => gameObject.SetActive(true),
+                afterComplete: () => originalHeadPosition.ApplyTo(headPoint)
             );
 
             var extensionTween = requiresAdjustmentTweening
@@ -75,8 +75,8 @@ namespace Primer.Shapes
         public Tween ShrinkToEnd(bool restoreTracking = false)
         {
             var shrinkTween = Animate(tailEnd: headPoint, preventRestoreTracking: !restoreTracking).Observe(
-                beforePlay: StopFollowing,
-                onComplete: () => this.SetActive(false)
+                beforeStart: StopFollowing,
+                afterComplete: () => this.SetActive(false)
             );
 
             if (tailPoint.adjustment == headPoint.adjustment)
@@ -87,7 +87,7 @@ namespace Primer.Shapes
             return Tween.Parallel(
                 shrinkTween,
                 Tween.Value(() => tailPoint.adjustment, headPoint.adjustment)
-                    .Observe(onComplete: () => tailPoint.adjustment = originalTailAdjustment)
+                    .Observe(afterComplete: () => tailPoint.adjustment = originalTailAdjustment)
             );
         }
 
@@ -113,7 +113,7 @@ namespace Primer.Shapes
                 return tween;
 
             return tween.Observe(
-                onComplete: () => {
+                afterComplete: () => {
                     tailTracking?.ApplyTo(tailPoint);
                     headTracking?.ApplyTo(headPoint);
                 }

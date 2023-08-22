@@ -99,7 +99,7 @@ namespace Primer.Graph
             ).Observe(
                 // After the transition is complete, we ensure we store the line we got
                 // instead of the result of ILine.Lerp() which is always a DiscreteLine.
-                onComplete: () => Render(targetData)
+                afterComplete: () => Render(targetData)
             );
         }
 
@@ -112,7 +112,7 @@ namespace Primer.Graph
             ).Observe(
                 // After the transition is complete, we ensure we store the line we got
                 // instead of the result of SmoothCut() which is always a DiscreteLine.
-                onComplete: () => Render(targetData)
+                afterComplete: () => Render(targetData)
             );
         }
 
@@ -123,7 +123,7 @@ namespace Primer.Graph
             return new Tween(
                 t => Render(targetData.Select(x => x.SmoothCut(x.resolution * (1 - t), fromOrigin: true)))
             ).Observe(
-                onComplete: () => gameObject.SetActive(false)
+                afterComplete: () => gameObject.SetActive(false)
             );
         }
 

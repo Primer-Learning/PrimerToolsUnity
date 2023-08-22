@@ -71,8 +71,8 @@ namespace Primer.Latex
         public Tween ToTween()
         {
             return new Tween(Evaluate).Observe(
-                whenZero: SetInitialState,
-                whenOne: SetEndState
+                onStart: SetInitialState,
+                onComplete: SetEndState
             );
         }
 
