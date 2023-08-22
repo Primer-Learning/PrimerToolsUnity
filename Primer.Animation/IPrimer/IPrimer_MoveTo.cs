@@ -130,13 +130,12 @@ namespace Primer.Animation
         {
             var transform = self.transform;
             var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
-
+            
             return self is IPrimer_CustomMoveTo custom
                 ? custom.MoveTo(newPosition, initial, globalSpace)
-                : transform.MoveTo(newPosition, initial, globalSpace);
+                : transform.MoveTo(newPosition, globalSpace);
         }
         #endregion
-
 
         // Actual implementation
         // Only in Transform, all other overloads redirect here
