@@ -86,18 +86,22 @@ namespace Primer.Animation
             var from = default(T);
             var to = default(T);
 
-            return new SetDurationAtEvaluateTween(
-                t => {
-                    if (!initialized) {
-                        from = getFrom();
-                        to = getTo();
-                        initialized = true;
+            return new Tween(
+                    t =>
+                    {
+                        if (!initialized)
+                        {
+                            from = getFrom();
+                            to = getTo();
+                            initialized = true;
+                        }
+
+                        set(lerp(from, to, t));
                     }
-                    
-                    set(lerp(from, to, t));
-                },
-                getDuration
-            );
+                )
+                {
+                    durationFunc = getDuration
+                };
         }
     }
 }

@@ -46,10 +46,12 @@ namespace Primer.Animation
             set => milliseconds = (int)(value * 1000);
         }
 
+        public Func<float> durationFunc = () => (float) DEFAULT_DURATION_MS / 1000;
         public float duration {
-            get => milliseconds / 1000f;
-            set => milliseconds = (int)(value * 1000);
+            get => durationFunc();
+            set => durationFunc = () => value;
         }
+
         #endregion
 
         public float totalDuration => duration + delay;
@@ -57,9 +59,16 @@ namespace Primer.Animation
 
         /// <summary>Applies the final state of the animation.</summary>
         public void Apply() => Evaluate(1);
-
+        
+        private bool durationInitialized;
         public virtual void Evaluate(float t)
         {
+            if (!durationInitialized)
+            {
+                durationInitialized = true;
+                duration = durationFunc();
+            }
+            
             if (delay is not 0) {
                 if (t < tStart)
                     return;
