@@ -8,7 +8,7 @@ namespace Primer.Simulation
     {
         public Rng rng { get; }
         public bool skipAnimations { get; }
-        public Tween SimulateSingleCycle();
+        public UniTask SimulateSingleCycle();
     }
 
     public static class ISimulationExtensions
