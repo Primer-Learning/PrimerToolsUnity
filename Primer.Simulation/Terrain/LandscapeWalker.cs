@@ -60,33 +60,37 @@ namespace Primer.Simulation
             var directionVector = targetPosition - initialPosition;
             var destination = targetPosition - directionVector.normalized * stopDistance;
 
-            // Func<float> durationCalculation = () => forcedDuration > 0
-            //     ? forcedDuration
-            //     : Vector3.Distance(myTransform.position, to.value) / DEFAULT_SPEED;
-            
+            float DurationCalculation() =>
+                forcedDuration > 0
+                    ? forcedDuration
+                    : Vector3.Distance(myTransform.position, to.value) / DEFAULT_SPEED;
+
             var moveTween = Tween.Value(
                 v =>
                 {
                     myTransform.position = landscape.GetGroundAt(v);
                 },
                 () => myTransform.position,
-                () => destination
-                // durationCalculation
+                () => destination,
+                (Func<float>)DurationCalculation
             );
 
-            var rotateTween = Tween.noop;
-            var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
-            if (lookRotation != Vector3.zero)
-            {
-                var targetRotation = Quaternion.LookRotation(lookRotation);
+            return moveTween;
 
-                rotateTween = Tween.Value(
-                    () => myTransform.rotation,
-                    targetRotation
-                );
-            }
+            // var rotateTween = Tween.noop;
+            // var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
+            // if (lookRotation != Vector3.zero)
+            // {
+            //     var targetRotation = Quaternion.LookRotation(lookRotation);
+            //
+            //     rotateTween = Tween.Value(
+            //         () => myTransform.rotation,
+            //         targetRotation
+            //     );
+            // }
 
-            return Tween.Parallel(moveTween, rotateTween);
+
+            // return Tween.Parallel(moveTween, rotateTween);
         }
         
     }
