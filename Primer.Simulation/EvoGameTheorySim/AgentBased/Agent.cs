@@ -43,17 +43,14 @@ namespace Simulation.GameTheory
             // var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
             var bite = DetachNearestFruit(tree);
 
-            var moveToMouthTween = bite.MoveTo(
-                    () => transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f)
-                    , globalSpace: true).Observe(onStart: () =>
-                    {
-                        if (!skipAnimations) blob.animator.SetTrigger(scoop);
-                    }
-                )
-                with
+            var moveToMouthTween = bite.MoveToDynamic(
+                    () => transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f),
+                    () => skipAnimations ? 0 : 0.5f, 
+                    globalSpace: true).Observe(onStart: () =>
                 {
-                    duration = skipAnimations ? 0 : 0.5f
-                };
+                    if (!skipAnimations) blob.animator.SetTrigger(scoop);
+                }
+            );
             var shrinkTween = bite.ScaleTo(0) with {duration = skipAnimations ? 0 : 0.5f};
             return Tween.Parallel(moveToMouthTween, shrinkTween);
         }
