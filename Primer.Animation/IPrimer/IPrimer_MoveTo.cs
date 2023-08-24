@@ -137,8 +137,10 @@ namespace Primer.Animation
         }
         #endregion
 
-        // Actual implementation
+        // Main implementation
         // Only in Transform, all other overloads redirect here
+        // Uses Tween.Value instead of new Tween so the initial position is dynamic (rarely do you want to set it manually)
+        // If you do want to set it manually, MoveTo won't work for you. Use the regular Tween constructor instead.
         public static Tween MoveTo(this Transform self, Vector3 newPosition,
             bool globalSpace = false)
         {
@@ -147,21 +149,25 @@ namespace Primer.Animation
                 : Tween.Value(() => self.localPosition, newPosition);
         }
         
-        // This one lets you use a Func<Vector3> instead of a Vector3, so the target can be dynamic
-        public static Tween MoveTo(this Transform self, Func<Vector3> to,
+        // This one lets the destination and duration also be dynamic
+        // For cases where many tweens are defined before they are evaluated
+        // Could make a bunch of overloads depending which parameters are dynamic, but seems cleaner to do one.
+        public static Tween MoveToDynamic(this Transform self, Func<Vector3> to, Func<float> durationFunc,
             bool globalSpace = false)
         {
             if (globalSpace)
                 return Tween.Value(
                     v => self.position = v,
                     () => self.position,
-                    to
+                    to,
+                    durationFunc
                 );
             
             return Tween.Value(
                 v => self.localPosition = v,
                 () => self.localPosition,
-                to
+                to,
+                durationFunc
             );
         }
     }
