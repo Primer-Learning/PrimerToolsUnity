@@ -16,7 +16,7 @@ namespace Simulation.GameTheory
         private readonly int foodPerTurn;
         
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
-        private FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
+        public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         
         private readonly Gnome _agentGnome;
 
@@ -110,12 +110,12 @@ namespace Simulation.GameTheory
             ).Observe(afterComplete: CleanUp);
         }
 
-        private Tween CreateFood()
+        public Tween CreateFood()
         {
             return trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
         }
 
-        private Tween AgentsGoToTrees()
+        public Tween AgentsGoToTrees()
         {
             // Make agents each go to a random tree, but a maximum of two per tree
             var treeSlots = trees.Concat(trees).Shuffle(rng);
@@ -126,7 +126,7 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        private Tween AgentsEatFood()
+        public Tween AgentsEatFood()
         {
             // Make agents eat food, but only agents where goingToEat is not null
             return agents
@@ -136,14 +136,14 @@ namespace Simulation.GameTheory
                 .RunInParallel();
         }
 
-        private Tween AgentsReturnHome()
+        public Tween AgentsReturnHome()
         {
             return agents
                 .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
                 .RunInParallel();
         }
 
-        private Tween AgentsReproduceOrDie()
+        public Tween AgentsReproduceOrDie()
         {
             _agentGnome.Reset();
 
@@ -171,7 +171,7 @@ namespace Simulation.GameTheory
             // return Tween.noop;
         }
         
-        private void CleanUp()
+        public void CleanUp()
         {
             foreach (var agent in agents) agent.DisposeDetachedFruit();
         }

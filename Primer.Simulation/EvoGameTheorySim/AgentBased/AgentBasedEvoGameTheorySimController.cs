@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Simulation
 {
@@ -22,8 +23,8 @@ namespace Primer.Simulation
             set
             {
                 _skipAnimations = value;
-                if (_sim != null)
-                    _sim.skipAnimations = value;
+                if (sim != null)
+                    sim.skipAnimations = value;
             }
         }
 
@@ -31,7 +32,7 @@ namespace Primer.Simulation
         // [HideLabel, Title("Conflict Resolution Rule")]
         protected StrategyRule<T> strategyRule;
 
-        protected AgentBasedEvoGameTheorySim<T> _sim;
+        public AgentBasedEvoGameTheorySim<T> sim;
         private int turn;
         
         #region Initial population handling 
@@ -88,12 +89,12 @@ namespace Primer.Simulation
         protected virtual async UniTask OnCycleCompleted() {}
         protected virtual async UniTask OnReset() {}
         
-        private void InitializeSim()
+        public void InitializeSim()
         {
             turn = 0;
             SetStrategyRule();
 
-            _sim = new AgentBasedEvoGameTheorySim<T>(
+            sim = new AgentBasedEvoGameTheorySim<T>(
                 transform: transform,
                 seed: seed,
                 initialBlobs: ConstructInitialStrategiesDictionary(),
@@ -104,7 +105,7 @@ namespace Primer.Simulation
 
         private void DisposeSim()
         {
-            _sim?.Dispose();
+            sim?.Dispose();
         }
 
         public async void Start()
@@ -115,7 +116,7 @@ namespace Primer.Simulation
             await OnSimStart();
             
             while (true) {
-                await _sim.SimulateSingleCycle();
+                await sim.SimulateSingleCycle();
                 await OnCycleCompleted();
                 await UniTask.Delay(1);
             }
@@ -130,7 +131,7 @@ namespace Primer.Simulation
             
             turn++;
             this.Log($"Running turn {turn}");
-            await _sim.SimulateSingleCycle();
+            await sim.SimulateSingleCycle();
             await OnCycleCompleted();
             this.Log($"Completed turn {turn}");
         }
