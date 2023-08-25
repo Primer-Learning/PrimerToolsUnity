@@ -30,34 +30,12 @@ namespace Primer.Simulation
         {
             var ignoreHeight = new Vector3(1, 0, 1);
             var myTransform = transform;
-            var initialPosition = myTransform.position;
-            var initialRotation = myTransform.rotation;
 
-            // return new Tween(
-            //     t => {
-            //         var targetPosition = to.value;
-            //
-            //         // we want to walk _to_ the target, no walk over it
-            //         var directionVector = targetPosition - initialPosition;
-            //         var destination = targetPosition - directionVector.normalized * stopDistance;
-            //
-            //         myTransform.position = landscape.GetGroundAt(Vector3.Lerp(initialPosition, destination, t));
-            //
-            //         var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
-            //         if (lookRotation == Vector3.zero)
-            //             return;
-            //
-            //         var targetRotation = Quaternion.LookRotation(lookRotation);
-            //         myTransform.rotation = Quaternion.Lerp(initialRotation, targetRotation, t * DEFAULT_TURN_SPEED);
-            //     }
-            // ) {
-            //     duration = forcedDuration < 0 ? Vector3.Distance(initialPosition, to.value) / DEFAULT_SPEED : forcedDuration
-            // };
             
             var targetPosition = to.value;
 
-            // we want to walk _to_ the target, no walk over it
-            var directionVector = targetPosition - initialPosition;
+            // We want to walk _to_ the target, no walk over it
+            var directionVector = targetPosition - myTransform.position;
             var destination = targetPosition - directionVector.normalized * stopDistance;
 
             float DurationCalculation() =>
@@ -74,24 +52,26 @@ namespace Primer.Simulation
                 () => destination,
                 (Func<float>)DurationCalculation
             );
+            
 
-            return moveTween;
+            // return moveTween;
 
-            // var rotateTween = Tween.noop;
-            // var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
-            // if (lookRotation != Vector3.zero)
-            // {
-            //     var targetRotation = Quaternion.LookRotation(lookRotation);
-            //
-            //     rotateTween = Tween.Value(
-            //         () => myTransform.rotation,
-            //         targetRotation
-            //     );
-            // }
+            var rotateTween = Tween.noop;
+            var lookRotation = (targetPosition - myTransform.position).ElementWiseMultiply(ignoreHeight);
+            if (lookRotation != Vector3.zero)
+            {
+                var targetRotation = Quaternion.LookRotation(lookRotation);
+            
+                rotateTween = Tween.Value(
+                    r => myTransform.localRotation = r,
+                    () => myTransform.localRotation,
+                    () => targetRotation,
+                    () => Mathf.Min(DurationCalculation(), 0.5f)
+                );
+            }
 
 
-            // return Tween.Parallel(moveTween, rotateTween);
+            return Tween.Parallel(moveTween, rotateTween);
         }
-        
     }
 }
