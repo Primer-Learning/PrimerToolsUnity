@@ -90,24 +90,24 @@ namespace Simulation.GameTheory
             _agentGnome.Purge(defer: true);
         }
 
-        public async UniTask SimulateSingleCycle()
+        public Tween SimulateSingleCycle()
         {
             turn++;
 
-            await CreateFood();
-            await AgentsGoToTrees();
-            await AgentsEatFood();
-            await AgentsReturnHome();
-            await AgentsReproduceOrDie();
-            CleanUp();
+            // await CreateFood();
+            // await AgentsGoToTrees();
+            // await AgentsEatFood();
+            // await AgentsReturnHome();
+            // await AgentsReproduceOrDie();
+            // CleanUp();
             
-            // return Tween.Series(
-            //     CreateFood(),
-            //     AgentsGoToTrees(),
-            //     AgentsEatFood(),
-            //     AgentsReturnHome(),
-            //     AgentsReproduceOrDie()
-            // ).Observe(afterComplete: CleanUp);
+            return Tween.Series(
+                CreateFood(),
+                AgentsGoToTrees(),
+                AgentsEatFood(),
+                AgentsReturnHome(),
+                AgentsReproduceOrDie()
+            ).Observe(afterComplete: CleanUp);
         }
 
         private Tween CreateFood()
@@ -145,7 +145,6 @@ namespace Simulation.GameTheory
 
         private Tween AgentsReproduceOrDie()
         {
-            // foodContainer.RemoveAllChildren();
             _agentGnome.Reset();
 
             var newAgents = new List<Agent>();
@@ -167,9 +166,7 @@ namespace Simulation.GameTheory
             }
 
             _agentGnome.Purge();
-
-            // Make room for new blobs and fill gaps left by dead blobs
-            // await AgentsReturnHome();
+            
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             // return Tween.noop;
         }
