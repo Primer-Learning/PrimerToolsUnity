@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.BaseCommands.Import;
+using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
 using Sirenix.OdinInspector;
@@ -458,6 +460,16 @@ public class PrimerBlob : PrimerCharacter {
         NeutralEyes();
         animator.SetBool("panicking", false);
         if (mouthOpen) animator.SetTrigger("MouthClosed");
+    }
+
+    public async void Chomp(float hold = 0.5f, float attack = 0.25f, float decay = 0.25f)
+    {
+        if (attack != 0.25f || decay != 0.25f)
+            Debug.LogWarning("Custom attack and decay are currently not implemented for chomp.");
+        
+        animator.SetTrigger("MouthOpenWide");
+        await UniTask.Delay((int)((hold + attack) * 1000));
+        animator.SetTrigger("MouthClosed");
     }
 
     public BlobAccessory AddAccessory(AccessoryType accessoryType, bool animate = false,

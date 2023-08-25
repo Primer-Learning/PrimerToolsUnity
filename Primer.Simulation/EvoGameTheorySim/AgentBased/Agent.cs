@@ -11,6 +11,8 @@ namespace Simulation.GameTheory
     public class Agent : LandscapeWalker
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
+        private static readonly int eatSpeed = Animator.StringToHash("EatSpeed");
+        private static readonly int mouthOpen = Animator.StringToHash("MouthOpenWide");
         // private static readonly int mouthOpenWide = Animator.StringToHash("MouthOpenWide");
         // private static readonly int mouthClosed = Animator.StringToHash("MouthClosed");
         public Rng rng;
@@ -40,15 +42,20 @@ namespace Simulation.GameTheory
         {
             goingToEat = null;
 
-            // var mouthPosition = transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f);
             var bite = DetachNearestFruit(tree);
 
             var moveToMouthTween = bite.MoveToDynamic(
                     () => transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f),
                     () => skipAnimations ? 0 : 0.5f, 
-                    globalSpace: true).Observe(onStart: () =>
+                    globalSpace: true)
+                .Observe(onStart: () =>
                 {
-                    if (!skipAnimations) blob.animator.SetTrigger(scoop);
+                    if (!skipAnimations)
+                    {
+                        blob.animator.SetFloat("EatSpeed", 2);
+                        blob.animator.SetTrigger(scoop);
+                        blob.Chomp(hold:0);
+                    }
                 }
             );
             var shrinkTween = bite.ScaleTo(0) with {duration = skipAnimations ? 0 : 0.5f};
