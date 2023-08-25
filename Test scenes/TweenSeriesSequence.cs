@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Primer.Animation;
 using Primer.Timeline;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Scenes.Intro_Scene_Sources
 {
@@ -67,9 +66,9 @@ namespace Scenes.Intro_Scene_Sources
                     () => new Vector3(-leftMagnitude, 1, 0),
                     () => testObject1.localPosition.x + leftMagnitude
                 ),
-                testObject2.MoveToDynamic(
-                    () => new Vector3(-leftMagnitude, -1, 0),
-                    () => testObject2.localPosition.x + leftMagnitude 
+                testObject1.MoveToDynamic(
+                    () => new Vector3(leftMagnitude, 1, 0),
+                    () => -testObject1.localPosition.x + leftMagnitude
                 )
             );
         }

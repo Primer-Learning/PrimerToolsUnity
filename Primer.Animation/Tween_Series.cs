@@ -30,12 +30,21 @@ namespace Primer.Animation
 
         public static Tween Series(params Tween[] tweenList)
         {
-            var fullDuration = tweenList.Sum(x => x.totalDuration);
+            // Calculating the duration this way allows Series to work properly with tweens
+            // that have a dynamic duration.
+            float DurationFunc()
+            {
+                float durationSoFar = 0;
+                foreach (var tween in tweenList)
+                {
+                    durationSoFar += tween.totalDuration;
+                    tween.Apply();
+                }
 
-            if (fullDuration is 0) {
-                Debug.LogWarning("Series tween list is empty");
-                return noop;
+                return durationSoFar;
             }
+
+            var fullDuration = DurationFunc();
 
             var cursor = 0;
             var cursorEnd = tweenList[0].duration;
