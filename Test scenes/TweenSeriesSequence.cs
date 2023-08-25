@@ -66,8 +66,8 @@ namespace Scenes.Intro_Scene_Sources
                     () => new Vector3(-leftMagnitude, 1, 0),
                     () => testObject1.localPosition.x + leftMagnitude
                 ),
-                testObject1.MoveToDynamic(
-                    () => new Vector3(leftMagnitude, 1, 0),
+                testObject2.MoveToDynamic(
+                    () => new Vector3(leftMagnitude, -1, 0),
                     () => -testObject1.localPosition.x + leftMagnitude
                 )
             );

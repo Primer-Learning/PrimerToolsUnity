@@ -34,11 +34,17 @@ namespace Primer.Animation
             // that have a dynamic duration.
             float DurationFunc()
             {
+                // Add up the durations, applying each tween to set up for the next one
                 float durationSoFar = 0;
-                foreach (var tween in tweenList)
+                for (int i = 0; i < tweenList.Length; i++)
                 {
-                    durationSoFar += tween.totalDuration;
-                    tween.Apply();
+                    durationSoFar += tweenList[i].totalDuration;
+                    tweenList[i].Apply();
+                }
+                // Rewind the tweens so the initial state is restored
+                for (int i = tweenList.Length - 1; i >= 0; i--)
+                {
+                    tweenList[i].Evaluate(0);
                 }
 
                 return durationSoFar;
