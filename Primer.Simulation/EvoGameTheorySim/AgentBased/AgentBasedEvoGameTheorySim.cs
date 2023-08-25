@@ -56,6 +56,11 @@ namespace Simulation.GameTheory
             this.skipAnimations = skipAnimations;
 
             PlaceInitialBlobs(initialBlobs);
+
+            foreach (var tree in trees)
+            {
+                tree.rng = rng;
+            }
         }
 
         private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)

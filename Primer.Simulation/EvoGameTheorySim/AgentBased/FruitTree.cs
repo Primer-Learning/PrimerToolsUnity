@@ -11,6 +11,7 @@ public class FruitTree : MonoBehaviour
     public static float xAngleMax = 5f;
     public static float yAngleMax = 360f;
     public static float zAngleMax = 5f;
+    public Rng rng;
 
     [HideInInspector] public bool skipAnimations = false;
     
@@ -56,7 +57,7 @@ public class FruitTree : MonoBehaviour
         // Choose random indices where there's not already a fruit
         var newFruitIndices = Enumerable.Range(0, flowers.Count)
             .Where(i => flowers[i].childCount == 0)
-            .Shuffle()
+            .Shuffle(rng: rng)
             .Take(total - existingFruitIndices.Length);
         
         return GrowSpecificFruits(newFruitIndices.Concat(existingFruitIndices).ToArray(), delayRange);
@@ -66,13 +67,13 @@ public class FruitTree : MonoBehaviour
     {
         // Create tweens, giving each a random delay between 0 and delayRange
         return indices
-            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : Rng.Range(delayRange)})
+            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : rng.Range(delayRange)})
             .RunInParallel();
     }
 
     private void RandomlyRotateFlower(int index)
     {
-        flowers[index].localRotation = Quaternion.Euler(Rng.Range(xAngleMax), Rng.Range(yAngleMax), Rng.Range(zAngleMax));
+        flowers[index].localRotation = Quaternion.Euler(rng.Range(xAngleMax), rng.Range(yAngleMax), rng.Range(zAngleMax));
     }
 
     public Transform HarvestFruit(Component closestTo = null)
