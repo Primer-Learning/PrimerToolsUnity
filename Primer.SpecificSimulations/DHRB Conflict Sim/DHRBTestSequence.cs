@@ -24,13 +24,14 @@ namespace Scenes.Intro_Scene_Sources
 
         public override async IAsyncEnumerator<Tween> Define()
         {
-            // yield return sim.SimulateSingleCycle();
             yield return sim.CreateFood();
             yield return sim.AgentsGoToTrees();
             yield return sim.AgentsEatFood();
             yield return sim.AgentsReturnHome();
             yield return sim.AgentsReproduceOrDie();
+            
             sim.CleanUp();
             yield return Tween.noop;
         }
-    }}
+    }
+}
