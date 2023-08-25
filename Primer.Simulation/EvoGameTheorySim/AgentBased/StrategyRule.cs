@@ -9,8 +9,8 @@ namespace Simulation.GameTheory
     public abstract class StrategyRule<T> : IRule where T : Enum
     {
         public RewardMatrix<T> rewardMatrix { get; set; }
-        public abstract void OnAgentCreated(Agent agent);
+        public abstract void OnAgentCreated(Creature agent);
 
-        public abstract Tween Resolve(IEnumerable<Agent> agents, FruitTree tree);
+        public abstract Tween Resolve(IEnumerable<Creature> agents, FruitTree tree);
     }
 }

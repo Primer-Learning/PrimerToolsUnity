@@ -30,8 +30,8 @@ namespace Scenes.Intro_Scene_Sources
             yield return sim.AgentsReturnHome();
             yield return sim.AgentsReproduceOrDie();
             
-            sim.CleanUp();
-            yield return Tween.noop;
+            // sim.CleanUp();
+            // yield return Tween.noop;
         }
     }
 }

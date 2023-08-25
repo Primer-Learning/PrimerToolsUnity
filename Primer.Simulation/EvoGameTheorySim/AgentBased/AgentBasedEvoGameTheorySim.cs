@@ -36,7 +36,7 @@ namespace Simulation.GameTheory
         }
         public Transform transform { get; }
         public Component component => transform;
-        public IEnumerable<Agent> agents => _agentGnome.ChildComponents<Agent>();
+        public IEnumerable<Creature> agents => _agentGnome.ChildComponents<Creature>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
@@ -77,7 +77,7 @@ namespace Simulation.GameTheory
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
                     var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
-                    var agent = blob.GetOrAddComponent<Agent>();
+                    var agent = blob.GetOrAddComponent<Creature>();
                     agent.strategy = strategy;
                     agent.landscape = terrain;
                     agent.rng = rng;
@@ -104,6 +104,11 @@ namespace Simulation.GameTheory
 
         public Tween CreateFood()
         {
+            foreach (var agent in agents)
+            {
+                agent.PurgeStomach();
+            }
+            
             return trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
         }
 
@@ -139,8 +144,10 @@ namespace Simulation.GameTheory
         {
             _agentGnome.Reset();
 
-            var newAgents = new List<Agent>();
+            var newAgents = new List<Creature>();
             foreach (var agent in agents) {
+                agent.PurgeStomach();
+                
                 if (agent.canSurvive)
                     _agentGnome.Insert(agent);
 
@@ -165,10 +172,9 @@ namespace Simulation.GameTheory
         
         public void CleanUp()
         {
-            foreach (var agent in agents) agent.DisposeDetachedFruit();
         }
 
-        private Tween Eat(List<Agent> competitors, FruitTree tree)
+        private Tween Eat(List<Creature> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
                 case 1:

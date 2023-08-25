@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class Agent : LandscapeWalker
+    public class Creature : LandscapeWalker
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
         private static readonly int eatSpeed = Animator.StringToHash("EatSpeed");
@@ -27,9 +27,11 @@ namespace Simulation.GameTheory
         public System.Enum strategy;
         private List<Transform> detachedFruit = new List<Transform>();
 
+        public Gnome stomach => new ("Stomach", parent: transform);
+        
         public bool canSurvive => energy >= 1 || rng.rand.NextDouble() < energy;
         public bool canReproduce => energy >= 2 || rng.rand.NextDouble() < energy - 1;
-
+        
         public Tween GoToEat(FruitTree tree)
         {
             goingToEat = tree;
@@ -50,7 +52,7 @@ namespace Simulation.GameTheory
                     globalSpace: true)
                 .Observe(onStart: () =>
                 {
-                    if (!skipAnimations)
+                    if (!skipAnimations && Application.isPlaying)
                     {
                         blob.animator.SetFloat("EatSpeed", 2);
                         blob.animator.SetTrigger(scoop);
@@ -103,19 +105,16 @@ namespace Simulation.GameTheory
             }
 
             var fruit = nearestFlowerWithFruit.GetChild(0);
-            fruit.SetParent(null);
+            stomach.Insert(fruit, new ChildOptions {worldPositionStays = true});
             
             detachedFruit.Add(fruit);
 
             return fruit;
         }
 
-        public void DisposeDetachedFruit()
+        public void PurgeStomach()
         {
-            foreach (var fruit in detachedFruit)
-            {
-                fruit.Dispose();
-            }
+            stomach.RemoveAllChildren();
         }
     }
 }
