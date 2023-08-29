@@ -51,7 +51,7 @@ namespace Primer.Simulation
         [Button(ButtonSizes.Large)]
         // [ButtonGroup]
         [DisableIf(nameof(locked))]
-        public void Emplace()
+        public void Place()
         {
             if (incrementSeed)
                 seed++;
@@ -84,6 +84,11 @@ namespace Primer.Simulation
                 } else {
                     instance.localPosition = new Vector3(pos.x, 0, pos.y);
                 }
+                
+                // Make sure the objects are visible in the editor.
+                // A sequence can make them scale 0 when necessary, but we always want to see them when 
+                // hitting the button.
+                if (instance.localScale == Vector3.zero) {instance.localScale = Vector3.one;}
 
                 if (randomizeRotation)
                     instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
