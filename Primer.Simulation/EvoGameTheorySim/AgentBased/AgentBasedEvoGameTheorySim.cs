@@ -18,7 +18,7 @@ namespace Simulation.GameTheory
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         
-        private readonly Gnome _agentGnome;
+        public readonly Gnome creatureGnome;
 
         private readonly StrategyRule<T> _strategyRule;
 
@@ -36,7 +36,7 @@ namespace Simulation.GameTheory
         }
         public Transform transform { get; }
         public Component component => transform;
-        public IEnumerable<Creature> agents => _agentGnome.ChildComponents<Creature>();
+        public IEnumerable<Creature> agents => creatureGnome.ChildComponents<Creature>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
@@ -51,7 +51,7 @@ namespace Simulation.GameTheory
             rng = new Rng(seed);
 
             var container = new Gnome(transform);
-            _agentGnome = container.AddGnome("Blobs").ScaleChildrenInPlayMode(1);
+            creatureGnome = container.AddGnome("Blobs").ScaleChildrenInPlayMode(1);
 
             this.skipAnimations = skipAnimations;
 
@@ -65,7 +65,7 @@ namespace Simulation.GameTheory
 
         private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)
         {
-            _agentGnome.Reset();
+            creatureGnome.Reset();
             
             // Add up the ints in the dictionary to get the total number of initial blobs
             var blobCount = initialBlobs.Sum(x => x.Value);
@@ -81,7 +81,7 @@ namespace Simulation.GameTheory
             
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
-                    var blob = _agentGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
+                    var blob = creatureGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
                     var agent = blob.GetOrAddComponent<Creature>();
                     agent.strategy = strategy;
                     agent.landscape = terrain;
@@ -92,7 +92,7 @@ namespace Simulation.GameTheory
                 }
             }
 
-            _agentGnome.Purge(defer: true);
+            creatureGnome.Purge(defer: true);
         }
 
         public async UniTask SimulateSingleCycle()
@@ -147,18 +147,18 @@ namespace Simulation.GameTheory
 
         public Tween AgentsReproduceOrDie()
         {
-            _agentGnome.Reset();
+            creatureGnome.Reset();
 
             var newAgents = new List<Creature>();
             foreach (var agent in agents) {
                 agent.PurgeStomach();
                 
                 if (agent.canSurvive)
-                    _agentGnome.Insert(agent);
+                    creatureGnome.Insert(agent);
 
                 if (agent.canReproduce)
                 {
-                    var child = _agentGnome.Add(agent, $"Blob born in {turn}");
+                    var child = creatureGnome.Add(agent, $"Blob born in {turn}");
                     child.ConsumeEnergy();
                     child.rng = rng;
                     child.strategy = agent.strategy;
@@ -169,7 +169,7 @@ namespace Simulation.GameTheory
                 agent.ConsumeEnergy();
             }
 
-            _agentGnome.Purge();
+            creatureGnome.Purge();
             
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             // return Tween.noop;
@@ -208,7 +208,7 @@ namespace Simulation.GameTheory
             var offset = Vector2.one * margin;
             var perimeter = terrain.size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var agentCount = blobCount ?? _agentGnome.childCount;
+            var agentCount = blobCount ?? creatureGnome.childCount;
             var positions = edgeLength / agentCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = terrain.size / -2;
@@ -242,7 +242,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            _agentGnome?.RemoveAllChildren();
+            creatureGnome?.RemoveAllChildren();
         }
     }
 }
