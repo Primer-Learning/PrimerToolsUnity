@@ -15,10 +15,12 @@ namespace Primer.Simulation
             Vector2 area,
             float minDistance = 2,
             OverflowMode overflowMode = OverflowMode.None,
-            Rng rng = null)
+            Rng rng = null,
+            int numSamplesBeforeRejection = 30
+            )
         {
             var sampler = new PoissonDiscSampler(minDistance, area, overflowMode) { rng = rng };
-            sampler.AddPoints(pointsCount);
+            sampler.AddPoints(pointsCount, numSamplesBeforeRejection);
             return sampler.points;
         }
 
@@ -81,9 +83,18 @@ namespace Primer.Simulation
             while (spawnPoints.Count > 0 && !pointFound) {
                 var spawnIndex = rng.Range(0, spawnPoints.Count);
                 var spawnCentre = spawnPoints[spawnIndex];
+                
+                // Make a list of all the angles dividing 360 by numSamplesBeforeRejection
+                // Makes a point slightly less likely not to find a valid point
+                var angles = new List<float>();
+                var angleOffset = rng.Range(360);
+                for (var i = 0; i < numSamplesBeforeRejection; i++) {
+                    angles.Add(angleOffset + i * 360f / numSamplesBeforeRejection);
+                }
+                angles.Shuffle(rng);
 
                 for (var i = 0; i < numSamplesBeforeRejection; i++) {
-                    var angle = rng.Range(Mathf.PI * 2);
+                    var angle = angles[i];
                     var dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
                     var candidate = spawnCentre + dir * rng.Range(minDistance, 2 * minDistance);
 
