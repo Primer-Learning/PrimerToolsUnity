@@ -99,6 +99,7 @@ namespace Simulation.GameTheory
 
         public async UniTask SimulateSingleCycle()
         {
+            Debug.Log("Simulating single cycle");
             turn++;
 
             await CreateFood();
