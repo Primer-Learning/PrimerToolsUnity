@@ -67,8 +67,10 @@ namespace Simulation.GameTheory
         {
             creatureGnome.Reset();
             
+            
             // Add up the ints in the dictionary to get the total number of initial blobs
             var blobCount = initialBlobs.Sum(x => x.Value);
+            if (blobCount == 0) return;
 
             var positions = GetBlobsRestingPosition(blobCount)
                 .Select(x => terrain.GetGroundAtLocal(x))
