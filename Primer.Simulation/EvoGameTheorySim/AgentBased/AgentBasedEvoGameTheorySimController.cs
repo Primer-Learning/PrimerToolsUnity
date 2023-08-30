@@ -12,6 +12,7 @@ namespace Primer.Simulation
     public class AgentBasedEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
     {
         public int seed = 0;
+        public bool runWhenEnteringPlayMode;
         
         [SerializeField, HideInInspector]
         private bool _skipAnimations = false;
@@ -110,9 +111,9 @@ namespace Primer.Simulation
 
         public async void Start()
         {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || !runWhenEnteringPlayMode)
                 return;
-
+            
             await OnSimStart();
             
             while (true) {
