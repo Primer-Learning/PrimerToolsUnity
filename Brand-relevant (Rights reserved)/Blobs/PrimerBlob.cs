@@ -461,6 +461,18 @@ public class PrimerBlob : PrimerCharacter {
         animator.SetBool("panicking", false);
         if (mouthOpen) animator.SetTrigger("MouthClosed");
     }
+    
+    public void Smile(float? duration = null)
+    {
+        StartCoroutine(smile(duration));
+    }
+    private IEnumerator smile(float? duration)
+    {
+        animator.SetTrigger("MouthSmile");
+        if (!duration.HasValue) yield break;
+        yield return new WaitForSeconds(duration.Value);
+        animator.SetTrigger("MouthClosed");
+    }
 
     public async void Chomp(float hold = 0.5f, float attack = 0.25f, float decay = 0.25f)
     {
