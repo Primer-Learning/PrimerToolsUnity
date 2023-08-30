@@ -20,7 +20,7 @@ namespace Simulation.GameTheory
         public bool skipAnimations;
 
         private PrimerBlob blobCache;
-        private PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
+        public PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
 
         public float energy;
         public FruitTree goingToEat;
