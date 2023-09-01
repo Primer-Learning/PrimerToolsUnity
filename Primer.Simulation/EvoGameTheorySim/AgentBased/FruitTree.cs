@@ -4,6 +4,7 @@ using Primer;
 using Primer.Animation;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class FruitTree : MonoBehaviour
 {
@@ -18,12 +19,11 @@ public class FruitTree : MonoBehaviour
     public bool hasFruit => flowers.Any(x => x.childCount > 0);
     
     [Title("Flowers")]
-    public List<Transform> flowers = new();
-    [Range(1, 4)] public int fruitCount = 4;
+    public List<Transform> flowers;
 
     public void Reset()
     {
-        flowers.GetChildren().SetScale(0);
+        flowers.GetChildren().Dispose();
     }
     
     public Tween GrowFruit(int index)
