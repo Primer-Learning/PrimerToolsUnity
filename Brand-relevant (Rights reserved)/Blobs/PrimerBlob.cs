@@ -382,6 +382,12 @@ public class PrimerBlob : PrimerCharacter {
         color = newColor;
     }
 
+    public Tween ChangeColor(Color newColor)
+    {
+        var t = transform.Find("blob_mesh");
+        return t.GetComponent<Renderer>().TweenColor(newColor);
+    }
+
     public override void FadeOut(float newAlpha = 0, float duration = 0.5f, float delay = 0,
         EaseMode ease = EaseMode.None, List<PrimerObject> exemptions = null)
     {

@@ -15,6 +15,11 @@ namespace Primer.Animation
         {
             return Tween.Value(self.SetColor, self.GetColor, () => newColor);
         }
+        
+        public static Tween TweenColor(this Renderer self, Color newColor)
+        {
+            return Tween.Value(self.SetColor, self.GetColor, () => newColor);
+        }
 
         public static Tween TweenColor(this IEnumerable<MeshRenderer> self, Color newColor)
         {
