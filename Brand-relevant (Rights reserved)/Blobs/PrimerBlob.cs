@@ -6,6 +6,7 @@ using Codice.Client.BaseCommands.Import;
 using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
+using Primer.Timeline;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = System.Random;
@@ -199,6 +200,21 @@ public class PrimerBlob : PrimerCharacter {
         // Debug.Log("Starting to look");
         // Debug.Log(releasing);
         StartCoroutine(lookAt(obj, moveDuration, correctionVector));
+    }
+    
+    public Tween TurnAndStartLookingAt(Transform obj, float moveDuration = 0.5f,
+        Vector3 lookCorrectionVector = new(), Vector3? turnOverrideVector = null)
+    {
+        var differenceVector = obj.position - transform.position;
+        if (!turnOverrideVector.HasValue)
+        {
+            turnOverrideVector = differenceVector;
+        }
+        if (PrimerTimeline.isPlaying) StartLookingAt(obj, moveDuration, lookCorrectionVector);
+        return transform.RotateTo(Quaternion.LookRotation(
+            Vector3.ProjectOnPlane(turnOverrideVector.Value, Vector3.up),
+            Vector3.up
+        ));
     }
 
     public void ChangeFocus(Transform obj, Vector3 correctionVector = new())
