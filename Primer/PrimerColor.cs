@@ -133,5 +133,25 @@ namespace Primer
                 PrimerColors.Black => black,
             };
         }
+        
+        public static Color JuicyInterpolate(Color a, Color b, float t, float juiciness = 0.5f)
+        {
+            float Ha, Sa, Va;
+            Color.RGBToHSV(a, out Ha, out Sa, out Va);
+            float Hb, Sb, Vb;
+            Color.RGBToHSV(b, out Hb, out Sb, out Vb);
+            
+            var lerp = Vector3.Lerp(new Vector4(Ha, Sa, Va), new Vector4(Hb, Sb, Vb), t);
+            var hsvLerped = Color.HSVToRGB(lerp.x, lerp.y, lerp.z);
+            hsvLerped.a = Mathf.Lerp(a.a, b.a, t);
+
+            var rgbLerped = Color.Lerp(a, b, t);
+
+            return Color.Lerp(rgbLerped, hsvLerped, juiciness);
+        }
+        public static Color ModeratelyJuicyInterpolate(Color a, Color b, float t)
+        {
+            return JuicyInterpolate(a, b, t, 0.5f);
+        }
     }
 }

@@ -28,6 +28,11 @@ namespace Primer.Animation
             if (typeof(T) == typeof(Quaternion))
                 return typeof(Quaternion).GetMethod("Slerp");
 
+            if (typeof(T) == typeof(Color))
+            {
+                return typeof(PrimerColor).GetMethod("ModeratelyJuicyInterpolate");
+            }
+            
             var lerp = typeof(T).GetMethod("Lerp");
 
             if (lerp is null) {
