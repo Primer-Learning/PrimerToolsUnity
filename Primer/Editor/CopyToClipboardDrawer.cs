@@ -26,10 +26,10 @@ namespace Primer.Editor
 
             var attribute = Property.GetAttribute<CopyToClipboardAttribute>();
             var text = attribute.label ?? label.text.Replace("To", "Copy");
-            var rect = OdinBullshitToGetRect(text, SIZE);
+            // var rect = OdinBullshitToGetRect(text, SIZE);
 
-            if (SirenixEditorGUI.SDFIconButton(rect, label, ICON))
-                Invoke();
+            // if (SirenixEditorGUI.SDFIconButton(rect, label, ICON))
+                // Invoke();
         }
 
         private void Invoke()
@@ -108,9 +108,9 @@ namespace Primer.Editor
             GUIUtility.systemCopyBuffer = str;
         }
 
-        private static Rect OdinBullshitToGetRect(string text, float buttonHeight)
-        {
-            throw new NotImplementedException();
+        // private static Rect OdinBullshitToGetRect(string text, float buttonHeight)
+        // {
+            // throw new NotImplementedException();
 
             // FIXME: Thanks Odin for breaking this
 
@@ -127,6 +127,6 @@ namespace Primer.Editor
             //
             // var rect = GUILayoutUtility.GetRect(0.0f, buttonHeight, GUILayout.MinWidth(minWidth));
             // return EditorGUI.IndentedRect(rect);
-        }
+        // }
     }
 }
