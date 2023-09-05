@@ -36,9 +36,6 @@ namespace Primer
             // unusedChildren.Clear();
             // unusedChildren.AddRange(ReadExistingChildren(transform));
         }
-        
-        
-
 
         #region Constructors
         public SimpleGnome(string name, Component parent = null)
