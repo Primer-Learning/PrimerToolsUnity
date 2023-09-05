@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -95,6 +96,8 @@ namespace Primer.Simulation
             }
 
             gnome.Purge();
+            if (gnome.children.Count() < numberToPlace)
+                Debug.LogWarning("Only " + gnome.children.Count() + " items were placed out of an attempted " + numberToPlace + ".");
         }
 
 #if UNITY_EDITOR
