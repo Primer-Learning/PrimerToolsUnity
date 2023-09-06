@@ -26,14 +26,9 @@ namespace Primer.Graph
             return self.axes.Select(axis => axis.GrowFromOrigin()).RunInParallel();
         }
 
-        public static Tween GrowFromOrigin(this IAxisController self, float newMax)
+        public static Tween GrowFromOrigin(this IAxisController self, float newLength)
         {
-            return self.axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
-        }
-
-        public static Tween GrowFromOrigin(this IAxisController self, float newMin, float newMax)
-        {
-            return self.axes.Select(axis => axis.GrowFromOrigin(newMax)).RunInParallel();
+            return self.axes.Select(axis => axis.GrowFromOrigin(newLength)).RunInParallel();
         }
 
         public static Tween ShrinkToOrigin(this IAxisController self)

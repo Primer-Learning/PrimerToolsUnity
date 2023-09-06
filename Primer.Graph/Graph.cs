@@ -74,18 +74,11 @@ namespace Primer.Graph
             return IAxisControllerExtensions.GrowFromOrigin(this);
         }
 
-        public Tween GrowFromOrigin(float newMax)
+        public Tween GrowFromOrigin(float newLength)
         {
             z?.SetActive(enableZAxis);
-            return IAxisControllerExtensions.GrowFromOrigin(this, newMax);
+            return IAxisControllerExtensions.GrowFromOrigin(this, newLength);
         }
-
-        public Tween GrowFromOrigin(float newMin, float newMax)
-        {
-            z?.SetActive(enableZAxis);
-            return IAxisControllerExtensions.GrowFromOrigin(this, newMin, newMax);
-        }
-
 
         private void UpdateAxes()
         {

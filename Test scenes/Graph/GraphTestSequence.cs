@@ -23,11 +23,13 @@ public class GraphTestSequence : Sequence
             // now we only need the component
             .component;
 
-        graph.x.length = 2;
+        graph.x.max = 10;
+        graph.y.max = 10;
+        graph.x.length = 3;
         graph.y.length = 2;
         graph.enableZAxis = false;
 
-        yield return graph.GrowFromOrigin(10) with { name = "Graph appears" };
+        yield return graph.GrowFromOrigin() with { name = "Graph appears" };
         yield return graph.SetDomain(5) with { name = "Graph shrink to 5" };
 
         foreach (var _ in TestLine(graph))

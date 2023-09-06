@@ -8,15 +8,19 @@ namespace Primer.Graph
         public Axis[] axes => axesCache ??= new[] { this };
 
 
-        public Tween GrowFromOrigin() => GrowFromOrigin(min, max);
-        public Tween GrowFromOrigin(float newMax) => GrowFromOrigin(min, newMax);
-        public Tween GrowFromOrigin(float newMin, float newMax)
+        public Tween GrowFromOrigin() => GrowFromOrigin(length);
+        public Tween GrowFromOrigin(float newLength)
         {
-            range = new MinMax(min: 0, max: 0);
+            length = 0;
             UpdateChildren();
 
-            range = new MinMax(min: newMin, max: newMax);
+            length = newLength;
             this.SetActive(true);
+
+            // Do this so the tics need to be created as the axis grows
+            var gnome = Gnome.For(this)
+                .AddGnome("Ticks container");
+            gnome.RemoveAllChildren();
 
             return Tween.Parallel(
                 delayBetweenStarts: 0.1f,
