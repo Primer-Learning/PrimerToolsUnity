@@ -24,10 +24,10 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnSimStart()
         {
-            var numDoves = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Dove));
-            var numHawks = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Hawk));
-            var numRetaliators = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
-            var numBullies = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Bully));
+            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Dove));
+            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Hawk));
+            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
+            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Bully));
             var total = numDoves + numHawks + numRetaliators + numBullies;
             
             if (graph is not null)
@@ -75,10 +75,10 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnCycleCompleted()
         {
-            var numDoves = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Dove));
-            var numHawks = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Hawk));
-            var numRetaliators = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
-            var numBullies = sim.agents.Count(agent => agent.strategy.Equals(DHRB.Bully));
+            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Dove));
+            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Hawk));
+            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
+            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Bully));
             var total = numDoves + numHawks + numRetaliators + numBullies;
 
             if (graph is not null)

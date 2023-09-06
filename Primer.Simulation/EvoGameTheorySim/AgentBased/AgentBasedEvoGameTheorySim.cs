@@ -18,7 +18,7 @@ namespace Simulation.GameTheory
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         
-        public readonly Gnome creatureGnome;
+        public readonly SimpleGnome creatureGnome;
 
         private readonly StrategyRule<T> _strategyRule;
 
@@ -31,12 +31,12 @@ namespace Simulation.GameTheory
             {
                 _skipAnimations = value;
                 foreach (var tree in trees) tree.skipAnimations = skipAnimations;
-                foreach (var agent in agents) agent.skipAnimations = skipAnimations;
+                foreach (var agent in creatures) agent.skipAnimations = skipAnimations;
             }
         }
         public Transform transform { get; }
         public Component component => transform;
-        public IEnumerable<Creature> agents => creatureGnome.ChildComponents<Creature>();
+        public IEnumerable<Creature> creatures => creatureGnome.ChildComponents<Creature>();
 
         public AgentBasedEvoGameTheorySim(
             Transform transform,
@@ -50,8 +50,7 @@ namespace Simulation.GameTheory
 
             rng = new Rng(seed);
 
-            var container = new Gnome(transform);
-            creatureGnome = container.AddGnome("Blobs").ScaleChildrenInPlayMode(1);
+            creatureGnome = new SimpleGnome("Blobs", parent: transform);
 
             this.skipAnimations = skipAnimations;
 
@@ -65,8 +64,7 @@ namespace Simulation.GameTheory
 
         private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)
         {
-            creatureGnome.Reset();
-            
+            // creatureGnome.Reset();
             
             // Add up the ints in the dictionary to get the total number of initial blobs
             var blobCount = initialBlobs.Sum(x => x.Value);
@@ -83,18 +81,15 @@ namespace Simulation.GameTheory
             
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
-                    var blob = creatureGnome.AddPrefab<Transform>("blob_skinned", $"Initial blob {strategy}");
-                    var agent = blob.GetOrAddComponent<Creature>();
-                    agent.strategy = strategy;
-                    agent.landscape = terrain;
-                    agent.rng = rng;
-                    _strategyRule.OnAgentCreated(agent);
-                    blob.position = positions[i];
-                    blob.LookAt(center);
+                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial blob {strategy}");
+                    creature.strategy = strategy;
+                    creature.landscape = terrain;
+                    creature.rng = rng;
+                    _strategyRule.OnAgentCreated(creature);
+                    creature.transform.position = positions[i];
+                    creature.transform.LookAt(center);
                 }
             }
-
-            creatureGnome.Purge(defer: true);
         }
 
         public async UniTask SimulateSingleCycle()
@@ -112,9 +107,9 @@ namespace Simulation.GameTheory
 
         public Tween CreateFood()
         {
-            foreach (var agent in agents)
+            foreach (var creature in creatures)
             {
-                agent.PurgeStomach();
+                creature.PurgeStomach();
             }
             
             return trees.Select(x => x.GrowRandomFruitsUpToTotal(total: 2, delayRange: 1)).RunInParallel();
@@ -122,20 +117,20 @@ namespace Simulation.GameTheory
 
         public Tween AgentsGoToTrees()
         {
-            // Make agents each go to a random tree, but a maximum of two per tree
+            // Make creatures each go to a random tree, but a maximum of two per tree
             var treeSlots = trees.Concat(trees).Shuffle(rng);
-            return agents
+            return creatures
                 .Shuffle(rng)
                 .Take(treeSlots.Count)
-                .Zip(treeSlots, (agent, tree) => agent.GoToEat(tree))
+                .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
                 .RunInParallel();
         }
 
         public Tween AgentsEatFood()
         {
-            // Make agents eat food, but only agents where goingToEat is not null
-            return agents
-                .Where(agent => agent.goingToEat != null)
+            // Make creatures eat food, but only creatures where goingToEat is not null
+            return creatures
+                .Where(creature => creature.goingToEat != null)
                 .GroupBy(x => x.goingToEat)
                 .Select(x => Eat(competitors: x.ToList(), tree: x.Key))
                 .RunInParallel();
@@ -143,36 +138,38 @@ namespace Simulation.GameTheory
 
         public Tween AgentsReturnHome()
         {
-            return agents
-                .Zip(GetBlobsRestingPosition(), (agent, position) => agent.ReturnHome(position))
+            return creatures
+                .Zip(GetBlobsRestingPosition(), (creature, position) => creature.ReturnHome(position))
                 .RunInParallel();
         }
 
         public Tween AgentsReproduceOrDie()
         {
-            creatureGnome.Reset();
-
             var newAgents = new List<Creature>();
-            foreach (var agent in agents) {
-                agent.PurgeStomach();
-                
-                if (agent.canSurvive)
-                    creatureGnome.Insert(agent);
+            foreach (var creature in creatures) {
+                creature.PurgeStomach();
 
-                if (agent.canReproduce)
+                if (!creature.canSurvive)
                 {
-                    var child = creatureGnome.Add(agent, $"Blob born in {turn}");
-                    child.ConsumeEnergy();
+                    creature.ShrinkAndDispose();
+                    creature.ConsumeEnergy();
+                    continue;
+                }
+
+                if (creature.canReproduce)
+                {
+                    var child = creatureGnome.Add<Creature>("blob_skinned", $"Blob born in {turn}");
+                    child.strategy = creature.strategy;
+                    child.landscape = terrain;
+                    child.transform.localPosition = creature.transform.localPosition;
+                    _strategyRule.OnAgentCreated(child);
                     child.rng = rng;
-                    child.strategy = agent.strategy;
                     child.transform.localScale = Vector3.zero;
                     newAgents.Add(child);
                 }
                 
-                agent.ConsumeEnergy();
+                creature.ConsumeEnergy();
             }
-
-            creatureGnome.Purge();
             
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             // return Tween.noop;
@@ -201,7 +198,7 @@ namespace Simulation.GameTheory
                     return _strategyRule.Resolve(competitors, tree);
                 
                 default:
-                    throw new ArgumentException("Cannot eat without agents", nameof(competitors));
+                    throw new ArgumentException("Cannot eat without creatures", nameof(competitors));
             }
         }
 
@@ -211,12 +208,13 @@ namespace Simulation.GameTheory
             var offset = Vector2.one * margin;
             var perimeter = terrain.size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var agentCount = blobCount ?? creatureGnome.childCount;
-            var positions = edgeLength / agentCount;
+            var creatureCount = blobCount ?? creatureGnome.activeChildCount;
+            var positions = edgeLength / creatureCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = terrain.size / -2;
         
-            for (var i = 0; i < agentCount; i++) {
+            
+            for (var i = 0; i < creatureCount; i++) {
                 var linearPosition = positions * i + centerInSlot;
                 var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
                 yield return perimeterPosition + offset + centerInTerrain;
