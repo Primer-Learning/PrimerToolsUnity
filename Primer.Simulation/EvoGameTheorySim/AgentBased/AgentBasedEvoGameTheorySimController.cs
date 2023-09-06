@@ -90,18 +90,31 @@ namespace Primer.Simulation
         protected virtual async UniTask OnCycleCompleted() {}
         protected virtual async UniTask OnReset() {}
         
-        public void InitializeSim()
+        public void InitializeSim(List<Creature> creatures = null)
         {
             turn = 0;
             SetStrategyRule();
 
-            sim = new AgentBasedEvoGameTheorySim<T>(
-                transform: transform,
-                seed: seed,
-                initialBlobs: ConstructInitialStrategiesDictionary(),
-                strategyRule,
-                skipAnimations: skipAnimations
-            );
+            if (creatures is null)
+            {
+                sim = new AgentBasedEvoGameTheorySim<T>(
+                    transform: transform,
+                    seed: seed,
+                    initialBlobs: ConstructInitialStrategiesDictionary(),
+                    strategyRule,
+                    skipAnimations: skipAnimations
+                );
+            }
+            else
+            {
+                sim = new AgentBasedEvoGameTheorySim<T>(
+                    transform: transform,
+                    seed: seed,
+                    initialBlobs: creatures,
+                    strategyRule,
+                    skipAnimations: skipAnimations
+                );
+            }
         }
 
         private void DisposeSim()

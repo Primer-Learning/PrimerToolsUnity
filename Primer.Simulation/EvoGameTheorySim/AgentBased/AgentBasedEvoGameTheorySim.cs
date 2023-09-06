@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
-using Primer.Timeline;
 using UnityEngine;
 
 namespace Simulation.GameTheory
@@ -38,6 +37,8 @@ namespace Simulation.GameTheory
         public Component component => transform;
         public IEnumerable<Creature> creatures => creatureGnome.ChildComponents<Creature>();
 
+        
+        // Constructor that creates blobs from a dictionary of strategies and counts
         public AgentBasedEvoGameTheorySim(
             Transform transform,
             int seed,
@@ -61,10 +62,35 @@ namespace Simulation.GameTheory
                 tree.rng = rng;
             }
         }
+        
+        // Constructor that accepts a list of creatures instead of a dictionary
+        public AgentBasedEvoGameTheorySim(
+            Transform transform,
+            int seed,
+            List<Creature> initialBlobs,
+            StrategyRule<T> strategyRule,
+            bool skipAnimations = false)
+        {
+            this.transform = transform;
+            this._strategyRule = strategyRule;
+
+            rng = new Rng(seed);
+
+            creatureGnome = new SimpleGnome("Blobs", parent: transform);
+
+            this.skipAnimations = skipAnimations;
+
+            ConfigureInitialBlobs(initialBlobs);
+
+            foreach (var tree in trees)
+            {
+                tree.rng = rng;
+            }
+        }
 
         private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)
         {
-            // creatureGnome.Reset();
+            creatureGnome.Reset();
             
             // Add up the ints in the dictionary to get the total number of initial blobs
             var blobCount = initialBlobs.Sum(x => x.Value);
@@ -81,7 +107,7 @@ namespace Simulation.GameTheory
             
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
-                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial blob {strategy}");
+                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
                     creature.strategy = strategy;
                     creature.landscape = terrain;
                     creature.rng = rng;
@@ -89,6 +115,20 @@ namespace Simulation.GameTheory
                     creature.transform.position = positions[i];
                     creature.transform.LookAt(center);
                 }
+            }
+        }
+
+        private void ConfigureInitialBlobs(List<Creature> initialBlobs)
+        {
+            creatureGnome.Reset();
+            
+            foreach (var creature in initialBlobs)
+            {
+                creature.transform.SetParent(creatureGnome);
+                creature.gameObject.SetActive(true);
+                creature.landscape = terrain;
+                creature.rng = rng;
+                _strategyRule.OnAgentCreated(creature);
             }
         }
 
@@ -146,6 +186,7 @@ namespace Simulation.GameTheory
         public Tween AgentsReproduceOrDie()
         {
             var newAgents = new List<Creature>();
+            
             foreach (var creature in creatures) {
                 creature.PurgeStomach();
 
@@ -158,7 +199,7 @@ namespace Simulation.GameTheory
 
                 if (creature.canReproduce)
                 {
-                    var child = creatureGnome.Add<Creature>("blob_skinned", $"Blob born in {turn}");
+                    var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
                     child.strategy = creature.strategy;
                     child.landscape = terrain;
                     child.transform.localPosition = creature.transform.localPosition;
@@ -240,10 +281,15 @@ namespace Simulation.GameTheory
 
             return new Vector2(0, perimeter.y - position);
         }
+        
+        private int StrategyCount(Enum strategy)
+        {
+            return creatures.Count(x => x.strategy.Equals(strategy));
+        }
 
         public void Dispose()
         {
-            creatureGnome?.RemoveAllChildren();
+            creatureGnome?.Reset(hard: true);
         }
     }
 }
