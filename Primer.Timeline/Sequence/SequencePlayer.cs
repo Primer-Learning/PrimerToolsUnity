@@ -175,7 +175,7 @@ namespace Primer.Timeline
 
             if (isDone) {
                 currentTween = null;
-                Debug.LogWarning($"Sequence {sequence} has more clips that yield returns.");
+                // Debug.LogWarning($"Sequence {sequence} has more clips than yield returns.");
                 return false;
             }
 
