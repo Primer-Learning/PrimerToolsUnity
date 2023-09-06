@@ -23,7 +23,8 @@ public class GraphTestSequence : Sequence
             // now we only need the component
             .component;
 
-        graph.scale = 0.2f;
+        graph.x.length = 2;
+        graph.y.length = 2;
         graph.enableZAxis = false;
 
         yield return graph.GrowFromOrigin(10) with { name = "Graph appears" };
@@ -92,9 +93,10 @@ public class GraphTestSequence : Sequence
     {
         PushClipColor(PrimerColor.green);
 
+        graph.enableZAxis = true;
         yield return Parallel(
             delayBetweenStarts: 0.1f,
-            graph.GrowZAxis(5),
+            graph.z.GrowFromOrigin(5),
             cam.Travel(
                 distance: 4,
                 swivel: new Vector3(15f, -25f, 0f)
@@ -129,7 +131,7 @@ public class GraphTestSequence : Sequence
 
         yield return Parallel(
             delayBetweenStarts: 0.1f,
-            graph.ShrinkZAxis(),
+            graph.z.ShrinkToOrigin(),
             cam.Travel(
                 distance: 2.8f,
                 swivelOrigin: new Vector3(1.1f, 1.1f, 0f),
