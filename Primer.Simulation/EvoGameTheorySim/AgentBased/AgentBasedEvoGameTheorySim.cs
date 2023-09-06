@@ -11,7 +11,7 @@ namespace Simulation.GameTheory
 {
     public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
     {
-        private int turn = 0;
+        public int turn = 0;
         private readonly int foodPerTurn;
         
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
