@@ -25,9 +25,8 @@ namespace Simulation.GameTheory
         public float energy;
         public FruitTree goingToEat;
         public System.Enum strategy;
-        private List<Transform> detachedFruit = new List<Transform>();
 
-        public Gnome stomach => new ("Stomach", parent: transform);
+        public SimpleGnome stomach => new ("Stomach", parent: transform);
         
         public bool canSurvive => energy >= 1 || rng.rand.NextDouble() < energy;
         public bool canReproduce => energy >= 2 || rng.rand.NextDouble() < energy - 1;
@@ -105,16 +104,14 @@ namespace Simulation.GameTheory
             }
 
             var fruit = nearestFlowerWithFruit.GetChild(0);
-            stomach.Insert(fruit, new ChildOptions {worldPositionStays = true});
-            
-            detachedFruit.Add(fruit);
+            fruit.SetParent(stomach.transform, worldPositionStays: true);
 
             return fruit;
         }
 
         public void PurgeStomach()
         {
-            stomach.RemoveAllChildren();
+            stomach.Reset(hard: true);
         }
     }
 }
