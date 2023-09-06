@@ -26,20 +26,10 @@ namespace Primer.Graph
         #endregion
 
         #region public float scale;
-        [SerializeField, HideInInspector]
         private float _scale = 0.2f;
-
-        [ShowInInspector]
-        [MinValue(0.1f)]
         public float scale {
             get => _scale;
-            set {
-                if (_scale == value)
-                    return;
-
-                _scale = value;
-                hasDomainChanged = true;
-            }
+            set => length = value * (range.max - range.min);
         }
         #endregion
 
@@ -48,7 +38,25 @@ namespace Primer.Graph
 
         internal float start => range.min * scale;
         internal float end => range.max * scale;
-        internal float length => end - start;
+
+        [SerializeField, HideInInspector]
+        private float _length = 1;
+        [ShowInInspector]
+        [MinValue(0.1f)]
+        public float length
+        {
+            get => _length;
+            set
+            {
+                if (_length == value)
+                    return;
+                
+                _length = value;
+                _scale = value / (range.max - range.min);
+                hasDomainChanged = true;
+            }
+        }
+
         internal float rodStart => start - padding.x;
         internal float rodEnd => end + padding.y;
 
