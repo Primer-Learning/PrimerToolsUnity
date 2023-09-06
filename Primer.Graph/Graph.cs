@@ -67,19 +67,6 @@ namespace Primer.Graph
         private void OnValidate() => UpdateAxes();
         private void Update() => EnsureDomainDimensions();
 
-
-        public Tween GrowZAxis(float newMax) => GrowZAxis(0, newMax);
-        public Tween GrowZAxis(float newMin, float newMax)
-        {
-            enableZAxis = true;
-            return z.GrowFromOrigin(newMin, newMax);
-        }
-
-        public Tween ShrinkZAxis()
-        {
-            return z.ShrinkToOrigin().Observe(afterComplete: () => enableZAxis = false);
-        }
-
         // We override this IAxisController extension method to ensure that the z axis is enabled/disabled
         public Tween GrowFromOrigin()
         {
