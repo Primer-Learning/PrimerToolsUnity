@@ -23,6 +23,7 @@ namespace Primer
         public void Dispose()
         {
             Reset();
+            transform.gameObject.SetActive(false);
         }
         public void Reset(bool hard = false)
         {
@@ -46,18 +47,21 @@ namespace Primer
                 : GetDirectChild(parent.transform, name);
 
             component = transform;
+            transform.gameObject.SetActive(true);
         }
 
         public SimpleGnome(Transform component)
         {
             this.component = component;
             transform = component;
+            transform.gameObject.SetActive(true);
         }
 
         protected SimpleGnome(Component component)
         {
             this.component = component;
             transform = component.transform;
+            transform.gameObject.SetActive(true);
         }
 
         private static Transform GetRootTransform(string name)
