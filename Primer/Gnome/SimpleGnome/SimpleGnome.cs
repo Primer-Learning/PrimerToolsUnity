@@ -2,6 +2,8 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Primer
 {
@@ -27,7 +29,6 @@ namespace Primer
         }
         public void Reset(bool hard = false)
         {
-            
             foreach (var child in transform.GetChildren())
             {
                 if (hard)
@@ -63,7 +64,30 @@ namespace Primer
             transform = component.transform;
             transform.gameObject.SetActive(true);
         }
+        #endregion
+        
+        #region Constructors that take a prefab
+        // Create a SimpleGnome from a prefab. Mostly useful for root objects you want to disable themselves.
+        public SimpleGnome(GameObject prefab, string name, Transform parent = null)
+        {
+            transform = parent is null
+                ? GetRootTransform(prefab, name)
+                : GetDirectChild(parent.transform, prefab, name);
 
+            transform.name = name;
+            component = transform;
+            transform.gameObject.SetActive(true);
+        }
+        
+        // Overload for the above that takes a prefab name instead of a prefab.
+        public SimpleGnome(string prefabName, string name, Transform parent = null)
+        : this(Resources.Load<GameObject>(prefabName), name, parent)
+        {
+        }
+        #endregion
+
+        #region Utilities
+        // Gets or creates a root object with the given name.
         private static Transform GetRootTransform(string name)
         {
             var scene = SceneManager.GetActiveScene();
@@ -72,7 +96,19 @@ namespace Primer
             var obj = found != null ? found : new GameObject(name);
             return obj.transform;
         }
+        
+        // Overload for the above that takes a prefab
+        private static Transform GetRootTransform(GameObject prefab, string name)
+        {
+            var scene = SceneManager.GetActiveScene();
+            var rootGameObjects = scene.GetRootGameObjects();
+            var found = rootGameObjects.FirstOrDefault(x => x.name == name);
+            var obj = found != null ? found : Object.Instantiate(prefab);
+            obj.name = name;
+            return obj.transform;
+        }
 
+        // Gets or creates a child object with the given name.
         private static Transform GetDirectChild(Transform parent, string name)
         {
             var found = parent.Find(name);
@@ -81,6 +117,19 @@ namespace Primer
                 return found;
 
             var child = new GameObject(name).transform;
+            child.SetParent(parent, false);
+            return child;
+        }
+        
+        // Overload for the above that takes a prefab
+        private static Transform GetDirectChild(Transform parent, GameObject prefab, string name)
+        {
+            var found = parent.Find(name);
+
+            if (found)
+                return found;
+
+            var child = Object.Instantiate(prefab).transform;
             child.SetParent(parent, false);
             return child;
         }
