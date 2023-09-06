@@ -24,18 +24,19 @@ namespace Primer
         {
             Reset();
         }
-        public void Reset()
+        public void Reset(bool hard = false)
         {
+            
             foreach (var child in transform.GetChildren())
             {
-                child.gameObject.SetActive(false);
+                if (hard)
+                    child.gameObject.Dispose();
+                else
+                    child.gameObject.SetActive(false);
             }
-            
-            // created.Clear();
-            // usedChildren.Clear();
-            // unusedChildren.Clear();
-            // unusedChildren.AddRange(ReadExistingChildren(transform));
         }
+        
+        public int activeChildCount => transform.GetChildren().Count(x => x.gameObject.activeSelf);
 
         #region Constructors
         public SimpleGnome(string name, Component parent = null)
@@ -45,24 +46,18 @@ namespace Primer
                 : GetDirectChild(parent.transform, name);
 
             component = transform;
-
-            Reset();
         }
 
         public SimpleGnome(Transform component)
         {
             this.component = component;
             transform = component;
-
-            Reset();
         }
 
         protected SimpleGnome(Component component)
         {
             this.component = component;
             transform = component.transform;
-
-            Reset();
         }
 
         private static Transform GetRootTransform(string name)
