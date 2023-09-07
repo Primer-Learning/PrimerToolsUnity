@@ -20,14 +20,18 @@ namespace Primer.Graph
                     return;
 
                 _range = value;
+                _scale = _length / (range.max - range.min);
                 hasDomainChanged = true;
             }
         }
         #endregion
 
         #region public float scale;
+        // Scale has been made internal. It's not a useful quantity to think about when making decisions about
+        // how a graph appears in a scene. Range and length are more useful.
+        // TODO: Eliminate scale as a field and make it always be calculated from range and length.
         private float _scale = 0.2f;
-        public float scale {
+        internal float scale {
             get => _scale;
             set => length = value * (range.max - range.min);
         }
