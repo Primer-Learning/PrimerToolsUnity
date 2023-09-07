@@ -3,6 +3,39 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/*
+ *  This is the methaphor.
+ *
+ *  GameObjects are expensive
+ *  We create GOs them when we need them
+ *  and disable GOs them when we don't
+ *  we can also .Purge() to get rid of unused GameObjects
+ *                 ^ this removes child GameObjects in hierarchy
+ *
+ *  So we ask Gnomes for GameObjects
+ *  "Hey Gnome, gimme a GameObject with PrimerComponent, called POTATO"
+ *
+ *      new Gnome<PrimerComponent>("POTATO");
+ *
+ *  The gnome will not delete the object after it's done.
+ *  It'll disable it at the end of the current function if you use `using` keyword.
+ *  (or you dispose them manually at any point)
+ *
+ *      using var myGnome = new Gnome<PrimerComponent>("POTATO");
+ *
+ *  If there was already a "POTATO" GameObject it will take it and enable it.
+ *  If there is none the Gnome will create it.
+ *  From then on, you can also use it to ensure the children are what you expect.
+ *
+ *      myGnome.Add<PrimerComponent>("POTATO's child")
+ *
+ *  Or create more gnomes to manage the children too
+ *
+ *      using var childGnome = myGnome.AddGnome<PrimerComponent>("Another child")
+ *      // or
+ *      using var childGnome = myGnome.Add<PrimerComponent>("Another child").ToGnome()
+ */
+
 namespace Primer
 {
     /// <summary>
