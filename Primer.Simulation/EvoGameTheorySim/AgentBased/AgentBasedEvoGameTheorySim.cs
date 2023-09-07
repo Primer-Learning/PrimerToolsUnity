@@ -36,6 +36,7 @@ namespace Simulation.GameTheory
         public Transform transform { get; }
         public Component component => transform;
         public IEnumerable<Creature> creatures => creatureGnome.ChildComponents<Creature>();
+        public int currentCreatureCount => creatureGnome.activeChildCount;
 
         
         // Constructor that creates blobs from a dictionary of strategies and counts
