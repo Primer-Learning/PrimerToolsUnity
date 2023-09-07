@@ -96,6 +96,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: lockTickOrientation._enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _lockTickOrientation._enabled
       value: 1
       objectReference: {fileID: 0}
@@ -221,6 +225,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: lockTickOrientation._enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _lockTickOrientation._enabled
       value: 1
       objectReference: {fileID: 0}
@@ -330,12 +338,20 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: tickPrefab.stored
+      value: 
+      objectReference: {fileID: 9045329591203473548, guid: aed2a79473b7bc742b56fb42e8e29ce1, type: 3}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: ticks.prefab.stored
       value: 
       objectReference: {fileID: 9045329591203473548, guid: aed2a79473b7bc742b56fb42e8e29ce1, type: 3}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _lockTickOrientation._value
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: lockTickOrientation._enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _lockTickOrientation._enabled
