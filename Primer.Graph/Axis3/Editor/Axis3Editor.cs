@@ -1,7 +1,6 @@
 ﻿using Primer.Graph;
 using UnityEditor;
 
-
 [CustomEditor(typeof(Axis3))]
 public class Axis3Editor : Editor
 {
@@ -14,11 +13,10 @@ public class Axis3Editor : Editor
         DrawDefaultInspector();
 
         // End change check
-        if (EditorGUI.EndChangeCheck())
-        {
-            // If here, some property was changed. Perform your actions.
-            var axis = (Axis3)target;
-            axis.UpdateChildren();
-        }
+        if (!EditorGUI.EndChangeCheck()) return;
+        
+        // Something has changed, update children
+        var axis = (Axis3)target;
+        axis.UpdateChildren();
     }
 }
