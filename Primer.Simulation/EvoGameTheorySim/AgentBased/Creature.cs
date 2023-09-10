@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
+using Primer.Timeline;
 using UnityEngine;
 
 namespace Simulation.GameTheory
@@ -51,7 +52,7 @@ namespace Simulation.GameTheory
                     globalSpace: true)
                 .Observe(onStart: () =>
                 {
-                    if (!skipAnimations && Application.isPlaying)
+                    if (!skipAnimations && PrimerTimeline.isPlaying)
                     {
                         blob.animator.SetFloat("EatSpeed", 2);
                         blob.animator.SetTrigger(scoop);
