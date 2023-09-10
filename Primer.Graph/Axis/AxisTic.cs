@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Primer.Graph
 {
-    public class AxisTick : MonoBehaviour
+    public class AxisTic : MonoBehaviour
     {
         public float value;
 
