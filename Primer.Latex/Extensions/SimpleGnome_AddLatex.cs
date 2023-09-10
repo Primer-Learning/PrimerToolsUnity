@@ -10,7 +10,6 @@ namespace Primer.Latex
             var child = gnome.Add<LatexComponent>("LaTex", name ?? formula);
 
             child.Process(formula);
-            child.transform.SetScale(0);
             child.SetActive(true);
 
             return child;
