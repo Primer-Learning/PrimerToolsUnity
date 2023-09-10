@@ -1,6 +1,8 @@
-﻿namespace Primer.Graph.Axis3
+﻿using UnityEngine;
+
+namespace Primer.Graph
 {
-    public class Axis3
+    public class Axis3 : MonoBehaviour
     {
         
     }
