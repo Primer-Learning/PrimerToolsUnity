@@ -72,6 +72,10 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: ticPrefab
+      value: 
+      objectReference: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
       value: 0.1
       objectReference: {fileID: 0}
@@ -209,6 +213,10 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: ticPrefab
+      value: 
+      objectReference: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
       value: 0.1
       objectReference: {fileID: 0}
@@ -325,6 +333,10 @@ PrefabInstance:
       propertyPath: padding.y
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
+      propertyPath: ticPrefab
+      value: 
+      objectReference: {fileID: 9045329591203473548, guid: aed2a79473b7bc742b56fb42e8e29ce1, type: 3}
     - target: {fileID: 4748708022717725990, guid: b303ed9bc4cdc44e892cde562813803d, type: 3}
       propertyPath: _padding.x
       value: 0.1

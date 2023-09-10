@@ -106,7 +106,7 @@ namespace Primer
             var scene = SceneManager.GetActiveScene();
             var rootGameObjects = scene.GetRootGameObjects();
             var found = rootGameObjects.FirstOrDefault(x => x.name == name);
-            var obj = found != null ? found : PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            var obj = found != null ? found : InstantiatePrefab(prefab);
             obj.name = name;
             return obj.transform;
         }
@@ -132,9 +132,15 @@ namespace Primer
             if (found)
                 return found;
 
-            var child = Object.Instantiate(prefab).transform;
-            child.SetParent(parent, false);
-            return child;
+            var child = InstantiatePrefab(prefab);
+            child.transform.SetParent(parent, false);
+            return child.transform;
+        }
+
+        private static GameObject InstantiatePrefab(GameObject prefab)
+        {
+            return PrefabUtility.InstantiatePrefab(prefab) as GameObject
+                   ?? throw new Exception("Failed to instantiate prefab");
         }
 
         public static implicit operator Transform(SimpleGnome gnome) => gnome.transform;

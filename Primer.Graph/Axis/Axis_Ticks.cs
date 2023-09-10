@@ -56,10 +56,11 @@ namespace Primer.Graph
         [FormerlySerializedAs("_manualTicks")]
         public List<TickData> manualTicks;
 
+        [FormerlySerializedAs("tickPrefab")]
         [RequiredIn(PrefabKind.PrefabAsset)]
         [EnableIf(nameof(showTicks))]
         [FormerlySerializedAs("_tickPrefab")]
-        public AxisTick tickPrefab;
+        public AxisTic ticPrefab;
 
 
         private List<TickData> PrepareTicks()
@@ -85,43 +86,43 @@ namespace Primer.Graph
             var addTweens = new List<Tween>();
             var updateTweens = new List<Tween>();
 
-            Vector3 GetPosition(AxisTick tick) => new((tick.value + valuePositionOffset) * scale, tickOffset, 0);
+            Vector3 GetPosition(AxisTic tick) => new((tick.value + valuePositionOffset) * scale, tickOffset, 0);
 
             var ticsToRemove = new List<Transform>(gnome.activeChildren.ToList());
             
             foreach (var data in PrepareTicks()) {
                 var tickName = $"Tick {data.label}";
                 var existingTick = gnome.transform.Find(tickName);
-                AxisTick tick;
+                AxisTic tic;
 
                 // If the tick exists and is active already
                 if (existingTick is not null && existingTick.gameObject.activeSelf)
                 {
                     ticsToRemove.Remove(existingTick);
-                    tick = existingTick.GetComponent<AxisTick>();
-                    tick.transform.localPosition = GetPosition(tick);
-                    tick.transform.localRotation = Quaternion.identity;
-                    updateTweens.Add(tick.MoveTo(GetPosition(tick)));
+                    tic = existingTick.GetComponent<AxisTic>();
+                    tic.transform.localPosition = GetPosition(tic);
+                    tic.transform.localRotation = Quaternion.identity;
+                    updateTweens.Add(tic.MoveTo(GetPosition(tic)));
                     // Probably already scale 1, but just in case
                     // addTweens.Add(tick.ScaleTo(1));
                 }
                 else // The tick should exist but doesn't
                 {
-                    tick = gnome.Add<AxisTick>(tickPrefab.gameObject, tickName);
-                    tick.value = data.value;
-                    tick.label = data.label;
-                    tick.transform.localPosition = GetPosition(tick);
-                    tick.transform.localRotation = Quaternion.identity;
-                    tick.transform.SetScale(0);
-                    addTweens.Add(tick.ScaleTo(1));
+                    tic = gnome.Add<AxisTic>(ticPrefab.gameObject, tickName);
+                    tic.value = data.value;
+                    tic.label = data.label;
+                    tic.transform.localPosition = GetPosition(tic);
+                    tic.transform.localRotation = Quaternion.identity;
+                    tic.transform.SetScale(0);
+                    addTweens.Add(tic.ScaleTo(1));
                 }
                 
                 if (lockTickOrientation.enabled)
-                    lockTickOrientation.value.ApplyTo(tick.latex);
+                    lockTickOrientation.value.ApplyTo(tic.latex);
             }
 
             var removeTweens = ticsToRemove
-                .Select(x => x.GetComponent<AxisTick>())
+                .Select(x => x.GetComponent<AxisTic>())
                 .OrderByDescending(x => Mathf.Abs(x.value))
                 .Select(
                     tick => {

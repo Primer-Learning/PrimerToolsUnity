@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Codice.CM.Common.Tree;
 using Primer.Animation;
 using Primer.Latex;
 using Sirenix.OdinInspector;
@@ -12,25 +15,42 @@ namespace Primer.Graph
     {
         public float min = 0;
         public float max = 10;
+        public float rangeSize => Mathf.Max(0.001f, max - min);
         
         public float length = 1;
-        
         private float _padding = 0.1f;
         public float padding {
             get => Mathf.Min(_padding, length / 2);
             set => _padding = value;
         }
-        private float actualPadding => Mathf.Min(padding, length / 2);
+        
+        public float scale => lengthMinusPadding / rangeSize;
+        
         public float lengthMinusPadding => length - padding;
         float thickness = 1;
 
         public Tween Transition()
         {
-            // Rod transition
-            return Tween.Parallel(
+            var (addTics, updateTics, removeTics) = TransitionTics();
+
+            var removeTween = Tween.Parallel(
+                removeTics
+            );
+            // Rod, arrow, label transitions
+            var updateTween = Tween.Parallel(
+                updateTics,
                 TransitionRod(),
                 TransitionArrows(),
                 TransitionLabel()
+            );
+            var addTween = Tween.Parallel(
+                addTics
+            );
+
+            return Tween.Series(
+                removeTween,
+                updateTween,
+                addTween
             );
         }
 
@@ -72,7 +92,7 @@ namespace Primer.Graph
 
             var endArrow = gnome.Add<Transform>(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
-            var endArrowPos = new Vector3(length - actualPadding, 0f, 0f);
+            var endArrowPos = new Vector3(length - padding, 0f, 0f);
             var endArrowTween = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
 
             if (arrowPresence != ArrowPresence.Both)
@@ -125,6 +145,109 @@ namespace Primer.Graph
                 labelRotation == labelTransform.localRotation ? null : labelTransform.RotateTo(labelRotation),
                 showLabel ? labelTransform.ScaleTo(0.1f * labelSize) : labelTransform.ScaleTo(0f)
             );
+        }
+
+        #endregion
+
+        #region Tics
+
+        public int ticStep = 2;
+        public bool showZero;
+        public int labelNumberOffset;
+        public AxisTic ticPrefab;
+        
+        private List<TicData> PrepareTics()
+        {
+            if (ticStep <= 0)
+                return new List<TicData>();
+
+            return CalculateTics();
+        }
+        private List<TicData> CalculateTics()
+        {
+            var domain = this;
+            var calculated = new List<TicData>();
+
+            if (showZero)
+                calculated.Add(new TicData(0, labelNumberOffset));
+
+            for (var i = Mathf.Max(ticStep, domain.min); i <= domain.max; i += ticStep)
+                calculated.Add(new TicData(i, labelNumberOffset));
+
+            for (var i = Mathf.Min(-ticStep, domain.max); i >= domain.min; i -= ticStep)
+                calculated.Add(new TicData(i, labelNumberOffset));
+
+            return calculated;
+        }
+        private (Tween add, Tween update, Tween remove) TransitionTics()
+        {
+            var parentGnome = new SimpleGnome(transform);
+            var gnomeTransform = parentGnome
+                .Add("Tics container");
+            gnomeTransform.localRotation = Quaternion.identity;
+            var gnome = new SimpleGnome(gnomeTransform);
+
+            var addTweens = new List<Tween>();
+            var updateTweens = new List<Tween>();
+
+            Vector3 GetPosition(AxisTic tic) => new(tic.value * scale, 0, 0);
+
+            var ticsToRemove = new List<Transform>(gnome.activeChildren.ToList());
+            
+            foreach (var data in PrepareTics()) {
+                var ticName = $"Tic {data.label}";
+                var existingTic = gnome.transform.Find(ticName);
+                AxisTic tic;
+
+                // If the tic exists and is active already
+                if (existingTic is not null && existingTic.gameObject.activeSelf)
+                {
+                    ticsToRemove.Remove(existingTic);
+                    tic = existingTic.GetComponent<AxisTic>();
+                    tic.transform.localRotation = Quaternion.identity;
+                    updateTweens.Add(tic.MoveTo(GetPosition(tic)));
+                    // Probably already scale 1, but just in case
+                    // addTweens.Add(tic.ScaleTo(1));
+                }
+                else // The tic should exist but doesn't
+                {
+                    tic = gnome.Add<AxisTic>(ticPrefab.gameObject, ticName);
+                    tic.value = data.value;
+                    tic.label = data.label;
+                    tic.transform.localPosition = GetPosition(tic);
+                    tic.transform.localRotation = Quaternion.identity;
+                    tic.transform.SetScale(0);
+                    addTweens.Add(tic.ScaleTo(1));
+                }
+            }
+
+            var removeTweens = ticsToRemove
+                .Select(x => x.GetComponent<AxisTic>())
+                .OrderByDescending(x => Mathf.Abs(x.value))
+                .Select(
+                    tic => {
+                        updateTweens.Add(tic.MoveTo(GetPosition(tic)));
+                        return tic.ScaleTo(0);
+                    }
+                );
+            
+            return (
+                addTweens.RunInParallel(),
+                updateTweens.RunInParallel(),
+                removeTweens.RunInParallel()
+            );
+        }
+        
+        [Serializable]
+        public class TicData
+        {
+            public float value;
+            public string label;
+
+            public TicData(float value, int labelOffset) {
+                this.value = value;
+                label = (value + labelOffset).FormatNumberWithDecimals();
+            }
         }
 
         #endregion

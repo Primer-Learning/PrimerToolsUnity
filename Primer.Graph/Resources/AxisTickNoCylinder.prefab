@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8357812543909439236}
-  - component: {fileID: 9045329591203473548}
+  - component: {fileID: 8404037125823504764}
   m_Layer: 0
   m_Name: AxisTickNoCylinder
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9045329591203473548
+--- !u!114 &8404037125823504764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 187056146824139349}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b556b14bb68499c99d910c467a55b1e, type: 3}
+  m_Script: {fileID: 11500000, guid: 89776836f8994f0e94004c7d88ee7f88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   value: 0
