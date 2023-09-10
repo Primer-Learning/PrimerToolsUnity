@@ -44,43 +44,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d251cc4992cf4d9ab447b71da57a6abc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _arrowPresence: 2
-  _arrowPrefab:
-    stored: {fileID: 1456995410002982541, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
-    _position: {x: 0, y: 0, z: 0}
-    hasPosition: 0
-    _rotation: {x: 0, y: 0, z: 0, w: 0}
-    hasRotation: 0
-    _scale: {x: 1, y: 1, z: 1}
-    hasScale: 0
+  arrowPresence: 2
+  arrowPrefab: {fileID: 2477842104010458270, guid: c9246c75b0bea4296b6d948b371ca68f, type: 3}
   _range:
     min: 0
     max: 10
-  _scale: 1
-  _padding: {x: 0, y: 0}
-  _showLabel: 1
-  _label: Label
-  _labelOffset: {x: 0, y: 0, z: 0}
-  _labelRotation: {x: 0, y: 0, z: 0, w: 1}
-  _labelPosition: 1
-  _thickness: 1
-  _showTicks: 1
-  _showZero: 0
-  _lockTickOrientation:
-    enabled: 0
-    value: 0
-  _step: 2
-  _maxTicks: 50
-  _maxDecimals: 2
-  _tickOffset: 0
-  _labelNumberOffset: 0
-  _valuePositionOffset: 0
-  _manualTicks: []
-  _tickPrefab:
-    stored: {fileID: 9045329591203473548, guid: abd792ad5726345beaabdf8f95833bb7, type: 3}
-    _position: {x: 0, y: 0, z: 0}
-    hasPosition: 0
-    _rotation: {x: 0, y: 0, z: 0, w: 0}
-    hasRotation: 0
-    _scale: {x: 1, y: 1, z: 1}
-    hasScale: 0
+  padding: {x: 0, y: 0}
+  _length: 1
+  showLabel: 1
+  label: Label
+  labelOffset: {x: 0, y: 0, z: 0}
+  labelRotation: {x: 0, y: 0, z: 0, w: 1}
+  labelPosition: 1
+  thickness: 1
+  showTicks: 1
+  showZero: 0
+  lockTickOrientation:
+    _enabled: 1
+    _value: 4
+  step: 2
+  maxTicks: 50
+  maxDecimals: 2
+  tickOffset: 0
+  labelNumberOffset: 0
+  valuePositionOffset: 0
+  manualTicks: []
+  tickPrefab: {fileID: 0}

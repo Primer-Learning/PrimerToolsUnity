@@ -4,6 +4,7 @@ using System.Linq;
 using Primer.Animation;
 using Primer.Timeline;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities.Editor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -58,12 +59,12 @@ namespace Primer.Graph
         [RequiredIn(PrefabKind.PrefabAsset)]
         [EnableIf(nameof(showTicks))]
         [FormerlySerializedAs("_tickPrefab")]
-        public PrefabProvider<AxisTick> tickPrefab;
+        public AxisTick tickPrefab;
 
 
         private List<TickData> PrepareTicks()
         {
-            if (!showTicks || step <= 0 || tickPrefab.isEmpty)
+            if (!showTicks || step <= 0)
                 return new List<TickData>();
 
             var expectedTicks = manualTicks.Count != 0
@@ -73,54 +74,66 @@ namespace Primer.Graph
             return CropTicksCount(expectedTicks);
         }
 
-        private (Tween add, Tween update, Tween remove) TransitionTicks(Gnome parentGnome, bool defer)
+        private (Tween add, Tween update, Tween remove) TransitionTicks(SimpleGnome parentGnome, bool defer)
         {
-            var gnome = parentGnome
-                .AddGnome("Ticks container")
-                .SetDefaults();
+
+            var gnomeTransform = parentGnome
+                .Add("Ticks container");
+            gnomeTransform.localRotation = Quaternion.identity;
+            var gnome = new SimpleGnome(gnomeTransform);
 
             var addTweens = new List<Tween>();
             var updateTweens = new List<Tween>();
 
             Vector3 GetPosition(AxisTick tick) => new((tick.value + valuePositionOffset) * scale, tickOffset, 0);
 
+            var ticsToRemove = new List<Transform>(gnome.activeChildren.ToList());
+            
             foreach (var data in PrepareTicks()) {
-                var tick = gnome.Add(tickPrefab, $"Tick {data.label}");
-                tick.value = data.value;
-                tick.label = data.label;
+                var tickName = $"Tick {data.label}";
+                var existingTick = gnome.transform.Find(tickName);
+                AxisTick tick;
 
-                if (gnome.IsCreated(tick)) {
+                // If the tick exists and is active already
+                if (existingTick is not null && existingTick.gameObject.activeSelf)
+                {
+                    ticsToRemove.Remove(existingTick);
+                    tick = existingTick.GetComponent<AxisTick>();
                     tick.transform.localPosition = GetPosition(tick);
-                    tick.transform.SetScale(0);
-                    addTweens.Add(tick.ScaleTo(1, 0));
-                }
-                else {
+                    tick.transform.localRotation = Quaternion.identity;
                     updateTweens.Add(tick.MoveTo(GetPosition(tick)));
+                    // Probably already scale 1, but just in case
+                    // addTweens.Add(tick.ScaleTo(1));
                 }
-
+                else // The tick should exist but doesn't
+                {
+                    tick = gnome.Add<AxisTick>(tickPrefab.gameObject, tickName);
+                    tick.value = data.value;
+                    tick.label = data.label;
+                    tick.transform.localPosition = GetPosition(tick);
+                    tick.transform.localRotation = Quaternion.identity;
+                    tick.transform.SetScale(0);
+                    addTweens.Add(tick.ScaleTo(1));
+                }
+                
                 if (lockTickOrientation.enabled)
                     lockTickOrientation.value.ApplyTo(tick.latex);
             }
 
-            var removeTweens = gnome.ManualPurge(defer: true)
+            var removeTweens = ticsToRemove
                 .Select(x => x.GetComponent<AxisTick>())
                 .OrderByDescending(x => Mathf.Abs(x.value))
                 .Select(
                     tick => {
                         updateTweens.Add(tick.MoveTo(GetPosition(tick)));
-
-                        return tick.ScaleTo(0, 1)
-                            .Observe(onDispose: () => tick.Dispose(defer));
+                        return tick.ScaleTo(0);
                     }
                 );
-
+            
             return (
-                addTweens.RunInParallel(delayBetweenStarts: 0.05f).WithDuration(Tween.DEFAULT_DURATION),
+                addTweens.RunInParallel(),
                 updateTweens.RunInParallel(),
-                removeTweens
-                    .RunInParallel(delayBetweenStarts: 0.05f)
-                    .WithDuration(Tween.DEFAULT_DURATION)
-                    .Observe(onDispose: () => gnome.Purge(defer))
+                removeTweens.RunInParallel()
             );
         }
 

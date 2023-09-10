@@ -19,8 +19,10 @@ namespace Primer.Graph
                 if (range.min == value.min && range.max == value.max)
                     return;
 
+                if (value.min >= value.max)
+                    throw new ArgumentException("Min must be less than max.", nameof(value));
+
                 _range = value;
-                _scale = _length / (range.max - range.min);
                 hasDomainChanged = true;
             }
         }
@@ -30,9 +32,9 @@ namespace Primer.Graph
         // Scale has been made internal. It's not a useful quantity to think about when making decisions about
         // how a graph appears in a scene. Range and length are more useful.
         // TODO: Eliminate scale as a field and make it always be calculated from range and length.
-        private float _scale = 0.2f;
-        internal float scale {
-            get => _scale;
+        internal float scale
+        {
+            get => _length / (range.max - range.min);
             set => length = value * (range.max - range.min);
         }
         #endregion
@@ -56,7 +58,6 @@ namespace Primer.Graph
                     return;
                 
                 _length = value;
-                _scale = value / (range.max - range.min);
                 hasDomainChanged = true;
             }
         }

@@ -18,36 +18,34 @@ public class GraphTestSequence : Sequence
             swivel: new Vector3(0f, 0f, 0f)
         ).Apply();
 
-        using var graph =  new Gnome<Graph>("Graph2")
-            // We used new Gnome() to get (or create) the root object "Graph"
-            // now we only need the component
-            .component;
+        using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
 
-        graph.x.max = 10;
-        graph.y.max = 10;
-        graph.x.length = 3;
-        graph.y.length = 2;
-        graph.enableZAxis = false;
+        yield return Tween.noop;
+        // graph.x.max = 10;
+        // graph.y.max = 10;
+        // graph.x.length = 3;
+        // graph.y.length = 2;
+        // graph.enableZAxis = false;
+        //
+        // yield return graph.GrowFromOrigin() with { name = "Graph appears" };
+        // yield return graph.SetDomain(5) with { name = "Graph shrink to 5" };
 
-        yield return graph.GrowFromOrigin() with { name = "Graph appears" };
-        yield return graph.SetDomain(5) with { name = "Graph shrink to 5" };
-
-        foreach (var _ in TestLine(graph))
-            yield return _;
-
-        foreach (var _ in TestSurface(graph, cam))
-            yield return _;
-
-        foreach (var _ in TestPoint(graph))
-            yield return _;
-
-        foreach (var _ in TestArea(graph))
-            yield return _;
-
-        foreach (var _ in TestBars(graph))
-            yield return _;
-
-        yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
+        // foreach (var _ in TestLine(graph))
+        //     yield return _;
+        //
+        // foreach (var _ in TestSurface(graph, cam))
+        //     yield return _;
+        //
+        // foreach (var _ in TestPoint(graph))
+        //     yield return _;
+        //
+        // foreach (var _ in TestArea(graph))
+        //     yield return _;
+        //
+        // foreach (var _ in TestBars(graph))
+        //     yield return _;
+        //
+        // yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
     }
 
     private IEnumerable<Tween> TestLine(Graph graph)
@@ -144,36 +142,42 @@ public class GraphTestSequence : Sequence
         PopClipColor();
     }
 
-    private IEnumerable<Tween> TestPoint(Graph graph)
-    {
-        PushClipColor(PrimerColor.blue);
-
-        var prefab = Prefab.Get("blob_skinned");
-        var blob = prefab.GetOrAddComponent<PrimerBlob>();
-        blob.GetOrAddComponent<SkinnedMeshRenderer>().sharedMaterial ??= Primer.RendererExtensions.defaultMaterial;
-
-        // Use `AddPoint()` to get the PrimerBlob back instead of the GraphDomain component
-        using var pointA = graph.AddTracker("Point A", blob, new Vector3(2, 5));
-        yield return pointA.ScaleTo(0.1f, 0) with { name = "Point A" };
-
-        using var pointB = graph.AddTracker("Point B", blob, new Vector3(5, 3));
-        yield return pointB.ScaleTo(0.1f, 0) with { name = "Point B" };
-
-        yield return Parallel(
-            Tween.Value(() => pointA.point, new Vector3(6, 1)),
-            Tween.Value(() => pointB.point, new Vector3(1, 1))
-        ) with { name = "Move points" };
-
-        foreach (var _ in RunGraphDeformations(graph))
-            yield return _;
-
-        yield return Parallel(
-            pointA.ScaleTo(0),
-            pointB.ScaleTo(0)
-        ) with { name = "Points go" };
-
-        PopClipColor();
-    }
+    // private IEnumerable<Tween> TestPoint(Graph graph)
+    // {
+    //     PushClipColor(PrimerColor.blue);
+    //
+    //     var prefab = Prefab.Get("blob_skinned");
+    //     var blob = prefab.GetOrAddComponent<PrimerBlob>();
+    //     blob.GetOrAddComponent<SkinnedMeshRenderer>().sharedMaterial ??= Primer.RendererExtensions.defaultMaterial;
+    //
+    //     // Use `AddPoint()` to get the PrimerBlob back instead of the GraphDomain component
+    //     using var pointA = graph.AddTracker("Point A", blob, new Vector3(2, 5));
+    //     yield return pointA.ScaleTo(0.1f, 0) with { name = "Point A" };
+    //
+    //     using var pointB = graph.AddTracker("Point B", blob, new Vector3(5, 3));
+    //     yield return pointB.ScaleTo(0.1f, 0) with { name = "Point B" };
+    //
+    //     yield return Parallel(
+    //         Tween.Value(
+    //             v => pointA.point = v,
+    //             () => pointA.point,
+    //             () => new Vector3(6, 1)),
+    //         Tween.Value(
+    //             v => pointB.point = v,
+    //             () => pointB.point,
+    //             () => new Vector3(1, 1))
+    //     ) with { name = "Move points" };
+    //
+    //     foreach (var _ in RunGraphDeformations(graph))
+    //         yield return _;
+    //
+    //     yield return Parallel(
+    //         pointA.ScaleTo(0),
+    //         pointB.ScaleTo(0)
+    //     ) with { name = "Points go" };
+    //
+    //     PopClipColor();
+    // }
 
     private IEnumerable<Tween> TestArea(Graph graph)
     {

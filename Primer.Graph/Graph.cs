@@ -45,7 +45,7 @@ namespace Primer.Graph
 
         [FormerlySerializedAs("containerCache")]
         public Gnome<Graph> gnomeCache;
-        public Gnome<Graph> gnome => gnomeCache ??= InitializeGnome();
+        public SimpleGnome gnome => new SimpleGnome("Graph", transform);
 
         public Vector3 domain { get; private set; }
 
@@ -139,25 +139,25 @@ namespace Primer.Graph
             return gnome.Add<BarPlot>(name);
         }
 
-        public GraphDomain AddPoint(string name, Vector3? coords = null)
-        {
-            var point = gnome.AddPrimitive(PrimitiveType.Sphere, name);
-            point.SetScale(0.1f);
-            return Track(point, coords);
-        }
+        // public GraphDomain AddPoint(string name, Vector3? coords = null)
+        // {
+        //     var point = gnome.AddPrimitive(PrimitiveType.Sphere, name);
+        //     point.SetScale(0.1f);
+        //     return Track(point, coords);
+        // }
 
-        public T AddPoint<T>(string name, T template, Vector3? coords = null) where T : Component
-        {
-            var point = gnome.Add(template, name);
-            Track(point, coords);
-            return point;
-        }
+        // public T AddPoint<T>(string name, T template, Vector3? coords = null) where T : Component
+        // {
+        //     var point = gnome.Add(template, name);
+        //     Track(point, coords);
+        //     return point;
+        // }
 
-        public GraphDomain AddTracker<T>(string name, T template, Vector3? coords = null) where T : Component
-        {
-            var point = gnome.Add(template, name);
-            return Track(point, coords);
-        }
+        // public GraphDomain AddTracker<T>(string name, T template, Vector3? coords = null) where T : Component
+        // {
+        //     var point = gnome.Add(template, name);
+        //     return Track(point, coords);
+        // }
 
         public GraphDomain Track(Component target, Vector3? coords = null)
         {
@@ -173,7 +173,7 @@ namespace Primer.Graph
 
         public void Reset()
         {
-            gnomeCache = InitializeGnome();
+            // gnomeCache = InitializeGnome();
         }
 
         public void Dispose()
@@ -182,13 +182,13 @@ namespace Primer.Graph
             gameObject.SetActive(false);
         }
 
-        private Gnome<Graph> InitializeGnome()
-        {
-            var result = Gnome.For(this);
-            result.Insert(xAxis);
-            result.Insert(yAxis);
-            result.Insert(zAxis);
-            return result;
-        }
+        // private Gnome<Graph> InitializeGnome()
+        // {
+        //     var result = Gnome.For(this);
+        //     result.Insert(xAxis);
+        //     result.Insert(yAxis);
+        //     result.Insert(zAxis);
+        //     return result;
+        // }
     }
 }

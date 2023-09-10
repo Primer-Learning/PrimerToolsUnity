@@ -27,31 +27,31 @@ namespace Primer.Graph
         public Tween Transition(bool defer = false)
         {
             // We don't want to run this on prefabs
-            if (gameObject.IsPreset())
-                return Tween.noop;
+            // if (gameObject.IsPreset())
+            //     return Tween.noop;
 
-            var gnome = Gnome.For(this);
+            var gnome = new SimpleGnome(transform);
             var updateParts = Tween.Parallel(
                 TransitionRod(gnome),
                 TransitionLabel(gnome),
                 TransitionArrows(gnome)
             );
-
-            var addParts = gnome.GetCreatedChildren()
-                .Select(x => x.ScaleUpFromZero())
-                .RunInParallel();
+            
+            // var addParts = gnome.newChildren
+            //     .Select(x => x.ScaleUpFromZero())
+            //     .RunInParallel();
 
             var (addTicks, updateTicks, removeTicks) = TransitionTicks(gnome, defer);
 
-            var removeParts = gnome.ManualPurge(defer: true)
-                .Select(x => x.ScaleDownToZero().Observe(onDispose: x.Dispose))
-                .RunInParallel();
+            // var removeParts = gnome.oldChildren
+            //     .Select(x => x.ScaleDownToZero().Observe(onDispose: x.Dispose))
+            //     .RunInParallel();
 
             var update = Tween.Parallel(
                 updateTicks,
-                removeParts,
-                updateParts,
-                addParts
+                // removeParts,
+                updateParts
+                // addParts
             );
 
             if (hasDomainChanged) {
