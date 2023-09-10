@@ -27,8 +27,8 @@ namespace Primer.Graph
         public Tween Transition(bool defer = false)
         {
             // We don't want to run this on prefabs
-            // if (gameObject.IsPreset())
-            //     return Tween.noop;
+            if (gameObject.IsPreset())
+                return Tween.noop;
 
             var gnome = new SimpleGnome(transform);
             var updateParts = Tween.Parallel(
