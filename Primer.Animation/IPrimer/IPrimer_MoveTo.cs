@@ -144,9 +144,18 @@ namespace Primer.Animation
         public static Tween MoveTo(this Transform self, Vector3 newPosition,
             bool globalSpace = false)
         {
-            return globalSpace
-                ? Tween.Value(() => self.position, newPosition) 
-                : Tween.Value(() => self.localPosition, newPosition);
+            if (globalSpace)
+                return Tween.Value(
+                    v => self.position = v,
+                    () => self.position,
+                    () => newPosition
+                );
+            
+            return Tween.Value(
+                v => self.localPosition = v,
+                () => self.localPosition,
+                () => newPosition
+            );
         }
         
         // This one lets the destination and duration also be dynamic

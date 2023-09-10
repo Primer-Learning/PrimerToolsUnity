@@ -75,16 +75,42 @@ namespace Primer.Scene
             var tween = new List<Tween>();
             var linear = LinearEasing.instance;
 
-            if (distance.HasValue) {
-                tween.Add(Tween.Value(() => this.distance, distance.Value) with { easing = linear });
+            if (distance.HasValue)
+            {
+                tween.Add(Tween.Value(
+                        v => this.distance = v,
+                        () => this.distance,
+                        () => distance.Value
+                    ) with
+                    {
+                        easing = linear
+                    });
             }
 
             if (swivelOrigin.HasValue) {
-                tween.Add(Tween.Value(() => this.swivelOrigin, swivelOrigin.Value) with { easing = linear });
+                {
+                    tween.Add(Tween.Value(
+                            v => this.swivelOrigin = v,
+                            () => this.swivelOrigin,
+                            () => swivelOrigin.Value
+                        ) with
+                        {
+                            easing = linear
+                        });
+                }
             }
 
             if (swivel.HasValue) {
-                tween.Add(Tween.Value(() => this.swivel, swivel.Value) with { easing = linear });
+                {
+                    tween.Add(Tween.Value(
+                            v => this.swivel = v,
+                            () => this.swivel,
+                            () => swivel.Value
+                        ) with
+                        {
+                            easing = linear
+                        });
+                }
             }
 
             // or use tween.RunInBatch() to merge all tweens into one with unified easing

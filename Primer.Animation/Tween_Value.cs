@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Sirenix.OdinInspector;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 
 namespace Primer.Animation
 {
@@ -15,34 +16,34 @@ namespace Primer.Animation
     //
     public partial record Tween
     {
-        public static Tween Value<T>(Expression<Func<T>> expression, T to, Func<T, T, float, T> lerp = null,
-            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            var accessor = new Accessor<T>(expression, filePath, lineNumber);
-            return CreateTween(accessor.Set, accessor.Get, () => to, lerp);
-        }
-
-        public static Tween Value<T>(Expression<Func<T>> expression, T from, T to, Func<T, T, float, T> lerp = null,
-            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            var accessor = new Accessor<T>(expression, filePath, lineNumber);
-            return CreateTween(accessor.Set, () => from, () => to, lerp);
-        }
-
-        public static Tween Value<T>(Expression<Func<T>> expression, Func<T, T> to, Func<T, T, float, T> lerp = null,
-            [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
-        {
-            var accessor = new Accessor<T>(expression, filePath, lineNumber);
-            return CreateTween(accessor.Set, accessor.Get, () => to(accessor.Get()), lerp);
-        }
-
-        public static Tween Value<T>(Expression<Func<T>> expression, T from, Func<T, T> to,
-            Func<T, T, float, T> lerp = null, [CallerFilePath] string filePath = "",
-            [CallerLineNumber] int lineNumber = 0)
-        {
-            var accessor = new Accessor<T>(expression, filePath, lineNumber);
-            return CreateTween(accessor.Set, () => from, () => to(accessor.Get()), lerp);
-        }
+        // public static Tween Value<T>(Expression<Func<T>> expression, T to, Func<T, T, float, T> lerp = null,
+        //     [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
+        // {
+        //     var accessor = new Accessor<T>(expression, filePath, lineNumber);
+        //     return CreateTween(accessor.Set, accessor.Get, () => to, lerp);
+        // }
+        //
+        // public static Tween Value<T>(Expression<Func<T>> expression, T from, T to, Func<T, T, float, T> lerp = null,
+        //     [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
+        // {
+        //     var accessor = new Accessor<T>(expression, filePath, lineNumber);
+        //     return CreateTween(accessor.Set, () => from, () => to, lerp);
+        // }
+        //
+        // public static Tween Value<T>(Expression<Func<T>> expression, Func<T, T> to, Func<T, T, float, T> lerp = null,
+        //     [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
+        // {
+        //     var accessor = new Accessor<T>(expression, filePath, lineNumber);
+        //     return CreateTween(accessor.Set, accessor.Get, () => to(accessor.Get()), lerp);
+        // }
+        //
+        // public static Tween Value<T>(Expression<Func<T>> expression, T from, Func<T, T> to,
+        //     Func<T, T, float, T> lerp = null, [CallerFilePath] string filePath = "",
+        //     [CallerLineNumber] int lineNumber = 0)
+        // {
+        //     var accessor = new Accessor<T>(expression, filePath, lineNumber);
+        //     return CreateTween(accessor.Set, () => from, () => to(accessor.Get()), lerp);
+        // }
 
         public static Tween Value<T>(Action<T> set, Func<T> from, Func<T> to, Func<T, T, float, T> lerp = null)
         {

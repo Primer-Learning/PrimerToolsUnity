@@ -62,7 +62,11 @@ namespace Primer.Shapes
             );
 
             var extensionTween = requiresAdjustmentTweening
-                ? Tween.Parallel(growTween, Tween.Value(() => headPoint.adjustment, tailPoint.adjustment, originalHeadAdjustment))
+                ? Tween.Parallel(growTween, Tween.Value(
+                    v => headPoint.adjustment = v, 
+                    () => tailPoint.adjustment, 
+                    () => originalHeadAdjustment)
+                )
                 : growTween;
 
             return Tween.Parallel(
@@ -86,7 +90,11 @@ namespace Primer.Shapes
 
             return Tween.Parallel(
                 shrinkTween,
-                Tween.Value(() => tailPoint.adjustment, headPoint.adjustment)
+                Tween.Value(
+                        v => tailPoint.adjustment = v,
+                        () => tailPoint.adjustment,
+                        () => headPoint.adjustment
+                        )
                     .Observe(afterComplete: () => tailPoint.adjustment = originalTailAdjustment)
             );
         }
