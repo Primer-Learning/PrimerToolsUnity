@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,11 +36,15 @@ namespace Primer
             
             // This also doesn't a TChild component to be present on the prefab.
             // Which is nice. Since you might want to add Creature to a PrimerBlob, for example.
-            var child = FindChild<TChild>(name) ?? Object.Instantiate(prefab, transform).GetOrAddComponent<TChild>();
-            child.name = name;
-            child.transform.SetParent(transform);
-            child.gameObject.SetActive(true);
-            return child;
+            var child = FindChild<TChild>(name);
+            if (child is not null) return child;
+            
+            var childGO = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            childGO.name = name;
+            childGO.transform.parent = transform;
+            childGO.transform.SetParent(transform);
+            childGO.SetActive(true);
+            return childGO.GetOrAddComponent<TChild>();
         }
         
         public TChild Add<TChild>(string prefabName, string name)

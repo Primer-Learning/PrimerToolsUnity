@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -38,6 +40,7 @@ namespace Primer
             }
         }
         
+        public IEnumerable<Transform> activeChildren => transform.GetChildren().Where(x => x.gameObject.activeSelf);
         public int activeChildCount => transform.GetChildren().Count(x => x.gameObject.activeSelf);
 
         #region Constructors
@@ -103,7 +106,7 @@ namespace Primer
             var scene = SceneManager.GetActiveScene();
             var rootGameObjects = scene.GetRootGameObjects();
             var found = rootGameObjects.FirstOrDefault(x => x.name == name);
-            var obj = found != null ? found : Object.Instantiate(prefab);
+            var obj = found != null ? found : PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             obj.name = name;
             return obj.transform;
         }
