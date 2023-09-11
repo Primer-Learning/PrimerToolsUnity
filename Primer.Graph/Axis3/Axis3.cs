@@ -59,9 +59,10 @@ namespace Primer.Graph
             );
         }
 
-        public Tween Transition()
+        public Tween Transition(bool allowZeroLength = false)
         {
             var (removeTween, updateTween, addTween) = PrepareTransitionParts();
+            if (length == 0 && !allowZeroLength) return Tween.noop;
             return Tween.Series(
                 removeTween,
                 updateTween,
@@ -73,10 +74,14 @@ namespace Primer.Graph
         {
             var targetLength = length;
             length = 0;
-            Transition().Apply();
+            Transition(allowZeroLength: true).Apply();
             ScaleDownTics().Apply();
             ScaleDownArrows().Apply();
             ScaleDownLabel().Apply();
+            transform.Find("Rod").localScale = Vector3.zero;
+
+            if (targetLength == 0)
+                return Tween.noop;
 
             length = targetLength;
             var (_, updateTweens, addTweens) = PrepareTransitionParts();
@@ -87,6 +92,7 @@ namespace Primer.Graph
         }
         public Tween Disappear()
         {
+            if (length == 0) return Tween.noop;
             length = 0;
             var (removeTweens, updateTweens, _) = PrepareTransitionParts();
 
@@ -108,13 +114,15 @@ namespace Primer.Graph
         {
             var rod = new SimpleGnome("Rod", parent: transform);
             var position = new Vector3(-padding, 0f, 0f);
-            var scale = new Vector3(length, thickness, thickness);
+            var rodScale = length == 0 
+                ? Vector3.zero
+                : new Vector3(length, thickness, thickness);
 
             DrawBar(rod);
 
             return Tween.Parallel(
                 rod.transform.localPosition == position ? null : rod.MoveTo(position),
-                rod.transform.localScale == scale ? null : rod.ScaleTo(scale)
+                rod.transform.localScale == rodScale ? null : rod.ScaleTo(rodScale)
             );
         }
 

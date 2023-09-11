@@ -20,15 +20,15 @@ public class GraphTestSequence : Sequence
 
         using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
         // yield return Tween.noop;
-
-        // graph.xAxis.length = 0;
         //
         // yield return graph.xAxis.Transition() with { name = "X axis" };
         graph.xAxis.length = 3;
-        yield return graph.xAxis.Appear();
+        graph.yAxis.length = 2;
+        graph.zAxis.length = 0;
+        yield return graph.Appear();
         graph.xAxis.length = 2;
-        yield return graph.xAxis.Transition();
-        yield return graph.xAxis.Disappear();
+        yield return graph.Transition();
+        yield return graph.Disappear();
         // graph.x.max = 10;
         // graph.y.max = 10;
         // graph.x.length = 3;
