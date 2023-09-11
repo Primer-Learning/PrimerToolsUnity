@@ -25,9 +25,19 @@ public class GraphTestSequence : Sequence
         graph.xAxis.length = 3;
         graph.yAxis.length = 2;
         graph.zAxis.length = 0;
+        graph.xAxis.max = 10;
+        graph.xAxis.ticStep = 2;
         yield return graph.Appear();
         graph.xAxis.length = 2;
         yield return graph.Transition();
+
+        graph.xAxis.max = 20;
+        graph.xAxis.ticStep = 4;
+        yield return graph.Transition();
+        graph.xAxis.max = 10;
+        graph.xAxis.ticStep = 5;
+        yield return graph.Transition();
+        
         yield return graph.Disappear();
         // graph.x.max = 10;
         // graph.y.max = 10;

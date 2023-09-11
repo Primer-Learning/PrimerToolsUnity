@@ -46,6 +46,7 @@ namespace Primer.Graph
                 TransitionArrows(),
                 updateLabel
             );
+            Debug.Log(updateTics.duration);
             var addTween = Tween.Parallel(
                 addTics,
                 addLabel
@@ -121,8 +122,8 @@ namespace Primer.Graph
             DrawBar(rod);
 
             return Tween.Parallel(
-                rod.transform.localPosition == position ? null : rod.MoveTo(position),
-                rod.transform.localScale == rodScale ? null : rod.ScaleTo(rodScale)
+                rod.transform.localPosition == position ? Tween.noop : rod.MoveTo(position),
+                rod.transform.localScale == rodScale ? Tween.noop : rod.ScaleTo(rodScale)
             );
         }
 
@@ -147,18 +148,19 @@ namespace Primer.Graph
             var endArrow = gnome.Add<Transform>(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
             var endArrowPos = new Vector3(length - padding, 0f, 0f);
-            var endArrowMove = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
-            var endArrowScale = arrowPresence == ArrowPresence.Neither ? endArrow.ScaleTo(0) : endArrow.ScaleTo(0.07f);
+            var endArrowMove = endArrowPos == endArrow.localPosition ? Tween.noop : endArrow.MoveTo(endArrowPos);
+            var endArrowScale = arrowPresence == ArrowPresence.Neither
+                ? endArrow.localScale == Vector3.zero ? Tween.noop : endArrow.ScaleTo(0)
+                : endArrow.localScale == Vector3.one * 0.07f ? Tween.noop : endArrow.ScaleTo(0.07f);
             var endArrowTween = Tween.Parallel(endArrowMove, endArrowScale);
-
-            if (arrowPresence != ArrowPresence.Both)
-                return endArrowTween;
 
             var originArrow = gnome.Add<Transform>(arrowPrefab, "Origin Arrow");
             originArrow.localRotation = Quaternion.Euler(0f, -90f, 0f);
             var originArrowPos = new Vector3(-padding, 0f, 0f);
-            var originArrowMove = originArrowPos == originArrow.localPosition ? null : originArrow.MoveTo(originArrowPos);
-            var originArrowScale = arrowPresence != ArrowPresence.Both ? originArrow.ScaleTo(0) : originArrow.ScaleTo(0.07f);
+            var originArrowMove = originArrowPos == originArrow.localPosition ? Tween.noop : originArrow.MoveTo(originArrowPos);
+            var originArrowScale = arrowPresence != ArrowPresence.Both
+                ? originArrow.localScale == Vector3.zero ? Tween.noop : originArrow.ScaleTo(0)
+                : originArrow.localScale == Vector3.one * 0.07f ? Tween.noop : originArrow.ScaleTo(0.07f);
             var originArrowTween = Tween.Parallel(originArrowMove, originArrowScale);
 
             return Tween.Parallel(endArrowTween, originArrowTween);
@@ -210,12 +212,16 @@ namespace Primer.Graph
             });
 
             var updateLabel = Tween.Parallel(
-                pos == labelTransform.localPosition ? null : labelTransform.MoveTo(pos),
-                labelRotation == labelTransform.localRotation ? null : labelTransform.RotateTo(labelRotation)
+                pos == labelTransform.localPosition ? Tween.noop : labelTransform.MoveTo(pos),
+                labelRotation == labelTransform.localRotation ? Tween.noop : labelTransform.RotateTo(labelRotation)
             );
 
-            var addLabel = showLabel ? labelTransform.ScaleTo(0.2f * labelSize) : Tween.noop;
-            var removeLabel = showLabel ? Tween.noop : labelTransform.ScaleTo(0f);
+            var addLabel = showLabel 
+                ? labelTransform.localScale == 0.2f * labelSize * Vector3.one ? Tween.noop : labelTransform.ScaleTo(0.2f * labelSize) 
+                : Tween.noop;
+            var removeLabel = showLabel 
+                ? Tween.noop 
+                : labelTransform.localScale == Vector3.zero ? Tween.noop : labelTransform.ScaleTo(0f);
 
             return (removeLabel, updateLabel, addLabel);
         }
@@ -282,30 +288,40 @@ namespace Primer.Graph
                 {
                     ticsToRemove.Remove(existingTic);
                     tic = existingTic.GetComponent<AxisTic>();
-                    tic.transform.localRotation = Quaternion.identity;
-                    updateTweens.Add(tic.MoveTo(GetPosition(tic)));
+                    var t = tic.transform;
+                    t.localRotation = Quaternion.identity;
+                    updateTweens.Add(t.localPosition == GetPosition(tic) ? Tween.noop : tic.MoveTo(GetPosition(tic)));
                     // Probably already scale 1, but not always. For example, if we are calling Appear.
-                    addTweens.Add(tic.ScaleTo(1));
+                    addTweens.Add(t.localScale == Vector3.one ? Tween.noop : tic.ScaleTo(1));
                 }
                 else // The tic should exist but doesn't
                 {
                     tic = gnome.Add<AxisTic>(ticPrefab.gameObject, ticName);
                     tic.value = data.value;
                     tic.label = data.label;
-                    tic.transform.localPosition = GetPosition(tic);
-                    tic.transform.localRotation = Quaternion.identity;
-                    tic.transform.SetScale(0);
-                    addTweens.Add(tic.ScaleTo(1));
+                    var t = tic.transform;
+                    t.localPosition = GetPosition(tic);
+                    t.localRotation = Quaternion.identity;
+                    t.SetScale(0);
+                    addTweens.Add(t.localScale == Vector3.one ? Tween.noop : tic.ScaleTo(1));
                 }
             }
 
+            bool disappearEarly =
+                ticsToRemove.Select(x => x.GetComponent<AxisTic>().value).Any(x => x < min || x > max);
+
             var removeTweens = ticsToRemove
                 .Select(x => x.GetComponent<AxisTic>())
-                .OrderByDescending(x => Mathf.Abs(x.value))
                 .Select(
                     tic => {
-                        updateTweens.Add(tic.MoveTo(GetPosition(tic)));
-                        return tic.ScaleTo(0);
+                        if (disappearEarly) return tic.transform.localScale == Vector3.zero ? Tween.noop : tic.ScaleTo(0);
+                        updateTweens.Add(
+                            Tween.Parallel(
+                                tic.transform.localPosition == GetPosition(tic) ? Tween.noop : tic.MoveTo(GetPosition(tic)),
+                                tic.transform.localScale == Vector3.zero ? Tween.noop : tic.ScaleTo(0)
+                            )
+                        );
+                        return Tween.noop;
                     }
                 );
             
