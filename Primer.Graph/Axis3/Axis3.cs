@@ -79,12 +79,16 @@ namespace Primer.Graph
             ScaleDownLabel().Apply();
 
             length = targetLength;
-            return Transition();
+            var (_, updateTweens, addTweens) = PrepareTransitionParts();
+            return Tween.Series(
+                updateTweens,
+                addTweens
+            );
         }
         public Tween Disappear()
         {
             length = 0;
-            var (removeTweens, updateTweens, addTweens) = PrepareTransitionParts();
+            var (removeTweens, updateTweens, _) = PrepareTransitionParts();
 
             return Tween.Series(
                 Tween.Parallel(
