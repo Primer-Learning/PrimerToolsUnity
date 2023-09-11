@@ -30,10 +30,10 @@ namespace Primer.Graph
         public float lengthMinusPadding => length - 2 * padding;
         float thickness = 1;
 
-        public Tween Transition()
+        public (Tween removeTween, Tween updateTween, Tween addTween) PrepareTransitionParts()
         {
-            var (addTics, updateTics, removeTics) = TransitionTics();
-            var (addLabel, updateLabel, removeLabel) = TransitionLabel();
+            var (removeTics, updateTics, addTics) = TransitionTics();
+            var (removeLabel, updateLabel, addLabel) = TransitionLabel();
 
             var removeTween = Tween.Parallel(
                 removeTics,
@@ -51,6 +51,17 @@ namespace Primer.Graph
                 addLabel
             );
 
+            return
+            (
+                removeTween,
+                updateTween,
+                addTween
+            );
+        }
+
+        public Tween Transition()
+        {
+            var (removeTween, updateTween, addTween) = PrepareTransitionParts();
             return Tween.Series(
                 removeTween,
                 updateTween,
@@ -70,8 +81,25 @@ namespace Primer.Graph
             length = targetLength;
             return Transition();
         }
+        public Tween Disappear()
+        {
+            length = 0;
+            var (removeTweens, updateTweens, addTweens) = PrepareTransitionParts();
 
-        #region Bar
+            return Tween.Series(
+                Tween.Parallel(
+                    removeTweens,
+                    ScaleDownTics(),
+                    ScaleDownLabel()
+                ),
+                Tween.Parallel(
+                    updateTweens,
+                    ScaleDownArrows()
+                )
+            );
+        }
+
+        #region Rod
         private Tween TransitionRod()
         {
             var rod = new SimpleGnome("Rod", parent: transform);
@@ -102,16 +130,14 @@ namespace Primer.Graph
 
         private Tween TransitionArrows()
         {
-            if (arrowPresence == ArrowPresence.Neither)
-                return null;
-
             var gnome = new SimpleGnome(transform);
-
+            
             var endArrow = gnome.Add<Transform>(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
             var endArrowPos = new Vector3(length - padding, 0f, 0f);
-            var endArrowTween = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
-            endArrowTween = Tween.Parallel(endArrowTween, endArrow.ScaleTo(0.07f));
+            var endArrowMove = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
+            var endArrowScale = arrowPresence == ArrowPresence.Neither ? endArrow.ScaleTo(0) : endArrow.ScaleTo(0.07f);
+            var endArrowTween = Tween.Parallel(endArrowMove, endArrowScale);
 
             if (arrowPresence != ArrowPresence.Both)
                 return endArrowTween;
@@ -119,8 +145,9 @@ namespace Primer.Graph
             var originArrow = gnome.Add<Transform>(arrowPrefab, "Origin Arrow");
             originArrow.localRotation = Quaternion.Euler(0f, -90f, 0f);
             var originArrowPos = new Vector3(-padding, 0f, 0f);
-            var originArrowTween = originArrowPos == originArrow.localPosition ? null : originArrow.MoveTo(originArrowPos);
-            originArrowTween = Tween.Parallel(originArrowTween, originArrow.ScaleTo(0.07f));
+            var originArrowMove = originArrowPos == originArrow.localPosition ? null : originArrow.MoveTo(originArrowPos);
+            var originArrowScale = arrowPresence != ArrowPresence.Both ? originArrow.ScaleTo(0) : originArrow.ScaleTo(0.07f);
+            var originArrowTween = Tween.Parallel(originArrowMove, originArrowScale);
 
             return Tween.Parallel(endArrowTween, originArrowTween);
         }
@@ -159,7 +186,7 @@ namespace Primer.Graph
         [EnableIf(nameof(showLabel))]
         public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
-        private (Tween addLabel, Tween updateLabel, Tween removeLabel) TransitionLabel()
+        private (Tween removeLabel, Tween updateLabel, Tween addLabel) TransitionLabel()
         {
             var gnome = new SimpleGnome(transform);
             var labelTransform = gnome.AddLatex(label, "Label").transform;
@@ -178,7 +205,7 @@ namespace Primer.Graph
             var addLabel = showLabel ? labelTransform.ScaleTo(0.2f * labelSize) : Tween.noop;
             var removeLabel = showLabel ? Tween.noop : labelTransform.ScaleTo(0f);
 
-            return (addLabel, updateLabel, removeLabel);
+            return (removeLabel, updateLabel, addLabel);
         }
         private Tween ScaleDownLabel()
         {
@@ -218,7 +245,7 @@ namespace Primer.Graph
 
             return calculated;
         }
-        private (Tween add, Tween update, Tween remove) TransitionTics()
+        private (Tween remove, Tween update, Tween add) TransitionTics()
         {
             var parentGnome = new SimpleGnome(transform);
             var gnomeTransform = parentGnome
@@ -271,9 +298,9 @@ namespace Primer.Graph
                 );
             
             return (
-                addTweens.RunInParallel(),
+                removeTweens.RunInParallel(),
                 updateTweens.RunInParallel(),
-                removeTweens.RunInParallel()
+                addTweens.RunInParallel()
             );
         }
 

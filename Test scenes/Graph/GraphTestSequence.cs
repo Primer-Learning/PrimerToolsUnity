@@ -28,6 +28,7 @@ public class GraphTestSequence : Sequence
         yield return graph.xAxis.Appear();
         graph.xAxis.length = 2;
         yield return graph.xAxis.Transition();
+        yield return graph.xAxis.Disappear();
         // graph.x.max = 10;
         // graph.y.max = 10;
         // graph.x.length = 3;
