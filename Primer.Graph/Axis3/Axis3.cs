@@ -18,7 +18,8 @@ namespace Primer.Graph
         public float rangeSize => Mathf.Max(0.001f, max - min);
         
         public float length = 1;
-        private float _padding = 0.1f;
+        [SerializeField, ShowInInspector]
+        private float _padding = 0.2f;
         public float padding {
             get => Mathf.Min(_padding, length / 2);
             set => _padding = value;
@@ -26,25 +27,28 @@ namespace Primer.Graph
         
         public float scale => lengthMinusPadding / rangeSize;
         
-        public float lengthMinusPadding => length - padding;
+        public float lengthMinusPadding => length - 2 * padding;
         float thickness = 1;
 
         public Tween Transition()
         {
             var (addTics, updateTics, removeTics) = TransitionTics();
+            var (addLabel, updateLabel, removeLabel) = TransitionLabel();
 
             var removeTween = Tween.Parallel(
-                removeTics
+                removeTics,
+                removeLabel
             );
             // Rod, arrow, label transitions
             var updateTween = Tween.Parallel(
                 updateTics,
                 TransitionRod(),
                 TransitionArrows(),
-                TransitionLabel()
+                updateLabel
             );
             var addTween = Tween.Parallel(
-                addTics
+                addTics,
+                addLabel
             );
 
             return Tween.Series(
@@ -52,6 +56,19 @@ namespace Primer.Graph
                 updateTween,
                 addTween
             );
+        }
+
+        public Tween Appear()
+        {
+            var targetLength = length;
+            length = 0;
+            Transition().Apply();
+            ScaleDownTics().Apply();
+            ScaleDownArrows().Apply();
+            ScaleDownLabel().Apply();
+
+            length = targetLength;
+            return Transition();
         }
 
         #region Bar
@@ -94,6 +111,7 @@ namespace Primer.Graph
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
             var endArrowPos = new Vector3(length - padding, 0f, 0f);
             var endArrowTween = endArrowPos == endArrow.localPosition ? null : endArrow.MoveTo(endArrowPos);
+            endArrowTween = Tween.Parallel(endArrowTween, endArrow.ScaleTo(0.07f));
 
             if (arrowPresence != ArrowPresence.Both)
                 return endArrowTween;
@@ -102,6 +120,18 @@ namespace Primer.Graph
             originArrow.localRotation = Quaternion.Euler(0f, -90f, 0f);
             var originArrowPos = new Vector3(-padding, 0f, 0f);
             var originArrowTween = originArrowPos == originArrow.localPosition ? null : originArrow.MoveTo(originArrowPos);
+            originArrowTween = Tween.Parallel(originArrowTween, originArrow.ScaleTo(0.07f));
+
+            return Tween.Parallel(endArrowTween, originArrowTween);
+        }
+
+        private Tween ScaleDownArrows()
+        {
+            // Find object named "End Arrow" and scale it down if it is found.
+            var endArrow = transform.Find("End Arrow");
+            var endArrowTween = transform.Find("End Arrow") is null ? Tween.noop : endArrow.ScaleTo(0);
+            var originArrow = transform.Find("Origin Arrow");
+            var originArrowTween = transform.Find("Origin Arrow") is null ? Tween.noop : originArrow.ScaleTo(0);
 
             return Tween.Parallel(endArrowTween, originArrowTween);
         }
@@ -129,22 +159,31 @@ namespace Primer.Graph
         [EnableIf(nameof(showLabel))]
         public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
-        private Tween TransitionLabel()
+        private (Tween addLabel, Tween updateLabel, Tween removeLabel) TransitionLabel()
         {
             var gnome = new SimpleGnome(transform);
             var labelTransform = gnome.AddLatex(label, "Label").transform;
 
             var pos = labelOffset + (labelPosition switch {
-                AxisLabelPosition.Along => new Vector3(length / 2, -0.3f, 0f),
+                AxisLabelPosition.Along => new Vector3(length / 2, -0.55f, 0f),
                 AxisLabelPosition.End => new Vector3(length - padding + X_OFFSET, 0f, 0f),
                 _ => Vector3.zero,
             });
 
-            return Tween.Parallel(
+            var updateLabel = Tween.Parallel(
                 pos == labelTransform.localPosition ? null : labelTransform.MoveTo(pos),
-                labelRotation == labelTransform.localRotation ? null : labelTransform.RotateTo(labelRotation),
-                showLabel ? labelTransform.ScaleTo(0.1f * labelSize) : labelTransform.ScaleTo(0f)
+                labelRotation == labelTransform.localRotation ? null : labelTransform.RotateTo(labelRotation)
             );
+
+            var addLabel = showLabel ? labelTransform.ScaleTo(0.2f * labelSize) : Tween.noop;
+            var removeLabel = showLabel ? Tween.noop : labelTransform.ScaleTo(0f);
+
+            return (addLabel, updateLabel, removeLabel);
+        }
+        private Tween ScaleDownLabel()
+        {
+            var labelTransform = transform.Find("Label");
+            return labelTransform is null ? Tween.noop : labelTransform.ScaleTo(0);
         }
 
         #endregion
@@ -206,8 +245,8 @@ namespace Primer.Graph
                     tic = existingTic.GetComponent<AxisTic>();
                     tic.transform.localRotation = Quaternion.identity;
                     updateTweens.Add(tic.MoveTo(GetPosition(tic)));
-                    // Probably already scale 1, but just in case
-                    // addTweens.Add(tic.ScaleTo(1));
+                    // Probably already scale 1, but not always. For example, if we are calling Appear.
+                    addTweens.Add(tic.ScaleTo(1));
                 }
                 else // The tic should exist but doesn't
                 {
@@ -236,6 +275,17 @@ namespace Primer.Graph
                 updateTweens.RunInParallel(),
                 removeTweens.RunInParallel()
             );
+        }
+
+        private Tween ScaleDownTics()
+        {
+            var ticsContainer = transform.Find("Tics container");
+            
+            if (ticsContainer is null)
+                return Tween.noop;
+            
+            var tics = ticsContainer.GetChildren().Select(x => x.GetComponent<AxisTic>());
+            return tics.Select(x => x.ScaleTo(0)).RunInParallel();
         }
         
         [Serializable]
