@@ -30,7 +30,7 @@ namespace Primer.Graph
         public float lengthMinusPadding => length - 2 * padding;
         float thickness = 1;
 
-        public (Tween removeTween, Tween updateTween, Tween addTween) PrepareTransitionParts()
+        internal (Tween removeTween, Tween updateTween, Tween addTween) PrepareTransitionParts()
         {
             var (removeTics, updateTics, addTics) = TransitionTics();
             var (removeLabel, updateLabel, addLabel) = TransitionLabel();
@@ -46,7 +46,6 @@ namespace Primer.Graph
                 TransitionArrows(),
                 updateLabel
             );
-            Debug.Log(updateTics.duration);
             var addTween = Tween.Parallel(
                 addTics,
                 addLabel
@@ -60,7 +59,7 @@ namespace Primer.Graph
             );
         }
 
-        public Tween Transition(bool allowZeroLength = false)
+        private Tween Transition(bool allowZeroLength = false)
         {
             var (removeTween, updateTween, addTween) = PrepareTransitionParts();
             if (length == 0 && !allowZeroLength) return Tween.noop;
@@ -71,7 +70,7 @@ namespace Primer.Graph
             );
         }
 
-        public Tween Appear()
+        internal Tween Appear()
         {
             var targetLength = length;
             length = 0;
@@ -91,12 +90,12 @@ namespace Primer.Graph
                 addTweens
             );
         }
-        public Tween Disappear()
+        internal Tween Disappear()
         {
             if (length == 0) return Tween.noop;
             length = 0;
             var (removeTweens, updateTweens, _) = PrepareTransitionParts();
-
+        
             return Tween.Series(
                 Tween.Parallel(
                     removeTweens,
