@@ -13,6 +13,9 @@ namespace Primer
             var child = FindChild<Transform>(name) ?? new GameObject(name).transform;
             child.SetParent(transform);
             child.gameObject.SetActive(true);
+            child.localPosition = Vector3.zero;
+            child.localRotation = Quaternion.identity;
+            child.localScale = Vector3.one;
             return child;
         }
 
@@ -20,7 +23,11 @@ namespace Primer
             where TChild : Component
         {
             var child = FindChild<TChild>(name) ??  new GameObject(name).AddComponent<TChild>();
-            child.transform.SetParent(transform);
+            Transform t = child.transform;
+            t.SetParent(transform);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
             child.gameObject.SetActive(true);
             return child;
         }
@@ -45,9 +52,12 @@ namespace Primer
             
             var childGO = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             childGO.name = name;
-            childGO.transform.parent = transform;
-            childGO.transform.SetParent(transform);
+            var t = childGO.transform;
+            t.SetParent(transform);
             childGO.SetActive(true);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
             return childGO.GetOrAddComponent<TChild>();
         }
         
