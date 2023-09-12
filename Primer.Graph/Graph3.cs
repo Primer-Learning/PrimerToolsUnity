@@ -56,6 +56,14 @@ namespace Primer.Graph
             return line;
         }
         
+        public StackedArea AddStackedArea(string name)
+        {
+            var gnome = new SimpleGnome(transform);
+            var area = gnome.Add<StackedArea>(name);
+            area.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
+            return area;
+        }
+        
         public Vector3 DataSpaceToPositionSpace(Vector3 point)
         {
             return new Vector3(

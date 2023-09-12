@@ -44,7 +44,10 @@ public class GraphTestSequence : Sequence
         foreach (var _ in TestLine(graph))
             yield return _;
         
-        // yield return graph.Disappear();
+        foreach (var _ in TestArea(graph))
+            yield return _;
+        
+        yield return graph.Disappear();
 
         // foreach (var _ in TestSurface(graph, cam))
         //     yield return _;
@@ -52,8 +55,6 @@ public class GraphTestSequence : Sequence
         // foreach (var _ in TestPoint(graph))
         //     yield return _;
         //
-        // foreach (var _ in TestArea(graph))
-        //     yield return _;
         //
         // foreach (var _ in TestBars(graph))
         //     yield return _;
@@ -84,7 +85,7 @@ public class GraphTestSequence : Sequence
         yield return blue.Transition() with { name = "Blue transition" };
     
         blue.SetFunction(x => Mathf.Pow(x, 2));
-        red.AddPoint(4, 5);
+        red.AddPoint(3, 4);
     
         yield return Parallel(
             blue.Transition(),
@@ -93,11 +94,11 @@ public class GraphTestSequence : Sequence
     
         foreach (var _ in RunGraphDeformations(graph))
             yield return _;
-        //
-        // yield return Parallel(
-        //     blue.ShrinkToEnd(),
-        //     red.ShrinkToEnd()
-        // ) with { name = "Lines go" };
+        
+        yield return Parallel(
+            blue.ShrinkToEnd(),
+            red.ShrinkToEnd()
+        ) with { name = "Lines go" };
     
         PopClipColor();
     }
@@ -192,39 +193,39 @@ public class GraphTestSequence : Sequence
     //     PopClipColor();
     // }
 
-    // private IEnumerable<Tween> TestArea(Graph graph)
-    // {
-    //     PushClipColor(PrimerColor.purple);
-    //
-    //     using var stackedArea = graph.AddStackedArea("Stacked");
-    //
-    //     stackedArea.SetData(
-    //         new float[] { 1, 2, 1, 2 },
-    //         new float[] { 1, 2, 3, 4 }
-    //     );
-    //
-    //     yield return stackedArea.GrowFromStart() with { name = "Area appears" };
-    //
-    //     stackedArea.SetData(
-    //         new float[] { 1, 1.5f, 1, 1.5f },
-    //         new float[] { 4, 3, 2, 1 }
-    //     );
-    //
-    //     yield return stackedArea.Transition() with { name = "Area transition" };
-    //
-    //     stackedArea.AddArea(0.25f, 0.5f, 0.75f, 1);
-    //     yield return stackedArea.Transition() with { name = "Add area" };
-    //
-    //     stackedArea.AddData(1, 0.25f, 2);
-    //     yield return stackedArea.Transition() with { name = "Add data" };
-    //
-    //     foreach (var _ in RunGraphDeformations(graph))
-    //         yield return _;
-    //
-    //     yield return stackedArea.ShrinkToEnd() with { name = "Area goes" };
-    //
-    //     PopClipColor();
-    // }
+    private IEnumerable<Tween> TestArea(Graph3 graph)
+    {
+        PushClipColor(PrimerColor.purple);
+    
+        using var stackedArea = graph.AddStackedArea("Stacked");
+    
+        stackedArea.SetData(
+            new float[] { 1, 2, 1, 2 },
+            new float[] { 1, 2, 3, 4 }
+        );
+    
+        yield return stackedArea.GrowFromStart() with { name = "Area appears" };
+    
+        stackedArea.SetData(
+            new float[] { 1, 1.5f, 1, 1.5f },
+            new float[] { 4, 3, 2, 1 }
+        );
+    
+        yield return stackedArea.Transition() with { name = "Area transition" };
+    
+        stackedArea.AddArea(0.25f, 0.5f, 0.75f, 1);
+        yield return stackedArea.Transition() with { name = "Add area" };
+    
+        stackedArea.AddData(1, 0.25f, 2);
+        yield return stackedArea.Transition() with { name = "Add data" };
+    
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
+    
+        yield return stackedArea.ShrinkToEnd() with { name = "Area goes" };
+    
+        PopClipColor();
+    }
     //
     // private IEnumerable<Tween> TestBars(Graph graph)
     // {

@@ -25,7 +25,7 @@ namespace Primer.Graph
         public delegate Vector3 Transformation(Vector3 inputPoint);
         public Transformation transformPointFromDataSpaceToPositionSpace = point => point;
 
-        private Graph3 graph => transform.GetComponent<Graph3>();
+        private Graph3 graph => transform.parent.GetComponent<Graph3>();
         
         #region public float width;
         [SerializeField, HideInInspector]
