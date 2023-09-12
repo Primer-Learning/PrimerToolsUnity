@@ -37,7 +37,11 @@ namespace Primer
             // This also doesn't a TChild component to be present on the prefab.
             // Which is nice. Since you might want to add Creature to a PrimerBlob, for example.
             var child = FindChild<TChild>(name);
-            if (child is not null) return child;
+            if (child is not null)
+            {
+                child.gameObject.SetActive(true);
+                return child;
+            }
             
             var childGO = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
             childGO.name = name;
