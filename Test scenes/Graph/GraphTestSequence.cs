@@ -19,9 +19,8 @@ public class GraphTestSequence : Sequence
         ).Apply();
 
         using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
-        // yield return Tween.noop;
-        //
-        // yield return graph.xAxis.Transition() with { name = "X axis" };
+        
+        #region Axes manipulations alone
         graph.xAxis.length = 3;
         graph.yAxis.length = 2;
         graph.zAxis.length = 0;
@@ -35,22 +34,18 @@ public class GraphTestSequence : Sequence
         graph.xAxis.ticStep = 4;
         yield return graph.Transition();
         graph.xAxis.max = 10;
-        graph.xAxis.ticStep = 5;
+        graph.xAxis.ticStep = 2;
         yield return graph.Transition();
+        #endregion
         
-        yield return graph.Disappear();
-        // graph.x.max = 10;
-        // graph.y.max = 10;
-        // graph.x.length = 3;
-        // graph.y.length = 2;
-        // graph.enableZAxis = false;
-        //
-        // yield return graph.GrowFromOrigin() with { name = "Graph appears" };
-        // yield return graph.SetDomain(5) with { name = "Graph shrink to 5" };
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
+        
+        foreach (var _ in TestLine(graph))
+            yield return _;
+        
+        // yield return graph.Disappear();
 
-        // foreach (var _ in TestLine(graph))
-        //     yield return _;
-        //
         // foreach (var _ in TestSurface(graph, cam))
         //     yield return _;
         //
@@ -66,46 +61,46 @@ public class GraphTestSequence : Sequence
         // yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
     }
 
-    // private IEnumerable<Tween> TestLine(Graph graph)
-    // {
-    //     PushClipColor(PrimerColor.red);
-    //
-    //     // Blue is disabled when this method ends
-    //     using var blue = graph.AddLine("Blue line");
-    //     blue.width = 0.05f;
-    //     blue.SetColor(PrimerColor.blue);
-    //     blue.SetFunction(x => Mathf.Cos(x * 2) * 5, resolution: 100, xEnd: 5);
-    //     yield return blue.GrowFromStart() with { name = "Blue line" };
-    //
-    //     // Red is disabled when this method ends
-    //     using var red = graph.AddLine("Red line");
-    //     red.width = 0.05f;
-    //     red.SetColor(PrimerColor.red);
-    //     red.SetZIndex(1);
-    //     red.SetData(new float[] { 0, 1, 2, 3 });
-    //     yield return red.GrowFromStart() with { name = "Red line" };
-    //
-    //     blue.SetFunction(x => Mathf.Sin(x * 2) * 5);
-    //     yield return blue.Transition() with { name = "Blue transition" };
-    //
-    //     blue.SetFunction(x => Mathf.Pow(x, 2));
-    //     red.AddPoint(4, 5);
-    //
-    //     yield return Parallel(
-    //         blue.Transition(),
-    //         red.Transition()
-    //     ) with { name = "Lines transition" };
-    //
-    //     foreach (var _ in RunGraphDeformations(graph))
-    //         yield return _;
-    //
-    //     yield return Parallel(
-    //         blue.ShrinkToEnd(),
-    //         red.ShrinkToEnd()
-    //     ) with { name = "Lines go" };
-    //
-    //     PopClipColor();
-    // }
+    private IEnumerable<Tween> TestLine(Graph3 graph)
+    {
+        PushClipColor(PrimerColor.red);
+    
+        // Blue is disabled when this method ends
+        using var blue = graph.AddLine("Blue line");
+        blue.width = 0.05f;
+        blue.SetColor(PrimerColor.blue);
+        blue.SetFunction(x => Mathf.Cos(x * 2) * 5, numPoints: 100, xEnd: 5);
+        yield return blue.GrowFromStart() with { name = "Blue line" };
+    
+        // Red is disabled when this method ends
+        using var red = graph.AddLine("Red line");
+        red.width = 0.05f;
+        red.SetColor(PrimerColor.red);
+        red.SetZIndex(1);
+        red.SetData(new float[] { 0, 1, 2, 3 });
+        yield return red.GrowFromStart() with { name = "Red line" };
+    
+        blue.SetFunction(x => Mathf.Sin(x * 2) * 5);
+        yield return blue.Transition() with { name = "Blue transition" };
+    
+        blue.SetFunction(x => Mathf.Pow(x, 2));
+        red.AddPoint(4, 5);
+    
+        yield return Parallel(
+            blue.Transition(),
+            red.Transition()
+        ) with { name = "Lines transition" };
+    
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
+        //
+        // yield return Parallel(
+        //     blue.ShrinkToEnd(),
+        //     red.ShrinkToEnd()
+        // ) with { name = "Lines go" };
+    
+        PopClipColor();
+    }
 
     // private IEnumerable<Tween> TestSurface(Graph graph, CameraRig cam)
     // {
@@ -265,31 +260,27 @@ public class GraphTestSequence : Sequence
     //     PopClipColor();
     // }
     //
-    // private IEnumerable<Tween> RunGraphDeformations(Graph graph)
-    // {
-    //     PushClipColor(PrimerColor.orange);
-    //
-    //     // Domain grows but graph doesn't take more space
-    //     // - ticks shrink together, some are added
-    //     // - dataviz has to shrink
-    //     yield return graph.GrowDomainInSameSpace(5) with { name = "Grow domain in same space" };
-    //     // - ticks walk into the abyss
-    //     yield return graph.ShrinkDomainInSameSpace(5) with { name = "Restore" };
-    //
-    //     // Domain remains while graph grows
-    //     // - ticks untouched
-    //     // - dataviz has to grow accordingly
-    //     yield return graph.SetGraphScale(1) with { name = "Scale graph" };
-    //     // - ticks untouched
-    //     yield return graph.SetGraphScale(0.2f) with { name = "Restore" };
-    //
-    //     // Domain grows and graph size grows proportionally
-    //     // - ticks stay in place while some are added
-    //     // - dataviz untouched
-    //     yield return graph.GrowDomain(5) with { name = "Grow domain" };
-    //     // - ticks are eaten by the graph's arrow
-    //     yield return graph.ShrinkDomain(5) with { name = "Restore" };
-    //
-    //     PopClipColor();
-    // }
+    private IEnumerable<Tween> RunGraphDeformations(Graph3 graph)
+    {
+        PushClipColor(PrimerColor.orange);
+        
+        graph.xAxis.max = 15;
+        yield return graph.Transition();
+        graph.xAxis.max = 10;
+        yield return graph.Transition();
+    
+        graph.yAxis.length = 3;
+        yield return graph.Transition();
+        graph.yAxis.length = 2;
+        yield return graph.Transition();
+    
+        graph.xAxis.max = 15;
+        graph.xAxis.length = 3;
+        yield return graph.Transition();
+        graph.xAxis.max = 10;
+        graph.xAxis.length = 2;
+        yield return graph.Transition();
+    
+        PopClipColor();
+    }
 }

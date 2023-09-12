@@ -10,11 +10,11 @@ namespace Primer.Graph
 {
     [ExecuteAlways]
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-    [RequireComponent(typeof(GraphDomain))]
-    public class PrimerLine : MonoBehaviour, IMeshController, IDisposable
+    public class PrimerLine : MonoBehaviour, IMeshController, IDisposable, IPrimerGraphData
     {
         private ILine renderedLine = new DiscreteLine(0);
-        private ILine incomingLine = null;
+        private Vector3[] rawPoints;
+        private Vector3[] transformedPoints => rawPoints.Select( x => transformPointFromDataSpaceToPositionSpace(x)).ToArray();
 
         private MeshFilter meshFilterCache;
         private MeshFilter meshFilter => transform.GetOrAddComponent(ref meshFilterCache);
@@ -22,9 +22,11 @@ namespace Primer.Graph
         private MeshRenderer meshRendererCache;
         private MeshRenderer meshRenderer => transform.GetOrAddComponent(ref meshRendererCache);
 
-        private GraphDomain domainCache;
-        private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
+        public delegate Vector3 Transformation(Vector3 inputPoint);
+        public Transformation transformPointFromDataSpaceToPositionSpace = point => point;
 
+        private Graph3 graph => transform.GetComponent<Graph3>();
+        
         #region public float width;
         [SerializeField, HideInInspector]
         private float _width = 0.1f;
@@ -89,13 +91,6 @@ namespace Primer.Graph
             }
         }
         #endregion
-        
-        private void OnEnable()
-        {
-            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
-            domain.onDomainChange = Render;
-            meshRenderer.sharedMaterial ??= RendererExtensions.defaultMaterial;
-        }
 
         /// <summary>
         ///   Allows to set one lines above the others.
@@ -111,84 +106,113 @@ namespace Primer.Graph
         #region SetData(float[] | Vector2[] | Vector3[])
         public void SetData(IEnumerable<float> data)
         {
-            var points = data.Select((y, i) => new Vector3(i, y, 0));
-            incomingLine = new DiscreteLine(points);
+            rawPoints = data.Select((y, i) => new Vector3(i, y, 0)).ToArray();
         }
 
         public void SetData(IEnumerable<Vector2> data)
         {
-            incomingLine = new DiscreteLine(data.Cast<Vector3>());
+            rawPoints = data.Cast<Vector3>().ToArray();
         }
 
         public void SetData(IEnumerable<Vector3> data)
         {
-            incomingLine = new DiscreteLine(data);
+            rawPoints = data.ToArray();
         }
         #endregion
 
         #region AddPoint(float | Vector2 | Vector3)
         public void AddPoint(params float[] data)
         {
-            var addTo = GetCurrentDiscreteLine();
-            var points = data.Select((y, i) => new Vector3(addTo.points.Length + i, y, 0));
-            incomingLine = GetCurrentDiscreteLine().Append(points.ToArray());
+            rawPoints = rawPoints.Concat(data.Select((y, i) => new Vector3(rawPoints.Length + i, y, 0))).ToArray();
         }
-
         public void AddPoint(params Vector2[] data)
         {
-            incomingLine = GetCurrentDiscreteLine().Append(data.Cast<Vector3>().ToArray());
+            rawPoints = rawPoints.Concat(data.Cast<Vector3>()).ToArray();
         }
 
         public void AddPoint(params Vector3[] data)
         {
-            incomingLine = GetCurrentDiscreteLine().Append(data);
+            rawPoints = rawPoints.Concat(data).ToArray();
         }
         #endregion
 
         #region SetFunction(Func<float, float> | Func<float, Vector2> | Func<float, Vector3>, int?, float?, float?)
-        public void SetFunction(Func<float, float> function, int? resolution = null, float? xStart = null, float? xEnd = null)
+        public void SetFunction(Func<float, float> function, int? numPoints = null, float? xStart = null, float? xEnd = null)
         {
-            var current = GetFunctionLineParams();
+            numPoints ??= resolution;
 
-            incomingLine = new FunctionLine(function) {
-                resolution = resolution ?? current.resolution,
-                start = xStart ?? current.start,
-                end = xEnd ?? current.end,
-            };
+            if (xStart is null)
+            {
+                if (graph is not null)
+                {
+                    xStart = graph.xAxis.min;
+                }
+                else
+                {
+                    xStart = 0;
+                }
+            }
+
+            if (xEnd is null)
+            {
+                if (graph is not null)
+                {
+                    xEnd = graph.xAxis.max;
+                }
+                else
+                {
+                    xEnd = 10;
+                }
+            }
+            
+            rawPoints = new Vector3[numPoints.Value];
+            for (var i = 0; i < numPoints; i++)
+            {
+                var extent = (float)i / numPoints.Value;
+                var x = extent * (xEnd.Value - xStart.Value) + xStart.Value;
+                var y = function(x);
+                rawPoints[i] = new Vector3(x, y, 0);
+            }
         }
-
-        public void SetFunction(Func<float, Vector2> function, int? resolution = null, float? xStart = null, float? xEnd = null)
+        
+        // Parametric 2D function
+        public void SetFunction(Func<float, Vector2> function, float tStart, float tEnd, int? numPoints = null)
         {
-            var current = GetFunctionLineParams();
+            SetFunction(Vector3Function, tStart, tEnd, numPoints: numPoints);
+            return;
 
-            incomingLine = new FunctionLine(function) {
-                resolution = resolution ?? current.resolution,
-                start = xStart ?? current.start,
-                end = xEnd ?? current.end,
-            };
+            Vector3 Vector3Function(float t)
+            {
+                return function(t);
+            }
         }
-
-        public void SetFunction(Func<float, Vector3> function, int? resolution = null, float? xStart = null, float? xEnd = null)
+        
+        // Parametric 3D function
+        public void SetFunction(Func<float, Vector3> function, float tStart, float tEnd, int? numPoints = null)
         {
-            var current = GetFunctionLineParams();
+            numPoints ??= resolution;
 
-            incomingLine = new FunctionLine(function) {
-                resolution = resolution ?? current.resolution,
-                start = xStart ?? current.start,
-                end = xEnd ?? current.end,
-            };
+            rawPoints = new Vector3[numPoints.Value];
+            for (var i = 0; i < numPoints; i++)
+            {
+                var extent = (float)i / numPoints.Value;
+                var t = extent * (tEnd - tStart) + tStart;
+                rawPoints[i] = function(t);
+            }
         }
         #endregion
-
+        
         public Tween Transition()
         {
-            if (incomingLine is null)
+            if (transformedPoints.Length == 0)
                 return Tween.noop;
-
-            var targetLine = incomingLine;
+            
+            var targetLine = new DiscreteLine(transformedPoints);
+            if (targetLine.points == renderedLine.points)
+                return Tween.noop;
+            
             var (from, to) = ILine.SameResolution(renderedLine, targetLine);
 
-            incomingLine = null;
 
             return new Tween(
                 t => Render(ILine.Lerp(from, to, t))
@@ -201,7 +225,7 @@ namespace Primer.Graph
 
         public Tween GrowFromStart()
         {
-            var targetLine = incomingLine ?? renderedLine;
+            var targetLine = new DiscreteLine(transformedPoints);
             var resolution = targetLine.resolution;
 
             return new Tween(
@@ -227,30 +251,9 @@ namespace Primer.Graph
 
         public void Dispose()
         {
-            Gnome.Dispose(this);
+            gameObject.SetActive(false);
         }
-
-        private DiscreteLine GetCurrentDiscreteLine()
-        {
-            var current = incomingLine ?? renderedLine;
-
-            if (current is not DiscreteLine discrete)
-                throw new Exception("Cannot add point to non-discrete line");
-
-            return discrete;
-        }
-
-        private FunctionLine GetFunctionLineParams()
-        {
-            if (incomingLine is FunctionLine incoming)
-                return incoming;
-
-            if (renderedLine is FunctionLine rendered)
-                return rendered;
-
-            return FunctionLine.Default();
-        }
-
+        
         public MeshRenderer[] GetMeshRenderers() => new[] { meshRenderer };
 
         private void Render() => Render(renderedLine);
@@ -259,7 +262,7 @@ namespace Primer.Graph
             if (line == null)
                 return;
 
-            var points = line.points.Select(domain.TransformPoint).ToArray();
+            var points = line.points;
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
 

@@ -51,10 +51,12 @@ namespace Primer.Graph
         public PrimerLine AddLine(string name)
         {
             var gnome = new SimpleGnome(transform);
-            return gnome.Add<PrimerLine>(name);
+            var line = gnome.Add<PrimerLine>(name);
+            line.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
+            return line;
         }
         
-        public Vector3 GraphSpaceToLocalSpace(Vector3 point)
+        public Vector3 DataSpaceToPositionSpace(Vector3 point)
         {
             return new Vector3(
                 (point.x - xAxis.min) / xAxis.rangeSize * xAxis.lengthMinusPadding,
