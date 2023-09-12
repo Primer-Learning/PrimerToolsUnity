@@ -20,6 +20,8 @@ public class GraphTestSequence : Sequence
 
         using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
         
+        graph.transform.localPosition = new Vector3(-3, 0, 0);
+        
         #region Axes manipulations alone
         graph.xAxis.length = 3;
         graph.yAxis.length = 2;
