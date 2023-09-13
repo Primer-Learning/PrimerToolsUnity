@@ -59,30 +59,45 @@ namespace Primer.Shapes
             return new DiscreteLine(newPoints);
         }
 
-        public ILine ChangeResolution(int newResolution) {
-            if (newResolution == numSegments)
+        public ILine ChangeResolution(int newNumSegments) {
+            if (newNumSegments == numSegments)
                 return this;
 
             if (numSegments == 0)
-                return new DiscreteLine(newResolution);
+                return new DiscreteLine(newNumSegments);
 
-            var result = new Vector3[newResolution + 1];
+            var newPoints = new Vector3[newNumSegments + 1];
 
-            for (var i = 0; i <= newResolution; i++) {
-                var currentIndex = (float)i / newResolution * numSegments;
-
-                if (currentIndex.IsInteger()) {
-                    result[i] = points[(int)currentIndex];
+            // Loop through the new points, assigning old points to them
+            // If we run out of old points, just repeat the last old point
+            // until we are out of slots for new points
+            for (var i = 0; i <= newNumSegments; i++)
+            {
+                if (i >= numSegments)
+                {
+                    newPoints[i] = points[numSegments];
                     continue;
-                }
-
-                var a = points[Mathf.FloorToInt(currentIndex)];
-                var b = points[Mathf.CeilToInt(currentIndex)];
-                var t = currentIndex.GetDecimals();
-                result[i] = Vector3.Lerp(a, b, t);
+                } 
+                newPoints[i] = points[i];
             }
+            
+            // This code inserts points in the middle of the line
+            // That's not currently desired, but keeping it here for future reference
+            // for (var i = 0; i <= newNumSegments; i++) {
+            //     var currentIndex = (float)i / newNumSegments * numSegments;
+            //
+            //     if (currentIndex.IsInteger()) {
+            //         newPoints[i] = points[(int)currentIndex];
+            //         continue;
+            //     }
+            //
+            //     var a = points[Mathf.FloorToInt(currentIndex)];
+            //     var b = points[Mathf.CeilToInt(currentIndex)];
+            //     var t = currentIndex.GetDecimals();
+            //     newPoints[i] = Vector3.Lerp(a, b, t);
+            // }
 
-            return new DiscreteLine(result);
+            return new DiscreteLine(newPoints);
         }
 
         public ILine SmoothCut(float toResolution, bool fromOrigin) {

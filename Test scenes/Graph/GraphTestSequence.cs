@@ -11,12 +11,12 @@ public class GraphTestSequence : Sequence
     public override async IAsyncEnumerator<Tween> Define()
     {
         var cam = FindObjectOfType<CameraRig>();
-        
+
         cam.Travel(
-            distance: 3.8f,
-            swivelOrigin: new Vector3(0.6f, 0.9f, 0f),
+            distance: 2.73f,
+            swivelOrigin: new Vector3(-2f, 0.9f, 0f),
             swivel: new Vector3(0f, 0f, 0f)
-        ).Apply();
+        );
 
         using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
         
@@ -210,15 +210,15 @@ public class GraphTestSequence : Sequence
     
         stackedArea.SetData(
             new float[] { 1, 1.5f, 1, 1.5f },
-            new float[] { 4, 3, 2, 1 }
+            new float[] { 1.5f, 1, 1.5f, 1 }
         );
     
         yield return stackedArea.Transition() with { name = "Area transition" };
     
-        stackedArea.AddArea(0.25f, 0.5f, 0.75f, 1);
+        stackedArea.AddArea(1, 2, 1, 2);
         yield return stackedArea.Transition() with { name = "Add area" };
     
-        stackedArea.AddData(1, 0.25f, 2);
+        stackedArea.AddData(1, 1, 1);
         yield return stackedArea.Transition() with { name = "Add data" };
     
         foreach (var _ in RunGraphDeformations(graph))

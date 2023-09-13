@@ -48,13 +48,13 @@ namespace Primer.Shapes
             this.function = x => new Vector3(x, function(x), 0);
         }
 
-        public ILine ChangeResolution(int newResolution)
+        public ILine ChangeResolution(int newNumSegments)
         {
-            if (newResolution == numSegments)
+            if (newNumSegments == numSegments)
                 return this;
 
             return new FunctionLine(function) {
-                numSegments = newResolution,
+                numSegments = newNumSegments,
                 start = start,
                 end = end,
             };

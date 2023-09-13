@@ -7,7 +7,7 @@ namespace Primer.Shapes
         int numSegments { get; }
         Vector3[] points { get; }
 
-        ILine ChangeResolution(int newResolution);
+        ILine ChangeResolution(int newNumSegments);
         ILine SmoothCut(float toResolution, bool fromOrigin);
 
         DiscreteLine ToDiscrete();
