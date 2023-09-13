@@ -9,7 +9,7 @@ namespace Primer.Shapes
     {
         public static ILine zero = new DiscreteLine(new[] { Vector3.zero });
 
-        public int resolution => points.Length - 1;
+        public int numSegments => points.Length - 1;
         public Vector3[] points { get; }
 
 
@@ -60,16 +60,16 @@ namespace Primer.Shapes
         }
 
         public ILine ChangeResolution(int newResolution) {
-            if (newResolution == resolution)
+            if (newResolution == numSegments)
                 return this;
 
-            if (resolution == 0)
+            if (numSegments == 0)
                 return new DiscreteLine(newResolution);
 
             var result = new Vector3[newResolution + 1];
 
             for (var i = 0; i <= newResolution; i++) {
-                var currentIndex = (float)i / newResolution * resolution;
+                var currentIndex = (float)i / newResolution * numSegments;
 
                 if (currentIndex.IsInteger()) {
                     result[i] = points[(int)currentIndex];
@@ -86,16 +86,16 @@ namespace Primer.Shapes
         }
 
         public ILine SmoothCut(float toResolution, bool fromOrigin) {
-            if (toResolution.IsInteger() && resolution == (int)toResolution)
+            if (toResolution.IsInteger() && numSegments == (int)toResolution)
                 return this;
 
-            if (resolution < toResolution)
+            if (numSegments < toResolution)
                 throw new Exception("Crop size is bigger than grid area. Do you want ILine.Resize()?");
 
             var finalSize = Mathf.CeilToInt(toResolution);
             if (finalSize < 1) return zero;
 
-            var firstIndex = fromOrigin ? resolution - finalSize : 0;
+            var firstIndex = fromOrigin ? numSegments - finalSize : 0;
             var lastIndex = firstIndex + finalSize;
 
             var copy = CutToArray(finalSize + 1, fromOrigin);

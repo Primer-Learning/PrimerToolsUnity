@@ -127,7 +127,7 @@ namespace Primer.Graph
             var targetData = transformedPointSets.Select(x => new DiscreteLine(x) as ILine).ToList();
         
             return new Tween(
-                t => Render(targetData.Select(x => x.SmoothCut(x.resolution * t, fromOrigin: false)))
+                t => Render(targetData.Select(x => x.SmoothCut(x.numSegments * t, fromOrigin: false)))
             ).Observe(
                 // After the transition is complete, we ensure we store the line we got
                 // instead of the result of SmoothCut() which is always a DiscreteLine.
@@ -140,7 +140,7 @@ namespace Primer.Graph
             var targetData = renderedData;
 
             return new Tween(
-                t => Render(targetData.Select(x => x.SmoothCut(x.resolution * (1 - t), fromOrigin: true)))
+                t => Render(targetData.Select(x => x.SmoothCut(x.numSegments * (1 - t), fromOrigin: true)))
             ).Observe(
                 afterComplete: () => gameObject.SetActive(false)
             );

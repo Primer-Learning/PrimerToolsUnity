@@ -45,7 +45,7 @@ namespace Primer.Graph
         [ShowInInspector]
         [MinValue(1)]
         public int resolution {
-            get => renderedLine.resolution;
+            get => renderedLine.numSegments;
             set => Render(renderedLine.ChangeResolution(value));
         }
         #endregion
@@ -226,7 +226,7 @@ namespace Primer.Graph
         public Tween GrowFromStart()
         {
             var targetLine = new DiscreteLine(transformedPoints);
-            var resolution = targetLine.resolution;
+            var resolution = targetLine.numSegments;
 
             return new Tween(
                 t => Render(targetLine.SmoothCut(resolution * t, fromOrigin: false))
@@ -240,7 +240,7 @@ namespace Primer.Graph
         public Tween ShrinkToEnd()
         {
             var targetLine = renderedLine;
-            var resolution = targetLine.resolution;
+            var resolution = targetLine.numSegments;
 
             return new Tween(
                 t => Render(targetLine.SmoothCut(resolution * (1 - t), fromOrigin: true))

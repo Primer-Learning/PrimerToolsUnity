@@ -13,20 +13,20 @@ namespace Primer.Shapes
         public static FunctionLine Default()
         {
             return new FunctionLine(x => Vector3.zero) {
-                resolution = DEFAULT_RESOLUTION,
+                numSegments = DEFAULT_RESOLUTION,
                 start = DEFAULT_START,
                 end = DEFAULT_END,
             };
         }
 
-        public int resolution { get; init; }
+        public int numSegments { get; init; }
         public float start { get; init; }
         public float end { get; init; }
         public Vector3[] points => CalculatePoints();
 
         public FunctionLine(Func<float, Vector3> function)
         {
-            resolution = DEFAULT_RESOLUTION;
+            numSegments = DEFAULT_RESOLUTION;
             start = DEFAULT_START;
             end = DEFAULT_END;
             this.function = function;
@@ -34,7 +34,7 @@ namespace Primer.Shapes
 
         public FunctionLine(Func<float, Vector2> function)
         {
-            resolution = DEFAULT_RESOLUTION;
+            numSegments = DEFAULT_RESOLUTION;
             start = DEFAULT_START;
             end = DEFAULT_END;
             this.function = x => function(x);
@@ -42,7 +42,7 @@ namespace Primer.Shapes
 
         public FunctionLine(Func<float, float> function)
         {
-            resolution = DEFAULT_RESOLUTION;
+            numSegments = DEFAULT_RESOLUTION;
             start = DEFAULT_START;
             end = DEFAULT_END;
             this.function = x => new Vector3(x, function(x), 0);
@@ -50,11 +50,11 @@ namespace Primer.Shapes
 
         public ILine ChangeResolution(int newResolution)
         {
-            if (newResolution == resolution)
+            if (newResolution == numSegments)
                 return this;
 
             return new FunctionLine(function) {
-                resolution = newResolution,
+                numSegments = newResolution,
                 start = start,
                 end = end,
             };
@@ -72,11 +72,11 @@ namespace Primer.Shapes
 
         private Vector3[] CalculatePoints()
         {
-            var result = new Vector3[resolution + 1];
-            var step = (end - start) / resolution;
+            var result = new Vector3[numSegments + 1];
+            var step = (end - start) / numSegments;
             var x = start;
 
-            for (var i = 0; i <= resolution; i++) {
+            for (var i = 0; i <= numSegments; i++) {
                 result[i] = function(x);
                 x += step;
             }
