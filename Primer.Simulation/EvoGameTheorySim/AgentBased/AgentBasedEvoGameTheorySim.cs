@@ -16,6 +16,7 @@ namespace Simulation.GameTheory
         
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
+        public Home[] homes => transform.GetComponentsInChildren<Home>();
         
         public readonly SimpleGnome creatureGnome;
 
@@ -105,7 +106,8 @@ namespace Simulation.GameTheory
             var center = positions.Average();
 
             if (transform is null) Debug.Log("transform is null");
-            
+
+            var homeIndex = 0;
             foreach (var (strategy, count) in initialBlobs) {
                 for (var i = 0; i < count; i++) {
                     var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
@@ -113,8 +115,9 @@ namespace Simulation.GameTheory
                     creature.landscape = terrain;
                     creature.rng = rng;
                     _strategyRule.OnAgentCreated(creature);
-                    creature.transform.position = positions[i];
-                    creature.transform.LookAt(center);
+                    creature.transform.position = homes[homeIndex % homes.Length].transform.position;
+                    homeIndex++;
+                    // creature.transform.LookAt(center);
                 }
             }
         }
@@ -180,7 +183,7 @@ namespace Simulation.GameTheory
         public Tween AgentsReturnHome()
         {
             return creatures
-                .Zip(GetBlobsRestingPosition(), (creature, position) => creature.ReturnHome(position))
+                .Zip(NearestHomePosition(), (creature, position) => creature.WalkTo(position))
                 .RunInParallel();
         }
 
@@ -261,6 +264,11 @@ namespace Simulation.GameTheory
                 var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
                 yield return perimeterPosition + offset + centerInTerrain;
             }
+        }
+        private IEnumerable<Vector3> NearestHomePosition()
+        {
+            var homePositions = homes.Select(x => x.transform.position).ToList();
+            return creatures.Select(x => homePositions.OrderBy(y => (x.transform.position - y).sqrMagnitude).First());
         }
 
         private static Vector2 PositionToPerimeter(Vector2 perimeter, float position)

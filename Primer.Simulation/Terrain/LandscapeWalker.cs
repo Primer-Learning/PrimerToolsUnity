@@ -11,7 +11,7 @@ namespace Primer.Simulation
         private const float DEFAULT_SPEED = 20;
         private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
-        public Tween WalkTo(Vector2 to, float stopDistance = 0, float forcedDuration = -1)
+        public Tween WalkTo(Vector3 to, float stopDistance = 0, float forcedDuration = -1)
         {
             return WalkToImpl(landscape.GetGroundAt(to), stopDistance, forcedDuration);
         }

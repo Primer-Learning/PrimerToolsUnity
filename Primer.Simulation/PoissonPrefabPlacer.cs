@@ -24,11 +24,13 @@ namespace Primer.Simulation
 
         [Title("Spawn items")]
         public float minDistance = 2;
-        [FormerlySerializedAs("amount")] public int numberToPlace = 30;
+        [FormerlySerializedAs("numberToPlace")] public int numberToPlace1 = 30;
+        public int numberToPlace2 = 0;
         public int maxAttemptsPerPoint = 30;
         public PoissonDiscSampler.OverflowMode overflowMode = PoissonDiscSampler.OverflowMode.None;
         public bool randomizeRotation = true;
-        public Transform prefab;
+        [FormerlySerializedAs("prefab")] public Transform prefab1;
+        public Transform prefab2;
 
         #region public Vector2 size;
         [SerializeField, HideInInspector]
@@ -74,8 +76,18 @@ namespace Primer.Simulation
                 offset -= size / 2;
 
             var rng = new Rng(seed);
+            
+            // Make a list of bools that reflect the desired counts of each prefab
+            var prefabAssignments = Enumerable.Repeat(true, numberToPlace1)
+                .Concat(Enumerable.Repeat(false, numberToPlace2)).Shuffle(rng: rng);
+            
+            var index = 0;
 
-            foreach (var point in PoissonDiscSampler.Rectangular(numberToPlace, spawnSpace, minDistance, overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint)) {
+            foreach (var point in PoissonDiscSampler.Rectangular(numberToPlace1 + numberToPlace2, spawnSpace, minDistance, overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint)) {
+                
+                // Start here
+                var prefab = prefabAssignments[index++] ? prefab1 : prefab2;
+                
                 var instance = gnome.Add(prefab);
                 var pos = point + offset;
 
@@ -96,8 +108,8 @@ namespace Primer.Simulation
             }
 
             gnome.Purge();
-            if (gnome.children.Count() < numberToPlace)
-                Debug.LogWarning("Only " + gnome.children.Count() + " items were placed out of an attempted " + numberToPlace + ".");
+            if (gnome.children.Count() < numberToPlace1)
+                Debug.LogWarning("Only " + gnome.children.Count() + " items were placed out of an attempted " + numberToPlace1 + ".");
         }
 
 #if UNITY_EDITOR
