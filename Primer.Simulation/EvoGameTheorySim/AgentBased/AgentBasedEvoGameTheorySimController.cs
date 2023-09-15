@@ -13,6 +13,8 @@ namespace Primer.Simulation
     {
         public int seed = 0;
         public bool runWhenEnteringPlayMode;
+        public HomeOptions homeOptions;
+        public TreeSelectionOptions treeSelectionOptions;
         
         [SerializeField, HideInInspector]
         private bool _skipAnimations = false;
@@ -102,7 +104,9 @@ namespace Primer.Simulation
                     seed: seed,
                     initialBlobs: ConstructInitialStrategiesDictionary(),
                     strategyRule,
-                    skipAnimations: skipAnimations
+                    skipAnimations: skipAnimations,
+                    homeOptions: homeOptions,
+                    treeSelectionOptions: treeSelectionOptions
                 );
             }
             else
@@ -112,7 +116,9 @@ namespace Primer.Simulation
                     seed: seed,
                     initialBlobs: creatures,
                     strategyRule,
-                    skipAnimations: skipAnimations
+                    skipAnimations: skipAnimations,
+                    homeOptions: homeOptions,
+                    treeSelectionOptions: treeSelectionOptions
                 );
             }
         }

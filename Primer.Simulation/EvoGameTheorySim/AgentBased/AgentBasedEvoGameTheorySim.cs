@@ -9,10 +9,27 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
+    public enum HomeOptions
+    {
+        Random,
+        ChooseNearestEveryDay,
+        Keep
+    }
+
+    public enum TreeSelectionOptions
+    {
+        Random,
+        PreferNearest,
+    }
+    
     public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
     {
+        private HomeOptions _homeOptions;
+        private TreeSelectionOptions _treeSelectionOptions;
+        
         public int turn = 0;
-        private readonly int foodPerTurn;
+        
+        // private readonly int foodPerTurn;
         
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
@@ -46,10 +63,15 @@ namespace Simulation.GameTheory
             int seed,
             Dictionary<T, int> initialBlobs,
             StrategyRule<T> strategyRule,
-            bool skipAnimations = false)
+            bool skipAnimations = false,
+            HomeOptions homeOptions = HomeOptions.Random,
+            TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random
+            )
         {
             this.transform = transform;
-            this._strategyRule = strategyRule;
+            _strategyRule = strategyRule;
+            _homeOptions = homeOptions;
+            _treeSelectionOptions = treeSelectionOptions;
 
             rng = new Rng(seed);
 
@@ -63,6 +85,10 @@ namespace Simulation.GameTheory
             {
                 tree.rng = rng;
             }
+            foreach (var home in homes)
+            {
+                home.OrderTreesByDistance();
+            }
         }
         
         // Constructor that accepts a list of creatures instead of a dictionary
@@ -71,10 +97,15 @@ namespace Simulation.GameTheory
             int seed,
             List<Creature> initialBlobs,
             StrategyRule<T> strategyRule,
-            bool skipAnimations = false)
+            bool skipAnimations = false,
+            HomeOptions homeOptions = HomeOptions.Random,
+            TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random
+            )
         {
             this.transform = transform;
-            this._strategyRule = strategyRule;
+            _strategyRule = strategyRule;
+            _homeOptions = homeOptions;
+            _treeSelectionOptions = treeSelectionOptions;
 
             rng = new Rng(seed);
 
@@ -87,6 +118,10 @@ namespace Simulation.GameTheory
             foreach (var tree in trees)
             {
                 tree.rng = rng;
+            }
+            foreach (var home in homes)
+            {
+                home.OrderTreesByDistance();
             }
         }
 
@@ -162,12 +197,46 @@ namespace Simulation.GameTheory
         public Tween AgentsGoToTrees()
         {
             // Make creatures each go to a random tree, but a maximum of two per tree
-            var treeSlots = trees.Concat(trees).Shuffle(rng);
-            return creatures
-                .Shuffle(rng)
-                .Take(treeSlots.Count)
-                .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
-                .RunInParallel();
+            var trees1 = trees.ToList();
+            var trees2 = trees.ToList();
+
+            switch (_treeSelectionOptions)
+            {
+                case TreeSelectionOptions.Random:
+                    // Make creatures each go to a random tree, but a maximum of two per tree
+                    var treeSlots = trees.Concat(trees).Shuffle(rng);
+                    return creatures
+                        .Shuffle(rng)
+                        .Take(treeSlots.Count)
+                        .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
+                        .RunInParallel();
+                case TreeSelectionOptions.PreferNearest:
+                    var tweens = new List<Tween>();
+                    foreach (var creature in creatures)
+                    {
+                        var foundTree = false;
+                        foreach (var tree in creature.home.treesByDistance)
+                        {
+                            if (!trees1.Contains(tree)) continue;
+                            tweens.Add(creature.GoToEat(tree, fruitIndex: 0));
+                            trees1.Remove(tree);
+                            foundTree = true;
+                            break;
+                        }
+                        if (foundTree) continue;
+                        foreach (var tree in creature.home.treesByDistance)
+                        {
+                            if (!trees2.Contains(tree)) continue;
+                            tweens.Add(creature.GoToEat(tree, fruitIndex: 1));
+                            trees2.Remove(tree);
+                            break;
+                        }
+                    }
+                    return tweens.RunInParallel();
+                default:
+                    Debug.LogError("Tree selection option not implemented");
+                    return null;
+            }
         }
 
         public Tween AgentsEatFood()
@@ -183,7 +252,7 @@ namespace Simulation.GameTheory
         public Tween AgentsReturnHome()
         {
             return creatures
-                .Zip(NearestHomePosition(), (creature, position) => creature.WalkTo(position))
+                .Zip(ChooseHomes(), (creature, home) => creature.ReturnHome(home))
                 .RunInParallel();
         }
 
@@ -205,6 +274,7 @@ namespace Simulation.GameTheory
                 {
                     var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
                     child.strategy = creature.strategy;
+                    child.home = creature.home;
                     child.landscape = terrain;
                     child.transform.localPosition = creature.transform.localPosition;
                     _strategyRule.OnAgentCreated(child);
@@ -265,10 +335,20 @@ namespace Simulation.GameTheory
                 yield return perimeterPosition + offset + centerInTerrain;
             }
         }
-        private IEnumerable<Vector3> NearestHomePosition()
+        private IEnumerable<Home> ChooseHomes()
         {
-            var homePositions = homes.Select(x => x.transform.position).ToList();
-            return creatures.Select(x => homePositions.OrderBy(y => (x.transform.position - y).sqrMagnitude).First());
+            switch (_homeOptions)
+            {
+                case HomeOptions.Random:
+                    return creatures.Select(x => homes.RandomItem());
+                case HomeOptions.ChooseNearestEveryDay:
+                    return creatures.Select(x => homes.OrderBy(y => (x.transform.position - y.transform.position).sqrMagnitude).First());
+                case HomeOptions.Keep:
+                    return creatures.Select(x => x.home);
+                default:
+                    Debug.LogError("Home option not implemented");
+                    return null;
+            }
         }
 
         private static Vector2 PositionToPerimeter(Vector2 perimeter, float position)

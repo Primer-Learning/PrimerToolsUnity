@@ -16,7 +16,9 @@ public class FruitTree : MonoBehaviour
 
     [HideInInspector] public bool skipAnimations = false;
     
+    
     public bool hasFruit => flowers.Any(x => x.childCount > 0);
+    public Transform[] fruits => flowers.Where(x => x.childCount > 0).Select(x => x.GetChild(0)).ToArray();
     
     [Title("Flowers")]
     public List<Transform> flowers;
