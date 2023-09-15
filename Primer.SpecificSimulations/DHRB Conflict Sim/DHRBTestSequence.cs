@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Primer;
 using Primer.Animation;
 using Primer.Simulation;
 using Primer.Timeline;
@@ -11,11 +13,60 @@ namespace Scenes.Intro_Scene_Sources
     {
         public AgentBasedEvoGameTheorySimController<DHRB> simController;
         public AgentBasedEvoGameTheorySim<DHRB> sim => simController.sim;
+
+        public List<Home> homes;
+
+        private List<Home> _homes => homes.Count > 0
+                    ? homes
+                    : new List<Home>(simController.transform.Find("Terrain").Find("Trees")
+                        .GetComponentsInChildren<Home>());
         
         public override void Cleanup()
         {
             base.Cleanup();
-            simController.InitializeSim();
+            
+            var initialStrategyCountsByHome = new List<Dictionary<DHRB, int>>()
+            {
+                new()
+                {
+                    {DHRB.Dove, 1},
+                    {DHRB.Hawk, 1}
+                },
+                new()
+                {
+                    {DHRB.Dove, 1},
+                    {DHRB.Hawk, 1}
+                },
+                new()
+                {
+                    {DHRB.Dove, 1},
+                    {DHRB.Hawk, 1}
+                },
+                new()
+                {
+                    {DHRB.Dove, 1},
+                    {DHRB.Hawk, 1}
+                }
+            };
+
+            var creatureGnome = new SimpleGnome("Blobs", parent: simController.transform);
+
+            var initialCreatures = new List<Creature>();
+            for (var i = 0; i < initialStrategyCountsByHome.Count; i++)
+            {
+                var initialCreaturesDict = initialStrategyCountsByHome[i];
+                foreach (var (strategy, count) in initialCreaturesDict) {
+                    for (var j = 0; j < count; j++) {
+                        var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
+                        initialCreatures.Add(creature);
+                        creature.strategy = strategy;
+                        creature.home = _homes[i];
+                        simController.strategyRule.OnAgentCreated(creature);
+                    }
+                }
+            }
+            
+            simController.InitializeSim(initialCreatures);
             foreach (var tree in sim.trees)
             {
                 tree.Reset();

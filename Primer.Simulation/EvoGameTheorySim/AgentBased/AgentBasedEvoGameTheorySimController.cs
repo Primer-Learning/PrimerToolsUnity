@@ -31,9 +31,7 @@ namespace Primer.Simulation
             }
         }
 
-        // [Required]
-        // [HideLabel, Title("Conflict Resolution Rule")]
-        protected StrategyRule<T> strategyRule;
+        public StrategyRule<T> strategyRule;
 
         public AgentBasedEvoGameTheorySim<T> sim;
         private int turn;
@@ -69,7 +67,6 @@ namespace Primer.Simulation
         private List<Creature> CreateInitialCreatures()
         {
             var initialCreaturesDict = ConstructInitialStrategiesDictionary();
-            var homeIndex = 0;
             var initialCreatures = new List<Creature>();
             var creatureGnome = new SimpleGnome("Blobs", parent: transform);
             foreach (var (strategy, count) in initialCreaturesDict) {
@@ -78,7 +75,6 @@ namespace Primer.Simulation
                     initialCreatures.Add(creature);
                     creature.strategy = strategy;
                     strategyRule.OnAgentCreated(creature);
-                    homeIndex++;
                     // creature.transform.LookAt(center);
                 }
             }
@@ -98,8 +94,6 @@ namespace Primer.Simulation
             if (Application.isPlaying && Input.GetKeyDown(KeyCode.Space))
                 Time.timeScale = Time.timeScale == 0 ? 1 : 0;
         }
-
-        private void OnValueChange() => InitializeSim();
 
         public void OnEnable() => InitializeSim();
 
