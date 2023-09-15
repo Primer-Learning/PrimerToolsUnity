@@ -65,6 +65,27 @@ namespace Primer.Simulation
             initialAlleleCounts = dict;
             return dict;
         }
+
+        private List<Creature> CreateInitialCreatures()
+        {
+            var initialCreaturesDict = ConstructInitialStrategiesDictionary();
+            var homeIndex = 0;
+            var initialCreatures = new List<Creature>();
+            var creatureGnome = new SimpleGnome("Blobs", parent: transform);
+            foreach (var (strategy, count) in initialCreaturesDict) {
+                for (var i = 0; i < count; i++) {
+                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
+                    initialCreatures.Add(creature);
+                    creature.strategy = strategy;
+                    strategyRule.OnAgentCreated(creature);
+                    homeIndex++;
+                    // creature.transform.LookAt(center);
+                }
+            }
+
+            return initialCreatures;
+        }
+        
         #endregion
 
         #region MonoBehaviour method implementations
@@ -97,30 +118,17 @@ namespace Primer.Simulation
             turn = 0;
             SetStrategyRule();
 
-            if (creatures is null)
-            {
-                sim = new AgentBasedEvoGameTheorySim<T>(
-                    transform: transform,
-                    seed: seed,
-                    initialBlobs: ConstructInitialStrategiesDictionary(),
-                    strategyRule,
-                    skipAnimations: skipAnimations,
-                    homeOptions: homeOptions,
-                    treeSelectionOptions: treeSelectionOptions
-                );
-            }
-            else
-            {
-                sim = new AgentBasedEvoGameTheorySim<T>(
-                    transform: transform,
-                    seed: seed,
-                    initialBlobs: creatures,
-                    strategyRule,
-                    skipAnimations: skipAnimations,
-                    homeOptions: homeOptions,
-                    treeSelectionOptions: treeSelectionOptions
-                );
-            }
+            creatures ??= CreateInitialCreatures();
+            
+            sim = new AgentBasedEvoGameTheorySim<T>(
+                transform: transform,
+                seed: seed,
+                initialBlobs: creatures,
+                strategyRule,
+                skipAnimations: skipAnimations,
+                homeOptions: homeOptions,
+                treeSelectionOptions: treeSelectionOptions
+            );
         }
 
         private void DisposeSim()

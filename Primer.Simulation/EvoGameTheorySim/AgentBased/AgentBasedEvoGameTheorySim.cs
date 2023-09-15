@@ -29,8 +29,6 @@ namespace Simulation.GameTheory
         
         public int turn = 0;
         
-        // private readonly int foodPerTurn;
-        
         private Landscape terrain => transform.GetComponentInChildren<Landscape>();
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         public Home[] homes => transform.GetComponentsInChildren<Home>();
@@ -55,41 +53,6 @@ namespace Simulation.GameTheory
         public Component component => transform;
         public IEnumerable<Creature> creatures => creatureGnome.ChildComponents<Creature>();
         public int currentCreatureCount => creatureGnome.activeChildCount;
-
-        
-        // Constructor that creates blobs from a dictionary of strategies and counts
-        public AgentBasedEvoGameTheorySim(
-            Transform transform,
-            int seed,
-            Dictionary<T, int> initialBlobs,
-            StrategyRule<T> strategyRule,
-            bool skipAnimations = false,
-            HomeOptions homeOptions = HomeOptions.Random,
-            TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random
-            )
-        {
-            this.transform = transform;
-            _strategyRule = strategyRule;
-            _homeOptions = homeOptions;
-            _treeSelectionOptions = treeSelectionOptions;
-
-            rng = new Rng(seed);
-
-            creatureGnome = new SimpleGnome("Blobs", parent: transform);
-
-            this.skipAnimations = skipAnimations;
-
-            PlaceInitialBlobs(initialBlobs);
-
-            foreach (var tree in trees)
-            {
-                tree.rng = rng;
-            }
-            foreach (var home in homes)
-            {
-                home.OrderTreesByDistance();
-            }
-        }
         
         // Constructor that accepts a list of creatures instead of a dictionary
         public AgentBasedEvoGameTheorySim(
@@ -125,38 +88,6 @@ namespace Simulation.GameTheory
             }
         }
 
-        private void PlaceInitialBlobs(Dictionary<T, int> initialBlobs)
-        {
-            creatureGnome.Reset();
-            
-            // Add up the ints in the dictionary to get the total number of initial blobs
-            var blobCount = initialBlobs.Sum(x => x.Value);
-            if (blobCount == 0) return;
-
-            var positions = GetBlobsRestingPosition(blobCount)
-                .Select(x => terrain.GetGroundAtLocal(x))
-                .Shuffle(rng)
-                .ToList();
-
-            var center = positions.Average();
-
-            if (transform is null) Debug.Log("transform is null");
-
-            var homeIndex = 0;
-            foreach (var (strategy, count) in initialBlobs) {
-                for (var i = 0; i < count; i++) {
-                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
-                    creature.strategy = strategy;
-                    creature.landscape = terrain;
-                    creature.rng = rng;
-                    _strategyRule.OnAgentCreated(creature);
-                    creature.transform.position = homes[homeIndex % homes.Length].transform.position;
-                    homeIndex++;
-                    // creature.transform.LookAt(center);
-                }
-            }
-        }
-
         private void ConfigureInitialBlobs(List<Creature> initialBlobs)
         {
             creatureGnome.Reset();
@@ -166,6 +97,7 @@ namespace Simulation.GameTheory
                 creature.transform.SetParent(creatureGnome);
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
+                creature.transform.position = (creature.home ??= homes.RandomItem()).transform.position;
                 creature.rng = rng;
                 _strategyRule.OnAgentCreated(creature);
             }
