@@ -344,7 +344,7 @@ namespace Simulation.GameTheory
                 case HomeOptions.ChooseNearestEveryDay:
                     return creatures.Select(x => homes.OrderBy(y => (x.transform.position - y.transform.position).sqrMagnitude).First());
                 case HomeOptions.Keep:
-                    return creatures.Select(x => x.home);
+                    return creatures.Select(x => x.home ?? homes.RandomItem());
                 default:
                     Debug.LogError("Home option not implemented");
                     return null;
