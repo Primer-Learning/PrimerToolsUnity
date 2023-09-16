@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
@@ -73,9 +74,8 @@ namespace Primer.Simulation
                 for (var i = 0; i < count; i++) {
                     var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
                     initialCreatures.Add(creature);
-                    creature.strategy = strategy;
+                    creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
                     strategyRule.OnAgentCreated(creature);
-                    // creature.transform.LookAt(center);
                 }
             }
 

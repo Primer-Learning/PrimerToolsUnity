@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using PlasticGui.WorkspaceWindow.IssueTrackers;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Simulation.GameTheory
@@ -22,10 +24,17 @@ namespace Simulation.GameTheory
         PreferNearest,
     }
     
+    public enum ReproductionType
+    {
+        Sexual,
+        Asexual
+    }
+    
     public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
     {
         private HomeOptions _homeOptions;
         private TreeSelectionOptions _treeSelectionOptions;
+        private ReproductionType _reproductionType;
         
         public int turn = 0;
         
@@ -62,13 +71,15 @@ namespace Simulation.GameTheory
             StrategyRule<T> strategyRule,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
-            TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random
+            TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random,
+            ReproductionType reproductionType = ReproductionType.Asexual
             )
         {
             this.transform = transform;
             _strategyRule = strategyRule;
             _homeOptions = homeOptions;
             _treeSelectionOptions = treeSelectionOptions;
+            _reproductionType = reproductionType;
 
             rng = new Rng(seed);
 
@@ -191,32 +202,68 @@ namespace Simulation.GameTheory
         public Tween AgentsReproduceOrDie()
         {
             var newAgents = new List<Creature>();
-            
-            foreach (var creature in creatures) {
-                creature.PurgeStomach();
 
-                if (!creature.canSurvive)
-                {
-                    creature.ShrinkAndDispose();
+            if (_reproductionType == ReproductionType.Asexual)
+            {
+                foreach (var creature in creatures) {
+                    creature.PurgeStomach();
+
+                    if (!creature.canSurvive)
+                    {
+                        creature.ShrinkAndDispose();
+                        creature.ConsumeEnergy();
+                        continue;
+                    }
+
+                    if (creature.canReproduce)
+                    {
+                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategyGenes} {newAgents.Count(x => x.strategyGenes.Equals(creature.strategyGenes)) + 1} born turn {turn}");
+                        child.strategyGenes = creature.strategyGenes;
+                        child.home = creature.home;
+                        child.landscape = terrain;
+                        child.transform.localPosition = creature.transform.localPosition;
+                        _strategyRule.OnAgentCreated(child);
+                        child.rng = rng;
+                        child.transform.localScale = Vector3.zero;
+                        newAgents.Add(child);
+                    }
+                    
                     creature.ConsumeEnergy();
-                    continue;
                 }
-
-                if (creature.canReproduce)
-                {
-                    var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
-                    child.strategy = creature.strategy;
-                    child.home = creature.home;
-                    child.landscape = terrain;
-                    child.transform.localPosition = creature.transform.localPosition;
-                    _strategyRule.OnAgentCreated(child);
-                    child.rng = rng;
-                    child.transform.localScale = Vector3.zero;
-                    newAgents.Add(child);
-                }
-                
-                creature.ConsumeEnergy();
             }
+
+            if (_reproductionType == ReproductionType.Sexual)
+            {
+                // Get creatures that can reproduce, then group them by home.
+                // Then for each group of creatures, choose two creatures at random and make them reproduce.
+                var creaturesByHome = creatures
+                    .Where(x => x.canReproduce)
+                    .GroupBy(x => x.home);
+
+                foreach (var home in creaturesByHome)
+                {
+                    var creaturesInHome = home.Shuffle().ToList();
+                    while (creaturesInHome.Count > 1)
+                    {
+                        var (first, second) = creaturesInHome.Take(2).ToList();
+                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{first.strategyGenes} {newAgents.Count(x => x.strategyGenes.Equals(first.strategyGenes)) + 1} born turn {turn}");
+                        
+                        // TODO: This is haploid with 10 chromosomes. Make it diploid with 5 chromosome pairs.
+                        child.strategyGenes = first.strategyGenes.Zip(second.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                        
+                        child.home = first.home;
+                        child.landscape = terrain;
+                        child.transform.localPosition = first.transform.localPosition;
+                        _strategyRule.OnAgentCreated(child);
+                        child.rng = rng;
+                        child.transform.localScale = Vector3.zero;
+                        newAgents.Add(child);
+                        creaturesInHome.Remove(first);
+                        creaturesInHome.Remove(second);
+                    }
+                }
+            }
+            
             
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             // return Tween.noop;

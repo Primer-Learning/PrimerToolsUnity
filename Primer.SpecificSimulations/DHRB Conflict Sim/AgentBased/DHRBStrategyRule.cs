@@ -18,27 +18,35 @@ namespace Simulation.GameTheory
         // to /Concepts/ folder maybe
         // as long as it's only used inside this class, let's keep it here
 
-        public override void OnAgentCreated(Creature agent)
+        public override void OnAgentCreated(Creature creature)
         {
-            switch (agent.strategy) {
-                case DHRB.Dove:
-                    agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.blue);
-                    break;
-                case DHRB.Hawk:
-                    agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.red);
-                    break;
-                case DHRB.Retaliator:
-                    agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.green);
-                    break;
-                case DHRB.Bully:
-                    agent.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.yellow);
-                    break;
-            }
+            creature.gameObject.GetComponent<PrimerBlob>()
+                .SetColor(
+                    PrimerColor.JuicyInterpolate(
+                        PrimerColor.blue,
+                        PrimerColor.red,
+                        creature.strategyGenes.Count(x => x.Equals(DHRB.Hawk)) / (float)creature.strategyGenes.Length)
+                );
+
+            // switch (creature.strategy) {
+            //     case DHRB.Dove:
+            //         creature.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.blue);
+            //         break;
+            //     case DHRB.Hawk:
+            //         creature.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.red);
+            //         break;
+            //     case DHRB.Retaliator:
+            //         creature.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.green);
+            //         break;
+            //     case DHRB.Bully:
+            //         creature.gameObject.GetComponent<PrimerBlob>().SetColor(PrimerColor.yellow);
+            //         break;
+            // }
         }
 
-        public override Tween Resolve(IEnumerable<Creature> agents, FruitTree tree)
+        public override Tween Resolve(IEnumerable<Creature> creature, FruitTree tree)
         {
-            var (first, second) = agents.Shuffle().ToList();
+            var (first, second) = creature.Shuffle().ToList();
 
             first.energy += rewardMatrix.Get((DHRB) first.strategy, (DHRB) second.strategy);
             second.energy += rewardMatrix.Get((DHRB) second.strategy, (DHRB) first.strategy);

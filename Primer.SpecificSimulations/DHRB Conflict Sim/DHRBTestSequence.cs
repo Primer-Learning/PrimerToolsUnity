@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer;
@@ -29,24 +30,22 @@ namespace Scenes.Intro_Scene_Sources
             {
                 new()
                 {
-                    {DHRB.Dove, 1},
-                    {DHRB.Hawk, 1}
+                    {DHRB.Dove, 3},
+                    {DHRB.Hawk, 0}
                 },
                 new()
                 {
-                    {DHRB.Dove, 1},
-                    {DHRB.Hawk, 1}
-                },
-                new()
-                {
-                    {DHRB.Dove, 1},
-                    {DHRB.Hawk, 1}
-                },
-                new()
-                {
-                    {DHRB.Dove, 1},
-                    {DHRB.Hawk, 1}
+                    {DHRB.Dove, 0},
+                    {DHRB.Hawk, 3}
                 }
+                // new()
+                // {
+                //     {DHRB.Retaliator, 3}
+                // },
+                // new()
+                // {
+                //     {DHRB.Bully, 3}
+                // }
             };
 
             var creatureGnome = new SimpleGnome("Blobs", parent: simController.transform);
@@ -59,7 +58,7 @@ namespace Scenes.Intro_Scene_Sources
                     for (var j = 0; j < count; j++) {
                         var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
                         initialCreatures.Add(creature);
-                        creature.strategy = strategy;
+                        creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
                         creature.home = _homes[i];
                         simController.strategyRule.OnAgentCreated(creature);
                     }
@@ -75,7 +74,7 @@ namespace Scenes.Intro_Scene_Sources
 
         public override async IAsyncEnumerator<Tween> Define()
         {
-            var numDays = 5;
+            var numDays = 20;
             for (var i = 0; i < numDays; i++)
             {
                 yield return sim.CreateFood();
