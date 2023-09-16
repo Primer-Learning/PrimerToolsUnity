@@ -16,6 +16,7 @@ namespace Primer.Simulation
         public bool runWhenEnteringPlayMode;
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
+        public ReproductionType reproductionType;
         
         [SerializeField, HideInInspector]
         private bool _skipAnimations = false;
@@ -121,7 +122,8 @@ namespace Primer.Simulation
                 strategyRule,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
-                treeSelectionOptions: treeSelectionOptions
+                treeSelectionOptions: treeSelectionOptions,
+                reproductionType: reproductionType
             );
         }
 

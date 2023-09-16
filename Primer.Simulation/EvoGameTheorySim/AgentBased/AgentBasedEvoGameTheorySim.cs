@@ -203,21 +203,25 @@ namespace Simulation.GameTheory
         {
             var newAgents = new List<Creature>();
 
+            foreach (var creature in creatures)
+            {
+                creature.PurgeStomach();
+                if (!creature.canSurvive)
+                {
+                    creature.ShrinkAndDispose();
+                    creature.ConsumeEnergy();
+                    continue;
+                }
+            }
+
             if (_reproductionType == ReproductionType.Asexual)
             {
                 foreach (var creature in creatures) {
                     creature.PurgeStomach();
 
-                    if (!creature.canSurvive)
-                    {
-                        creature.ShrinkAndDispose();
-                        creature.ConsumeEnergy();
-                        continue;
-                    }
-
                     if (creature.canReproduce)
                     {
-                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategyGenes} {newAgents.Count(x => x.strategyGenes.Equals(creature.strategyGenes)) + 1} born turn {turn}");
+                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
                         child.strategyGenes = creature.strategyGenes;
                         child.home = creature.home;
                         child.landscape = terrain;
@@ -246,10 +250,16 @@ namespace Simulation.GameTheory
                     while (creaturesInHome.Count > 1)
                     {
                         var (first, second) = creaturesInHome.Take(2).ToList();
-                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{first.strategyGenes} {newAgents.Count(x => x.strategyGenes.Equals(first.strategyGenes)) + 1} born turn {turn}");
+                        first.PurgeStomach();
+                        second.PurgeStomach();
+                        
+                        var strategyGenes = first.strategyGenes.Zip(second.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                        var strategyName = StrategyGenesString(strategyGenes);
+                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{strategyName} {newAgents.Count(x => x.strategyName.Equals(strategyName)) + 1} born turn {turn}");
                         
                         // TODO: This is haploid with 10 chromosomes. Make it diploid with 5 chromosome pairs.
-                        child.strategyGenes = first.strategyGenes.Zip(second.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                        child.strategyGenes = strategyGenes;
+                        child.strategyName = strategyName;
                         
                         child.home = first.home;
                         child.landscape = terrain;
@@ -263,7 +273,6 @@ namespace Simulation.GameTheory
                     }
                 }
             }
-            
             
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
             // return Tween.noop;
@@ -358,6 +367,18 @@ namespace Simulation.GameTheory
         public void Dispose()
         {
             creatureGnome?.Reset(hard: true);
+        }
+        
+        private string StrategyGenesString(Enum[] strategyGenes)
+        {
+            // Iterate through the enum of type T and count the number of times each strategy appears in the creature's strategy genes
+            var strategyCounts = new Dictionary<T, int>();
+            foreach (var strategy in Enum.GetValues(typeof(T)).Cast<T>())
+            {
+                strategyCounts.Add(strategy, strategyGenes.Count(x => x.Equals(strategy)));
+            }
+            // Return a string of the strategy counts
+            return string.Join(", ", strategyCounts.Select(x => $"{x.Key}: {x.Value}"));
         }
     }
 }

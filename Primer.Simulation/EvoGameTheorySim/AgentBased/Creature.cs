@@ -27,6 +27,7 @@ namespace Simulation.GameTheory
         public FruitTree goingToEat;
         public System.Enum[] strategyGenes;
         public System.Enum strategy => strategyGenes.RandomItem();
+        public string strategyName;
         public Home home;
 
         public SimpleGnome stomach => new ("Stomach", parent: transform);
