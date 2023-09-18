@@ -58,6 +58,13 @@ namespace Primer.Graph
 
         public void AddData(params float[] newColumn)
         {
+            rawPointSets ??= new List<Vector3[]>();
+            if (rawPointSets.Count == 0)
+            {
+                for (var i = 0; i < newColumn.Length; i++) {
+                    rawPointSets.Add(Array.Empty<Vector3>());
+                }
+            }
             if (newColumn.Length != rawPointSets.Count)
             {
                 Debug.Log("New data has different length than existing data.");
