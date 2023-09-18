@@ -21,8 +21,11 @@ namespace Primer.Animation
 
         private static MethodInfo GetNewLerpMethod<T>()
         {
-            if (typeof(T) == typeof(float) || typeof(T) == typeof(int) || typeof(T) == typeof(double))
+            if (typeof(T) == typeof(float) || typeof(T) == typeof(double))
                 return typeof(Mathf).GetMethod("Lerp");
+
+            if (typeof(T) == typeof(int))
+                return typeof(LerpMethods).GetMethod("IntLerp");
 
             // Special case for Quaternion so we use Slerp instead of Lerp
             if (typeof(T) == typeof(Quaternion))
@@ -40,6 +43,11 @@ namespace Primer.Animation
             }
 
             return lerp;
+        }
+        
+        public static int IntLerp(int a, int b, float t)
+        {
+            return (int)Math.Round(a + (b - a) * t);
         }
     }
 }
