@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Primer.Graph
 {
     [ExecuteAlways]
-    public class StackedArea : MonoBehaviour, IDisposable
+    public class StackedArea : MonoBehaviour, IDisposable, IPrimerGraphData
     {
         public List<ILine> renderedData = new();
         public List<Vector3[]> rawPointSets;
@@ -47,9 +47,9 @@ namespace Primer.Graph
         //     domain.onDomainChange = Render;
         // }
 
-        public void SetData(params IEnumerable<float>[] data)
+        public void SetData(params float[][] data)
         {
-            rawPointSets = new List<Vector3[]>(data.Length);
+            rawPointSets = new List<Vector3[]>();
 
             for (var i = 0; i < data.Length; i++) {
                 rawPointSets.Add(data[i].Select((y, j) => new Vector3(j, y)).ToArray());

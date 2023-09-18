@@ -234,7 +234,7 @@ namespace Primer.Graph
 
         #region Tics
 
-        public int ticStep = 2;
+        public float ticStep = 2;
         public bool showZero;
         public int labelNumberOffset;
         public AxisTic ticPrefab;
