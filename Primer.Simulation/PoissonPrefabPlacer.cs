@@ -75,7 +75,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var gnome = new Gnome(transform);
+            var gnome = new SimpleGnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             offset = Vector2.one * distanceFromBorder;
 
@@ -98,7 +98,7 @@ namespace Primer.Simulation
                 // Start here
                 var prefab = prefabAssignments[index++] ? prefab1 : prefab2;
                 
-                var instance = gnome.Add(prefab);
+                var instance = gnome.Add<Transform>(prefab.gameObject, prefab.name + points.IndexOf(point));
                 var pos = point + offset;
 
                 if (hasLandscape) {
@@ -117,9 +117,8 @@ namespace Primer.Simulation
                     instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
             }
 
-            gnome.Purge();
-            if (gnome.children.Count() < numberToPlace1 + numberToPlace2)
-                Debug.LogWarning("Only " + gnome.children.Count() + " items were placed out of an attempted " + numberToPlace1 + numberToPlace2 + ".");
+            if (gnome.activeChildCount < numberToPlace1 + numberToPlace2)
+                Debug.LogWarning("Only " + gnome.activeChildCount + " items were placed out of an attempted " + (numberToPlace1 + numberToPlace2) + ".");
         }
 
         [Button(ButtonSizes.Large)]
@@ -139,7 +138,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var gnome = new Gnome(transform);
+            var gnome = new SimpleGnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             
             offset = Vector2.one * distanceFromBorder;
@@ -166,7 +165,7 @@ namespace Primer.Simulation
                 // Start here
                 var prefab = prefabAssignments[index++] ? prefab1 : prefab2;
                 
-                var instance = gnome.Add(prefab);
+                var instance = gnome.Add<Transform>(prefab.gameObject, prefab.name + points.IndexOf(point));
                 var pos = point + offset;
 
                 if (hasLandscape) {
@@ -186,9 +185,8 @@ namespace Primer.Simulation
                     instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
             }
 
-            gnome.Purge();
-            if (gnome.children.Count() < numberToPlace1 + numberToPlace2)
-                Debug.LogWarning("Only " + gnome.children.Count() + " items were placed out of an attempted " + (numberToPlace1 + numberToPlace2) + ".");
+            if (gnome.activeChildCount < numberToPlace1 + numberToPlace2)
+                Debug.LogWarning("Only " + gnome.activeChildCount + " items were placed out of an attempted " + (numberToPlace1 + numberToPlace2) + ".");
         }
 
 #if UNITY_EDITOR

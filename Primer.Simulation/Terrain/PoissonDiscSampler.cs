@@ -39,20 +39,6 @@ namespace Primer.Simulation
             sampler.AddPoints(additionalPointsCount, numSamplesBeforeRejection);
             return sampler.points;
         }
-        
-        // public static PoissonDiscSampler RectangularSampler(
-        //     int pointsCount,
-        //     Vector2 area,
-        //     float minDistance = 2,
-        //     OverflowMode overflowMode = OverflowMode.None,
-        //     Rng rng = null,
-        //     int numSamplesBeforeRejection = 30
-        // )
-        // {
-        //     var sampler = new PoissonDiscSampler(minDistance, area, overflowMode) { rng = rng };
-        //     sampler.AddPoints(pointsCount, numSamplesBeforeRejection);
-        //     return sampler;
-        // }
 
         public enum OverflowMode
         {
@@ -67,25 +53,6 @@ namespace Primer.Simulation
         private readonly OverflowMode overflowMode;
         private float minDistance;
         private Vector2 _sampleRegionSize;
-        // public Vector2 sampleRegionSize
-        // {
-        //     get => _sampleRegionSize;
-        //     set
-        //     {
-        //         grid = new int[
-        //             Mathf.CeilToInt(value.x / cellSize),
-        //             Mathf.CeilToInt(value.y / cellSize)
-        //         ];
-        //         for (var i = 0; i < points.Count; i++)
-        //         {
-        //             points[i] -= _sampleRegionSize / 2;
-        //             points[i] += value / 2;
-        //             SetInGrid(points[i], i);
-        //         }
-        //         spawnPoints = new List<Vector2>(points);
-        //         _sampleRegionSize = value;
-        //     }
-        // }
         private float cellSize;
         private int[,] grid;
         public List<Vector2> points = new();
@@ -247,7 +214,6 @@ namespace Primer.Simulation
 
                     if (pointIndex == -1)
                         continue;
-                    Debug.Log("Checking");
 
                     var sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
 
