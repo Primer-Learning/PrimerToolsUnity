@@ -10,7 +10,7 @@ namespace Primer.Simulation
     /// </summary>
     public class PoissonDiscSampler
     {
-        public static IEnumerable<Vector2> Rectangular(
+        public static IEnumerable<Vector2> RectangularPointSet(
             int pointsCount,
             Vector2 area,
             float minDistance = 2,
@@ -23,6 +23,36 @@ namespace Primer.Simulation
             sampler.AddPoints(pointsCount, numSamplesBeforeRejection);
             return sampler.points;
         }
+        
+        public static IEnumerable<Vector2> RectangularPointSet(
+            IEnumerable<Vector2> startingPoints,
+            int additionalPointsCount,
+            Vector2 area,
+            float minDistance = 2,
+            OverflowMode overflowMode = OverflowMode.None,
+            Rng rng = null,
+            int numSamplesBeforeRejection = 30
+        )
+        {
+            var sampler = new PoissonDiscSampler(minDistance, area, overflowMode) { rng = rng };
+            sampler.AddSpecificPoints(startingPoints);
+            sampler.AddPoints(additionalPointsCount, numSamplesBeforeRejection);
+            return sampler.points;
+        }
+        
+        // public static PoissonDiscSampler RectangularSampler(
+        //     int pointsCount,
+        //     Vector2 area,
+        //     float minDistance = 2,
+        //     OverflowMode overflowMode = OverflowMode.None,
+        //     Rng rng = null,
+        //     int numSamplesBeforeRejection = 30
+        // )
+        // {
+        //     var sampler = new PoissonDiscSampler(minDistance, area, overflowMode) { rng = rng };
+        //     sampler.AddPoints(pointsCount, numSamplesBeforeRejection);
+        //     return sampler;
+        // }
 
         public enum OverflowMode
         {
@@ -36,10 +66,29 @@ namespace Primer.Simulation
 
         private readonly OverflowMode overflowMode;
         private float minDistance;
-        private Vector2 sampleRegionSize;
+        private Vector2 _sampleRegionSize;
+        // public Vector2 sampleRegionSize
+        // {
+        //     get => _sampleRegionSize;
+        //     set
+        //     {
+        //         grid = new int[
+        //             Mathf.CeilToInt(value.x / cellSize),
+        //             Mathf.CeilToInt(value.y / cellSize)
+        //         ];
+        //         for (var i = 0; i < points.Count; i++)
+        //         {
+        //             points[i] -= _sampleRegionSize / 2;
+        //             points[i] += value / 2;
+        //             SetInGrid(points[i], i);
+        //         }
+        //         spawnPoints = new List<Vector2>(points);
+        //         _sampleRegionSize = value;
+        //     }
+        // }
         private float cellSize;
         private int[,] grid;
-        private readonly List<Vector2> points = new();
+        public List<Vector2> points = new();
         private List<Vector2> spawnPoints = new();
 
         private Rng rng { get; init; }
@@ -56,7 +105,7 @@ namespace Primer.Simulation
         private void Initialize(float newMinDistance, Vector2 newSampleRegionSize)
         {
             minDistance = newMinDistance;
-            sampleRegionSize = newSampleRegionSize;
+            _sampleRegionSize = newSampleRegionSize;
             cellSize = newMinDistance / Mathf.Sqrt(2);
 
             grid = new int[
@@ -75,9 +124,8 @@ namespace Primer.Simulation
         public void AddPoint(int numSamplesBeforeRejection = 30)
         {
             var pointFound = false;
-
             if (spawnPoints.Count == 0) {
-                spawnPoints.Add(sampleRegionSize / 2);
+                spawnPoints.Add(_sampleRegionSize / 2);
             }
 
             while (spawnPoints.Count > 0 && !pointFound) {
@@ -126,7 +174,7 @@ namespace Primer.Simulation
             if (points.Count < numPoints && overflowMode != OverflowMode.None)
             {
                 var numBeforeSqueezing = points.Count;
-                Initialize(minDistance / 2, sampleRegionSize);
+                Initialize(minDistance / 2, _sampleRegionSize);
 
                 for (var i = points.Count; i < numPoints; i++) {
                     AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
@@ -138,7 +186,7 @@ namespace Primer.Simulation
             {
                 var numForced = numPoints - points.Count;
                 while (points.Count < numPoints) {
-                    Initialize(minDistance / 2, sampleRegionSize);
+                    Initialize(minDistance / 2, _sampleRegionSize);
                 
                     for (var i = points.Count; i < numPoints; i++) {
                         AddPoint(numSamplesBeforeRejection: numSamplesBeforeRejection);
@@ -148,13 +196,22 @@ namespace Primer.Simulation
                    Debug.Log($"Forced {numForced} points into the grid.");
             }
 
-            Initialize(storedMinDistance, sampleRegionSize);
+            Initialize(storedMinDistance, _sampleRegionSize);
+        }
+        private void AddSpecificPoints(IEnumerable<Vector2> pointSet, int numSamplesBeforeRejection = 30)
+        {
+            foreach (var point in pointSet)
+            {
+                points.Add(point);
+                spawnPoints.Add(point);
+                SetInGrid(point, points.Count);
+            }
         }
 
         public void AddPointsUntilFull(int numSamplesBeforeRejection = 30)
         {
             if (spawnPoints.Count == 0) {
-                spawnPoints.Add(sampleRegionSize / 2);
+                spawnPoints.Add(_sampleRegionSize / 2);
             }
 
             while (spawnPoints.Count > 0) {
@@ -170,9 +227,9 @@ namespace Primer.Simulation
         private bool IsValidRect(Vector2 candidate)
         {
             var isOutOfBounds = candidate.x < 0
-                || candidate.x >= sampleRegionSize.x
+                || candidate.x >= _sampleRegionSize.x
                 || candidate.y < 0
-                || candidate.y >= sampleRegionSize.y;
+                || candidate.y >= _sampleRegionSize.y;
 
             if (isOutOfBounds)
                 return false;
@@ -190,6 +247,7 @@ namespace Primer.Simulation
 
                     if (pointIndex == -1)
                         continue;
+                    Debug.Log("Checking");
 
                     var sqrDst = (candidate - points[pointIndex]).sqrMagnitude;
 
