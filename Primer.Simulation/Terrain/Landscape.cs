@@ -1,4 +1,3 @@
-using System.Drawing;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -301,6 +300,11 @@ namespace Primer.Simulation
                     normalViewer.DrawNormals();
                 }
             }
+
+            // This is a hack to ensure the collider updates properly so that the landscape items can find the ground
+            meshCollider.enabled = false;
+            meshCollider.enabled = true;
+            // transform.parent.GetComponentsInChildren<LandscapeItem>().ForEach(item => item.DelayedTouchGround());
         }
         #endregion
 
