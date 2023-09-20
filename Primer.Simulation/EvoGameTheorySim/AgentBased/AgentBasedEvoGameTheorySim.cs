@@ -7,6 +7,7 @@ using Primer;
 using Primer.Animation;
 using Primer.Simulation;
 using Sirenix.Utilities;
+using UnityEditor;
 using UnityEngine;
 
 namespace Simulation.GameTheory
@@ -84,7 +85,8 @@ namespace Simulation.GameTheory
             rng = new Rng(seed);
 
             creatureGnome = new SimpleGnome("Blobs", parent: transform);
-
+            creatureGnome.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<Creature>())).ForEach(x => x.gameObject.Dispose());
+            
             this.skipAnimations = skipAnimations;
 
             ConfigureInitialBlobs(initialBlobs);
@@ -210,7 +212,6 @@ namespace Simulation.GameTheory
                 {
                     creature.ShrinkAndDispose();
                     creature.ConsumeEnergy();
-                    continue;
                 }
             }
 
@@ -221,7 +222,11 @@ namespace Simulation.GameTheory
 
                     if (creature.canReproduce)
                     {
-                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
+                        // var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
+                        var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
+                        childGO.transform.parent = creatureGnome.transform;
+                        var child = childGO.AddComponent<Creature>();
+                        Debug.Log(child);
                         child.strategyGenes = creature.strategyGenes;
                         child.home = creature.home;
                         child.landscape = terrain;
@@ -255,8 +260,9 @@ namespace Simulation.GameTheory
                         
                         var strategyGenes = first.strategyGenes.Zip(second.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
                         var strategyName = StrategyGenesString(strategyGenes);
-                        var child = creatureGnome.Add<Creature>("blob_skinned", $"{strategyName} {newAgents.Count(x => x.strategyName.Equals(strategyName)) + 1} born turn {turn}");
+                        // var child = creatureGnome.Add<Creature>("blob_skinned", $"{strategyName} {newAgents.Count(x => x.strategyName.Equals(strategyName)) + 1} born turn {turn}");
                         
+                        var child = PrefabUtility.InstantiatePrefab(first) as Creature;
                         // TODO: This is haploid with 10 chromosomes. Make it diploid with 5 chromosome pairs.
                         child.strategyGenes = strategyGenes;
                         child.strategyName = strategyName;
