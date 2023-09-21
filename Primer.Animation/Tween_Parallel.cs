@@ -6,36 +6,43 @@ namespace Primer.Animation
 {
     public partial record Tween
     {
-        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenList)
+        public static Tween Parallel(float delayBetweenStarts, params Tween[] tweenArray)
         {
-            var tweens = tweenList
+            var tweens = tweenArray
                 .RemoveEmptyTweens()
                 .Select((tween, i) => tween with { delay = delayBetweenStarts * i })
                 .ToArray();
 
             return Parallel_Internal(tweens);
         }
-
-        public static Tween Parallel(IEnumerable<Tween> tweenList)
+        public static Tween Parallel(float totalDuration, float durationPerIndividualTween, params Tween[] tweenArray)
         {
-            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
+            if (tweenArray.Length is 0)
+                return tweenArray[0] with { duration = totalDuration };
+            var delayBetweenStarts = (totalDuration - durationPerIndividualTween) / (tweenArray.Length - 1);
+            return Parallel(delayBetweenStarts, tweenArray.Select(x => x with { duration = durationPerIndividualTween }).ToArray());
         }
 
-        public static Tween Parallel(params Tween[] tweenList)
+        public static Tween Parallel(IEnumerable<Tween> tweenArray)
         {
-            return Parallel_Internal(tweenList.RemoveEmptyTweens().ToArray());
+            return Parallel_Internal(tweenArray.RemoveEmptyTweens().ToArray());
+        }
+
+        public static Tween Parallel(params Tween[] tweenArray)
+        {
+            return Parallel_Internal(tweenArray.RemoveEmptyTweens().ToArray());
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
-        private static Tween Parallel_Internal(Tween[] tweenList)
+        private static Tween Parallel_Internal(Tween[] tweenArray)
         {
-            if (tweenList.Length is 0)
+            if (tweenArray.Length is 0)
                 return noop;
 
-            if (tweenList.Length is 1)
-                return tweenList[0];
+            if (tweenArray.Length is 1)
+                return tweenArray[0];
 
-            var fullDuration = tweenList.Max(x => x.totalDuration);
+            var fullDuration = tweenArray.Max(x => x.totalDuration);
 
             if (fullDuration is 0) {
                 Debug.LogWarning("Parallel tween list is empty");
@@ -44,8 +51,8 @@ namespace Primer.Animation
 
             var result = new Tween(
                 t => {
-                    for (var i = 0; i < tweenList.Length; i++) {
-                        var tween = tweenList[i];
+                    for (var i = 0; i < tweenArray.Length; i++) {
+                        var tween = tweenArray[i];
                         tween.Evaluate(Mathf.Clamp01(t / tween.totalDuration * fullDuration));
                     }
                 }
@@ -55,7 +62,7 @@ namespace Primer.Animation
                 isCalculated = true,
             };
 
-            var observed = tweenList
+            var observed = tweenArray
                 .Select(x => x as ObservableTween)
                 .Where(x => x?.onDispose != null)
                 .ToList();

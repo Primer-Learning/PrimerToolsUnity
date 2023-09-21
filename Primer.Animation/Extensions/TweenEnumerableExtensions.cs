@@ -20,7 +20,12 @@ namespace Primer.Animation
         {
             return Tween.Parallel(delayBetweenStarts, tweens.ToArray());
         }
+        public static Tween RunInParallel(this IEnumerable<Tween> tween, float totalDuration, float durationPerIndividualTween)
+        {
+            return Tween.Parallel(totalDuration, durationPerIndividualTween, tween.ToArray());
+        }
 
+        // This is meant to allow easing to be defined for the whole ensemble rather than each individual tween.
         public static Tween RunInBatch(this IEnumerable<Tween> tweens)
         {
             var defaultEasing = IEasing.defaultMethod;
