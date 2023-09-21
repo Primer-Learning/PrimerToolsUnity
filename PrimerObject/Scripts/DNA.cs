@@ -1,52 +1,69 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Primer;
+using Primer.Animation;
+using Sirenix.Utilities;
 using UnityEngine;
-using TMPro;
 
-public class DNA : PrimerObject
+public class DNA : MonoBehaviour
 {
-    [SerializeField] GameObject strandOnePrefab = null;
-    [SerializeField] GameObject strandTwoPrefab = null;
-    public PrimerObject strand1;
-    public PrimerObject strand2;
+    [SerializeField] GameObject[] strandPrefabs = new GameObject[2];
+    public Transform[] strands = new Transform[2];
     public Color? color = null;
-    protected override void Awake() {
-        base.Awake();
-    }
+    private SimpleGnome gnome => new (transform);
     
-    public void GenerateStrands(float duration = 1) {
-        if (strand1 == null) {
-            strand1 = Instantiate(strandOnePrefab).MakePrimerObject();
-            if (color != null) {
-                strand1.SetColor((Color)color);
+    public Tween GenerateStrands(float duration = 1, float durationPerPiece = 0.1f) {
+        var tweens = new List<Tween>();
+        for (var i = 0; i < strands.Length; i++)
+        {
+            if (strands[i] == null) {
+                strands[i] = gnome.Add<Transform>(strandPrefabs[i], $"strand {i}");
+                var strandChildren = strands[i].GetComponentsInChildren<Transform>();
+                var strandChildrenScales = strandChildren.Select(x => x.localScale).ToArray();
+                if (color != null) {
+                    strandChildren.ForEach(x => x.GetComponent<Renderer>().SetColor((Color)color));
+                }
+                strands[i].parent = transform;
+                strands[i].localPosition = Vector3.zero;
+                strands[i].localRotation = Quaternion.identity;
+                
+                strandChildren.ForEach(x => x.localScale = Vector3.zero);
+                tweens.Add(strandChildren.Select((x, j) => x.ScaleTo(strandChildrenScales[j])).RunInParallel(duration, durationPerPiece));
+                
+                // tweens.Add(strandChildren.Select(x => x.ScaleUpFromZero()).RunInParallel(duration, durationPerPiece));
             }
-            strand1.transform.parent = transform;
-            strand1.transform.localPosition = Vector3.zero;
-            strand1.transform.localRotation = Quaternion.identity;
-            strand1.ScaleUpFromZeroStaggered(duration: duration);
         }
-        if (strand2 == null) {
-            strand2 = Instantiate(strandTwoPrefab).MakePrimerObject();
-            if (color != null) {
-                strand2.SetColor((Color)color);
-            }
-            strand2.transform.parent = transform;
-            strand2.transform.localPosition = Vector3.zero;
-            strand2.transform.localRotation = Quaternion.identity;
-            strand2.ScaleUpFromZeroStaggered(duration: duration);
-        }
+        return tweens.RunInParallel();
     }
 
-    public PrimerObject ReleaseStrand() {
-        PrimerObject strand = strand1;
-        strand1 = null;
+    public void ClearStrands()
+    {
+        foreach (var strand in strands)
+        {
+            if (strand != null) {
+                strand.Dispose();
+            }
+        }
+    }
+    public Transform ReleaseStrand(int index) {
+        Transform strand = strands[index];
+        strands[index] = null;
         return strand;
     }
-    public void AcceptStrand(PrimerObject strand, float duration = 1) {
-        strand1 = strand;
-        strand1.transform.parent = transform;
-        strand1.MoveTo(Vector3.zero, duration: duration);
-        strand1.RotateTo(Quaternion.identity, duration: duration);
-        strand1.ScaleTo(Vector3.one, duration: duration);
+    public Tween AcceptStrand(Transform strand, int index) {
+        if (strands[index] != null) {
+            Debug.LogError($"Strand {index} already exists");
+        }
+        
+        strands[index] = strand;
+        strands[index].parent = transform;
+        var tweens = new Tween[]
+        {
+            strands[index].MoveTo(Vector3.zero),
+            strands[index].RotateTo(Quaternion.identity),
+            strands[index].ScaleTo(Vector3.one)
+        };
+        return tweens.RunInParallel();
     }
 }
