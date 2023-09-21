@@ -609,9 +609,6 @@ public class PrimerObject : MonoBehaviour
         yield return new WaitForSeconds(duration - attack - decay);
         ChangeColor(oldColor, duration: decay, ease: ease);
     }
-    public virtual void SetColor(Color newColor, Renderer r) {
-        r.SetColor(newColor);
-    }
     public virtual void SetColor(Color newColor, bool onlyFirstMaterial = false) {
         Renderer[] mrs = GetComponentsInChildren<Renderer>();
         if (onlyFirstMaterial) {
@@ -637,92 +634,6 @@ public class PrimerObject : MonoBehaviour
     }
     public virtual void AnimateEmissionColor(Color newColor, float duration = 0.5f, EaseMode ease = EaseMode.None) {
         AnimateValue<Color>("EmissionColor", newColor, duration: duration, ease: ease);
-    }
-    public virtual void FadeOut(float newAlpha = 0, float duration = 0.5f, float delay = 0, EaseMode ease = EaseMode.None, List<PrimerObject> exemptions = null) {
-        if (exemptions == null) { exemptions = new List<PrimerObject>(); }
-        StartCoroutine(fadeOut(newAlpha, duration, delay, ease, exemptions));
-    }
-    IEnumerator fadeOut(float newAlpha, float duration, float delay, EaseMode ease, List<PrimerObject> exemptions) {
-        yield return new WaitForSeconds(delay);
-
-        List<Transform> trueExemptions = new List<Transform>();
-        foreach (PrimerObject p in exemptions) {
-            trueExemptions.AddRange(p.GetComponentsInChildren<Transform>());
-        }
-        // List<Transform> exemptionParents = new List<Transform>();
-        // foreach (PrimerObject e in exemptions) {
-        //     exemptionParents.Add(e.transform.parent);
-        //     e.transform.parent = null;
-        // }
-        // List<Transform> children = GetComponentsInChildren<Transform>().ToList();
-        // foreach (Transform
-        MeshRenderer[] mrs = GetComponentsInChildren<MeshRenderer>();
-        // foreach (Transform t in children) {
-        foreach (MeshRenderer mr in mrs) {
-            if (trueExemptions.Contains(mr.gameObject.GetComponent<Transform>())) { continue; }
-            // MeshRenderer mr = t.gameObject.GetComponent<MeshRenderer>();
-            foreach (Material mat in mr.materials) {
-                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Transparent);
-            }
-        }
-        SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>();
-        foreach (SkinnedMeshRenderer smr in smrs) {
-            if (trueExemptions.Contains(smr.gameObject.GetComponent<Transform>())) { continue; }
-            foreach (Material mat in smr.materials) {
-                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Transparent);
-            }
-        }
-        // for (int i = 0; i < exemptions.Count; i++) {
-        //     exemptions[i].transform.parent = exemptionParents[i];
-        // }
-        ChangeAlpha(newAlpha, duration: duration, ease, trueExemptions);
-    }
-    public void FadeIn(float duration = 0.5f, EaseMode ease = EaseMode.None) {
-        StartCoroutine(fadeIn(duration, ease));
-    }
-    private IEnumerator fadeIn(float duration = 0.5f, EaseMode ease = EaseMode.None) {
-        ChangeAlpha(1, duration: duration, ease);
-        yield return new WaitForSeconds(duration);
-        MeshRenderer[] mrs = GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer mr in mrs) {
-            foreach (Material mat in mr.materials) {
-                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Opaque);
-            }
-        }
-        SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>();
-        foreach (SkinnedMeshRenderer smr in smrs) {
-            foreach (Material mat in smr.materials) {
-                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Opaque);
-            }
-        }
-    }
-
-    public void ChangeAlpha(float newAlpha, float duration = 0.5f, EaseMode ease = EaseMode.None, List<Transform> exemptions = null) {
-        if (exemptions == null) { exemptions = new List<Transform>(); }
-        // foreach (PrimerObject e in exemptions) {
-        //     e.transform.parent = null;
-        // }
-        MeshRenderer[] mrs = GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer mr in mrs) {
-            if (exemptions.Contains(mr.gameObject.GetComponent<Transform>())) { continue; }
-            foreach (Material mat in mr.materials) {
-                Color newColor =  mat.color;
-                newColor.a = newAlpha;
-                StartCoroutine(changeColor(mat, newColor, duration, ease));
-            }
-        }
-        SkinnedMeshRenderer[] smrs = GetComponentsInChildren<SkinnedMeshRenderer>();
-        foreach (SkinnedMeshRenderer smr in smrs) {
-            if (exemptions.Contains(smr.gameObject.GetComponent<Transform>())) { continue; }
-            foreach (Material mat in smr.materials) {
-                Color newColor =  mat.color;
-                newColor.a = newAlpha;
-                StartCoroutine(changeColor(mat, newColor, duration, ease));
-            }
-        }
-        // foreach (PrimerObject e in exemptions) {
-        //     e.transform.parent = transform;
-        // }
     }
     public void RevertColor(float duration = 0.5f, EaseMode ease = EaseMode.None) {
         MeshRenderer[] mrs = GetComponentsInChildren<MeshRenderer>();

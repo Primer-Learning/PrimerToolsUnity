@@ -12,6 +12,7 @@ using UnityEngine;
 using Random = System.Random;
 
 public class PrimerBlob : PrimerCharacter {
+    public Renderer skinRenderer => transform.Find("blob_mesh").GetComponent<Renderer>();
     public enum MeshType
     {
         HighPolySkinned,
@@ -366,7 +367,7 @@ public class PrimerBlob : PrimerCharacter {
         if (go == null) go = transform.Find("blob_mball.022");
         if (go == null) Debug.LogError("Couldn't find valid object for PrimerBlob.SetColor.");
         var r = go.GetComponent<Renderer>();
-        base.SetColor(newColor, r);
+        r.SetColor(newColor);
         color = newColor;
     }
 
@@ -388,17 +389,10 @@ public class PrimerBlob : PrimerCharacter {
         return t.GetComponent<Renderer>().TweenColor(newColor);
     }
 
-    public override void FadeOut(float newAlpha = 0, float duration = 0.5f, float delay = 0,
-        EaseMode ease = EaseMode.None, List<PrimerObject> exemptions = null)
+    public Tween FadeToAlpha(float alpha = 0)
     {
-        if (exemptions == null) exemptions = new List<PrimerObject>();
-        exemptions.Add(lEye);
-        exemptions.Add(rEye);
-        exemptions.Add(mouth);
-        Debug.Log(exemptions.Count);
-        base.FadeOut(newAlpha, duration, delay, ease, exemptions);
+        return skinRenderer.FadeToAlpha(alpha);
     }
-
 
     public void PulseEyes(float factor = 1.2f, float duration = 1, float attack = 0.5f,
         float decay = 0.5f)
