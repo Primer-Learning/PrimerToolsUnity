@@ -52,6 +52,7 @@ public class DNA : MonoBehaviour
             var strandChildren = strand.GetComponentsInChildren<Renderer>();
             tweens.Add(strandChildren.Select(x => x.TweenColor(newColor)).RunInParallel());
         }
+        color = newColor;
         return tweens.RunInParallel();
     }
 
@@ -72,7 +73,7 @@ public class DNA : MonoBehaviour
     }
     public Tween AcceptStrand(Transform strand, int index) {
         if (strands[index] != null) {
-            Debug.LogError($"Strand {index} already exists");
+            Debug.LogWarning($"Strand {index} already exists");
         }
         
         strands[index] = strand;
