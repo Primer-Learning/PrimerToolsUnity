@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LeftEyebrownDown
+  m_Name: right_eye_heart
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -27,13 +27,22 @@ AnimationClip:
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.083333336
+        value: 100
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: blendShape.eyedown_r.eye_l1
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open/eye_l
+    attribute: blendShape.heartR.eye_r3
+    path: blob_rig/bone_torso/bone_neck/bone_eye_r/bone_eye_r_open/eye_r
     classID: 137
     script: {fileID: 0}
   m_PPtrCurves: []
@@ -45,8 +54,8 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 3535970997
-      attribute: 3626044336
+      path: 568661540
+      attribute: 3362219230
       script: {fileID: 0}
       typeID: 137
       customType: 20
@@ -57,7 +66,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0
+    m_StopTime: 0.083333336
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -83,13 +92,22 @@ AnimationClip:
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.083333336
+        value: 100
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: blendShape.eyedown_r.eye_l1
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open/eye_l
+    attribute: blendShape.heartR.eye_r3
+    path: blob_rig/bone_torso/bone_neck/bone_eye_r/bone_eye_r_open/eye_r
     classID: 137
     script: {fileID: 0}
   m_EulerEditorCurves: []
