@@ -23,7 +23,7 @@ public class DNA : MonoBehaviour
         var tweens = new List<Tween>();
         for (var i = 0; i < strands.Length; i++)
         {
-            if (strands[i] == null) {
+            if (strands[i] == null || !strands[i].gameObject.activeSelf)  {
                 strands[i] = gnome.Add<Transform>(strandPrefabs[i], $"strand {i}");
                 var strandChildren = strands[i].GetComponentsInChildren<Renderer>();
                 var strandChildrenScales = strandChildren.Select(x => x.transform.localScale).ToArray();
@@ -55,12 +55,13 @@ public class DNA : MonoBehaviour
         return tweens.RunInParallel();
     }
 
-    public void ClearStrands()
+    public void HideStrands()
     {
         foreach (var strand in strands)
         {
-            if (strand != null) {
-                strand.Dispose();
+            if (strand != null)
+            {
+                strand.gameObject.SetActive(false);
             }
         }
     }
