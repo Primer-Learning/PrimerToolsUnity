@@ -12,19 +12,45 @@ namespace Primer.Scene
         private Camera cameraCache;
         public Camera cam => cameraCache == null ? cameraCache = GetComponent<Camera>() : cameraCache;
 
-
-        public float distance = 10;
-        public Vector3 swivelOrigin;
-        public Vector3 swivel;
+        [SerializeField, HideInInspector]
+        private float _distance = 10;
+        [ShowInInspector]
+        public float distance {
+            get => _distance;
+            set {
+                
+                _distance = value;
+                UpdateSwivel();
+            }
+        }
+        
+        [SerializeField, HideInInspector]
+        private Vector3 _swivelOrigin;
+        [ShowInInspector]
+        public Vector3 swivelOrigin {
+            get => _swivelOrigin;
+            set
+            {
+                _swivelOrigin = value;
+                UpdateSwivel();
+            }
+        }
+        
+        [SerializeField, HideInInspector]
+        private Vector3 _swivel;
+        [ShowInInspector]
+        public Vector3 swivel {
+            get => _swivel;
+            set
+            {
+                _swivel = value;
+                UpdateSwivel();
+            }
+        }
+        
         public bool faceSwivel = true;
-        public Color backgroundColor = new(41 / 255f, 45 / 255f, 47 / 255f);
+        public Color backgroundColor = PrimerColor.gray;
 
-
-        public float ActualDistance => (transform.position - swivelOrigin).magnitude;
-
-
-        private void Update() => Validate();
-        private void OnValidate() => Validate();
         private void OnDrawGizmos() => Gizmos.DrawSphere(swivelOrigin, 0.1f);
 
         private void Awake()
@@ -35,34 +61,11 @@ namespace Primer.Scene
             }
         }
 
-        // TODO: using properties with getter / setter we can get rid of the old* variables
-        private Vector3? oldSwivelOrigin;
-        private Vector3? oldSwivel;
-        private bool? lastFaceSwivel;
-        private void Validate()
-        {
-            var isDistanceWrong = Mathf.Abs(ActualDistance - distance) > 0.1;
-            var isPositionOutdated = lastFaceSwivel != faceSwivel || oldSwivelOrigin != swivelOrigin || isDistanceWrong;
-
-            if (isPositionOutdated || oldSwivel != swivel) {
-                UpdateSwivel();
-                lastFaceSwivel = faceSwivel;
-                oldSwivelOrigin = swivelOrigin;
-                oldSwivel = swivel;
-            }
-        }
-
         private void UpdateSwivel()
         {
-            var direction = faceSwivel ? Vector3.back : Vector3.forward;
-            transform.position = Quaternion.Euler(swivel) * direction * distance + swivelOrigin;
-
-            transform.LookAt(swivelOrigin);
-
-            // handle rotation in the axis the camera is pointing at as LookAt can't do this
-            if (swivel.z != 0) {
-                transform.Rotate(0, 0, swivel.z);
-            }
+            // var direction = faceSwivel ? Vector3.back : Vector3.forward;
+            transform.position = Quaternion.Euler(swivel) * Vector3.back * distance + swivelOrigin;
+            transform.rotation = Quaternion.Euler(swivel);
         }
 
         public Tween FocusOn(Component target, Vector3 offset, float? distance = null, Vector3? swivel = null)
