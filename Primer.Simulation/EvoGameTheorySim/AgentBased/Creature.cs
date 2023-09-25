@@ -27,7 +27,6 @@ namespace Simulation.GameTheory
         public FruitTree goingToEat;
         public System.Enum[] strategyGenes;
         public System.Enum strategy => strategyGenes.RandomItem();
-        public string strategyName;
         public Home home;
 
         public SimpleGnome stomach => new ("Stomach", parent: transform);
@@ -70,25 +69,8 @@ namespace Simulation.GameTheory
         public Tween ReturnHome(Home home)
         {
             this.home = home;
-            // Debug.Log(this.home);
             return WalkTo(home.transform.position);
         }
-        
-        // public Tween ReturnHome(Vector2 position)
-        // {
-        //     var walkTween = WalkToLocal(position, forcedDuration: skipAnimations ? 0 : -1);
-        //
-        //     if (this == null)
-        //         return walkTween;
-        //
-        //     var originalRotation = transform.rotation;
-        //     transform.LookAt(Vector3.zero);
-        //     var targetRotation = transform.rotation;
-        //     
-        //     transform.rotation = originalRotation;
-        //     var rotateTween = transform.RotateTo(targetRotation) with {duration = skipAnimations ? 0 : 0.5f};
-        //     return Tween.Series(walkTween, rotateTween);
-        // }
 
         public void ConsumeEnergy()
         {
