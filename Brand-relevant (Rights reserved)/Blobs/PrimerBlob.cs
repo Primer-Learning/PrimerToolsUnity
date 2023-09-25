@@ -393,6 +393,10 @@ public class PrimerBlob : PrimerCharacter {
     {
         return skinRenderer.FadeToAlpha(alpha);
     }
+    public void SetAlpha(float alpha)
+    {
+        skinRenderer.SetAlpha(alpha);
+    }
 
     public void PulseEyes(float factor = 1.2f, float duration = 1, float attack = 0.5f,
         float decay = 0.5f)

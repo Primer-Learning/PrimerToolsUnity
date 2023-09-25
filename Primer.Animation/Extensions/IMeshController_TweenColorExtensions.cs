@@ -23,6 +23,20 @@ namespace Primer.Animation
             var meshes = self.GetMeshRenderers();
             return Tween.Value(meshes.SetColor, meshes.GetColor, () => newColor);
         }
+        public static void SetAlpha(this Renderer self, float alpha)
+        {
+            var mat = self.sharedMaterial;
+            if (alpha >= 1)
+            {
+                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Opaque);
+            }
+            else
+            {
+                StandardShaderUtils.ChangeRenderMode(mat, StandardShaderUtils.BlendMode.Transparent);
+            }
+            var oldColor = self.GetColor();
+            self.SetColor(new Color(oldColor.r, oldColor.g, oldColor.b, alpha));
+        }
         public static Tween FadeToAlpha(this Renderer self, float alpha)
         {
             return alpha >= 1 ? self.FadeIn() : self.FadeOut(alpha);
