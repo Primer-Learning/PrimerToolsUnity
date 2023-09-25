@@ -27,7 +27,8 @@ namespace Simulation.GameTheory
     
     public enum ReproductionType
     {
-        Sexual,
+        SexualHaploid,
+        SexualDiploid,
         Asexual
     }
     
@@ -110,7 +111,6 @@ namespace Simulation.GameTheory
                 creature.transform.SetParent(creatureGnome);
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
-                creature.transform.position = (creature.home ??= homes.RandomItem()).transform.position;
                 creature.rng = rng;
                 _strategyRule.OnAgentCreated(creature);
             }
@@ -214,76 +214,94 @@ namespace Simulation.GameTheory
                     creature.ConsumeEnergy();
                 }
             }
+            
+            // Get creatures that can reproduce, then group them by home.
+            // Then for each group of creatures, choose two creatures at random and make them reproduce.
+            // We loop this way even if reproduction is asexual
+            var creaturesByHome = creatures
+                .Where(x => x.canReproduce)
+                .GroupBy(x => x.home);
 
-            if (_reproductionType == ReproductionType.Asexual)
+            foreach (var home in creaturesByHome)
             {
-                foreach (var creature in creatures) {
-                    creature.PurgeStomach();
-
-                    if (creature.canReproduce)
-                    {
-                        // var child = creatureGnome.Add<Creature>("blob_skinned", $"{creature.strategy} {newAgents.Count(x => x.strategy.Equals(creature.strategy)) + 1} born turn {turn}");
-                        var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
-                        childGO.transform.parent = creatureGnome.transform;
-                        var child = childGO.AddComponent<Creature>();
-                        Debug.Log(child);
-                        child.strategyGenes = creature.strategyGenes;
-                        child.home = creature.home;
-                        child.landscape = terrain;
-                        child.transform.localPosition = creature.transform.localPosition;
-                        _strategyRule.OnAgentCreated(child);
-                        child.rng = rng;
-                        child.transform.localScale = Vector3.zero;
-                        newAgents.Add(child);
-                    }
-                    
-                    creature.ConsumeEnergy();
-                }
-            }
-
-            if (_reproductionType == ReproductionType.Sexual)
-            {
-                // Get creatures that can reproduce, then group them by home.
-                // Then for each group of creatures, choose two creatures at random and make them reproduce.
-                var creaturesByHome = creatures
-                    .Where(x => x.canReproduce)
-                    .GroupBy(x => x.home);
-
-                foreach (var home in creaturesByHome)
+                var creaturesInHome = home.Shuffle().ToList();
+                while (creaturesInHome.Count > 1)
                 {
-                    var creaturesInHome = home.Shuffle().ToList();
-                    while (creaturesInHome.Count > 1)
-                    {
-                        var (first, second) = creaturesInHome.Take(2).ToList();
-                        first.PurgeStomach();
-                        second.PurgeStomach();
-                        
-                        var strategyGenes = first.strategyGenes.Zip(second.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
-                        var strategyName = StrategyGenesString(strategyGenes);
-                        // var child = creatureGnome.Add<Creature>("blob_skinned", $"{strategyName} {newAgents.Count(x => x.strategyName.Equals(strategyName)) + 1} born turn {turn}");
-                        
-                        var child = PrefabUtility.InstantiatePrefab(first) as Creature;
-                        // TODO: This is haploid with 10 chromosomes. Make it diploid with 5 chromosome pairs.
-                        child.strategyGenes = strategyGenes;
-                        child.strategyName = strategyName;
-                        
-                        child.home = first.home;
-                        child.landscape = terrain;
-                        child.transform.localPosition = first.transform.localPosition;
-                        _strategyRule.OnAgentCreated(child);
-                        child.rng = rng;
-                        child.transform.localScale = Vector3.zero;
-                        newAgents.Add(child);
-                        creaturesInHome.Remove(first);
-                        creaturesInHome.Remove(second);
-                    }
+                    var (first, second) = creaturesInHome.Take(2).ToList();
+                    first.PurgeStomach();
+                    second.PurgeStomach();
+                    
+                    // Pass the parents in opposite orders so it works in the asexual case
+                    newAgents.Add(CreateChild(first, second));
+                    newAgents.Add(CreateChild(second, first));
+                    
+                    creaturesInHome.Remove(first);
+                    creaturesInHome.Remove(second);
+                }
+                
+                // Check if anyone is left over
+                if (creaturesInHome.Count == 1)
+                {
+                    var creature = creaturesInHome.First();
+                    creature.PurgeStomach();
+                    newAgents.Add(CreateChild(creature, null));
                 }
             }
             
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
-            // return Tween.noop;
         }
-        
+
+        private Creature CreateChild(Creature firstParent, Creature secondParent)
+        {
+            var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
+            childGO.transform.parent = creatureGnome.transform;
+            var child = childGO.AddComponent<Creature>();
+            child.home = firstParent.home;
+            
+            // Inheritance depends on reproduction type
+            if (_reproductionType == ReproductionType.Asexual)
+            {
+                child.strategyGenes = firstParent.strategyGenes;
+            }
+            if (_reproductionType == ReproductionType.SexualHaploid)
+            {
+                var strategyGenes = firstParent.strategyGenes
+                    .Zip(secondParent.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                
+                child.strategyGenes = strategyGenes;
+            }
+
+            if (_reproductionType == ReproductionType.SexualDiploid)
+            {
+                var numGenes = firstParent.strategyGenes.Length;
+                if (numGenes % 2 != 0)
+                {
+                    Debug.LogError("Number of genes must be even for diploid reproduction");
+                    return null;
+                }
+                var strategyGenes = new Enum[numGenes];
+                for (var i = 0; i < numGenes / 2; i++)
+                {
+                    strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
+                        : firstParent.strategyGenes[i + numGenes / 2];
+                }
+                for (var i = numGenes / 2; i < numGenes; i++)
+                {
+                    strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? secondParent.strategyGenes[i]
+                        : secondParent.strategyGenes[i - secondParent.strategyGenes.Length / 2];
+                }
+                child.strategyGenes = strategyGenes;
+            }
+
+            child.landscape = terrain;
+            child.transform.localPosition = firstParent.transform.localPosition;
+            _strategyRule.OnAgentCreated(child);
+            child.rng = rng;
+            child.transform.localScale = Vector3.zero;
+
+            return child;
+        }
+
         public void CleanUp()
         {
         }
@@ -321,7 +339,6 @@ namespace Simulation.GameTheory
             var positions = edgeLength / creatureCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = terrain.size / -2;
-        
             
             for (var i = 0; i < creatureCount; i++) {
                 var linearPosition = positions * i + centerInSlot;

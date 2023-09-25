@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Primer.Simulation
 {
@@ -76,6 +75,8 @@ namespace Primer.Simulation
                     var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
                     initialCreatures.Add(creature);
                     creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
+                    creature.home = sim.homes.RandomItem();
+                    creature.transform.position = creature.home.transform.position;
                     strategyRule.OnAgentCreated(creature);
                 }
             }
