@@ -259,38 +259,42 @@ namespace Simulation.GameTheory
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type
-            if (_reproductionType == ReproductionType.Asexual)
+            if (_reproductionType == ReproductionType.Asexual || secondParent == null)
             {
                 child.strategyGenes = firstParent.strategyGenes;
             }
-            if (_reproductionType == ReproductionType.SexualHaploid)
+            else switch (_reproductionType)
             {
-                var strategyGenes = firstParent.strategyGenes
-                    .Zip(secondParent.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                case ReproductionType.SexualHaploid:
+                {
+                    var strategyGenes = firstParent.strategyGenes
+                        .Zip(secondParent.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
                 
-                child.strategyGenes = strategyGenes;
-            }
-
-            if (_reproductionType == ReproductionType.SexualDiploid)
-            {
-                var numGenes = firstParent.strategyGenes.Length;
-                if (numGenes % 2 != 0)
-                {
-                    Debug.LogError("Number of genes must be even for diploid reproduction");
-                    return null;
+                    child.strategyGenes = strategyGenes;
+                    break;
                 }
-                var strategyGenes = new Enum[numGenes];
-                for (var i = 0; i < numGenes / 2; i++)
+                case ReproductionType.SexualDiploid:
                 {
-                    strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
-                        : firstParent.strategyGenes[i + numGenes / 2];
+                    var numGenes = firstParent.strategyGenes.Length;
+                    if (numGenes % 2 != 0)
+                    {
+                        Debug.LogError("Number of genes must be even for diploid reproduction");
+                        return null;
+                    }
+                    var strategyGenes = new Enum[numGenes];
+                    for (var i = 0; i < numGenes / 2; i++)
+                    {
+                        strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
+                            : firstParent.strategyGenes[i + numGenes / 2];
+                    }
+                    for (var i = numGenes / 2; i < numGenes; i++)
+                    {
+                        strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? secondParent.strategyGenes[i]
+                            : secondParent.strategyGenes[i - secondParent.strategyGenes.Length / 2];
+                    }
+                    child.strategyGenes = strategyGenes;
+                    break;
                 }
-                for (var i = numGenes / 2; i < numGenes; i++)
-                {
-                    strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? secondParent.strategyGenes[i]
-                        : secondParent.strategyGenes[i - secondParent.strategyGenes.Length / 2];
-                }
-                child.strategyGenes = strategyGenes;
             }
 
             child.landscape = terrain;
