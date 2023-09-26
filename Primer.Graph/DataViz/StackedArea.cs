@@ -4,14 +4,16 @@ using System.Linq;
 using Primer.Animation;
 using Primer.Shapes;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Graph
 {
     [ExecuteAlways]
     public class StackedArea : MonoBehaviour, IDisposable, IPrimerGraphData
     {
-        public List<ILine> renderedData = new();
+        public List<ILine> renderedLines = new();
         public List<Vector3[]> rawPointSets;
         
         private List<Vector3[]> transformedPointSets => rawPointSets
@@ -40,12 +42,6 @@ namespace Primer.Graph
             }
         }
         #endregion
-        
-        // private void OnEnable()
-        // {
-        //     domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
-        //     domain.onDomainChange = Render;
-        // }
 
         public void SetData(params float[][] data)
         {
@@ -108,14 +104,19 @@ namespace Primer.Graph
             
             // var targetData = new DiscreteLine(transformedPoints);
             var targetData = transformedPointSets.Select(x => new DiscreteLine(x) as ILine).ToList();
-            if (targetData == renderedData)
+            if (targetData == renderedLines)
                 return Tween.noop;
 
-            var linesCount = Math.Max(renderedData.Count, targetData.Count);
+            var linesCount = Math.Max(renderedLines.Count, targetData.Count);
             var lines = new List<(ILine from, ILine to)>(linesCount);
 
+            if (renderedLines.Count == 0)
+            {
+                return GrowFromStart();
+            }
+            
             for (var i = 0; i < linesCount; i++) {
-                var from = i < renderedData.Count ? renderedData[i] : FlatLine(renderedData[0]);
+                var from = i < renderedLines.Count ? renderedLines[i] : FlatLine(renderedLines[0]);
                 var to = i < targetData.Count ? targetData[i] : FlatLine(from);
                 lines.Add((from, to));
             }
@@ -144,7 +145,7 @@ namespace Primer.Graph
 
         public Tween ShrinkToEnd()
         {
-            var targetData = renderedData;
+            var targetData = renderedLines;
 
             return new Tween(
                 t => Render(targetData.Select(x => x.SmoothCut(x.numSegments * (1 - t), fromOrigin: true)))
@@ -158,7 +159,7 @@ namespace Primer.Graph
             Gnome.Dispose(this);
         }
 
-        private void Render() => Render(renderedData);
+        private void Render() => Render(renderedLines);
         private void Render(IEnumerable<ILine> data)
         {
             var gnome = new SimpleGnome(transform);
@@ -219,9 +220,15 @@ namespace Primer.Graph
                 prevLine = line;
             }
 
-            renderedData = RemoveRedundantPoints(lines);
+            renderedLines = RemoveRedundantPoints(lines);
         }
 
+        public void Reset()
+        {
+            transform.GetChildren().ForEach(x => x.gameObject.SetActive(false));
+            renderedLines = new List<ILine>();
+        }
+        
         private static DiscreteLine FlatLine(ILine sample)
         {
             var points = sample.points
