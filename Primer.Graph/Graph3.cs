@@ -11,9 +11,9 @@ namespace Primer.Graph
         public bool enableZAxis;
         public bool isRightHanded = true;
 
-        public Axis3 xAxis => GameObject.Find("X").GetComponent<Axis3>(); 
-        public Axis3 yAxis => GameObject.Find("Y").GetComponent<Axis3>(); 
-        public Axis3 zAxis => GameObject.Find("Z").GetComponent<Axis3>();
+        public Axis3 xAxis => transform.Find("X").GetComponent<Axis3>(); 
+        public Axis3 yAxis => transform.Find("Y").GetComponent<Axis3>(); 
+        public Axis3 zAxis => transform.Find("Z").GetComponent<Axis3>();
         private List<Axis3> axes => new() { xAxis, yAxis, zAxis };
 
         public Tween Transition()
@@ -62,6 +62,14 @@ namespace Primer.Graph
             var area = gnome.Add<StackedArea>(name);
             area.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return area;
+        }
+        
+        public BarPlot AddBarPlot(string name)
+        {
+            var gnome = new SimpleGnome(transform);
+            var barPlot = gnome.Add<BarPlot>(name);
+            barPlot.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
+            return barPlot;
         }
         
         public Vector3 DataSpaceToPositionSpace(Vector3 point)
