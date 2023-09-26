@@ -6,35 +6,29 @@ using Primer.Shapes;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-using BarPlotData = System.Collections.Generic.List<System.Collections.Generic.List<float>>;
-
 namespace Primer.Graph
 {
     [ExecuteAlways]
-    [RequireComponent(typeof(GraphDomain))]
-    public class BarPlot : MonoBehaviour, IDisposable
+    public class BarPlot : MonoBehaviour, IDisposable, IPrimerGraphData
     {
-        public BarPlotData renderedData = new BarPlotData();
-        public BarPlotData incomingData;
+        private List<Tuple<float, float, float>> renderedRectProperties = new();
+        public List<float> data;
+        
+        private List<Tuple<float, float, float>> DataAsRectProperties()
+        {
+            return data.Select( (value, i) =>
+                new Tuple<float, float, float>(
+                    transformPointFromDataSpaceToPositionSpace(new Vector3(i + _offset, 0, 0)).x,
+                    transformPointFromDataSpaceToPositionSpace(new Vector3(_barWidth, 0, 0)).x,
+                    transformPointFromDataSpaceToPositionSpace(new Vector3(0, value, 0)).y
+                )
+            ).ToList();
+        }
+        
+        public delegate Vector3 Transformation(Vector3 inputPoint);
+        public Transformation transformPointFromDataSpaceToPositionSpace = point => point;
 
         public List<Color> colors = new List<Color>(PrimerColor.all);
-
-        private GraphDomain domainCache;
-        private GraphDomain domain => transform.GetOrAddComponent(ref domainCache);
-
-        #region public float barGap;
-        [SerializeField, HideInInspector]
-        private Vector2 _barGap = new Vector2(1, 0);
-
-        [ShowInInspector]
-        public Vector2 barGap {
-            get => _barGap;
-            set {
-                _barGap = value;
-                Render();
-            }
-        }
-        #endregion
 
         #region public float offset;
         [SerializeField, HideInInspector]
@@ -52,7 +46,7 @@ namespace Primer.Graph
 
         #region public float barWidth;
         [SerializeField, HideInInspector]
-        private float _barWidth = 1.5f;
+        private float _barWidth = 0.8f;
 
         [ShowInInspector]
         public float barWidth {
@@ -64,70 +58,41 @@ namespace Primer.Graph
         }
         #endregion
 
-        private void OnEnable()
-        {
-            domain.behaviour = GraphDomain.Behaviour.InvokeMethod;
-            domain.onDomainChange = Render;
-        }
-
         public void SetData(params float[] bars)
         {
-            incomingData = ToLists(bars.Select(x => new List<float> { x }));
+            data = bars.ToList();
         }
 
-        public void SetData(float[,] data)
+        public void AddData(params float[] newData)
         {
-            incomingData = ToLists(data);
-        }
-
-        public void SetData(params IEnumerable<float>[] data)
-        {
-            incomingData = ToLists(data);
-        }
-
-        public void AddStack(params float[] data)
-        {
-            // We create a copy so we can mutate it
-            incomingData = ToLists(incomingData ?? renderedData ?? new BarPlotData());
-
-            for (var i = 0; i < data.Length; i++) {
-                if (incomingData.Count <= i)
-                    incomingData.Add(new List<float>());
-
-                incomingData[i].Add(data[i]);
-            }
-        }
-
-        public void AddData(params float[] data)
-        {
-            incomingData = ToLists(incomingData ?? renderedData);
-            incomingData.Add(new List<float>(data));
+            data ??= new List<float>();
+            data.AddRange(newData);
         }
 
         public Tween Transition()
         {
-            if (incomingData is null)
+            if (DataAsRectProperties().SequenceEqual(renderedRectProperties))
                 return Tween.noop;
 
-            var initial = ToLists(renderedData);
-            var target = ToLists(incomingData);
+            // Make a copy of the renderedRectProperties so that we can tween from it
+            var from = new List<Tuple<float, float, float>>(renderedRectProperties);
 
-            incomingData = null;
-            return new Tween(t => Render(Lerp(initial, target, t)));
+            return new Tween(t => Render(LerpFloatTriple(from, DataAsRectProperties(), t)))
+                .Observe(afterComplete: () => Render(DataAsRectProperties()));
         }
 
         public Tween GrowFromStart()
         {
-            var initial = new BarPlotData();
-            var target = ToLists(incomingData ?? renderedData);
-            return new Tween(t => Render(Lerp(initial, target, t)));
+            var initial = new List<Tuple<float, float, float>>();
+            var target = DataAsRectProperties() ?? renderedRectProperties;
+            return new Tween(t => Render(LerpFloatTriple(initial, target, t)));
         }
 
         public Tween ShrinkToEnd()
         {
-            var initial = renderedData;
-            var target = new BarPlotData();
-            return new Tween(t => Render(Lerp(initial, target, t)));
+            var initial = renderedRectProperties;
+            var target = new List<Tuple<float, float, float>>();
+            return new Tween(t => Render(LerpFloatTriple(initial, target, t)));
         }
 
         public void Dispose()
@@ -135,73 +100,53 @@ namespace Primer.Graph
             Gnome.Dispose(this);
         }
 
-        private void Render() => Render(renderedData);
-        private void Render(BarPlotData data)
-        {
-            var gnome = Gnome.For(this);
-            var width = domain.TransformPoint(new Vector3(barWidth, 0)).x;
-            var gap = domain.TransformPoint(barGap);
-            var offset = domain.TransformPoint(new Vector3(this.offset, 0)).x;
+        private void Render() => Render(renderedRectProperties);
+        private void Render(List<Tuple<float, float, float>> dataToRender)
+        {;
+            var gnome = new SimpleGnome(transform);
+            gnome.Reset();
 
-            for (var x = 0; x < data.Count; x++) {
-                var bar = data[x];
-                var bottom = domain.TransformPoint(new Vector3(x, 0));
-                var coords = bar.Select(y => domain.TransformPoint(new Vector3(x, y))).ToList();
+            for (var i = 0; i < dataToRender.Count; i++) {
+                var bar = dataToRender[i];
 
-                for (var j = 0; j < data[x].Count; j++) {
-                    var rect = gnome.Add<Rectangle>($"Bar {x} stack {j}");
-                    rect.transform.localPosition = new Vector3(bottom.x + (gap.x * x) + offset, bottom.y);
-                    rect.pivot = RectPivot.BottomCenter;
-                    rect.width = width;
-                    rect.height = coords[j].y;
-                    rect.color = colors[j % colors.Count];
-                    bottom = new Vector3(bottom.x, bottom.y + coords[j].y + gap.y);
-                }
+                var rect = gnome.Add<Rectangle>($"Bar {i} stack {0}");
+                rect.transform.localPosition = new Vector3(bar.Item1, 0, 0);
+                rect.pivot = RectPivot.BottomCenter;
+                rect.width = bar.Item2;
+                rect.height = bar.Item3;
+                rect.color = colors[i % colors.Count];
             }
 
-            gnome.Purge();
-            renderedData = data;
+            renderedRectProperties = dataToRender;
         }
 
-        private static BarPlotData ToLists(IEnumerable<IEnumerable<float>> data)
+        private static List<Tuple<float, float, float>> LerpFloatTriple(List<Tuple<float, float, float>> a, List<Tuple<float, float, float>> b, float t)
         {
-            return data.Select(x => x.ToList()).ToList();
-        }
-
-        private static BarPlotData ToLists(float[,] data)
-        {
-            var lists = new List<List<float>>();
-
-            for (var x = 0; x < data.GetLength(0); x++) {
-                var list = new List<float>();
-
-                for (var y = 0; y < data.GetLength(1); y++)
-                    list.Add(data[x, y]);
-
-                lists.Add(list);
-            }
-
-            return lists;
-        }
-
-        private static BarPlotData Lerp(BarPlotData a, BarPlotData b, float t)
-        {
-            var result = new BarPlotData();
+            // The default values don't properly handle offset. Since this is a static method, we can't look at 
+            // instance variables to subtract offset from the position.
+            // It works fine as long as offset is 1.
+            // To make this work properly with other offset values, we need to pass in the offset as a parameter
+            // or make this a non-static method, or ensure the tuple lists are the same length before passing them
+            // to this method.
+            
+            var result = new List<Tuple<float, float, float>>();
             var barsCount = Mathf.Max(a.Count, b.Count);
+            
+            var xSpacingA = a.Count > 0 ? a[0].Item1 : b.Count > 0 ? b[0].Item1 : 1f;
+            var defaultWidth = a.Count > 0 ? a[0].Item2 : b.Count > 0 ? b[0].Item2 : 0f;
+            var defaultHeight = 0f;
+            var xSpacingB = b.Count > 0 ? b[0].Item1 : a.Count > 0 ? a[0].Item1 : 0f;
 
             for (var i = 0; i < barsCount; i++) {
-                var from = i < a.Count ? a[i] : new List<float>();
-                var to = i < b.Count ? b[i] : new List<float>();
-                var stackCount = Mathf.Max(from.Count, to.Count);
-                var lerpedBar = new List<float>();
-
-                for (var j = 0; j < stackCount; j++) {
-                    var fromValue = j < from.Count ? from[j] : 0;
-                    var toValue = j < to.Count ? to[j] : 0;
-                    lerpedBar.Add(Mathf.Lerp(fromValue, toValue, t));
-                }
-
-                result.Add(lerpedBar);
+                var barA = i < a.Count ? a[i] : new Tuple<float, float, float>((i + 1) * xSpacingA, defaultWidth, defaultHeight);
+                var barB = i < b.Count ? b[i] : new Tuple<float, float, float>((i + 1) * xSpacingB, defaultWidth, defaultHeight);
+                result.Add(
+                    new Tuple<float, float, float>(
+                        Mathf.Lerp(barA.Item1, barB.Item1, t),
+                        Mathf.Lerp(barA.Item2, barB.Item2, t),
+                        Mathf.Lerp(barA.Item3, barB.Item3, t)
+                    )
+                );
             }
 
             return result;

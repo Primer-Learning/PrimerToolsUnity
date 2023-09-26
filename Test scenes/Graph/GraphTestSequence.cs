@@ -16,7 +16,7 @@ public class GraphTestSequence : Sequence
             distance: 2.73f,
             swivelOrigin: new Vector3(-2f, 0.9f, 0f),
             swivel: new Vector3(0f, 0f, 0f)
-        );
+        ).Apply();
 
         using var graph = new SimpleGnome("Graph3", "Graph").transform.GetComponent<Graph3>();
         
@@ -49,8 +49,12 @@ public class GraphTestSequence : Sequence
         foreach (var _ in TestArea(graph))
             yield return _;
         
+        foreach (var _ in TestBars(graph))
+            yield return _;
+        
         yield return graph.Disappear();
 
+        
         // foreach (var _ in TestSurface(graph, cam))
         //     yield return _;
         //
@@ -58,8 +62,6 @@ public class GraphTestSequence : Sequence
         //     yield return _;
         //
         //
-        // foreach (var _ in TestBars(graph))
-        //     yield return _;
         //
         // yield return graph.ShrinkToOrigin() with { name = "Graph goes" };
     }
@@ -200,7 +202,7 @@ public class GraphTestSequence : Sequence
         PushClipColor(PrimerColor.purple);
     
         using var stackedArea = graph.AddStackedArea("Stacked");
-    
+        stackedArea.Reset();
         stackedArea.SetData(
             new float[] { 1, 2, 1, 2 },
             new float[] { 1, 2, 3, 4 }
@@ -229,40 +231,28 @@ public class GraphTestSequence : Sequence
         PopClipColor();
     }
     //
-    // private IEnumerable<Tween> TestBars(Graph graph)
-    // {
-    //     PushClipColor(PrimerColor.yellow);
-    //
-    //     using var barData = graph.AddBarPlot("Bar data");
-    //
-    //     barData.SetData(new float [,] {
-    //         { 1, 2, 1, 2 },
-    //         { 1, 2, 3, 4 },
-    //     });
-    //
-    //     yield return barData.GrowFromStart() with { name = "Bars appear" };
-    //
-    //     barData.SetData(
-    //         new float[] { 1, 1.5f, 1, 1.5f },
-    //         new float[] { 4, 3, 2, 1 }
-    //     );
-    //
-    //     yield return barData.Transition() with { name = "Bars transition" };
-    //
-    //     barData.AddStack(0.25f, 0.5f);
-    //     yield return barData.Transition() with { name = "Add stack" };
-    //
-    //     barData.AddData(1, 0.25f, 2);
-    //     yield return barData.Transition() with { name = "Add data" };
-    //
-    //     foreach (var _ in RunGraphDeformations(graph))
-    //         yield return _;
-    //
-    //     yield return barData.ShrinkToEnd() with { name = "Bars go" };
-    //
-    //     PopClipColor();
-    // }
-    //
+    private IEnumerable<Tween> TestBars(Graph3 graph)
+    {
+        PushClipColor(PrimerColor.yellow);
+    
+        using var barData = graph.AddBarPlot("Bar data");
+        barData.SetData(1, 2, 1, 2);
+        yield return barData.GrowFromStart() with { name = "Bars appear" };
+    
+        barData.SetData(1, 1.5f, 1, 1.5f );
+        yield return barData.Transition() with { name = "Bars transition" };
+        
+        barData.AddData(1, 0.25f, 2);
+        yield return barData.Transition() with { name = "Add data" };
+    
+        foreach (var _ in RunGraphDeformations(graph))
+            yield return _;
+    
+        yield return barData.ShrinkToEnd() with { name = "Bars go" };
+    
+        PopClipColor();
+    }
+    
     private IEnumerable<Tween> RunGraphDeformations(Graph3 graph)
     {
         PushClipColor(PrimerColor.orange);
