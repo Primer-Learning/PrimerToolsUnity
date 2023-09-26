@@ -62,7 +62,10 @@ namespace Simulation.GameTheory
         }
         public Transform transform { get; }
         public Component component => transform;
-        public IEnumerable<Creature> creatures => creatureGnome.ChildComponents<Creature>();
+
+        public IEnumerable<Creature> creatures =>
+            creatureGnome.ChildComponents<Creature>().Where(x => x.gameObject.activeSelf);
+        public IEnumerable<Enum> alleles => creatures.SelectMany(x => x.strategyGenes);
         public int currentCreatureCount => creatureGnome.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
