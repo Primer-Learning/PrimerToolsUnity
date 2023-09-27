@@ -18,16 +18,21 @@ namespace Primer.Graph
         public float rangeSize => Mathf.Max(0.001f, max - min);
         
         public float length = 1;
-        [SerializeField, ShowInInspector]
-        private float _padding = 0.2f;
-        public float padding {
-            get => Mathf.Min(_padding, length / 2);
+        [SerializeField]
+        private Vector2 _padding = new (0.2f, 0.2f);
+        public Vector2 padding {
+            get
+            {
+                if (_padding.x + _padding.y > length)
+                    return new Vector2(length / 2, length / 2);
+                return _padding;
+            }
             set => _padding = value;
         }
         
         public float scale => lengthMinusPadding / rangeSize;
-        
-        public float lengthMinusPadding => length - 2 * padding;
+
+        public float lengthMinusPadding => length - padding.x - padding.y;
         float thickness = 1;
 
         internal (Tween removeTween, Tween updateTween, Tween addTween) PrepareTransitionParts()
@@ -113,7 +118,7 @@ namespace Primer.Graph
         private Tween TransitionRod()
         {
             var rod = new SimpleGnome("Rod", parent: transform);
-            var position = new Vector3(-padding, 0f, 0f);
+            var position = new Vector3(-padding.x, 0f, 0f);
             var rodScale = length == 0 
                 ? Vector3.zero
                 : new Vector3(length, thickness, thickness);
@@ -146,7 +151,7 @@ namespace Primer.Graph
             
             var endArrow = gnome.Add<Transform>(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
-            var endArrowPos = new Vector3(length - padding, 0f, 0f);
+            var endArrowPos = new Vector3(length - padding.x, 0f, 0f);
             var endArrowMove = endArrowPos == endArrow.localPosition ? Tween.noop : endArrow.MoveTo(endArrowPos);
             var endArrowScale = arrowPresence == ArrowPresence.Neither
                 ? endArrow.localScale == Vector3.zero ? Tween.noop : endArrow.ScaleTo(0)
@@ -155,7 +160,7 @@ namespace Primer.Graph
 
             var originArrow = gnome.Add<Transform>(arrowPrefab, "Origin Arrow");
             originArrow.localRotation = Quaternion.Euler(0f, -90f, 0f);
-            var originArrowPos = new Vector3(-padding, 0f, 0f);
+            var originArrowPos = new Vector3(-padding.x, 0f, 0f);
             var originArrowMove = originArrowPos == originArrow.localPosition ? Tween.noop : originArrow.MoveTo(originArrowPos);
             var originArrowScale = arrowPresence != ArrowPresence.Both
                 ? originArrow.localScale == Vector3.zero ? Tween.noop : originArrow.ScaleTo(0)
@@ -206,7 +211,7 @@ namespace Primer.Graph
 
             var pos = labelOffset + (labelPosition switch {
                 AxisLabelPosition.Along => new Vector3(length / 2, -0.55f, 0f),
-                AxisLabelPosition.End => new Vector3(length - padding + X_OFFSET, 0f, 0f),
+                AxisLabelPosition.End => new Vector3(length - padding.x + X_OFFSET, 0f, 0f),
                 _ => Vector3.zero,
             });
 
