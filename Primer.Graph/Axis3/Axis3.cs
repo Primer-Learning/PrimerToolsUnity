@@ -239,13 +239,19 @@ namespace Primer.Graph
 
         #region Tics
 
+        [DisableIf("@manualTicks.Count != 0")]
         public float ticStep = 2;
         public bool showZero;
         public int labelNumberOffset;
         public AxisTic ticPrefab;
         
+        public List<TicData> manualTicks;
+        
         private List<TicData> PrepareTics()
         {
+            if (manualTicks.Count > 0)
+                return manualTicks;
+            
             if (ticStep <= 0)
                 return new List<TicData>();
 
@@ -356,6 +362,10 @@ namespace Primer.Graph
             public TicData(float value, int labelOffset) {
                 this.value = value;
                 label = (value + labelOffset).FormatNumberWithDecimals();
+            }
+            public TicData(float value, string label) {
+                this.value = value;
+                this.label = label;
             }
         }
 
