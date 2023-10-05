@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Simulation.GameTheory
 {
-    public class Creature : LandscapeWalker
+    public class SimultaneousTurnCreature : LandscapeWalker
     {
         private static readonly int scoop = Animator.StringToHash("Scoop");
         private static readonly int eatSpeed = Animator.StringToHash("EatSpeed");

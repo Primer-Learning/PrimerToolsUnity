@@ -12,8 +12,8 @@ namespace Scenes.Intro_Scene_Sources
 {
     public class DHRBTestSequence : Sequence
     {
-        public AgentBasedEvoGameTheorySimController<DHRB> simController;
-        public AgentBasedEvoGameTheorySim<DHRB> sim => simController.sim;
+        public AgentBasedSimultaneousTurnEvoGameTheorySimController<DHRB> simController;
+        public AgentBasedSimultaneousTurnEvoGameTheorySim<DHRB> sim => simController.sim;
 
         public List<Home> homes;
 
@@ -50,13 +50,13 @@ namespace Scenes.Intro_Scene_Sources
 
             var creatureGnome = new SimpleGnome("Blobs", parent: simController.transform);
 
-            var initialCreatures = new List<Creature>();
+            var initialCreatures = new List<SimultaneousTurnCreature>();
             for (var i = 0; i < initialStrategyCountsByHome.Count; i++)
             {
                 var initialCreaturesDict = initialStrategyCountsByHome[i];
                 foreach (var (strategy, count) in initialCreaturesDict) {
                     for (var j = 0; j < count; j++) {
-                        var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
+                        var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
                         initialCreatures.Add(creature);
                         creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
                         creature.home = _homes[i];

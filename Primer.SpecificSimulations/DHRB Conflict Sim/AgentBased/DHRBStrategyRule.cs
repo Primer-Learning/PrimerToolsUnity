@@ -18,7 +18,7 @@ namespace Simulation.GameTheory
         // to /Concepts/ folder maybe
         // as long as it's only used inside this class, let's keep it here
 
-        public override void OnAgentCreated(Creature creature)
+        public override void OnAgentCreated(SimultaneousTurnCreature creature)
         {
             creature.gameObject.GetComponent<PrimerBlob>()
                 .SetColor(
@@ -44,7 +44,7 @@ namespace Simulation.GameTheory
             // }
         }
 
-        public override Tween Resolve(IEnumerable<Creature> creature, FruitTree tree)
+        public override Tween Resolve(IEnumerable<SimultaneousTurnCreature> creature, FruitTree tree)
         {
             var (first, second) = creature.Shuffle().ToList();
 

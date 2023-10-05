@@ -32,7 +32,7 @@ namespace Simulation.GameTheory
         Asexual
     }
     
-    public class AgentBasedEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
+    public class AgentBasedSimultaneousTurnEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
     {
         private HomeOptions _homeOptions;
         private TreeSelectionOptions _treeSelectionOptions;
@@ -63,16 +63,16 @@ namespace Simulation.GameTheory
         public Transform transform { get; }
         public Component component => transform;
 
-        public IEnumerable<Creature> creatures =>
-            creatureGnome.ChildComponents<Creature>().Where(x => x.gameObject.activeSelf);
+        public IEnumerable<SimultaneousTurnCreature> creatures =>
+            creatureGnome.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
         public IEnumerable<Enum> alleles => creatures.SelectMany(x => x.strategyGenes);
         public int currentCreatureCount => creatureGnome.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
-        public AgentBasedEvoGameTheorySim(
+        public AgentBasedSimultaneousTurnEvoGameTheorySim(
             Transform transform,
             int seed,
-            List<Creature> initialBlobs,
+            List<SimultaneousTurnCreature> initialBlobs,
             StrategyRule<T> strategyRule,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
@@ -89,7 +89,7 @@ namespace Simulation.GameTheory
             rng = new Rng(seed);
 
             creatureGnome = new SimpleGnome("Blobs", parent: transform);
-            creatureGnome.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<Creature>())).ForEach(x => x.gameObject.Dispose());
+            creatureGnome.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.Dispose());
             
             this.skipAnimations = skipAnimations;
 
@@ -105,7 +105,7 @@ namespace Simulation.GameTheory
             }
         }
 
-        private void ConfigureInitialBlobs(List<Creature> initialBlobs)
+        private void ConfigureInitialBlobs(List<SimultaneousTurnCreature> initialBlobs)
         {
             creatureGnome.Reset();
             
@@ -206,7 +206,7 @@ namespace Simulation.GameTheory
 
         public Tween AgentsReproduceOrDie()
         {
-            var newAgents = new List<Creature>();
+            var newAgents = new List<SimultaneousTurnCreature>();
 
             foreach (var creature in creatures)
             {
@@ -254,11 +254,11 @@ namespace Simulation.GameTheory
             return newAgents.Select(x => x.ScaleTo(1)).RunInParallel();
         }
 
-        private Creature CreateChild(Creature firstParent, Creature secondParent)
+        private SimultaneousTurnCreature CreateChild(SimultaneousTurnCreature firstParent, SimultaneousTurnCreature secondParent)
         {
             var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
             childGO.transform.parent = creatureGnome.transform;
-            var child = childGO.AddComponent<Creature>();
+            var child = childGO.AddComponent<SimultaneousTurnCreature>();
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type
@@ -313,7 +313,7 @@ namespace Simulation.GameTheory
         {
         }
 
-        private Tween Eat(List<Creature> competitors, FruitTree tree)
+        private Tween Eat(List<SimultaneousTurnCreature> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
                 case 1:

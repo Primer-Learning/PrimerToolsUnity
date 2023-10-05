@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Primer.Simulation
 {
     [ExecuteAlways]
-    public class AgentBasedEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
+    public class AgentBasedSimultaneousTurnEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
     {
         public int seed = 0;
         public bool runWhenEnteringPlayMode;
@@ -34,7 +34,7 @@ namespace Primer.Simulation
 
         public StrategyRule<T> strategyRule;
 
-        public AgentBasedEvoGameTheorySim<T> sim;
+        public AgentBasedSimultaneousTurnEvoGameTheorySim<T> sim;
         private int turn;
         
         #region Initial population handling 
@@ -65,14 +65,14 @@ namespace Primer.Simulation
             return dict;
         }
 
-        private List<Creature> CreateInitialCreatures()
+        private List<SimultaneousTurnCreature> CreateInitialCreatures()
         {
             var initialCreaturesDict = ConstructInitialStrategiesDictionary();
-            var initialCreatures = new List<Creature>();
+            var initialCreatures = new List<SimultaneousTurnCreature>();
             var creatureGnome = new SimpleGnome("Blobs", parent: transform);
             foreach (var (strategy, count) in initialCreaturesDict) {
                 for (var i = 0; i < count; i++) {
-                    var creature = creatureGnome.Add<Creature>("blob_skinned", $"Initial {strategy} {i + 1}");
+                    var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {i + 1}");
                     initialCreatures.Add(creature);
                     creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
                     creature.home = sim.homes.RandomItem();
@@ -109,14 +109,14 @@ namespace Primer.Simulation
         protected virtual async UniTask OnCycleCompleted() {}
         protected virtual async UniTask OnReset() {}
         
-        public void InitializeSim(List<Creature> creatures = null)
+        public void InitializeSim(List<SimultaneousTurnCreature> creatures = null)
         {
             turn = 0;
             SetStrategyRule();
 
             creatures ??= CreateInitialCreatures();
             
-            sim = new AgentBasedEvoGameTheorySim<T>(
+            sim = new AgentBasedSimultaneousTurnEvoGameTheorySim<T>(
                 transform: transform,
                 seed: seed,
                 initialBlobs: creatures,

@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Primer.SpecificSimulations
 {
     [RequireComponent(typeof(DHRBRewardEditorComponent))]
-    public class DHRBAgentBasedSimController : AgentBasedEvoGameTheorySimController<DHRB>
+    public class DHRBAgentBasedSimultaneousTurnSimController : AgentBasedSimultaneousTurnEvoGameTheorySimController<DHRB>
     {
         public Graph.Graph graph;
         public TernaryPlot ternaryPlot;

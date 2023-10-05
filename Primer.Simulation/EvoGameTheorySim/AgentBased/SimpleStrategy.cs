@@ -12,12 +12,12 @@ namespace Simulation.GameTheory
     }
     public class SimpleStrategyRule : StrategyRule<SimpleStrategy>
     {
-        public override void OnAgentCreated(Creature agent)
+        public override void OnAgentCreated(SimultaneousTurnCreature agent)
         {
             // noop
         }
 
-        public override Tween Resolve(IEnumerable<Creature> agents, FruitTree tree)
+        public override Tween Resolve(IEnumerable<SimultaneousTurnCreature> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 
