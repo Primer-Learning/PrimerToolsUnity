@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Primer.Simulation
 {
     [ExecuteAlways]
-    public class AgentBasedSimultaneousTurnEvoGameTheorySimController<T> : MonoBehaviour where T : Enum
+    public class AgentBasedSimultaneousTurnEvoGameTheorySimController : MonoBehaviour
     {
         public int seed = 0;
         public bool runWhenEnteringPlayMode;
@@ -32,31 +32,31 @@ namespace Primer.Simulation
             }
         }
 
-        public StrategyRule<T> strategyRule;
+        public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler;
 
-        public AgentBasedSimultaneousTurnEvoGameTheorySim<T> sim;
+        public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
         private int turn;
         
         #region Initial population handling 
         [SerializeField, HideInInspector]
-        private List<T> initialStrategyList;
+        private List<Type> initialStrategyList;
         [SerializeField, HideInInspector]
         private List<int> initialStrategyCountList;
 
         [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        public Dictionary<T, int> initialAlleleCounts = new();
+        public Dictionary<Type, int> initialAlleleCounts = new();
 
         [Button]
         private void SaveInitialPopulation()
         {
-            initialStrategyList = new List<T>(initialAlleleCounts.Keys);
+            initialStrategyList = new List<Type>(initialAlleleCounts.Keys);
             initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
             InitializeSim();
         }
         
-        private Dictionary<T, int> ConstructInitialStrategiesDictionary()
+        private Dictionary<Type, int> ConstructInitialStrategiesDictionary()
         {
-            var dict = new Dictionary<T, int>();
+            var dict = new Dictionary<Type, int>();
             for (var i = 0; i < initialStrategyList.Count; i++)
             {
                 dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
@@ -74,10 +74,10 @@ namespace Primer.Simulation
                 for (var i = 0; i < count; i++) {
                     var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {i + 1}");
                     initialCreatures.Add(creature);
-                    creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
+                    creature.strategyGenes = new Type[] { strategy };
                     creature.home = sim.homes.RandomItem();
                     creature.transform.position = creature.home.transform.position;
-                    strategyRule.OnAgentCreated(creature);
+                    simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
                 }
             }
 
@@ -116,11 +116,11 @@ namespace Primer.Simulation
 
             creatures ??= CreateInitialCreatures();
             
-            sim = new AgentBasedSimultaneousTurnEvoGameTheorySim<T>(
+            sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
                 transform: transform,
                 seed: seed,
                 initialBlobs: creatures,
-                strategyRule,
+                simultaneousTurnGameAgentHandler,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
                 treeSelectionOptions: treeSelectionOptions,

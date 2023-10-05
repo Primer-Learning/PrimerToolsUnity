@@ -5,29 +5,30 @@ using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Graph;
 using Primer.Simulation;
+using Primer.Simulation.Strategy.DHRB_Strategies;
 using Simulation.GameTheory;
 using UnityEngine;
 
 namespace Primer.SpecificSimulations
 {
     [RequireComponent(typeof(DHRBRewardEditorComponent))]
-    public class DHRBAgentBasedSimultaneousTurnSimController : AgentBasedSimultaneousTurnEvoGameTheorySimController<DHRB>
+    public class DHRBAgentBasedSimultaneousTurnSimController : AgentBasedSimultaneousTurnEvoGameTheorySimController
     {
         public Graph.Graph graph;
         public TernaryPlot ternaryPlot;
         
         protected override void SetStrategyRule()
         {
-            strategyRule = new DHRBStrategyRule();
-            strategyRule.rewardMatrix = GetComponent<RewardEditorComponent<DHRB>>().rewardMatrix;
+            simultaneousTurnGameAgentHandler = new DHRBSimultaneousTurnGameAgentHandler();
+            simultaneousTurnGameAgentHandler.rewardMatrix = GetComponent<RewardEditorComponent>().rewardMatrix;
         }
 
         protected override async UniTask OnSimStart()
         {
-            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Dove));
-            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Hawk));
-            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
-            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Bully));
+            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Dove)));
+            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Hawk)));
+            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Retaliator)));
+            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Bully)));
             var total = numDoves + numHawks + numRetaliators + numBullies;
             
             if (graph is not null)
@@ -75,10 +76,10 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnCycleCompleted()
         {
-            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Dove));
-            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Hawk));
-            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Retaliator));
-            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(DHRB.Bully));
+            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Dove)));
+            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Hawk)));
+            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Retaliator)));
+            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Bully)));
             var total = numDoves + numHawks + numRetaliators + numBullies;
 
             if (graph is not null)

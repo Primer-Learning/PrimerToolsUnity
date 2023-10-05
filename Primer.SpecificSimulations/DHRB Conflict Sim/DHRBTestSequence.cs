@@ -4,6 +4,7 @@ using System.Linq;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
+using Primer.Simulation.Strategy.DHRB_Strategies;
 using Primer.Timeline;
 using Simulation.GameTheory;
 using UnityEngine;
@@ -12,8 +13,8 @@ namespace Scenes.Intro_Scene_Sources
 {
     public class DHRBTestSequence : Sequence
     {
-        public AgentBasedSimultaneousTurnEvoGameTheorySimController<DHRB> simController;
-        public AgentBasedSimultaneousTurnEvoGameTheorySim<DHRB> sim => simController.sim;
+        public AgentBasedSimultaneousTurnEvoGameTheorySimController simController;
+        public AgentBasedSimultaneousTurnEvoGameTheorySim sim => simController.sim;
 
         public List<Home> homes;
 
@@ -26,17 +27,17 @@ namespace Scenes.Intro_Scene_Sources
         {
             base.Cleanup();
             
-            var initialStrategyCountsByHome = new List<Dictionary<DHRB, int>>()
+            var initialStrategyCountsByHome = new List<Dictionary<Type, int>>()
             {
                 new()
                 {
-                    {DHRB.Dove, 3},
-                    {DHRB.Hawk, 0}
+                    {typeof(Dove), 3},
+                    {typeof(Hawk), 0}
                 },
                 new()
                 {
-                    {DHRB.Dove, 0},
-                    {DHRB.Hawk, 3}
+                    {typeof(Dove), 0},
+                    {typeof(Hawk), 3}
                 }
                 // new()
                 // {
@@ -58,9 +59,9 @@ namespace Scenes.Intro_Scene_Sources
                     for (var j = 0; j < count; j++) {
                         var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
                         initialCreatures.Add(creature);
-                        creature.strategyGenes = Enumerable.Repeat((Enum)strategy, 10).ToArray();
+                        creature.strategyGenes = new Type[] {strategy}; 
                         creature.home = _homes[i];
-                        simController.strategyRule.OnAgentCreated(creature);
+                        simController.simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
                     }
                 }
             }

@@ -2,45 +2,46 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Primer.Simulation.Strategy;
 using UnityEngine;
 
 namespace Primer.Simulation
 {
     [Serializable]
-    public class RewardMatrix<T> : IEnumerable<(T, T, float)> where T : Enum
+    public class RewardMatrix : IEnumerable<(Type, Type, float)>
     {
         [Serializable]
         private struct Entry
         {
-            public T a;
-            public T b;
+            public Type a;
+            public Type b;
             public float value;
         }
 
         [SerializeField] private List<Entry> entries = new();
 
-        // private readonly Dictionary<T, Dictionary<T, float>> data = new();
+        private Type[] strategies; 
 
-        public float this[T a, T b] => Get(a, b);
+        public float this[Type a, Type b] => Get(a, b);
 
-        public RewardMatrix(float[,] values)
+        public RewardMatrix(Type[] strategies, float[,] values)
         {
-            var types = EnumUtil.Values<T>();
+            this.strategies = strategies;
             var cols = values.GetLength(0);
             var rows = values.GetLength(1);
 
-            if (cols != types.Length)
-                throw new ArgumentException("First dimension of values must match number of enum values");
+            if (cols != strategies.Length)
+                throw new ArgumentException("First dimension of values must match number of strategies");
 
-            if (rows != types.Length)
-                throw new ArgumentException("Second dimension of values must match number of enum values");
+            if (rows != strategies.Length)
+                throw new ArgumentException("Second dimension of values must match number of strategies");
 
             for (var i = 0; i < cols; i++)
             for (var j = 0; j < rows; j++)
-                Set(types[i], types[j], values[i, j]);
+                Set(strategies[i], strategies[j], values[i, j]);
         }
 
-        public float Get(T a, T b)
+        public float Get(Type a, Type b)
         {
             var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
 
@@ -50,7 +51,7 @@ namespace Primer.Simulation
             return entries[index].value;
         }
 
-        public void Set(T a, T b, float value)
+        public void Set(Type a, Type b, float value)
         {
             var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
 
@@ -62,12 +63,10 @@ namespace Primer.Simulation
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IEnumerator<(T, T, float)> GetEnumerator()
+        public IEnumerator<(Type, Type, float)> GetEnumerator()
         {
-            var types = EnumUtil.Values<T>();
-
-            foreach (var a in types)
-            foreach (var b in types)
+            foreach (var a in strategies)
+            foreach (var b in strategies)
                 yield return (a, b, this[a, b]);
         }
     }

@@ -3,7 +3,7 @@ using Primer.Simulation;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-public abstract class RewardEditorComponent<T> : MonoBehaviour where T : Enum
+public abstract class RewardEditorComponent : MonoBehaviour
 {
     // Obviously there's a more general way to handle triggering/listening, but this is straightforward for now.
     [PropertyOrder(-2)]
@@ -14,8 +14,10 @@ public abstract class RewardEditorComponent<T> : MonoBehaviour where T : Enum
         if (vectorField is not null)
             vectorField.TriggeredPlotArrows();
     }
+
+    protected abstract Type[] GetStrategyTypes();
     
-    public RewardMatrix<T> rewardMatrix => new(PutValuesInMatrix());
+    public RewardMatrix rewardMatrix => new(GetStrategyTypes(), PutValuesInMatrix());
 
     public abstract float[,] PutValuesInMatrix();
 }

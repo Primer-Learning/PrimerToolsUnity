@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -25,8 +26,8 @@ namespace Simulation.GameTheory
 
         public float energy;
         public FruitTree goingToEat;
-        public System.Enum[] strategyGenes;
-        public System.Enum strategy => strategyGenes.RandomItem();
+        public Type[] strategyGenes;
+        public Type strategy => strategyGenes.RandomItem();
         public Home home;
 
         public SimpleGnome stomach => new ("Stomach", parent: transform);

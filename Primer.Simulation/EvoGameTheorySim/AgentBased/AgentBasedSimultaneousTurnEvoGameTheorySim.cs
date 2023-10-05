@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using PlasticGui.WorkspaceWindow.IssueTrackers;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
@@ -32,7 +31,7 @@ namespace Simulation.GameTheory
         Asexual
     }
     
-    public class AgentBasedSimultaneousTurnEvoGameTheorySim<T> : ISimulation, IPrimer, IDisposable where T : Enum
+    public class AgentBasedSimultaneousTurnEvoGameTheorySim : ISimulation, IPrimer, IDisposable
     {
         private HomeOptions _homeOptions;
         private TreeSelectionOptions _treeSelectionOptions;
@@ -46,7 +45,7 @@ namespace Simulation.GameTheory
         
         public readonly SimpleGnome creatureGnome;
 
-        private readonly StrategyRule<T> _strategyRule;
+        private readonly SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
 
         public Rng rng { get; }
         
@@ -65,7 +64,7 @@ namespace Simulation.GameTheory
 
         public IEnumerable<SimultaneousTurnCreature> creatures =>
             creatureGnome.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
-        public IEnumerable<Enum> alleles => creatures.SelectMany(x => x.strategyGenes);
+        public IEnumerable<Type> alleles => creatures.SelectMany(x => x.strategyGenes);
         public int currentCreatureCount => creatureGnome.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
@@ -73,7 +72,7 @@ namespace Simulation.GameTheory
             Transform transform,
             int seed,
             List<SimultaneousTurnCreature> initialBlobs,
-            StrategyRule<T> strategyRule,
+            SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
             TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random,
@@ -81,7 +80,7 @@ namespace Simulation.GameTheory
             )
         {
             this.transform = transform;
-            _strategyRule = strategyRule;
+            _simultaneousTurnGameAgentHandler = simultaneousTurnGameAgentHandler;
             _homeOptions = homeOptions;
             _treeSelectionOptions = treeSelectionOptions;
             _reproductionType = reproductionType;
@@ -115,7 +114,7 @@ namespace Simulation.GameTheory
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
                 creature.rng = rng;
-                _strategyRule.OnAgentCreated(creature);
+                _simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
             }
         }
 
@@ -284,7 +283,7 @@ namespace Simulation.GameTheory
                         Debug.LogError("Number of genes must be even for diploid reproduction");
                         return null;
                     }
-                    var strategyGenes = new Enum[numGenes];
+                    var strategyGenes = new Type[numGenes];
                     for (var i = 0; i < numGenes / 2; i++)
                     {
                         strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
@@ -302,7 +301,7 @@ namespace Simulation.GameTheory
 
             child.landscape = terrain;
             child.transform.localPosition = firstParent.transform.localPosition;
-            _strategyRule.OnAgentCreated(child);
+            _simultaneousTurnGameAgentHandler.OnAgentCreated(child);
             child.rng = rng;
             child.transform.localScale = Vector3.zero;
 
@@ -329,7 +328,7 @@ namespace Simulation.GameTheory
                 }
                 
                 case > 1:
-                    return _strategyRule.Resolve(competitors, tree);
+                    return _simultaneousTurnGameAgentHandler.Resolve(competitors, tree);
                 
                 default:
                     throw new ArgumentException("Cannot eat without creatures", nameof(competitors));
@@ -399,16 +398,16 @@ namespace Simulation.GameTheory
             creatureGnome?.Reset(hard: true);
         }
         
-        private string StrategyGenesString(Enum[] strategyGenes)
-        {
-            // Iterate through the enum of type T and count the number of times each strategy appears in the creature's strategy genes
-            var strategyCounts = new Dictionary<T, int>();
-            foreach (var strategy in Enum.GetValues(typeof(T)).Cast<T>())
-            {
-                strategyCounts.Add(strategy, strategyGenes.Count(x => x.Equals(strategy)));
-            }
-            // Return a string of the strategy counts
-            return string.Join(", ", strategyCounts.Select(x => $"{x.Key}: {x.Value}"));
-        }
+        // private string StrategyGenesString(Enum[] strategyGenes)
+        // {
+        //     // Iterate through the enum of type T and count the number of times each strategy appears in the creature's strategy genes
+        //     var strategyCounts = new Dictionary<T, int>();
+        //     foreach (var strategy in Enum.GetValues(typeof(T)).Cast<T>())
+        //     {
+        //         strategyCounts.Add(strategy, strategyGenes.Count(x => x.Equals(strategy)));
+        //     }
+        //     // Return a string of the strategy counts
+        //     return string.Join(", ", strategyCounts.Select(x => $"{x.Key}: {x.Value}"));
+        // }
     }
 }

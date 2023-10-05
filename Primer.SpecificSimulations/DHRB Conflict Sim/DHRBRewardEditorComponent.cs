@@ -1,7 +1,9 @@
-﻿using Simulation.GameTheory;
+﻿using System;
+using Primer.Simulation.Strategy.DHRB_Strategies;
+using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 
-public class DHRBRewardEditorComponent : RewardEditorComponent<DHRB>
+public class DHRBRewardEditorComponent : RewardEditorComponent
 {
     [Title("Base fitness reward")]
     [PropertyOrder(-2)]
@@ -64,7 +66,19 @@ public class DHRBRewardEditorComponent : RewardEditorComponent<DHRB>
     public float demandAmount = 0;
     public float firstStrikeAdvantage = 0;
     public float bluffPenalty = 0;
-    
+
+    private readonly Type[] strategyTypes =
+    {
+        typeof(Dove),
+        typeof(Hawk),
+        typeof(Retaliator),
+        typeof(Bully)
+    };
+    protected override Type[] GetStrategyTypes()
+    {
+        return strategyTypes;
+    }
+
     public override float[,] PutValuesInMatrix()
     {
         return new[,] {

@@ -10,7 +10,7 @@ namespace Simulation.GameTheory
     {
         Share
     }
-    public class SimpleStrategyRule : StrategyRule<SimpleStrategy>
+    public class SimpleSimultaneousTurnGameAgentHandler : SimultaneousTurnGameAgentHandler
     {
         public override void OnAgentCreated(SimultaneousTurnCreature agent)
         {
