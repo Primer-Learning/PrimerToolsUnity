@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
+using Primer.Simulation.Genome.Strategy;
 using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace Simulation.GameTheory
 
         public IEnumerable<SimultaneousTurnCreature> creatures =>
             creatureGnome.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
-        public IEnumerable<Type> alleles => creatures.SelectMany(x => x.strategyGenes);
+        public IEnumerable<SimultaneousTurnStrategyGene> alleles => creatures.SelectMany(x => x.strategyGenes.GetAlleles());
         public int currentCreatureCount => creatureGnome.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
@@ -265,38 +266,39 @@ namespace Simulation.GameTheory
             {
                 child.strategyGenes = firstParent.strategyGenes;
             }
-            else switch (_reproductionType)
+            else
             {
-                case ReproductionType.SexualHaploid:
-                {
-                    var strategyGenes = firstParent.strategyGenes
-                        .Zip(secondParent.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
-                
-                    child.strategyGenes = strategyGenes;
-                    break;
-                }
-                case ReproductionType.SexualDiploid:
-                {
-                    var numGenes = firstParent.strategyGenes.Length;
-                    if (numGenes % 2 != 0)
-                    {
-                        Debug.LogError("Number of genes must be even for diploid reproduction");
-                        return null;
-                    }
-                    var strategyGenes = new Type[numGenes];
-                    for (var i = 0; i < numGenes / 2; i++)
-                    {
-                        strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
-                            : firstParent.strategyGenes[i + numGenes / 2];
-                    }
-                    for (var i = numGenes / 2; i < numGenes; i++)
-                    {
-                        strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? secondParent.strategyGenes[i]
-                            : secondParent.strategyGenes[i - secondParent.strategyGenes.Length / 2];
-                    }
-                    child.strategyGenes = strategyGenes;
-                    break;
-                }
+                child.strategyGenes = firstParent.strategyGenes.SexuallyReproduce(secondParent.strategyGenes);
+                // case ReproductionType.SexualHaploid:
+                // {
+                //     var strategyGenes = firstParent.strategyGenes
+                //         .Zip(secondParent.strategyGenes, (a, b) => rng.rand.NextDouble() < 0.5 ? a : b).ToArray();
+                //
+                //     child.strategyGenes = strategyGenes;
+                //     break;
+                // }
+                // case ReproductionType.SexualDiploid:
+                // {
+                //     var numGenes = firstParent.strategyGenes.Length;
+                //     if (numGenes % 2 != 0)
+                //     {
+                //         Debug.LogError("Number of genes must be even for diploid reproduction");
+                //         return null;
+                //     }
+                //     var strategyGenes = new Type[numGenes];
+                //     for (var i = 0; i < numGenes / 2; i++)
+                //     {
+                //         strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? firstParent.strategyGenes[i]
+                //             : firstParent.strategyGenes[i + numGenes / 2];
+                //     }
+                //     for (var i = numGenes / 2; i < numGenes; i++)
+                //     {
+                //         strategyGenes[i] = rng.rand.NextDouble() < 0.5 ? secondParent.strategyGenes[i]
+                //             : secondParent.strategyGenes[i - secondParent.strategyGenes.Length / 2];
+                //     }
+                //     child.strategyGenes = strategyGenes;
+                //     break;
+                // }
             }
 
             child.landscape = terrain;
@@ -390,7 +392,7 @@ namespace Simulation.GameTheory
         
         private int StrategyCount(Enum strategy)
         {
-            return creatures.Count(x => x.strategy.Equals(strategy));
+            return creatures.Count(x => x.action.Equals(strategy));
         }
 
         public void Dispose()

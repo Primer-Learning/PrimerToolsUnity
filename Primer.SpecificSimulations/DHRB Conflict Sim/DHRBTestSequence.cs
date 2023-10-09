@@ -4,7 +4,8 @@ using System.Linq;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
-using Primer.Simulation.Strategy.DHRB_Strategies;
+using Primer.Simulation.EvoGameTheorySim.AgentBased;
+using Primer.Simulation.Genome.Strategy;
 using Primer.Timeline;
 using Simulation.GameTheory;
 using UnityEngine;
@@ -27,17 +28,17 @@ namespace Scenes.Intro_Scene_Sources
         {
             base.Cleanup();
             
-            var initialStrategyCountsByHome = new List<Dictionary<Type, int>>()
+            var initialStrategyCountsByHome = new List<Dictionary<SimultaneousTurnStrategyGene, int>>()
             {
                 new()
                 {
-                    {typeof(Dove), 3},
-                    {typeof(Hawk), 0}
+                    {new SimultaneousTurnStrategyGenes.Dove(), 3},
+                    {new SimultaneousTurnStrategyGenes.Hawk(), 0}
                 },
                 new()
                 {
-                    {typeof(Dove), 0},
-                    {typeof(Hawk), 3}
+                    {new SimultaneousTurnStrategyGenes.Dove(), 0},
+                    {new SimultaneousTurnStrategyGenes.Hawk(), 3}
                 }
                 // new()
                 // {
@@ -59,7 +60,7 @@ namespace Scenes.Intro_Scene_Sources
                     for (var j = 0; j < count; j++) {
                         var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
                         initialCreatures.Add(creature);
-                        creature.strategyGenes = new Type[] {strategy}; 
+                        creature.strategyGenes = new SimultaneousTurnGenome(strategy); 
                         creature.home = _homes[i];
                         simController.simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
                     }

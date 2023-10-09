@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Graph;
 using Primer.Simulation;
-using Primer.Simulation.Strategy.DHRB_Strategies;
 using Simulation.GameTheory;
 using UnityEngine;
 
@@ -25,11 +24,14 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnSimStart()
         {
-            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Dove)));
-            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Hawk)));
-            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Retaliator)));
-            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Bully)));
-            var total = numDoves + numHawks + numRetaliators + numBullies;
+            var alleles = sim.alleles;
+            var numDoves = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Dove));
+            var numHawks = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Hawk));
+            var numRetaliators = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Retaliator));
+            var numBullies = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Bully));
+            var numMixed = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.MixedHawkDove));
+            
+            var total = numDoves + numHawks + numRetaliators + numBullies + numMixed;
             
             if (graph is not null)
             {
@@ -76,11 +78,14 @@ namespace Primer.SpecificSimulations
 
         protected override async UniTask OnCycleCompleted()
         {
-            var numDoves = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Dove)));
-            var numHawks = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Hawk)));
-            var numRetaliators = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Retaliator)));
-            var numBullies = sim.creatures.Count(agent => agent.strategy.Equals(typeof(Bully)));
-            var total = numDoves + numHawks + numRetaliators + numBullies;
+            var alleles = sim.alleles;
+            var numDoves = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Dove));
+            var numHawks = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Hawk));
+            var numRetaliators = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Retaliator));
+            var numBullies = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.Bully));
+            var numMixed = alleles.Count(allele => allele.GetType() == typeof(SimultaneousTurnStrategyGenes.MixedHawkDove));
+            
+            var total = numDoves + numHawks + numRetaliators + numBullies + numMixed;
 
             if (graph is not null)
             {

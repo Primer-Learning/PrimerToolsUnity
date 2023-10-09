@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Primer;
 using Primer.Animation;
 using Primer.Simulation;
+using Primer.Simulation.Genome.Strategy;
 using Primer.Timeline;
 using UnityEngine;
 
@@ -26,8 +27,8 @@ namespace Simulation.GameTheory
 
         public float energy;
         public FruitTree goingToEat;
-        public Type[] strategyGenes;
-        public Type strategy => strategyGenes.RandomItem();
+        public SimultaneousTurnGenome strategyGenes;
+        public SimultaneousTurnAction action => strategyGenes.GetAction();
         public Home home;
 
         public SimpleGnome stomach => new ("Stomach", parent: transform);

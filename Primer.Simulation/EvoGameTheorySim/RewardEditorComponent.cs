@@ -15,7 +15,7 @@ public abstract class RewardEditorComponent : MonoBehaviour
             vectorField.TriggeredPlotArrows();
     }
 
-    protected abstract Type[] GetStrategyTypes();
+    protected abstract SimultaneousTurnAction[] GetStrategyTypes();
     
     public RewardMatrix rewardMatrix => new(GetStrategyTypes(), PutValuesInMatrix());
 

@@ -1,6 +1,6 @@
 ﻿using System;
-using Primer.Simulation.Strategy.DHRB_Strategies;
-using Simulation.GameTheory;
+using Primer.Simulation;
+using Primer.Simulation.Genome.Strategy;
 using Sirenix.OdinInspector;
 
 public class DHRBRewardEditorComponent : RewardEditorComponent
@@ -67,14 +67,14 @@ public class DHRBRewardEditorComponent : RewardEditorComponent
     public float firstStrikeAdvantage = 0;
     public float bluffPenalty = 0;
 
-    private readonly Type[] strategyTypes =
+    private readonly SimultaneousTurnAction[] strategyTypes =
     {
-        typeof(Dove),
-        typeof(Hawk),
-        typeof(Retaliator),
-        typeof(Bully)
+        SimultaneousTurnAction.Dove,
+        SimultaneousTurnAction.Hawk,
+        SimultaneousTurnAction.Retaliator,
+        SimultaneousTurnAction.Bully
     };
-    protected override Type[] GetStrategyTypes()
+    protected override SimultaneousTurnAction[] GetStrategyTypes()
     {
         return strategyTypes;
     }

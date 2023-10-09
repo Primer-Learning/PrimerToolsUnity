@@ -1,30 +1,28 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Primer.Simulation.Strategy;
 using UnityEngine;
 
 namespace Primer.Simulation
 {
     [Serializable]
-    public class RewardMatrix : IEnumerable<(Type, Type, float)>
+    public class RewardMatrix : IEnumerable<(SimultaneousTurnAction, SimultaneousTurnAction, float)>
     {
         [Serializable]
         private struct Entry
         {
-            public Type a;
-            public Type b;
+            public SimultaneousTurnAction a;
+            public SimultaneousTurnAction b;
             public float value;
         }
 
         [SerializeField] private List<Entry> entries = new();
 
-        private Type[] strategies; 
+        private SimultaneousTurnAction[] strategies; 
 
-        public float this[Type a, Type b] => Get(a, b);
+        public float this[SimultaneousTurnAction a, SimultaneousTurnAction b] => Get(a, b);
 
-        public RewardMatrix(Type[] strategies, float[,] values)
+        public RewardMatrix(SimultaneousTurnAction[] strategies, float[,] values)
         {
             this.strategies = strategies;
             var cols = values.GetLength(0);
@@ -41,7 +39,7 @@ namespace Primer.Simulation
                 Set(strategies[i], strategies[j], values[i, j]);
         }
 
-        public float Get(Type a, Type b)
+        public float Get(SimultaneousTurnAction a, SimultaneousTurnAction b)
         {
             var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
 
@@ -51,7 +49,7 @@ namespace Primer.Simulation
             return entries[index].value;
         }
 
-        public void Set(Type a, Type b, float value)
+        public void Set(SimultaneousTurnAction a, SimultaneousTurnAction b, float value)
         {
             var index = entries.FindIndex(x => x.a.Equals(a) && x.b.Equals(b));
 
@@ -63,7 +61,7 @@ namespace Primer.Simulation
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IEnumerator<(Type, Type, float)> GetEnumerator()
+        public IEnumerator<(SimultaneousTurnAction, SimultaneousTurnAction, float)> GetEnumerator()
         {
             foreach (var a in strategies)
             foreach (var b in strategies)

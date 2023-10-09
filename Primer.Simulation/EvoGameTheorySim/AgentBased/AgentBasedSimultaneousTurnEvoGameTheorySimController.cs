@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Primer.Simulation.Genome.Strategy;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -54,35 +55,35 @@ namespace Primer.Simulation
             InitializeSim();
         }
         
-        private Dictionary<Type, int> ConstructInitialStrategiesDictionary()
-        {
-            var dict = new Dictionary<Type, int>();
-            for (var i = 0; i < initialStrategyList.Count; i++)
-            {
-                dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
-            }
-            initialAlleleCounts = dict;
-            return dict;
-        }
+        // private Dictionary<Type, int> ConstructInitialStrategiesDictionary()
+        // {
+        //     var dict = new Dictionary<SimultaneousTurnStrategyGene, int>();
+        //     for (var i = 0; i < initialStrategyList.Count; i++)
+        //     {
+        //         dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
+        //     }
+        //     initialAlleleCounts = dict;
+        //     return dict;
+        // }
 
-        private List<SimultaneousTurnCreature> CreateInitialCreatures()
-        {
-            var initialCreaturesDict = ConstructInitialStrategiesDictionary();
-            var initialCreatures = new List<SimultaneousTurnCreature>();
-            var creatureGnome = new SimpleGnome("Blobs", parent: transform);
-            foreach (var (strategy, count) in initialCreaturesDict) {
-                for (var i = 0; i < count; i++) {
-                    var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {i + 1}");
-                    initialCreatures.Add(creature);
-                    creature.strategyGenes = new Type[] { strategy };
-                    creature.home = sim.homes.RandomItem();
-                    creature.transform.position = creature.home.transform.position;
-                    simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
-                }
-            }
-
-            return initialCreatures;
-        }
+        // private List<SimultaneousTurnCreature> CreateInitialCreatures()
+        // {
+        //     var initialCreaturesDict = ConstructInitialStrategiesDictionary();
+        //     var initialCreatures = new List<SimultaneousTurnCreature>();
+        //     var creatureGnome = new SimpleGnome("Blobs", parent: transform);
+        //     foreach (var (strategy, count) in initialCreaturesDict) {
+        //         for (var i = 0; i < count; i++) {
+        //             var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {i + 1}");
+        //             initialCreatures.Add(creature);
+        //             creature.strategyGenes = (SimultaneousTurnGenome)new Genome(strategy);
+        //             creature.home = sim.homes.RandomItem();
+        //             creature.transform.position = creature.home.transform.position;
+        //             simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
+        //         }
+        //     }
+        //
+        //     return initialCreatures;
+        // }
         
         #endregion
 
@@ -113,9 +114,7 @@ namespace Primer.Simulation
         {
             turn = 0;
             SetStrategyRule();
-
-            creatures ??= CreateInitialCreatures();
-            
+            // creatures ??= CreateInitialCreatures();
             sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
                 transform: transform,
                 seed: seed,
