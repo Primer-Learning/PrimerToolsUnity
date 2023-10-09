@@ -110,16 +110,22 @@ namespace Primer.Simulation
         protected virtual async UniTask OnCycleCompleted() {}
         protected virtual async UniTask OnReset() {}
         
-        public void InitializeSim(List<SimultaneousTurnCreature> creatures = null)
+        public void InitializeSim(List<SimultaneousTurnCreature> creatures = null, Rng rng = null)
         {
+            // Log messages to hopefully prevent confusion when providing an rng object
+            if (rng != null)
+            {
+                Debug.LogWarning("Initializing sim with provided rng object. Seed will be ignored.");
+            }
+            
             turn = 0;
             SetStrategyRule();
-            // creatures ??= CreateInitialCreatures();
             sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
                 transform: transform,
-                seed: seed,
                 initialBlobs: creatures,
                 simultaneousTurnGameAgentHandler,
+                rngSeed: seed,
+                rng: rng,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
                 treeSelectionOptions: treeSelectionOptions,

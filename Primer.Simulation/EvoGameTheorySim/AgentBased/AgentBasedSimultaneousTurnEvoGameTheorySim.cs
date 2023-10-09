@@ -71,9 +71,10 @@ namespace Simulation.GameTheory
         // Constructor that accepts a list of creatures instead of a dictionary
         public AgentBasedSimultaneousTurnEvoGameTheorySim(
             Transform transform,
-            int seed,
             List<SimultaneousTurnCreature> initialBlobs,
             SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler,
+            int rngSeed,
+            Rng rng = null,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
             TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random,
@@ -86,7 +87,14 @@ namespace Simulation.GameTheory
             _treeSelectionOptions = treeSelectionOptions;
             _reproductionType = reproductionType;
 
-            rng = new Rng(seed);
+            if (rng != null)
+            {
+                this.rng = rng;
+            }
+            else
+            {
+                this.rng = new Rng(rngSeed);
+            }
 
             creatureGnome = new SimpleGnome("Blobs", parent: transform);
             creatureGnome.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.Dispose());
