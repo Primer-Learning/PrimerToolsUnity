@@ -333,7 +333,6 @@ namespace Primer.Simulation
 
             var collision = meshCollider.Raycast(ray, out var hitInfo, float.PositiveInfinity);
             if (!collision) return new Vector3(x, 0, z);
-            Debug.Log("Hit!");
             return hitInfo.point;
         }
 

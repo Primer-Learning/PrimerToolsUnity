@@ -116,9 +116,7 @@ namespace Primer.Simulation
                 var pos = point + offset;
 
                 if (hasLandscape) {
-                    Debug.Log(pos);
                     instance.position = landscape.GetGroundAtWorldPoint(landscape.transform.TransformPoint(new Vector3(pos.x, 0, pos.y)));
-                    Debug.Log(instance.position);
                     var landscapeItem = instance.GetOrAddComponent<LandscapeItem>();
                     landscapeItem.landscape = landscape;
                 } else {
