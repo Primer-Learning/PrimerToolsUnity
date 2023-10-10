@@ -27,8 +27,7 @@ namespace Simulation.GameTheory
     
     public enum ReproductionType
     {
-        SexualHaploid,
-        SexualDiploid,
+        Sexual,
         Asexual
     }
     
@@ -161,20 +160,29 @@ namespace Simulation.GameTheory
                 case TreeSelectionOptions.Random:
                     // Make creatures each go to a random tree, but a maximum of two per tree
                     var treeSlots = trees.Concat(trees).Shuffle(rng);
-                    return creatures
-                        .Shuffle(rng)
+                    var shuffledCreatures = creatures.Shuffle(rng);
+                    var goToTreesTweens = creatures
                         .Take(treeSlots.Count)
                         .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
                         .RunInParallel();
+                    var deathTweens= shuffledCreatures
+                        .Skip(treeSlots.Count)
+                        .Select(creature => creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)))
+                        .RunInParallel();
+                    return Tween.Parallel(
+                        goToTreesTweens,
+                        deathTweens
+                    );
                 case TreeSelectionOptions.PreferNearest:
-                    var tweens = new List<Tween>();
-                    foreach (var creature in creatures)
+                    var goToTreesTweenList = new List<Tween>();
+                    var deathTweenList = new List<Tween>();
+                    foreach (var creature in creatures.Shuffle(rng))
                     {
                         var foundTree = false;
                         foreach (var tree in creature.home.treesByDistance)
                         {
                             if (!trees1.Contains(tree)) continue;
-                            tweens.Add(creature.GoToEat(tree, fruitIndex: 0));
+                            goToTreesTweenList.Add(creature.GoToEat(tree, fruitIndex: 0));
                             trees1.Remove(tree);
                             foundTree = true;
                             break;
@@ -183,12 +191,18 @@ namespace Simulation.GameTheory
                         foreach (var tree in creature.home.treesByDistance)
                         {
                             if (!trees2.Contains(tree)) continue;
-                            tweens.Add(creature.GoToEat(tree, fruitIndex: 1));
+                            goToTreesTweenList.Add(creature.GoToEat(tree, fruitIndex: 1));
                             trees2.Remove(tree);
+                            foundTree = true;
                             break;
                         }
+                        if (foundTree) continue;
+                        deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)));
                     }
-                    return tweens.RunInParallel();
+                    return Tween.Parallel(
+                        goToTreesTweenList.RunInParallel(),
+                        deathTweenList.RunInParallel()
+                    );
                 default:
                     Debug.LogError("Tree selection option not implemented");
                     return null;
@@ -235,7 +249,7 @@ namespace Simulation.GameTheory
 
             foreach (var home in creaturesByHome)
             {
-                var creaturesInHome = home.Shuffle().ToList();
+                var creaturesInHome = home.Shuffle(rng).ToList();
                 while (creaturesInHome.Count > 1)
                 {
                     var (first, second) = creaturesInHome.Take(2).ToList();
@@ -367,11 +381,11 @@ namespace Simulation.GameTheory
             switch (_homeOptions)
             {
                 case HomeOptions.Random:
-                    return creatures.Select(x => homes.RandomItem());
+                    return creatures.Select(x => homes.RandomItem(rng));
                 case HomeOptions.ChooseNearestEveryDay:
                     return creatures.Select(x => homes.OrderBy(y => (x.transform.position - y.transform.position).sqrMagnitude).First());
                 case HomeOptions.Keep:
-                    return creatures.Select(x => x.home ?? homes.RandomItem());
+                    return creatures.Select(x => x.home ?? homes.RandomItem(rng));
                 default:
                     Debug.LogError("Home option not implemented");
                     return null;
