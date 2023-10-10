@@ -232,7 +232,7 @@ namespace Primer.Simulation
         private void Awake()
         {
             var meshRenderer = root.GetOrAddComponent<MeshRenderer>();
-            meshRenderer.sharedMaterial ??= new Material(Shader.Find("Standard"));
+            meshRenderer.sharedMaterial ??= Resources.Load<Material>("grass");
             Generate();
         }
 
