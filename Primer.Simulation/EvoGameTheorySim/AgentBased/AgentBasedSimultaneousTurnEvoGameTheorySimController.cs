@@ -36,6 +36,9 @@ namespace Primer.Simulation
         public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler;
 
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
+        public IEnumerable<Home> homes => transform.GetComponentsInChildren<Home>();
+        public IEnumerable<FruitTree> trees => transform.GetComponentsInChildren<FruitTree>();
+        public PoissonPrefabPlacer placer => transform.GetComponentInChildren<PoissonPrefabPlacer>();
         private int turn;
         
         #region Initial population handling 
@@ -98,7 +101,14 @@ namespace Primer.Simulation
                 Time.timeScale = Time.timeScale == 0 ? 1 : 0;
         }
 
-        public void OnEnable() => InitializeSim();
+        public void Awake()
+        {
+            var terrainAndObjectGnome = new SimpleGnome(transform);
+            var newPlacer = terrainAndObjectGnome.Add<PoissonPrefabPlacer>("Trees");
+            newPlacer.prefab1 = Resources.Load<Transform>("mango tree medium");
+            newPlacer.prefab2 = Resources.Load<Transform>("home");
+            newPlacer.landscape = terrainAndObjectGnome.Add<Landscape>("Terrain");
+        }
 
         public async void OnDisable() => DisposeSim();
         #endregion
