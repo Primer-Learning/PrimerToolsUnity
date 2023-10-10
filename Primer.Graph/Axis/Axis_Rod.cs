@@ -11,7 +11,7 @@ namespace Primer.Graph
 
         private Tween TransitionRod(Transform rodParent)
         {
-            var rod = new SimpleGnome("Rod", parent: rodParent);
+            var rod = new Primer.SimpleGnome("Rod", parent: rodParent);
             var position = new Vector3(rodStart, 0f, 0f);
             var scale = new Vector3(rodEnd - rodStart, thickness, thickness);
 
@@ -23,7 +23,7 @@ namespace Primer.Graph
             );
         }
 
-        private static void DrawBar(SimpleGnome rod)
+        private static void DrawBar(Primer.SimpleGnome rod)
         {
             var cylinder = rod.Add<Transform>("AxisRod", "AxisRod");
             cylinder.localPosition = new Vector3(0.5f, 0, 0);

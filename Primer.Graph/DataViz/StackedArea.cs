@@ -162,7 +162,7 @@ namespace Primer.Graph
         private void Render() => Render(renderedLines);
         private void Render(IEnumerable<ILine> data)
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             gnome.Reset();
             var lines = (data ?? new List<ILine>()).ToList();
 

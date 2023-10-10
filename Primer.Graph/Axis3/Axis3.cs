@@ -117,7 +117,7 @@ namespace Primer.Graph
         #region Rod
         private Tween TransitionRod()
         {
-            var rod = new SimpleGnome("Rod", parent: transform);
+            var rod = new Primer.SimpleGnome("Rod", parent: transform);
             var position = new Vector3(-padding.x, 0f, 0f);
             var rodScale = length == 0 
                 ? Vector3.zero
@@ -131,7 +131,7 @@ namespace Primer.Graph
             );
         }
 
-        private static void DrawBar(SimpleGnome rod)
+        private static void DrawBar(Primer.SimpleGnome rod)
         {
             var cylinder = rod.Add<Transform>("AxisRod", "AxisRod");
             cylinder.localPosition = new Vector3(0.5f, 0, 0);
@@ -147,7 +147,7 @@ namespace Primer.Graph
 
         private Tween TransitionArrows()
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             
             var endArrow = gnome.Add<Transform>(arrowPrefab, "End Arrow");
             endArrow.localRotation = Quaternion.Euler(0f, 90f, 0f);
@@ -206,7 +206,7 @@ namespace Primer.Graph
 
         private (Tween removeLabel, Tween updateLabel, Tween addLabel) TransitionLabel()
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var labelTransform = gnome.AddLatex(label, "Label").transform;
 
             var pos = labelOffset + (labelPosition switch {
@@ -275,11 +275,11 @@ namespace Primer.Graph
         }
         private (Tween remove, Tween update, Tween add) TransitionTics()
         {
-            var parentGnome = new SimpleGnome(transform);
+            var parentGnome = new Primer.SimpleGnome(transform);
             var gnomeTransform = parentGnome
                 .Add("Tics container");
             gnomeTransform.localRotation = Quaternion.identity;
-            var gnome = new SimpleGnome(gnomeTransform);
+            var gnome = new Primer.SimpleGnome(gnomeTransform);
 
             var addTweens = new List<Tween>();
             var updateTweens = new List<Tween>();

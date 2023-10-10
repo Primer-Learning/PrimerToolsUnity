@@ -5,6 +5,7 @@ using Primer.Graph;
 using Primer.Scene;
 using Primer.Timeline;
 using UnityEngine;
+using SimpleGnome = Primer.SimpleGnome;
 
 public class GraphTestSequence : Sequence
 {

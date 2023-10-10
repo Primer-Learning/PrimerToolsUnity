@@ -75,13 +75,13 @@ namespace Primer.Graph
             return CropTicksCount(expectedTicks);
         }
 
-        private (Tween add, Tween update, Tween remove) TransitionTicks(SimpleGnome parentGnome, bool defer)
+        private (Tween add, Tween update, Tween remove) TransitionTicks(Primer.SimpleGnome parentGnome, bool defer)
         {
 
             var gnomeTransform = parentGnome
                 .Add("Ticks container");
             gnomeTransform.localRotation = Quaternion.identity;
-            var gnome = new SimpleGnome(gnomeTransform);
+            var gnome = new Primer.SimpleGnome(gnomeTransform);
 
             var addTweens = new List<Tween>();
             var updateTweens = new List<Tween>();

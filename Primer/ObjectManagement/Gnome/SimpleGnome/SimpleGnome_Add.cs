@@ -1,7 +1,5 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Primer
 {
@@ -72,7 +70,7 @@ namespace Primer
             var hasName = !string.IsNullOrWhiteSpace(childName);
             var isTransform = typeof(TChild) == typeof(Transform);
 
-            for (var i = 0; i < transform.GetChildren().Length; i++) {
+            for (var i = 0; i < IPrimer_GetChildrenExtensions.GetChildren((Transform)transform).Length; i++) {
                 var child = transform.GetChild(i);
 
                 if (!child || hasName && child.name != childName)

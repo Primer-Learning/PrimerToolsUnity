@@ -5,6 +5,7 @@ using Primer;
 using Primer.Animation;
 using Sirenix.Utilities;
 using UnityEngine;
+using SimpleGnome = Primer.SimpleGnome;
 
 public class DNA : MonoBehaviour
 {

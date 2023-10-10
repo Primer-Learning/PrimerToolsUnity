@@ -50,7 +50,7 @@ namespace Primer.Graph
         
         public PrimerLine AddLine(string name)
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var line = gnome.Add<PrimerLine>(name);
             line.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return line;
@@ -58,7 +58,7 @@ namespace Primer.Graph
         
         public StackedArea AddStackedArea(string name)
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var area = gnome.Add<StackedArea>(name);
             area.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return area;
@@ -66,7 +66,7 @@ namespace Primer.Graph
         
         public BarPlot AddBarPlot(string name)
         {
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var barPlot = gnome.Add<BarPlot>(name);
             barPlot.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return barPlot;

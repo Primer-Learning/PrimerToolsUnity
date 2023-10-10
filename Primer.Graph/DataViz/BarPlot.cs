@@ -103,7 +103,7 @@ namespace Primer.Graph
         private void Render() => Render(renderedRectProperties);
         private void Render(List<Tuple<float, float, float>> dataToRender)
         {;
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             gnome.Reset();
 
             for (var i = 0; i < dataToRender.Count; i++) {

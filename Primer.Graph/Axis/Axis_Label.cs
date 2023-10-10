@@ -30,7 +30,7 @@ namespace Primer.Graph
         [FormerlySerializedAs("_labelPosition")]
         public AxisLabelPosition labelPosition = AxisLabelPosition.End;
 
-        private Tween TransitionLabel(SimpleGnome labelParent)
+        private Tween TransitionLabel(Primer.SimpleGnome labelParent)
         {
             var labelTransform = labelParent.AddLatex(label, "Label").transform;
 

@@ -45,7 +45,7 @@ namespace Primer.Graph
 
         [FormerlySerializedAs("containerCache")]
         public Gnome<Graph> gnomeCache;
-        public SimpleGnome gnome => new SimpleGnome("Graph", transform);
+        public Primer.SimpleGnome gnome => new Primer.SimpleGnome("Graph", transform);
 
         public Vector3 domain { get; private set; }
 

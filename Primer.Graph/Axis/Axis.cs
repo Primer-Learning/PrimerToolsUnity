@@ -30,7 +30,7 @@ namespace Primer.Graph
             if (gameObject.IsPreset())
                 return Tween.noop;
 
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var updateParts = Tween.Parallel(
                 TransitionRod(gnome),
                 TransitionLabel(gnome),

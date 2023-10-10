@@ -75,7 +75,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var gnome = new SimpleGnome(transform);
+            var gnome = new Primer.SimpleGnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             offset = Vector2.one * distanceFromBorder;
 

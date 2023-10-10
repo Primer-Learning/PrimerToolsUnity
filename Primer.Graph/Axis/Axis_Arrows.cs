@@ -13,7 +13,7 @@ namespace Primer.Graph
 
         public GameObject arrowPrefab;
 
-        private Tween TransitionArrows(SimpleGnome gnome)
+        private Tween TransitionArrows(Primer.SimpleGnome gnome)
         {
             if (arrowPresence == ArrowPresence.Neither)
                 return null;
