@@ -35,7 +35,7 @@ namespace Primer.Simulation
         [Button]
         public void TouchGround()
         {
-            transform.position = landscape.GetGroundAt(transform.position);
+            transform.localPosition = landscape.GetGroundAtWorldPoint(transform.localPosition);
         }
     }
 }

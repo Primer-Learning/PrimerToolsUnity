@@ -13,17 +13,17 @@ namespace Primer.Simulation
 
         public Tween WalkTo(Vector3 to, float stopDistance = 0, float forcedDuration = -1)
         {
-            return WalkToImpl(landscape.GetGroundAt(to), stopDistance, forcedDuration);
+            return WalkToImpl(landscape.GetGroundAtWorldPoint(to), stopDistance, forcedDuration);
         }
 
         public Tween WalkToLocal(Vector2 to, float stopDistance = 0, float forcedDuration = -1)
         {
-            return WalkToImpl(landscape.GetGroundAtLocal(to), stopDistance, forcedDuration);
+            return WalkToImpl(landscape.GetGroundAtLocalPoint(to), stopDistance, forcedDuration);
         }
 
         public Tween WalkTo(Component to, float stopDistance = 0, float forcedDuration = -1)
         {
-            return WalkToImpl(new Vector3Provider(() => landscape.GetGroundAt(to.transform.position)), stopDistance, forcedDuration);
+            return WalkToImpl(new Vector3Provider(() => landscape.GetGroundAtWorldPoint(to.transform.position)), stopDistance, forcedDuration);
         }
 
         private Tween WalkToImpl(Vector3Provider to, float stopDistance, float forcedDuration)
@@ -46,7 +46,7 @@ namespace Primer.Simulation
             var moveTween = Tween.Value(
                 v =>
                 {
-                    myTransform.position = landscape.GetGroundAt(v);
+                    myTransform.position = landscape.GetGroundAtWorldPoint(v);
                 },
                 () => myTransform.position,
                 () => destination,

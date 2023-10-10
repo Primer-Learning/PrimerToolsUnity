@@ -309,32 +309,32 @@ namespace Primer.Simulation
         // public Vector3 GetGroundAt(Vector3 localPosition) => GetGroundAt(localPosition.x, localPosition.z);
         // public Vector3 GetGroundAt(Vector2 localPosition) => GetGroundAt(localPosition.x, localPosition.y);
 
-        public Vector3 GetGroundAtLocal(Vector3 localPosition) => GetGroundAtLocal(localPosition.x, localPosition.z);
-        public Vector3 GetGroundAtLocal(Vector2 localPosition) => GetGroundAtLocal(localPosition.x, localPosition.y);
-        public Vector3 GetGroundAt(Vector3 worldPosition) => GetGroundAt(worldPosition.x, worldPosition.z);
-        public Vector3 GetGroundAt(Vector2 worldPosition) => GetGroundAt(worldPosition.x, worldPosition.y);
+        public Vector3 GetGroundAtLocalPoint(Vector3 worldPosition) => GetGroundAtLocalPoint(worldPosition.x, worldPosition.z);
+        public Vector3 GetGroundAtLocalPoint(Vector2 worldPosition) => GetGroundAtLocalPoint(worldPosition.x, worldPosition.y);
+        public Vector3 GetGroundAtWorldPoint(Vector3 worldPosition) => GetGroundAtWorldPoint(worldPosition.x, worldPosition.z);
+        public Vector3 GetGroundAtWorldPoint(Vector2 worldPosition) => GetGroundAtWorldPoint(worldPosition.x, worldPosition.y);
 
-        private Vector3 GetGroundAtLocal(float x, float z)
+        private Vector3 GetGroundAtLocalPoint(float x, float z)
         {
-            // The ray needs to be in world coordinates.
-            var worldPosition = transform.TransformPoint(new Vector3(x, 0, z));
-            return GetGroundAt(worldPosition.x, worldPosition.z);
+            var localPosition = transform.TransformPoint(new Vector3(x, 0, z));
+            return transform.InverseTransformPoint(GetGroundAtWorldPoint(localPosition.x, localPosition.z));
         }
 
         /// <summary>Gets the position of the ground at the given (x, z)</summary>
         /// <param name="x">Local-to-terrain x</param>
         /// <param name="z">Local-to-terrain y</param>
         /// <returns>The position of the ground in world space.</returns>
-        private Vector3 GetGroundAt(float x, float z)
+        private Vector3 GetGroundAtWorldPoint(float x, float z)
         {
             // Create a ray pointing straight down from high above the (x, z) coordinate given.
-            var pointAbove = new Vector3(x, size.y * 2, z);
+            var pointAbove = new Vector3(x, size.y * 10, z);
             var down = transform.TransformDirection(Vector3.down);
             var ray = new Ray(pointAbove, down);
 
-            return meshCollider.Raycast(ray, out var hitInfo, float.PositiveInfinity)
-                ? hitInfo.point
-                : transform.TransformPoint(new Vector3(x, 0, z));
+            var collision = meshCollider.Raycast(ray, out var hitInfo, float.PositiveInfinity);
+            if (!collision) return new Vector3(x, 0, z);
+            Debug.Log("Hit!");
+            return hitInfo.point;
         }
 
         public MeshRenderer[] GetMeshRenderers() => root.GetComponentsInChildren<MeshRenderer>();

@@ -75,7 +75,7 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var gnome = new Primer.SimpleGnome(transform);
+            var gnome = new SimpleGnome(transform);
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             offset = Vector2.one * distanceFromBorder;
 
@@ -93,17 +93,34 @@ namespace Primer.Simulation
             points = PoissonDiscSampler.RectangularPointSet(numberToPlace1 + numberToPlace2, spawnSpace, minDistance,
                 overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint).ToList();
             oldSize = size;
+            
+            var nameIndex1 = 0;
+            var nameIndex2 = 0;
 
             foreach (var point in points) {
                 // Start here
-                var prefab = prefabAssignments[index++] ? prefab1 : prefab2;
+                bool isPrefab1 = prefabAssignments[index++];
+                var prefab = isPrefab1 ? prefab1 : prefab2;
+
+                string name;
+                if (isPrefab1)
+                {
+                    name = prefab.name + nameIndex1++;
+                }
+                else
+                {
+                    name = prefab.name + nameIndex2++;
+                }
                 
-                var instance = gnome.Add<Transform>(prefab.gameObject, prefab.name + points.IndexOf(point));
+                var instance = gnome.Add<Transform>(prefab.gameObject, name);
                 var pos = point + offset;
 
                 if (hasLandscape) {
-                    instance.localPosition = landscape.GetGroundAtLocal(pos);
-                    instance.GetOrAddComponent<LandscapeItem>();
+                    Debug.Log(pos);
+                    instance.position = landscape.GetGroundAtWorldPoint(landscape.transform.TransformPoint(new Vector3(pos.x, 0, pos.y)));
+                    Debug.Log(instance.position);
+                    var landscapeItem = instance.GetOrAddComponent<LandscapeItem>();
+                    landscapeItem.landscape = landscape;
                 } else {
                     instance.localPosition = new Vector3(pos.x, 0, pos.y);
                 }
@@ -169,7 +186,7 @@ namespace Primer.Simulation
                 var pos = point + offset;
 
                 if (hasLandscape) {
-                    instance.localPosition = landscape.GetGroundAtLocal(pos);
+                    instance.localPosition = landscape.GetGroundAtLocalPoint(pos);
                     instance.GetOrAddComponent<LandscapeItem>();
                 } else {
                     instance.localPosition = new Vector3(pos.x, 0, pos.y);
