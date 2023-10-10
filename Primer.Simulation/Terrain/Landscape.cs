@@ -227,15 +227,13 @@ namespace Primer.Simulation
         private MeshFilter meshFilterCache;
         private MeshFilter meshFilter => root.GetOrAddComponent(ref meshFilterCache);
         #endregion
-
-
+        
         private void Awake()
         {
             var meshRenderer = root.GetOrAddComponent<MeshRenderer>();
             meshRenderer.sharedMaterial ??= Resources.Load<Material>("grass");
             Generate();
         }
-
 
         #region Mesh generation
 
@@ -307,8 +305,7 @@ namespace Primer.Simulation
             // transform.parent.GetComponentsInChildren<LandscapeItem>().ForEach(item => item.DelayedTouchGround());
         }
         #endregion
-
-
+        
         // public Vector3 GetGroundAt(Vector3 localPosition) => GetGroundAt(localPosition.x, localPosition.z);
         // public Vector3 GetGroundAt(Vector2 localPosition) => GetGroundAt(localPosition.x, localPosition.y);
 

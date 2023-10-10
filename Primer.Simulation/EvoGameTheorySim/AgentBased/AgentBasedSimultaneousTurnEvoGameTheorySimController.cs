@@ -39,6 +39,7 @@ namespace Primer.Simulation
         public IEnumerable<Home> homes => transform.GetComponentsInChildren<Home>();
         public IEnumerable<FruitTree> trees => transform.GetComponentsInChildren<FruitTree>();
         public PoissonPrefabPlacer placer => transform.GetComponentInChildren<PoissonPrefabPlacer>();
+        public Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private int turn;
         
         #region Initial population handling 
