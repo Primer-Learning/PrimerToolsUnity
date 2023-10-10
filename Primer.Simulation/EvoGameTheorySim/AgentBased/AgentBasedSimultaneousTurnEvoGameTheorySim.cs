@@ -9,6 +9,7 @@ using Primer.Simulation.Genome.Strategy;
 using Sirenix.Utilities;
 using UnityEditor;
 using UnityEngine;
+using SimpleGnome = Primer.SimpleGnome;
 
 namespace Simulation.GameTheory
 {
@@ -43,7 +44,7 @@ namespace Simulation.GameTheory
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         public Home[] homes => transform.GetComponentsInChildren<Home>();
         
-        public readonly SimpleGnome creatureGnome;
+        public readonly Pool<SimultaneousTurnCreature> creaturePool;
 
         private readonly SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
 
@@ -63,9 +64,9 @@ namespace Simulation.GameTheory
         public Component component => transform;
 
         public IEnumerable<SimultaneousTurnCreature> creatures =>
-            creatureGnome.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
+            creaturePool.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
         public IEnumerable<SimultaneousTurnStrategyGene> alleles => creatures.SelectMany(x => x.strategyGenes.GetAlleles());
-        public int currentCreatureCount => creatureGnome.activeChildCount;
+        public int currentCreatureCount => creaturePool.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
         public AgentBasedSimultaneousTurnEvoGameTheorySim(
@@ -95,8 +96,9 @@ namespace Simulation.GameTheory
                 this.rng = new Rng(rngSeed);
             }
 
-            creatureGnome = new SimpleGnome("Blobs", parent: transform);
-            creatureGnome.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.Dispose());
+            creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
+            creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.Dispose());
+            creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
             
             this.skipAnimations = skipAnimations;
 
@@ -114,11 +116,11 @@ namespace Simulation.GameTheory
 
         private void ConfigureInitialBlobs(List<SimultaneousTurnCreature> initialBlobs)
         {
-            creatureGnome.Reset();
+            creaturePool.Reset();
             
             foreach (var creature in initialBlobs)
             {
-                creature.transform.SetParent(creatureGnome);
+                creature.transform.SetParent(creaturePool.transform);
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
                 creature.rng = rng;
@@ -235,7 +237,8 @@ namespace Simulation.GameTheory
                 creature.PurgeStomach();
                 if (!creature.canSurvive)
                 {
-                    creature.ShrinkAndDispose();
+                    // TODO: Add death animation
+                    creature.gameObject.SetActive(false);
                     creature.ConsumeEnergy();
                 }
             }
@@ -278,9 +281,10 @@ namespace Simulation.GameTheory
 
         private SimultaneousTurnCreature CreateChild(SimultaneousTurnCreature firstParent, SimultaneousTurnCreature secondParent)
         {
-            var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
-            childGO.transform.parent = creatureGnome.transform;
-            var child = childGO.AddComponent<SimultaneousTurnCreature>();
+            // var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
+            // childGO.transform.parent = creaturePool.transform;
+
+            var child = creaturePool.AddOrActivate();
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type
@@ -365,7 +369,7 @@ namespace Simulation.GameTheory
             var offset = Vector2.one * margin;
             var perimeter = terrain.size - offset * 2;
             var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var creatureCount = blobCount ?? creatureGnome.activeChildCount;
+            var creatureCount = blobCount ?? creaturePool.activeChildCount;
             var positions = edgeLength / creatureCount;
             var centerInSlot = positions / 2;
             var centerInTerrain = terrain.size / -2;
@@ -419,7 +423,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            creatureGnome?.Reset(hard: true);
+            creaturePool?.Reset(hard: true);
         }
         
         // private string StrategyGenesString(Enum[] strategyGenes)

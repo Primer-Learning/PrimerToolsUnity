@@ -8,6 +8,7 @@ using Primer.Simulation;
 using Primer.Simulation.Genome.Strategy;
 using Primer.Timeline;
 using UnityEngine;
+using SimpleGnome = Primer.SimpleGnome;
 
 namespace Simulation.GameTheory
 {

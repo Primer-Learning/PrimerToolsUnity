@@ -40,7 +40,7 @@ namespace Primer.Simulation
             float hawkChance;
             Rng rng;
             public override Color color => PrimerColor.JuicyInterpolate(PrimerColor.blue, PrimerColor.red, hawkChance);
-            public override SimultaneousTurnAction action => rng.Range(1) > hawkChance 
+            public override SimultaneousTurnAction action => rng.Range(1) < hawkChance 
                 ? SimultaneousTurnAction.Hawk 
                 : SimultaneousTurnAction.Dove;
             // I'm a little foggy on whether the above will work if rng has not been initialized. I think it will,

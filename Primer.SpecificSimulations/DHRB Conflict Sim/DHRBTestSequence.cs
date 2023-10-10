@@ -9,6 +9,7 @@ using Primer.Simulation.Genome.Strategy;
 using Primer.Timeline;
 using Simulation.GameTheory;
 using UnityEngine;
+using SimpleGnome = Primer.SimpleGnome;
 
 namespace Scenes.Intro_Scene_Sources
 {
@@ -21,36 +22,27 @@ namespace Scenes.Intro_Scene_Sources
 
         private List<Home> _homes => homes.Count > 0
                     ? homes
-                    : new List<Home>(simController.transform.Find("Terrain").Find("Trees")
+                    : new List<Home>(simController.transform.Find("Trees")
                         .GetComponentsInChildren<Home>());
-        
-        public override void Cleanup()
+
+        public override async IAsyncEnumerator<Tween> Define()
         {
-            base.Cleanup();
-            
             var initialStrategyCountsByHome = new List<Dictionary<SimultaneousTurnStrategyGene, int>>()
             {
                 new()
                 {
-                    {new SimultaneousTurnStrategyGenes.Dove(), 3},
+                    {new SimultaneousTurnStrategyGenes.Dove(), 1},
                     {new SimultaneousTurnStrategyGenes.Hawk(), 0}
                 },
                 new()
                 {
                     {new SimultaneousTurnStrategyGenes.Dove(), 0},
-                    {new SimultaneousTurnStrategyGenes.Hawk(), 3}
+                    {new SimultaneousTurnStrategyGenes.Hawk(), 1}
                 }
-                // new()
-                // {
-                //     {DHRB.Retaliator, 3}
-                // },
-                // new()
-                // {
-                //     {DHRB.Bully, 3}
-                // }
             };
 
-            var creatureGnome = new SimpleGnome("Blobs", parent: simController.transform);
+            var creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: simController.transform);
+            creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
 
             var initialCreatures = new List<SimultaneousTurnCreature>();
             for (var i = 0; i < initialStrategyCountsByHome.Count; i++)
@@ -58,10 +50,10 @@ namespace Scenes.Intro_Scene_Sources
                 var initialCreaturesDict = initialStrategyCountsByHome[i];
                 foreach (var (strategy, count) in initialCreaturesDict) {
                     for (var j = 0; j < count; j++) {
-                        var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {j + 1} on home {i}");
+                        var creature = creaturePool.AddOrActivate();
                         initialCreatures.Add(creature);
                         creature.strategyGenes = new SimultaneousTurnGenome(strategy); 
-                        creature.home = _homes[i];
+                        creature.home = _homes[i % _homes.Count];
                         simController.simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
                     }
                 }
@@ -72,10 +64,7 @@ namespace Scenes.Intro_Scene_Sources
             {
                 tree.Reset();
             }
-        }
 
-        public override async IAsyncEnumerator<Tween> Define()
-        {
             var numDays = 20;
             for (var i = 0; i < numDays; i++)
             {
