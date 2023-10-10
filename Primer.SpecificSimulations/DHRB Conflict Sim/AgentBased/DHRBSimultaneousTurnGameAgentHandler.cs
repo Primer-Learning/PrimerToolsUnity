@@ -12,7 +12,7 @@ namespace Simulation.GameTheory
         {
             var alleles = creature.strategyGenes.GetAlleles();
 
-            if (alleles.Count == 0)
+            if (alleles.Count == 1)
             {
                 creature.gameObject.GetComponent<PrimerBlob>().SetColor(alleles[0].color);
             }
