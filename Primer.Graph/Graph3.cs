@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace Primer.Graph
@@ -48,13 +49,18 @@ namespace Primer.Graph
             gameObject.SetActive(false);
         }
         
-        public PrimerLine AddLine(string name)
+        public PrimerLine AddLine(string name, Color color)
         {
             var gnome = new SimpleGnome(transform);
             var line = gnome.Add<PrimerLine>(name);
+            line.SetColor(color);
             line.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             line.Reset();
             return line;
+        }
+        public PrimerLine AddLine(string name)
+        {
+            return AddLine(name, PrimerColor.white);
         }
         
         public StackedArea AddStackedArea(string name)
