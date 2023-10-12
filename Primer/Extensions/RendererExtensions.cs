@@ -10,7 +10,7 @@ namespace Primer
     {
         private static Material defaultMaterialCache;
         public static Material defaultMaterial
-            => defaultMaterialCache ??= AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
+            => defaultMaterialCache ??= Resources.Load<Material>("BasicDiffuse");
 
         private static readonly Dictionary<WeakReference<Renderer>, Material> memory = new();
 
