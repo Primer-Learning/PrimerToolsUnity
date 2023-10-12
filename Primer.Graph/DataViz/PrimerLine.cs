@@ -12,8 +12,8 @@ namespace Primer.Graph
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
     public class PrimerLine : MonoBehaviour, IMeshController, IDisposable, IPrimerGraphData
     {
-        private ILine renderedLine = new DiscreteLine(0);
-        private Vector3[] rawPoints;
+        private ILine renderedLine = new DiscreteLine(1);
+        private Vector3[] rawPoints = Array.Empty<Vector3>();
         private Vector3[] transformedPoints => rawPoints.Select( x => transformPointFromDataSpaceToPositionSpace(x)).ToArray();
 
         private MeshFilter meshFilterCache;
@@ -207,6 +207,11 @@ namespace Primer.Graph
             if (transformedPoints.Length == 0)
                 return Tween.noop;
             
+            if (renderedLine.numSegments == 0)
+            {
+                return GrowFromStart();
+            }
+            
             var targetLine = new DiscreteLine(transformedPoints);
             if (targetLine.points == renderedLine.points)
                 return Tween.noop;
@@ -252,6 +257,11 @@ namespace Primer.Graph
         public void Dispose()
         {
             gameObject.SetActive(false);
+        }
+
+        public void Reset()
+        {
+            Render(new DiscreteLine(1));
         }
         
         public MeshRenderer[] GetMeshRenderers() => new[] { meshRenderer };

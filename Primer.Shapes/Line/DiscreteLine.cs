@@ -12,20 +12,24 @@ namespace Primer.Shapes
         public int numSegments => points.Length - 1;
         public Vector3[] points { get; }
 
-
         public DiscreteLine(int length)
         {
+            if (length < 1) Debug.LogError("DiscreteLine must have at least one point");
             points = new Vector3[length];
         }
 
         public DiscreteLine(IEnumerable<Vector3> points)
         {
-            this.points = points.ToArray();
+            var enumerable = points as Vector3[] ?? points.ToArray();
+            if (!enumerable.Any()) Debug.LogError("DiscreteLine must have at least one point"); 
+            this.points = enumerable.ToArray();
         }
 
         public DiscreteLine(IEnumerable<float> points)
         {
-            this.points = points.Select((y, i) => new Vector3(i, y)).ToArray();
+            var enumerable = points as float[] ?? points.ToArray();
+            if (!enumerable.Any()) Debug.LogError("DiscreteLine must have at least one point"); 
+            this.points = enumerable.Select((y, i) => new Vector3(i, y)).ToArray();
         }
 
         public DiscreteLine Append(params Vector3[] data)
@@ -63,7 +67,7 @@ namespace Primer.Shapes
             if (newNumSegments == numSegments)
                 return this;
 
-            if (numSegments == 0)
+            if (points.Length <= 1)
                 return new DiscreteLine(newNumSegments);
 
             var newPoints = new Vector3[newNumSegments + 1];
