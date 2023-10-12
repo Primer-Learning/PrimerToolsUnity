@@ -50,15 +50,16 @@ namespace Primer.Graph
         
         public PrimerLine AddLine(string name)
         {
-            var gnome = new Primer.SimpleGnome(transform);
+            var gnome = new SimpleGnome(transform);
             var line = gnome.Add<PrimerLine>(name);
             line.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
+            line.Reset();
             return line;
         }
         
         public StackedArea AddStackedArea(string name)
         {
-            var gnome = new Primer.SimpleGnome(transform);
+            var gnome = new SimpleGnome(transform);
             var area = gnome.Add<StackedArea>(name);
             area.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return area;
