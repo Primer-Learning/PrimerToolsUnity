@@ -7,9 +7,7 @@ using Primer.Animation;
 using Primer.Simulation;
 using Primer.Simulation.Genome.Strategy;
 using Sirenix.Utilities;
-using UnityEditor;
 using UnityEngine;
-using SimpleGnome = Primer.SimpleGnome;
 
 namespace Simulation.GameTheory
 {
@@ -423,7 +421,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            creaturePool?.Reset(hard: true);
+            creaturePool?.Reset();
         }
         
         // private string StrategyGenesString(Enum[] strategyGenes)
