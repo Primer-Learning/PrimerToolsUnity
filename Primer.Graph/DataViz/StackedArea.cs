@@ -14,7 +14,7 @@ namespace Primer.Graph
     public class StackedArea : MonoBehaviour, IDisposable, IPrimerGraphData
     {
         private List<ILine> renderedLines = new();
-        public List<Vector3[]> rawPointSets;
+        public List<Vector3[]> rawPointSets = new();
         
         private List<Vector3[]> transformedPointSets => rawPointSets
             .Select(set => set
