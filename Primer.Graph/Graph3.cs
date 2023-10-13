@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
+using Primer.Simulation;
 using UnityEditor.Graphs;
 using UnityEngine;
 
@@ -40,6 +41,12 @@ namespace Primer.Graph
                 addTransitions.RunInParallel()
             );
         }
+
+        public Tween ShrinkPlottedDataToEnd()
+        {
+            return GetComponentsInChildren<IPrimerGraphData>().Select(x => x.ShrinkToEnd()).RunInParallel();
+        }
+        
         // We assume there will be no data present when the axes are drown, so they appear independently
         public Tween Appear() => axes.Select(x => x.Appear()).RunInParallel();
         public Tween Disappear() => axes.Select(x => x.Disappear()).RunInParallel();
@@ -92,5 +99,6 @@ namespace Primer.Graph
     public interface IPrimerGraphData
     {
         public Tween Transition();
+        public Tween ShrinkToEnd();
     }
 }
