@@ -35,7 +35,7 @@ namespace Primer
 
         #region Add
 
-        public T AddOrActivate()
+        public T Add()
         {
             var inactiveChildren = transform.GetChildren().Where(x => x.gameObject.activeSelf == false && x.HasComponent<T>()).ToArray();
             

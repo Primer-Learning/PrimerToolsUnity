@@ -282,7 +282,7 @@ namespace Simulation.GameTheory
             // var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
             // childGO.transform.parent = creaturePool.transform;
 
-            var child = creaturePool.AddOrActivate();
+            var child = creaturePool.Add();
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type

@@ -50,7 +50,7 @@ namespace Scenes.Intro_Scene_Sources
                 var initialCreaturesDict = initialStrategyCountsByHome[i];
                 foreach (var (strategy, count) in initialCreaturesDict) {
                     for (var j = 0; j < count; j++) {
-                        var creature = creaturePool.AddOrActivate();
+                        var creature = creaturePool.Add();
                         initialCreatures.Add(creature);
                         creature.strategyGenes = new SimultaneousTurnGenome(strategy); 
                         creature.home = _homes[i % _homes.Count];
