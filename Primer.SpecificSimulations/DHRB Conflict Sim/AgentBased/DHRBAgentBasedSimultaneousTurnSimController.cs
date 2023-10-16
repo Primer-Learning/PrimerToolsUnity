@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Graph;
 using Primer.Simulation;
 using Simulation.GameTheory;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.SpecificSimulations
@@ -128,12 +128,25 @@ namespace Primer.SpecificSimulations
             }
         }
 
-        protected override async UniTask OnReset()
+        // protected override async UniTask OnReset()
+        // {
+        //     var gnome = ternaryPlot.GetContentGnome("Agent-based");
+        //     await gnome.GetChildren().Select(x => x.ScaleTo(0) with { duration = skipAnimations ? 0 : 0.5f }).RunInParallel();
+        //     gnome.Purge();
+        //     Debug.Log("Reset sim");
+        // }
+        public Tween PlaceAndScaleTreesAndHomes(int numTrees, int numHomes)
         {
-            var gnome = ternaryPlot.GetContentGnome("Agent-based");
-            await gnome.GetChildren().Select(x => x.ScaleTo(0) with { duration = skipAnimations ? 0 : 0.5f }).RunInParallel();
-            gnome.Purge();
-            Debug.Log("Reset sim");
+            placer.numberToPlace1 = numTrees;
+            placer.numberToPlace2 = numHomes;
+            placer.Place();
+            trees.ForEach(x => x.transform.localScale = Vector3.zero);
+            homes.ForEach(x => x.transform.localScale = Vector3.zero);
+
+            return Tween.Parallel(
+                trees.Select(x => x.ScaleTo(1) with { delay = Rng.Range(0.2f) }).RunInParallel(),
+                homes.Select(x => x.ScaleTo(1) with { delay = Rng.Range(0.2f) }).RunInParallel()
+            );
         }
     }
 }
