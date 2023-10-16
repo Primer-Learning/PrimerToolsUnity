@@ -95,7 +95,7 @@ namespace Simulation.GameTheory
             }
 
             creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
-            creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.Dispose());
+            creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.SetActive(false));
             creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
             
             this.skipAnimations = skipAnimations;
