@@ -69,13 +69,13 @@ public class FruitTree : MonoBehaviour
     {
         // Create tweens, giving each a random delay between 0 and delayRange
         return indices
-            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : rng.Range(delayRange)})
+            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : rng.RangeFloat(delayRange)})
             .RunInParallel();
     }
 
     private void RandomlyRotateFlower(int index)
     {
-        flowers[index].localRotation = Quaternion.Euler(rng.Range(xAngleMax), rng.Range(yAngleMax), rng.Range(zAngleMax));
+        flowers[index].localRotation = Quaternion.Euler(rng.RangeFloat(xAngleMax), rng.RangeFloat(yAngleMax), rng.RangeFloat(zAngleMax));
     }
 
     public Transform HarvestFruit(Component closestTo = null)

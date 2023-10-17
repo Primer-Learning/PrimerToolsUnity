@@ -144,8 +144,8 @@ namespace Primer.SpecificSimulations
             homes.ForEach(x => x.transform.localScale = Vector3.zero);
 
             return Tween.Parallel(
-                trees.Select(x => x.ScaleTo(1) with { delay = Rng.Range(0.2f) }).RunInParallel(),
-                homes.Select(x => x.ScaleTo(1) with { delay = Rng.Range(0.2f) }).RunInParallel()
+                trees.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel(),
+                homes.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel()
             );
         }
     }

@@ -57,7 +57,7 @@ namespace Primer.Simulation.EvoGameTheorySim.AgentBased
             var gamete = new Chromosome[homologs.Length];
             for (var i = 0; i < homologs.Length; i++)
             {
-                gamete[i] = homologs[i].chromosomes[Rng.Range(0, ploidy)];
+                gamete[i] = homologs[i].chromosomes[Rng.RangeInt(0, ploidy)];
             }
             return gamete;
         }

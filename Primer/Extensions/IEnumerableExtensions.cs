@@ -26,7 +26,7 @@ namespace Primer
         public static T RandomItem<T>(this IEnumerable<T> enumerable, Rng rng = null)
         {
             var list = enumerable as List<T> ?? enumerable.ToList();
-            var index = rng.Range(0, list.Count);
+            var index = rng.RangeInt(0, list.Count);
             return list[index];
         }
 
@@ -45,7 +45,7 @@ namespace Primer
 
             while (n > 1) {
                 n--;
-                var k = rng.Range(0, n + 1);
+                var k = rng.RangeInt(0, n + 1);
                 (list[k], list[n]) = (list[n], list[k]);
             }
         }

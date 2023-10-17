@@ -129,7 +129,7 @@ namespace Primer.Simulation
                 if (instance.localScale == Vector3.zero) {instance.localScale = Vector3.one;}
 
                 if (randomizeRotation)
-                    instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
+                    instance.localRotation = Quaternion.Euler(0, rng.RangeInt(0, 360), 0);
             }
 
             if (gnome.activeChildCount < numberToPlace1 + numberToPlace2)
@@ -197,7 +197,7 @@ namespace Primer.Simulation
 
                 if (points.IndexOf(point) < oldPointCount) continue;
                 if (randomizeRotation)
-                    instance.localRotation = Quaternion.Euler(0, rng.Range(0, 360), 0);
+                    instance.localRotation = Quaternion.Euler(0, rng.RangeInt(0, 360), 0);
             }
 
             if (gnome.activeChildCount < numberToPlace1 + numberToPlace2)

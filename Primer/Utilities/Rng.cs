@@ -24,17 +24,17 @@ namespace Primer
             }
         }
         
-        public static int Range(int maxExclusive) => Range(0, maxExclusive);
+        public static int RangeInt(int maxExclusive) => RangeInt(0, maxExclusive);
 
-        public static int Range(int minInclusive, int maxExclusive)
+        public static int RangeInt(int minInclusive, int maxExclusive)
         {
             Initialize();
             return staticRandom.Next(minInclusive, maxExclusive);
         }
 
-        public static float Range(float maxInclusive) => Range(0, maxInclusive);
+        public static float RangeFloat(float maxInclusive) => RangeFloat(0, maxInclusive);
 
-        public static float Range(float minInclusive, float maxExclusive)
+        public static float RangeFloat(float minInclusive, float maxExclusive)
         {
             Initialize();
             return (float) staticRandom.NextDouble() * (maxExclusive - minInclusive) + minInclusive;
@@ -57,25 +57,25 @@ namespace Primer
     // Methods are declared as extension methods so that they can be used even on `null` Rngs.
     public static class RngExtensions
     {
-        public static int Range(this Rng rng, int maxExclusive) => Range(rng, 0, maxExclusive);
+        public static int RangeInt(this Rng rng, int maxExclusive) => RangeInt(rng, 0, maxExclusive);
 
-        public static int Range(this Rng rng, int minInclusive, int maxExclusive)
+        public static int RangeInt(this Rng rng, int minInclusive, int maxExclusive)
         {
             var rand = rng?.rand;
 
             return rand is null
-                ? Rng.Range(minInclusive, maxExclusive)
+                ? Rng.RangeInt(minInclusive, maxExclusive)
                 : rand.Next(minInclusive, maxExclusive);
         }
 
-        public static float Range(this Rng rng, float maxExclusive) => Range(rng, 0, maxExclusive);
+        public static float RangeFloat(this Rng rng, float maxExclusive) => RangeFloat(rng, 0, maxExclusive);
 
-        public static float Range(this Rng rng, float minInclusive, float maxExclusive)
+        public static float RangeFloat(this Rng rng, float minInclusive, float maxExclusive)
         {
             var rand = rng?.rand;
 
             return rand is null
-                ? Rng.Range(minInclusive, maxExclusive)
+                ? Rng.RangeFloat(minInclusive, maxExclusive)
                 : (float)(rand.NextDouble() * (maxExclusive - minInclusive) + minInclusive);
         }
     }

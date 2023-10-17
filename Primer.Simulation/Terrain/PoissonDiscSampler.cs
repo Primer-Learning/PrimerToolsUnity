@@ -96,13 +96,13 @@ namespace Primer.Simulation
             }
 
             while (spawnPoints.Count > 0 && !pointFound) {
-                var spawnIndex = rng.Range(0, spawnPoints.Count);
+                var spawnIndex = rng.RangeInt(0, spawnPoints.Count);
                 var spawnCentre = spawnPoints[spawnIndex];
                 
                 // Make a list of all the angles dividing 360 by numSamplesBeforeRejection
                 // Makes a point slightly less likely not to find a valid point
                 var angles = new List<float>();
-                var angleOffset = rng.Range(360);
+                var angleOffset = rng.RangeInt(360);
                 for (var i = 0; i < numSamplesBeforeRejection; i++) {
                     angles.Add(angleOffset + i * 360f / numSamplesBeforeRejection);
                 }
@@ -111,7 +111,7 @@ namespace Primer.Simulation
                 for (var i = 0; i < numSamplesBeforeRejection; i++) {
                     var angle = angles[i];
                     var dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
-                    var candidate = spawnCentre + dir * rng.Range(minDistance, 2 * minDistance);
+                    var candidate = spawnCentre + dir * rng.RangeFloat(minDistance, 2 * minDistance);
 
                     if (!IsValidRect(candidate))
                         continue;
