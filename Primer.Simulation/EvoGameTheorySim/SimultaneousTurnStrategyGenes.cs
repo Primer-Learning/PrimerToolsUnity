@@ -40,21 +40,10 @@ namespace Primer.Simulation
             float hawkChance;
             Rng rng;
             public override Color color => PrimerColor.JuicyInterpolate(PrimerColor.blue, PrimerColor.red, hawkChance);
-            public override SimultaneousTurnAction action
-            {
-                get
-                {
-                    var value = rng.RangeInt(1);
-                    Debug.Log($"value: {value}");
-                        
-                    return value < hawkChance
-                        ? SimultaneousTurnAction.Hawk
-                        : SimultaneousTurnAction.Dove;
-                }
-            }
-            // I'm a little foggy on whether the above will work if rng has not been initialized. I think it will,
-            // but if not, the following line should be added to the getter.
-            // if (rng == null) return Rng.Range(1) > hawkChance ? SimultaneousTurnStrategy.Hawk : SimultaneousTurnStrategy.Dove;
+
+            public override SimultaneousTurnAction action => rng.RangeFloat(1) < hawkChance
+                ? SimultaneousTurnAction.Hawk
+                : SimultaneousTurnAction.Dove;
             
             public MixedHawkDove(float hawkChance, Rng rng = null)
             {
