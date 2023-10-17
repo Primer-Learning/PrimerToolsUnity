@@ -64,6 +64,7 @@ namespace Simulation.GameTheory
         public IEnumerable<SimultaneousTurnCreature> creatures =>
             creaturePool.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
         public IEnumerable<SimultaneousTurnStrategyGene> alleles => creatures.SelectMany(x => x.strategyGenes.GetAlleles());
+        public float GetFrequency(Type allele) => alleles.Count(x => x.GetType() == allele) / (float)alleles.Count();
         public int currentCreatureCount => creaturePool.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
