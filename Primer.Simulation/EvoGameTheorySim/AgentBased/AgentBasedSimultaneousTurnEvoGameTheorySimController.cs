@@ -59,12 +59,13 @@ namespace Primer.Simulation
             InitializeSim();
         }
         
-        public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false)
+        public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false, Home home = null)
         {
             var simCreatureGnome = new SimpleGnome("Blobs", parent: transform);
             var t = simCreatureGnome.Add<Transform>("blob_skinned", creatureName);
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             if (initialEnergy) simultaneousTurnCreature.energy = 1;
+            simultaneousTurnCreature.home = home ? home : homes.RandomItem();
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
             return simultaneousTurnCreature;
         }
