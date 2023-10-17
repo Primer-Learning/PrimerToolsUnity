@@ -160,19 +160,19 @@ namespace Primer.Simulation
             sim?.Dispose();
         }
 
-        public async void Start()
-        {
-            if (!Application.isPlaying || !runWhenEnteringPlayMode)
-                return;
-            
-            await OnSimStart();
-            
-            while (true) {
-                await sim.SimulateSingleCycle();
-                await OnCycleCompleted();
-                await UniTask.Delay(1);
-            }
-        }
+        // public async void Start()
+        // {
+        //     if (!Application.isPlaying || !runWhenEnteringPlayMode)
+        //         return;
+        //     
+        //     await OnSimStart();
+        //     
+        //     while (true) {
+        //         await sim.SimulateSingleCycle();
+        //         await OnCycleCompleted();
+        //         await UniTask.Delay(1);
+        //     }
+        // }
 
         [Title("Controls", HorizontalLine = false)]
         [Button]
@@ -188,13 +188,13 @@ namespace Primer.Simulation
             this.Log($"Completed turn {turn}");
         }
         
-        [Button("Reset")]
-        public async void Reset()
-        {
-            await OnReset();
-            DisposeSim();
-            InitializeSim();
-        }
+        // [Button("Reset")]
+        // public async void Reset()
+        // {
+        //     await OnReset();
+        //     DisposeSim();
+        //     InitializeSim();
+        // }
         #endregion
     }
 }
