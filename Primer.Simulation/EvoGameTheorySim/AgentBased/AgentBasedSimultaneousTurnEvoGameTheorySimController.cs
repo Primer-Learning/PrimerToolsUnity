@@ -49,7 +49,7 @@ namespace Primer.Simulation
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             simultaneousTurnCreature.energy = initialEnergy ? 1 : 0;
             simultaneousTurnCreature.home = home ? home : homes.RandomItem();
-            simultaneousTurnCreature.transform.localPosition = simultaneousTurnCreature.home.transform.localPosition;
+            simultaneousTurnCreature.transform.position = simultaneousTurnCreature.home.transform.position;
             simultaneousTurnCreature.transform.localScale = Vector3.one;
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
             return simultaneousTurnCreature;
