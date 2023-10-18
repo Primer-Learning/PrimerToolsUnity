@@ -31,8 +31,37 @@ namespace Primer.Simulation
                     sim.skipAnimations = value;
             }
         }
+        
+        private Pool<SimultaneousTurnCreature> _creaturePool;
+        public Pool<SimultaneousTurnCreature> creaturePool
+        {
+            get
+            {
+                if (_creaturePool != null && _creaturePool.transform) return _creaturePool;
 
-        public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler;
+                new SimpleGnome("Blobs", parent: transform);
+                _creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
+                _creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
+                return _creaturePool;
+            }
+        } 
+
+        private SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
+        public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler
+        {
+            get
+            {
+                if (_simultaneousTurnGameAgentHandler != null) return _simultaneousTurnGameAgentHandler;
+
+                SetStrategyRule();
+                return _simultaneousTurnGameAgentHandler;
+            }
+            set
+            {
+                _simultaneousTurnGameAgentHandler = value;
+            }
+        } 
+        
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
         public IEnumerable<Home> homes => placer.transform.GetComponentsInChildren<Home>();
         public IEnumerable<FruitTree> trees => placer.transform.GetComponentsInChildren<FruitTree>();
@@ -44,14 +73,14 @@ namespace Primer.Simulation
         
         public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false, Home home = null)
         {
-            var simCreatureGnome = new SimpleGnome("Blobs", parent: transform);
-            var t = simCreatureGnome.Add<Transform>("blob_skinned", creatureName);
+            var t = creaturePool.Add();
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             simultaneousTurnCreature.energy = initialEnergy ? 1 : 0;
             simultaneousTurnCreature.home = home ? home : homes.RandomItem();
             simultaneousTurnCreature.transform.position = simultaneousTurnCreature.home.transform.position;
             simultaneousTurnCreature.transform.localScale = Vector3.one;
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
+            simultaneousTurnGameAgentHandler.OnAgentCreated(simultaneousTurnCreature);
             return simultaneousTurnCreature;
         }
 
@@ -86,9 +115,10 @@ namespace Primer.Simulation
             turn = 0;
             SetStrategyRule();
             sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
-                transform: transform,
-                initialBlobs: creatures,
+                transform,
+                creatures,
                 simultaneousTurnGameAgentHandler,
+                 _creaturePool,
                 rng: rng,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,

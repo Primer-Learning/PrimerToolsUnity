@@ -42,7 +42,7 @@ namespace Simulation.GameTheory
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         public Home[] homes => transform.GetComponentsInChildren<Home>();
         
-        public readonly Pool<SimultaneousTurnCreature> creaturePool;
+        private Pool<SimultaneousTurnCreature> _creaturePool;
 
         private readonly SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
 
@@ -62,16 +62,17 @@ namespace Simulation.GameTheory
         public Component component => transform;
 
         public IEnumerable<SimultaneousTurnCreature> creatures =>
-            creaturePool.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
+            _creaturePool.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
         public IEnumerable<SimultaneousTurnStrategyGene> alleles => creatures.SelectMany(x => x.strategyGenes.GetAlleles());
         public float GetFrequency(Type allele) => alleles.Count(x => x.GetType() == allele) / (float)alleles.Count();
-        public int currentCreatureCount => creaturePool.activeChildCount;
+        public int currentCreatureCount => _creaturePool.activeChildCount;
         
         // Constructor that accepts a list of creatures instead of a dictionary
         public AgentBasedSimultaneousTurnEvoGameTheorySim(
             Transform transform,
             List<SimultaneousTurnCreature> initialBlobs,
             SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler,
+            Pool<SimultaneousTurnCreature> creaturePool,
             Rng rng = null,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
@@ -80,6 +81,7 @@ namespace Simulation.GameTheory
             )
         {
             this.transform = transform;
+            _creaturePool = creaturePool;
             _simultaneousTurnGameAgentHandler = simultaneousTurnGameAgentHandler;
             _homeOptions = homeOptions;
             _treeSelectionOptions = treeSelectionOptions;
@@ -87,7 +89,6 @@ namespace Simulation.GameTheory
 
             this.rng = rng;
 
-            creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
             creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.SetActive(false));
             creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
             
@@ -107,11 +108,11 @@ namespace Simulation.GameTheory
 
         private void ConfigureInitialBlobs(List<SimultaneousTurnCreature> initialBlobs)
         {
-            creaturePool.Reset();
+            _creaturePool.Reset();
             
             foreach (var creature in initialBlobs)
             {
-                creature.transform.SetParent(creaturePool.transform);
+                creature.transform.SetParent(_creaturePool.transform);
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
                 creature.rng = rng;
@@ -260,9 +261,9 @@ namespace Simulation.GameTheory
         private SimultaneousTurnCreature CreateChild(SimultaneousTurnCreature firstParent, SimultaneousTurnCreature secondParent)
         {
             // var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
-            // childGO.transform.parent = creaturePool.transform;
+            // childGO.transform.parent = _creaturePool.transform;
 
-            var child = creaturePool.Add();
+            var child = _creaturePool.Add();
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type
@@ -356,7 +357,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            creaturePool?.Reset();
+            _creaturePool?.Reset();
             transform.gameObject.SetActive(false);
         }
     }
