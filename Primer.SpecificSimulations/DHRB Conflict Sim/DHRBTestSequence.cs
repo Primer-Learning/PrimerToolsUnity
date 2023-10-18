@@ -59,7 +59,7 @@ namespace Scenes.Intro_Scene_Sources
                 }
             }
             
-            simController.InitializeSim(initialCreatures);
+            simController.InitializeSim(initialCreatures, new Rng(0));
             foreach (var tree in sim.trees)
             {
                 tree.Reset();

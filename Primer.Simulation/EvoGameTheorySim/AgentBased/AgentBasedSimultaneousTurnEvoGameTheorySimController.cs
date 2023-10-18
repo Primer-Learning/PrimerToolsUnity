@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Simulation.Genome.Strategy;
 using Simulation.GameTheory;
@@ -42,22 +41,22 @@ namespace Primer.Simulation
         public Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private int turn;
         
-        #region Initial population handling 
-        [SerializeField, HideInInspector]
-        private List<Type> initialStrategyList;
-        [SerializeField, HideInInspector]
-        private List<int> initialStrategyCountList;
+        // #region Initial population handling 
+        // [SerializeField, HideInInspector]
+        // private List<Type> initialStrategyList;
+        // [SerializeField, HideInInspector]
+        // private List<int> initialStrategyCountList;
 
-        [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        public Dictionary<Type, int> initialAlleleCounts = new();
+        // [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
+        // public Dictionary<Type, int> initialAlleleCounts = new();
 
-        [Button]
-        private void SaveInitialPopulation()
-        {
-            initialStrategyList = new List<Type>(initialAlleleCounts.Keys);
-            initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
-            InitializeSim();
-        }
+        // [Button]
+        // private void SaveInitialPopulation()
+        // {
+        //     initialStrategyList = new List<Type>(initialAlleleCounts.Keys);
+        //     initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
+        //     InitializeSim();
+        // }
         
         public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false, Home home = null)
         {
@@ -99,8 +98,7 @@ namespace Primer.Simulation
         //
         //     return initialCreatures;
         // }
-        
-        #endregion
+        // #endregion
 
         #region MonoBehaviour method implementations
         private void Update()
@@ -132,14 +130,8 @@ namespace Primer.Simulation
         protected virtual async UniTask OnCycleCompleted() {}
         protected virtual async UniTask OnReset() {}
         
-        public void InitializeSim(List<SimultaneousTurnCreature> creatures = null, Rng rng = null)
+        public void InitializeSim(List<SimultaneousTurnCreature> creatures, Rng rng)
         {
-            // Log messages to hopefully prevent confusion when providing an rng object
-            if (rng != null)
-            {
-                Debug.LogWarning("Initializing sim with provided rng object. Seed will be ignored.");
-            }
-            
             turn = 0;
             SetStrategyRule();
             sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
