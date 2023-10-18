@@ -209,34 +209,29 @@ namespace Simulation.GameTheory
 
         public Tween AgentsReproduceOrDie()
         {
-            var newAgents = new List<SimultaneousTurnCreature>();
+            var willReproduce = new List<SimultaneousTurnCreature>();
 
             foreach (var creature in creatures)
             {
+                if (creature.canReproduce) willReproduce.Add(creature);
+                else if (!creature.canSurvive) creature.gameObject.SetActive(false);
+                
+                creature.energy = 0;
                 creature.PurgeStomach();
-                if (!creature.canSurvive)
-                {
-                    // TODO: Add death animation
-                    creature.gameObject.SetActive(false);
-                    creature.ConsumeEnergy();
-                }
             }
+
             
             // Get creatures that can reproduce, then group them by home.
             // Then for each group of creatures, choose two creatures at random and make them reproduce.
             // We loop this way even if reproduction is asexual
-            var creaturesByHome = creatures
-                .Where(x => x.canReproduce)
-                .GroupBy(x => x.home);
-
+            var newAgents = new List<SimultaneousTurnCreature>();
+            var creaturesByHome = willReproduce.GroupBy(x => x.home);
             foreach (var home in creaturesByHome)
             {
                 var creaturesInHome = home.Shuffle(rng).ToList();
                 while (creaturesInHome.Count > 1)
                 {
                     var (first, second) = creaturesInHome.Take(2).ToList();
-                    first.PurgeStomach();
-                    second.PurgeStomach();
                     
                     // Pass the parents in opposite orders so it works in the asexual case
                     newAgents.Add(CreateChild(first, second));
@@ -250,7 +245,6 @@ namespace Simulation.GameTheory
                 if (creaturesInHome.Count == 1)
                 {
                     var creature = creaturesInHome.First();
-                    creature.PurgeStomach();
                     newAgents.Add(CreateChild(creature, null));
                 }
             }

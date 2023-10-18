@@ -75,11 +75,6 @@ namespace Simulation.GameTheory
             return WalkTo(home.transform.position);
         }
 
-        public void ConsumeEnergy()
-        {
-            energy = 0;
-        }
-
         private Transform DetachNearestFruit(FruitTree tree)
         {
             // Look at flowers on the tree and return the nearest one
