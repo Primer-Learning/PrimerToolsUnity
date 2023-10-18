@@ -310,6 +310,7 @@ namespace Simulation.GameTheory
             _simultaneousTurnGameAgentHandler.OnAgentCreated(child);
             child.rng = rng;
             child.transform.localScale = Vector3.zero;
+            child.energy = 0;
 
             return child;
         }
@@ -356,6 +357,7 @@ namespace Simulation.GameTheory
         public void Dispose()
         {
             creaturePool?.Reset();
+            transform.gameObject.SetActive(false);
         }
     }
 }

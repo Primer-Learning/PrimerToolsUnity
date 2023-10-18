@@ -13,7 +13,6 @@ namespace Primer.Simulation
     [ExecuteAlways]
     public class AgentBasedSimultaneousTurnEvoGameTheorySimController : MonoBehaviour
     {
-        public bool runWhenEnteringPlayMode;
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
         public ReproductionType reproductionType;
@@ -34,10 +33,11 @@ namespace Primer.Simulation
         }
 
         public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler;
-
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
-        public IEnumerable<Home> homes => transform.GetComponentsInChildren<Home>();
-        public IEnumerable<FruitTree> trees => transform.GetComponentsInChildren<FruitTree>();
+        public IEnumerable<Home> homes => placer.transform.GetComponentsInChildren<Home>();
+        public IEnumerable<FruitTree> trees => placer.transform.GetComponentsInChildren<FruitTree>();
+        public IEnumerable<SimultaneousTurnCreature> creatures =>
+            transform.Find("Blobs").GetComponentsInChildren<SimultaneousTurnCreature>();
         public PoissonPrefabPlacer placer => transform.GetComponentInChildren<PoissonPrefabPlacer>();
         public Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private int turn;
@@ -47,9 +47,10 @@ namespace Primer.Simulation
             var simCreatureGnome = new SimpleGnome("Blobs", parent: transform);
             var t = simCreatureGnome.Add<Transform>("blob_skinned", creatureName);
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
-            if (initialEnergy) simultaneousTurnCreature.energy = 1;
+            simultaneousTurnCreature.energy = initialEnergy ? 1 : 0;
             simultaneousTurnCreature.home = home ? home : homes.RandomItem();
             simultaneousTurnCreature.transform.localPosition = simultaneousTurnCreature.home.transform.localPosition;
+            simultaneousTurnCreature.transform.localScale = Vector3.one;
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
             return simultaneousTurnCreature;
         }
@@ -101,6 +102,11 @@ namespace Primer.Simulation
         {
             placer.numberToPlace1 = numTrees;
             placer.numberToPlace2 = numHomes;
+            return PlaceAndScaleTreesAndHomes();
+        }
+
+        public Tween PlaceAndScaleTreesAndHomes()
+        {
             placer.Place();
             trees.ForEach(x => x.transform.localScale = Vector3.zero);
             homes.ForEach(x => x.transform.localScale = Vector3.zero);
