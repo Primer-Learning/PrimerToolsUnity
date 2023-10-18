@@ -72,7 +72,6 @@ namespace Simulation.GameTheory
             Transform transform,
             List<SimultaneousTurnCreature> initialBlobs,
             SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler,
-            int rngSeed,
             Rng rng = null,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
@@ -86,14 +85,7 @@ namespace Simulation.GameTheory
             _treeSelectionOptions = treeSelectionOptions;
             _reproductionType = reproductionType;
 
-            if (rng != null)
-            {
-                this.rng = rng;
-            }
-            else
-            {
-                this.rng = new Rng(rngSeed);
-            }
+            this.rng = rng;
 
             creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
             creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.SetActive(false));
@@ -125,19 +117,6 @@ namespace Simulation.GameTheory
                 creature.rng = rng;
                 _simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
             }
-        }
-
-        public async UniTask SimulateSingleCycle()
-        {
-            Debug.Log("Simulating single cycle");
-            turn++;
-
-            await CreateFood();
-            await AgentsGoToTrees();
-            await AgentsEatFood();
-            await AgentsReturnHome();
-            await AgentsReproduceOrDie();
-            CleanUp();
         }
 
         public Tween CreateFood()
@@ -335,10 +314,6 @@ namespace Simulation.GameTheory
             return child;
         }
 
-        public void CleanUp()
-        {
-        }
-
         private Tween Eat(List<SimultaneousTurnCreature> competitors, FruitTree tree)
         {
             switch (competitors.Count) {
@@ -362,23 +337,6 @@ namespace Simulation.GameTheory
             }
         }
 
-        private IEnumerable<Vector2> GetBlobsRestingPosition(int? blobCount = null)
-        {
-            float margin = terrain.roundingRadius;
-            var offset = Vector2.one * margin;
-            var perimeter = terrain.size - offset * 2;
-            var edgeLength = perimeter.x * 2 + perimeter.y * 2;
-            var creatureCount = blobCount ?? creaturePool.activeChildCount;
-            var positions = edgeLength / creatureCount;
-            var centerInSlot = positions / 2;
-            var centerInTerrain = terrain.size / -2;
-            
-            for (var i = 0; i < creatureCount; i++) {
-                var linearPosition = positions * i + centerInSlot;
-                var perimeterPosition = PositionToPerimeter(perimeter, linearPosition);
-                yield return perimeterPosition + offset + centerInTerrain;
-            }
-        }
         private IEnumerable<Home> ChooseHomes()
         {
             switch (_homeOptions)
@@ -395,46 +353,9 @@ namespace Simulation.GameTheory
             }
         }
 
-        private static Vector2 PositionToPerimeter(Vector2 perimeter, float position)
-        {
-            if (position < perimeter.x)
-                return new Vector2(position, 0);
-
-            position -= perimeter.x;
-
-            if (position < perimeter.y)
-                return new Vector2(perimeter.x, position);
-
-            position -= perimeter.y;
-
-            if (position < perimeter.x)
-                return new Vector2(perimeter.x - position, perimeter.y);
-
-            position -= perimeter.x;
-
-            return new Vector2(0, perimeter.y - position);
-        }
-        
-        private int StrategyCount(Enum strategy)
-        {
-            return creatures.Count(x => x.action.Equals(strategy));
-        }
-
         public void Dispose()
         {
             creaturePool?.Reset();
         }
-        
-        // private string StrategyGenesString(Enum[] strategyGenes)
-        // {
-        //     // Iterate through the enum of type T and count the number of times each strategy appears in the creature's strategy genes
-        //     var strategyCounts = new Dictionary<T, int>();
-        //     foreach (var strategy in Enum.GetValues(typeof(T)).Cast<T>())
-        //     {
-        //         strategyCounts.Add(strategy, strategyGenes.Count(x => x.Equals(strategy)));
-        //     }
-        //     // Return a string of the strategy counts
-        //     return string.Join(", ", strategyCounts.Select(x => $"{x.Key}: {x.Value}"));
-        // }
     }
 }

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+using System.Linq;
+using Primer.Animation;
 using Primer.Simulation.Genome.Strategy;
 using Simulation.GameTheory;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Simulation
@@ -11,7 +13,6 @@ namespace Primer.Simulation
     [ExecuteAlways]
     public class AgentBasedSimultaneousTurnEvoGameTheorySimController : MonoBehaviour
     {
-        public int seed = 0;
         public bool runWhenEnteringPlayMode;
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
@@ -41,23 +42,6 @@ namespace Primer.Simulation
         public Landscape terrain => transform.GetComponentInChildren<Landscape>();
         private int turn;
         
-        // #region Initial population handling 
-        // [SerializeField, HideInInspector]
-        // private List<Type> initialStrategyList;
-        // [SerializeField, HideInInspector]
-        // private List<int> initialStrategyCountList;
-
-        // [ShowInInspector, DictionaryDrawerSettings(KeyLabel = "Strategy", ValueLabel = "Count")]
-        // public Dictionary<Type, int> initialAlleleCounts = new();
-
-        // [Button]
-        // private void SaveInitialPopulation()
-        // {
-        //     initialStrategyList = new List<Type>(initialAlleleCounts.Keys);
-        //     initialStrategyCountList = new List<int>(initialAlleleCounts.Values);
-        //     InitializeSim();
-        // }
-        
         public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false, Home home = null)
         {
             var simCreatureGnome = new SimpleGnome("Blobs", parent: transform);
@@ -65,40 +49,10 @@ namespace Primer.Simulation
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             if (initialEnergy) simultaneousTurnCreature.energy = 1;
             simultaneousTurnCreature.home = home ? home : homes.RandomItem();
+            simultaneousTurnCreature.transform.localPosition = simultaneousTurnCreature.home.transform.localPosition;
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
             return simultaneousTurnCreature;
         }
-        
-        // private Dictionary<Type, int> ConstructInitialStrategiesDictionary()
-        // {
-        //     var dict = new Dictionary<SimultaneousTurnStrategyGene, int>();
-        //     for (var i = 0; i < initialStrategyList.Count; i++)
-        //     {
-        //         dict.Add(initialStrategyList[i], initialStrategyCountList[i]);
-        //     }
-        //     initialAlleleCounts = dict;
-        //     return dict;
-        // }
-
-        // private List<SimultaneousTurnCreature> CreateInitialCreatures()
-        // {
-        //     var initialCreaturesDict = ConstructInitialStrategiesDictionary();
-        //     var initialCreatures = new List<SimultaneousTurnCreature>();
-        //     var creatureGnome = new SimpleGnome("Blobs", parent: transform);
-        //     foreach (var (strategy, count) in initialCreaturesDict) {
-        //         for (var i = 0; i < count; i++) {
-        //             var creature = creatureGnome.Add<SimultaneousTurnCreature>("blob_skinned", $"Initial {strategy} {i + 1}");
-        //             initialCreatures.Add(creature);
-        //             creature.strategyGenes = (SimultaneousTurnGenome)new Genome(strategy);
-        //             creature.home = sim.homes.RandomItem();
-        //             creature.transform.position = creature.home.transform.position;
-        //             simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
-        //         }
-        //     }
-        //
-        //     return initialCreatures;
-        // }
-        // #endregion
 
         #region MonoBehaviour method implementations
         private void Update()
@@ -120,15 +74,11 @@ namespace Primer.Simulation
             newPlacer.landscape = terrainAndObjectGnome.Add<Landscape>("Terrain");
         }
 
-        public async void OnDisable() => DisposeSim();
         #endregion
 
         #region Sim lifecycle
         
         protected virtual void SetStrategyRule() {}
-        protected virtual async UniTask OnSimStart() {}
-        protected virtual async UniTask OnCycleCompleted() {}
-        protected virtual async UniTask OnReset() {}
         
         public void InitializeSim(List<SimultaneousTurnCreature> creatures, Rng rng)
         {
@@ -138,7 +88,6 @@ namespace Primer.Simulation
                 transform: transform,
                 initialBlobs: creatures,
                 simultaneousTurnGameAgentHandler,
-                rngSeed: seed,
                 rng: rng,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
@@ -146,47 +95,20 @@ namespace Primer.Simulation
                 reproductionType: reproductionType
             );
         }
-
-        private void DisposeSim()
-        {
-            sim?.Dispose();
-        }
-
-        // public async void Start()
-        // {
-        //     if (!Application.isPlaying || !runWhenEnteringPlayMode)
-        //         return;
-        //     
-        //     await OnSimStart();
-        //     
-        //     while (true) {
-        //         await sim.SimulateSingleCycle();
-        //         await OnCycleCompleted();
-        //         await UniTask.Delay(1);
-        //     }
-        // }
-
-        [Title("Controls", HorizontalLine = false)]
-        [Button]
-        public async void RunTurn()
-        {
-            if (turn == 0)
-                await OnSimStart();
-            
-            turn++;
-            this.Log($"Running turn {turn}");
-            await sim.SimulateSingleCycle();
-            await OnCycleCompleted();
-            this.Log($"Completed turn {turn}");
-        }
-        
-        // [Button("Reset")]
-        // public async void Reset()
-        // {
-        //     await OnReset();
-        //     DisposeSim();
-        //     InitializeSim();
-        // }
         #endregion
+        
+        public Tween PlaceAndScaleTreesAndHomes(int numTrees, int numHomes)
+        {
+            placer.numberToPlace1 = numTrees;
+            placer.numberToPlace2 = numHomes;
+            placer.Place();
+            trees.ForEach(x => x.transform.localScale = Vector3.zero);
+            homes.ForEach(x => x.transform.localScale = Vector3.zero);
+
+            return Tween.Parallel(
+                trees.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel(),
+                homes.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel()
+            );
+        }
     }
 }
