@@ -44,7 +44,7 @@ namespace Primer.Simulation
                 _creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
                 return _creaturePool;
             }
-        } 
+        }
 
         private SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
         public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler
@@ -118,7 +118,7 @@ namespace Primer.Simulation
                 transform,
                 creatures,
                 simultaneousTurnGameAgentHandler,
-                 _creaturePool,
+                creaturePool,
                 rng: rng,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
