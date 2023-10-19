@@ -13,6 +13,7 @@ namespace Primer
         
         public void Dispose()
         {
+            Reset();
             transform.gameObject.SetActive(false);
         }
         
