@@ -11,29 +11,28 @@ namespace Primer.Simulation
         #region public Vector2Int size;
         public Vector2Int size
         {
-            get => new(_width, _depth);
+            get => new(width, depth);
             set
             {
-                _width = value.x;
-                _depth = value.y;
-                Generate();
+                width = value.x;
+                depth = value.y;
             }
         }
 
         [SerializeField, HideInInspector]
-        private int _width = 50;
+        public int width = 50;
         [SerializeField, HideInInspector]
-        private int _depth = 50;
+        public int depth = 50;
         
         [ShowInInspector]
         [HorizontalGroup("Size")]
         [LabelText("Width")]
-        public int width 
+        private int _width 
         { 
-            get => _width;
+            get => width;
             set
             {
-                _width = value;
+                width = value;
                 Generate();
             }
         }
@@ -41,12 +40,12 @@ namespace Primer.Simulation
         [ShowInInspector]
         [HorizontalGroup("Size")]
         [LabelText("Depth")]
-        public int depth 
+        private int _depth 
         { 
-            get => _depth;
+            get => depth;
             set
             {
-                _depth = value;
+                depth = value;
                 Generate();
             }
         }
@@ -54,64 +53,64 @@ namespace Primer.Simulation
 
         #region Noise settings
         [SerializeField, HideInInspector]
-        private float _noiseScale = 10;
+        public float noiseScale = 10;
 
         [Title("Noise settings")]
         [ShowInInspector]
-        public float noiseScale {
-            get => _noiseScale;
+        private float _noiseScale {
+            get => noiseScale;
             set {
-                _noiseScale = value;
+                noiseScale = value;
                 Generate();
             }
         }
 
         [SerializeField, HideInInspector]
-        private int _octaves = 5;
+        public int octaves = 5;
 
         [ShowInInspector]
         [PropertyRange(0, 10)]
-        public int octaves {
-            get => _octaves;
+        private int _octaves {
+            get => octaves;
             set {
-                _octaves = value;
+                octaves = value;
                 Generate();
             }
         }
 
         [SerializeField, HideInInspector]
-        private float _persistance = 0.5f;
+        public float persistance = 0.5f;
 
         [ShowInInspector]
         [PropertyRange(0, 1)]
-        public float persistance {
-            get => _persistance;
+        private float _persistance {
+            get => persistance;
             set {
-                _persistance = value;
+                persistance = value;
                 Generate();
             }
         }
 
         [SerializeField, HideInInspector]
-        private float _lacunarity = 1;
+        public float lacunarity = 1;
 
         [ShowInInspector]
-        public float lacunarity {
-            get => _lacunarity;
+        private float _lacunarity {
+            get => lacunarity;
             set {
-                _lacunarity = value;
+                lacunarity = value;
                 Generate();
             }
         }
 
         [SerializeField, HideInInspector]
-        private int _seed;
+        public int seed;
 
         [ShowInInspector]
-        public int seed {
-            get => _seed;
+        private int _seed {
+            get => seed;
             set {
-                _seed = value;
+                seed = value;
                 Generate();
             }
         }
@@ -132,55 +131,55 @@ namespace Primer.Simulation
 
         #region Mesh settings
         [SerializeField, HideInInspector]
-        private float _meshHeightMultiplier = 4;
+        public float meshHeightMultiplier = 4;
 
         [Title("Mesh settings")]
         [ShowInInspector]
         [Tooltip("A constant that's multiplied with the unmultiplied elevation value (which will be bounded from 0 to 1).")]
-        public float meshHeightMultiplier {
-            get => _meshHeightMultiplier;
+        private float _meshHeightMultiplier {
+            get => meshHeightMultiplier;
             set {
-                _meshHeightMultiplier = value;
+                meshHeightMultiplier = value;
                 GenerateMesh();
             }
         }
 
         [FormerlySerializedAs("_roundness")] [SerializeField, HideInInspector]
-        private float _roundingRadius = 1;
+        public float roundingRadius = 1;
 
         [ShowInInspector]
         [Tooltip("Determines the roundingRadius of the edges. Max roundingRadius will be better if `size.y` is even.")]
         [PropertyRange(0, 50)]
-        public float roundingRadius {
-            get => _roundingRadius;
+        private float _roundingRadius {
+            get => roundingRadius;
             set {
-                _roundingRadius = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
+                roundingRadius = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
                 GenerateMesh();
             }
         }
 
         [SerializeField, HideInInspector]
-        private float _elevationOffset = 0;
+        public float elevationOffset = 0;
 
         [ShowInInspector]
         [Tooltip("A constant that's subtracted from the elevation value.")]
         [PropertyRange(0, 10)]
-        public float elevationOffset {
-            get => _elevationOffset;
+        private float _elevationOffset {
+            get => elevationOffset;
             set {
-                _elevationOffset = value;
+                elevationOffset = value;
                 GenerateMesh();
             }
         }
 
-        [FormerlySerializedAs("_edgeClampDistance")] [SerializeField, HideInInspector]
-        private float _edgeClampFactor;
+        [SerializeField, HideInInspector]
+        public float edgeClampFactor;
         [ShowInInspector]
         [PropertyRange(0, 1)]
-        public float edgeClampFactor {
-            get => _edgeClampFactor;
+        private float _edgeClampFactor {
+            get => edgeClampFactor;
             set {
-                _edgeClampFactor = value;
+                edgeClampFactor = value;
                 GenerateMesh();
             }
         }
