@@ -239,7 +239,7 @@ namespace Primer.Simulation
 
         [ShowInInspector]
         [Tooltip("Determines the roundingRadius of the edges. Max roundingRadius will be better if `size.y` is even.")]
-        [PropertyRange(0, 50)]
+        [PropertyRange(0, 200)]
         private float InspectorRoundingRadius {
             get => roundingRadius;
             set {
