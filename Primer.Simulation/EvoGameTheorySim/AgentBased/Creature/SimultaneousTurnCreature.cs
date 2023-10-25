@@ -72,7 +72,7 @@ namespace Simulation.GameTheory
         public Tween ReturnHome(Home home)
         {
             this.home = home;
-            return WalkTo(home.transform.position);
+            return WalkTo(home.transform);
         }
 
         private Transform DetachNearestFruit(FruitTree tree)

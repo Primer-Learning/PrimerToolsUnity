@@ -19,7 +19,7 @@ namespace Primer.SpecificSimulations
         protected override void SetStrategyRule()
         {
             simultaneousTurnGameAgentHandler = new DHRBSimultaneousTurnGameAgentHandler();
-            simultaneousTurnGameAgentHandler.rewardMatrix = GetComponent<RewardEditorComponent>().rewardMatrix;
+            simultaneousTurnGameAgentHandler.rewardMatrix = GetComponent<DHRBRewardEditorComponent>().rewardMatrix;
         }
 
         // protected override async UniTask OnSimStart()

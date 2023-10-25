@@ -64,7 +64,7 @@ namespace Primer.Simulation
         
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
         public IEnumerable<Home> homes => placer.transform.GetComponentsInChildren<Home>();
-        public IEnumerable<FruitTree> trees => placer.transform.GetComponentsInChildren<FruitTree>();
+        public IEnumerable<FruitTree> trees => placer.transform.GetComponentsInChildren<FruitTree>(includeInactive: true);
         public IEnumerable<SimultaneousTurnCreature> creatures =>
             transform.Find("Blobs").GetComponentsInChildren<SimultaneousTurnCreature>();
         public PoissonPrefabPlacer placer => transform.GetComponentInChildren<PoissonPrefabPlacer>();
@@ -145,6 +145,21 @@ namespace Primer.Simulation
                 trees.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel(),
                 homes.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel()
             );
+        }
+        
+        public SimultaneousTurnCreature AddCreature(float energy = 0, SimultaneousTurnStrategyGene gene = null)
+        {
+            var creature = creaturePool.Add();
+            var t = creature.transform;
+            t.localScale = Vector3.one;
+            t.localRotation = Quaternion.Euler(0, 180, 0);
+                
+            creature.energy = energy;
+            creature.PurgeStomach();
+                
+            gene ??= new SimultaneousTurnStrategyGenes.Dove();
+            creature.strategyGenes = new SimultaneousTurnGenome(gene);
+            return creature;
         }
     }
 }
