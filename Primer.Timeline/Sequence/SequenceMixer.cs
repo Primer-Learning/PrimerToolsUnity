@@ -27,8 +27,8 @@ namespace Primer.Timeline
 
         public SequenceMixer()
         {
-            if (instances is 0)
-                Debug.Log("SequenceMixer initiated");
+            if (instances is 0) {}
+                // Debug.Log("SequenceMixer initiated");
 
             instances++;
         }
