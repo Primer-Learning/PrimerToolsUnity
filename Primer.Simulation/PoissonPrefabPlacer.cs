@@ -84,10 +84,6 @@ namespace Primer.Simulation
             prefab2Pool.Reset();
             
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
-            offset = Vector2.one * distanceFromBorder;
-
-            if (center)
-                offset -= size / 2;
 
             var rng = new Rng(seed);
             
@@ -100,6 +96,15 @@ namespace Primer.Simulation
             points = PoissonDiscSampler.RectangularPointSet(numberToPlace1 + numberToPlace2, spawnSpace, minDistance,
                 overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint).ToList();
             oldSize = size;
+
+            if (center) offset = -points.Average();
+            // Old implementation of centering. This pays attention to geometry, but doesn't consider the actual points.
+            // The above implementation could push things out of bounds, but is unlikely to. It otherwise 
+            // produces better-looking results.
+            // {
+            //     offset = Vector2.one * distanceFromBorder;
+            //     offset -= size / 2;
+            // }
 
             foreach (var point in points) {
                 // Start here
