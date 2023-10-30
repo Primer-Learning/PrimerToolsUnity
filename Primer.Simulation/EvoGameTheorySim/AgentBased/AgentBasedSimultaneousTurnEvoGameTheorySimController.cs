@@ -60,7 +60,15 @@ namespace Primer.Simulation
             {
                 _simultaneousTurnGameAgentHandler = value;
             }
-        } 
+        }
+
+        private RewardMatrix _rewardMatrix;
+        
+        public RewardMatrix rewardMatrix
+        {
+            get => simultaneousTurnGameAgentHandler.rewardMatrix;
+            
+        }
         
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
         public IEnumerable<Home> homes => placer.transform.GetComponentsInChildren<Home>();
@@ -107,7 +115,6 @@ namespace Primer.Simulation
         #endregion
 
         #region Sim lifecycle
-        
         protected virtual void SetStrategyRule() {}
         
         public void InitializeSim(List<SimultaneousTurnCreature> creatures, Rng rng)
