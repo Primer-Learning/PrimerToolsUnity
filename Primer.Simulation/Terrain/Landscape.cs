@@ -243,7 +243,7 @@ namespace Primer.Simulation
         private float InspectorRoundingRadius {
             get => roundingRadius;
             set {
-                roundingRadius = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
+                roundingRadius = Mathf.Min(value, Mathf.Min((float) size.x / 2, (float) size.y / 2));
                 GenerateMesh();
             }
         }
