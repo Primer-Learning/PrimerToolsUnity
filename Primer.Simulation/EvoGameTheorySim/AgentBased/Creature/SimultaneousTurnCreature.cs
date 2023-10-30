@@ -52,7 +52,7 @@ namespace Simulation.GameTheory
             var bite = DetachNearestFruit(tree);
 
             var moveToMouthTween = bite.MoveToDynamic(
-                    () => transform.TransformPoint(Vector3.forward * 0.3f + Vector3.up * 1f),
+                    () => transform.TransformPoint(new Vector3(0, 1.26f, 0.13f)),
                     () => skipAnimations ? 0 : 0.5f, 
                     globalSpace: true)
                 .Observe(onStart: () =>
@@ -61,7 +61,7 @@ namespace Simulation.GameTheory
                     {
                         blob.animator.SetFloat("EatSpeed", 2);
                         blob.animator.SetTrigger(scoop);
-                        blob.Chomp(hold:0);
+                        blob.Chomp(hold:0.2f);
                     }
                 }
             );
