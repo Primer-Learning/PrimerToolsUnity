@@ -12,6 +12,12 @@ namespace Primer
             var total = array.Aggregate((current, vec) => current + vec);
             return total / array.Length;
         }
+        public static Vector2 Average(this IEnumerable<Vector2> vectors)
+        {
+            var array = vectors.ToArray();
+            var total = array.Aggregate((current, vec) => current + vec);
+            return total / array.Length;
+        }
 
         public static Vector3 ElementWiseMultiply(this Vector3 v1, Vector3 v2)
         {
