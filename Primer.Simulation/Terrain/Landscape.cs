@@ -8,6 +8,8 @@ namespace Primer.Simulation
     [ExecuteAlways]
     public class Landscape : MonoBehaviour, IMeshController
     {
+        private bool meshUpToDate;
+        
         #region public Vector2Int size;
         public Vector2Int size
         {
@@ -20,14 +22,20 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public int width = 50;
-        [SerializeField, HideInInspector]
-        public int depth = 50;
-        
+        private int _width = 50;
+        public int width
+        {
+            get => _width;
+            set
+            {
+                if (_width != value) meshUpToDate = false;
+                _width = value;
+            }
+        }
         [ShowInInspector]
         [HorizontalGroup("Size")]
         [LabelText("Width")]
-        private int _width 
+        private int InspectorWidth 
         { 
             get => width;
             set
@@ -37,10 +45,21 @@ namespace Primer.Simulation
             }
         }
 
+        [SerializeField, HideInInspector]
+        private int _depth = 50;
+        public int depth
+        {
+            get => _depth;
+            set
+            {
+                if (_depth != value) meshUpToDate = false;
+                _depth = value;
+            }
+        }
         [ShowInInspector]
         [HorizontalGroup("Size")]
         [LabelText("Depth")]
-        private int _depth 
+        private int InspectorDepth 
         { 
             get => depth;
             set
@@ -53,11 +72,19 @@ namespace Primer.Simulation
 
         #region Noise settings
         [SerializeField, HideInInspector]
-        public float noiseScale = 10;
-
+        private float _noiseScale = 10;
+        public float noiseScale
+        {
+            get => _noiseScale;
+            set
+            {
+                if (_noiseScale != value) meshUpToDate = false;
+                _noiseScale = value;
+            }
+        }
         [Title("Noise settings")]
         [ShowInInspector]
-        private float _noiseScale {
+        private float InspectorNoiseScale {
             get => noiseScale;
             set {
                 noiseScale = value;
@@ -66,11 +93,20 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public int octaves = 5;
+        private int _octaves = 5;
+        public int octaves
+        {
+            get => _octaves;
+            set
+            {
+                if (_octaves != value) meshUpToDate = false;
+                _octaves = value;
+            }
+        }
 
         [ShowInInspector]
         [PropertyRange(0, 10)]
-        private int _octaves {
+        private int InspectorOctaves {
             get => octaves;
             set {
                 octaves = value;
@@ -78,24 +114,42 @@ namespace Primer.Simulation
             }
         }
 
-        [SerializeField, HideInInspector]
-        public float persistance = 0.5f;
+        [FormerlySerializedAs("persistance")] [SerializeField, HideInInspector]
+        private float _persistence = 0.5f;
+        public float persistence
+        {
+            get => _persistence;
+            set
+            {
+                if (_persistence != value) meshUpToDate = false;
+                _persistence = value;
+            }
+        }
 
         [ShowInInspector]
         [PropertyRange(0, 1)]
-        private float _persistance {
-            get => persistance;
+        private float InspectorPersistance {
+            get => persistence;
             set {
-                persistance = value;
+                persistence = value;
                 Generate();
             }
         }
 
         [SerializeField, HideInInspector]
-        public float lacunarity = 1;
+        private float _lacunarity = 1;
+        public float lacunarity
+        {
+            get => _lacunarity;
+            set
+            {
+                if (_lacunarity != value) meshUpToDate = false;
+                _lacunarity = value;
+            }
+        }
 
         [ShowInInspector]
-        private float _lacunarity {
+        private float InspectorLacunarity {
             get => lacunarity;
             set {
                 lacunarity = value;
@@ -104,10 +158,19 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public int seed;
+        private int _seed;
+        public int seed
+        {
+            get => _seed;
+            set
+            {
+                if (_seed != value) meshUpToDate = false;
+                _seed = value;
+            }
+        }
 
         [ShowInInspector]
-        private int _seed {
+        private int InspectorSeed {
             get => seed;
             set {
                 seed = value;
@@ -116,14 +179,23 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        private Vector2 _offset = Vector2.zero;
+        private Vector2 _offset;
+        public Vector2 offset
+        {
+            get => _offset;
+            set
+            {
+                if (_offset != value) meshUpToDate = false;
+                _offset = value;
+            }
+        }
 
         [ShowInInspector]
         [Tooltip("Moves the region we sample elevation values from.")]
-        public Vector2 offset {
-            get => _offset;
+        public Vector2 InspectorOffset {
+            get => offset;
             set {
-                _offset = value;
+                offset = value;
                 Generate();
             }
         }
@@ -131,12 +203,21 @@ namespace Primer.Simulation
 
         #region Mesh settings
         [SerializeField, HideInInspector]
-        public float meshHeightMultiplier = 4;
+        private float _meshHeightMultiplier = 4;
+        public float meshHeightMultiplier
+        {
+            get => _meshHeightMultiplier;
+            set
+            {
+                if (_meshHeightMultiplier != value) meshUpToDate = false;
+                _meshHeightMultiplier = value;
+            }
+        }
 
         [Title("Mesh settings")]
         [ShowInInspector]
         [Tooltip("A constant that's multiplied with the unmultiplied elevation value (which will be bounded from 0 to 1).")]
-        private float _meshHeightMultiplier {
+        private float InspectorMeshHeightMultiplier {
             get => meshHeightMultiplier;
             set {
                 meshHeightMultiplier = value;
@@ -144,13 +225,22 @@ namespace Primer.Simulation
             }
         }
 
-        [FormerlySerializedAs("_roundness")] [SerializeField, HideInInspector]
-        public float roundingRadius = 1;
+        [SerializeField, HideInInspector]
+        private float _roundingRadius = 1;
+        public float roundingRadius
+        {
+            get => _roundingRadius;
+            set
+            {
+                if (_roundingRadius != value) meshUpToDate = false;
+                _roundingRadius = value;
+            }
+        }
 
         [ShowInInspector]
         [Tooltip("Determines the roundingRadius of the edges. Max roundingRadius will be better if `size.y` is even.")]
-        [PropertyRange(0, 50)]
-        private float _roundingRadius {
+        [PropertyRange(0, 200)]
+        private float InspectorRoundingRadius {
             get => roundingRadius;
             set {
                 roundingRadius = Mathf.Min(value, Mathf.Min(size.x / 2, size.y / 2));
@@ -159,12 +249,21 @@ namespace Primer.Simulation
         }
 
         [SerializeField, HideInInspector]
-        public float elevationOffset = 0;
+        private float _elevationOffset;
+        public float elevationOffset
+        {
+            get => _elevationOffset;
+            set
+            {
+                if (_elevationOffset != value) meshUpToDate = false;
+                _elevationOffset = value;
+            }
+        }
 
         [ShowInInspector]
         [Tooltip("A constant that's subtracted from the elevation value.")]
         [PropertyRange(0, 10)]
-        private float _elevationOffset {
+        private float InspectorElevationOffset {
             get => elevationOffset;
             set {
                 elevationOffset = value;
@@ -172,11 +271,20 @@ namespace Primer.Simulation
             }
         }
 
-        [SerializeField, HideInInspector]
-        public float edgeClampFactor;
+        [SerializeField, HideInInspector] 
+        private float _edgeClampFactor = 0;
+        public float edgeClampFactor
+        {
+            get => _edgeClampFactor;
+            set
+            {
+                if (_edgeClampFactor != value) meshUpToDate = false;
+                _edgeClampFactor = value;
+            }
+        }
         [ShowInInspector]
         [PropertyRange(0, 1)]
-        private float _edgeClampFactor {
+        private float InspectorEdgeClampFactor {
             get => edgeClampFactor;
             set {
                 edgeClampFactor = value;
@@ -236,71 +344,74 @@ namespace Primer.Simulation
 
         #region Mesh generation
 
-        private float[,] _noiseMap;
+        // private float[,] _noiseMap;
         public float[,] noiseMap {
             get
             {
-                if (_noiseMap is null)
-                {
-                    _noiseMap = Noise.GenerateNoiseMap(
-                        new Vector2Int(size.x + 1, size.y + 1),
-                        seed,
-                        noiseScale,
-                        octaves,
-                        persistance,
-                        lacunarity,
-                        offset
-                    );
-                };
-                return _noiseMap;
+                return Noise.GenerateNoiseMap(
+                    new Vector2Int(size.x + 1, size.y + 1),
+                    seed,
+                    noiseScale,
+                    octaves,
+                    persistence,
+                    lacunarity,
+                    offset
+                );
             }
-            set => _noiseMap = value;
+            // set => _noiseMap = value;
         }
 
         [Title("Controls", HorizontalLine = false)]
         [Button]
         public void Generate()
         {
-            noiseMap = Noise.GenerateNoiseMap(
-                new Vector2Int(size.x + 1, size.y + 1),
-                seed,
-                noiseScale,
-                octaves,
-                persistance,
-                lacunarity,
-                offset
-            );
+            if (meshUpToDate) return;
+            
+            // noiseMap = Noise.GenerateNoiseMap(
+            //     new Vector2Int(size.x + 1, size.y + 1),
+            //     seed,
+            //     noiseScale,
+            //     octaves,
+            //     persistence,
+            //     lacunarity,
+            //     offset
+            // );
 
             GenerateMesh();
         }
 
         private void GenerateMesh()
         {
-            var mesh = MeshGenerator.CreateMesh(
-                roundingRadius,
-                size,
-                noiseMap,
-                meshHeightMultiplier,
-                elevationOffset,
-                edgeClampFactor
-            );
-
-            meshCollider.sharedMesh = mesh;
-            meshFilter.sharedMesh = mesh;
-            root.localPosition = new Vector3(size.x, 0, size.y) / -2f;
-
-            if (_showNormals)
+            if (!meshUpToDate)
             {
-                var normalViewer = root.GetComponent<MeshNormalViewer>();
-                if (normalViewer is not null && normalViewer.enabled)
+                var mesh = MeshGenerator.CreateMesh(
+                    roundingRadius,
+                    size,
+                    noiseMap,
+                    meshHeightMultiplier,
+                    elevationOffset,
+                    edgeClampFactor
+                );
+                meshUpToDate = true;
+                
+                meshCollider.sharedMesh = mesh;
+                meshFilter.sharedMesh = mesh;
+
+                root.localPosition = new Vector3(size.x, 0, size.y) / -2f;
+
+                if (_showNormals)
                 {
-                    normalViewer.DrawNormals();
+                    var normalViewer = root.GetComponent<MeshNormalViewer>();
+                    if (normalViewer is not null && normalViewer.enabled)
+                    {
+                        normalViewer.DrawNormals();
+                    }
                 }
             }
 
             // This is a hack to ensure the collider updates properly so that the landscape items can find the ground
-            meshCollider.enabled = false;
-            meshCollider.enabled = true;
+            // meshCollider.enabled = false;
+            // meshCollider.enabled = true;
             // transform.parent.GetComponentsInChildren<LandscapeItem>().ForEach(item => item.DelayedTouchGround());
         }
         #endregion

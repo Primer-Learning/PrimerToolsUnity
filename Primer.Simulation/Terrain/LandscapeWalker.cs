@@ -11,9 +11,9 @@ namespace Primer.Simulation
         private const float DEFAULT_SPEED = 20;
         private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
-        public Tween WalkTo(Vector3 to, float stopDistance = 0, float forcedDuration = -1)
+        public Tween WalkTo(Transform to, float stopDistance = 0, float forcedDuration = -1)
         {
-            return WalkToImpl(landscape.GetGroundAtWorldPoint(to), stopDistance, forcedDuration);
+            return WalkToImpl(landscape.GetGroundAtWorldPoint(to.position), stopDistance, forcedDuration);
         }
 
         public Tween WalkToLocal(Vector2 to, float stopDistance = 0, float forcedDuration = -1)
@@ -23,25 +23,25 @@ namespace Primer.Simulation
 
         public Tween WalkTo(Component to, float stopDistance = 0, float forcedDuration = -1)
         {
-            return WalkToImpl(new Vector3Provider(() => landscape.GetGroundAtWorldPoint(to.transform.position)), stopDistance, forcedDuration);
+            return WalkToImpl(landscape.GetGroundAtWorldPoint(to.transform.position), stopDistance, forcedDuration);
         }
 
-        private Tween WalkToImpl(Vector3Provider to, float stopDistance, float forcedDuration)
+        private Tween WalkToImpl(Vector3 to, float stopDistance, float forcedDuration)
         {
             var ignoreHeight = new Vector3(1, 0, 1);
             var myTransform = transform;
 
             
-            var targetPosition = to.value;
+            var targetPosition = to;
 
             // We want to walk _to_ the target, no walk over it
             var directionVector = targetPosition - myTransform.position;
-            var destination = targetPosition - directionVector.normalized * stopDistance;
+            var destination = targetPosition - directionVector.normalized * (stopDistance * landscape.transform.lossyScale.x);
 
             float DurationCalculation() =>
                 forcedDuration > 0
                     ? forcedDuration
-                    : Vector3.Distance(myTransform.position, to.value) / DEFAULT_SPEED;
+                    : Vector3.Distance(myTransform.position, to) / DEFAULT_SPEED;
 
             var moveTween = Tween.Value(
                 v =>

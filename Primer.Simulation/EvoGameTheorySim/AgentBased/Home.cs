@@ -8,7 +8,7 @@ public class Home : MonoBehaviour
 
     public FruitTree[] OrderTreesByDistance()
     {
-        var trees = transform.parent.GetComponentsInChildren<FruitTree>();
+        var trees = transform.parent.parent.Find("Trees").GetComponentsInChildren<FruitTree>();
         _treesByDistance = trees.OrderBy(tree => (tree.transform.position - transform.position).sqrMagnitude).ToArray();
         return treesByDistance;
     }
