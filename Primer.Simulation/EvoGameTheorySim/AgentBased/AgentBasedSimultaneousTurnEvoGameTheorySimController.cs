@@ -16,6 +16,8 @@ namespace Primer.Simulation
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
         public ReproductionType reproductionType;
+
+        public Rng rng;
         
         [SerializeField, HideInInspector]
         private bool _skipAnimations = false;
@@ -117,8 +119,9 @@ namespace Primer.Simulation
         #region Sim lifecycle
         protected virtual void SetStrategyRule() {}
         
-        public void InitializeSim(List<SimultaneousTurnCreature> creatures, Rng rng)
+        public void InitializeSim(List<SimultaneousTurnCreature> creatures, Rng rng = null)
         {
+            rng ??= this.rng;
             turn = 0;
             SetStrategyRule();
             sim = new AgentBasedSimultaneousTurnEvoGameTheorySim(
@@ -149,8 +152,8 @@ namespace Primer.Simulation
             homes.ForEach(x => x.transform.localScale = Vector3.zero);
 
             return Tween.Parallel(
-                trees.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel(),
-                homes.Select(x => x.ScaleTo(1) with { delay = Rng.RangeFloat(0.2f) }).RunInParallel()
+                trees.Select(x => x.ScaleTo(1) with { delay = rng.RangeFloat(0.2f) }).RunInParallel(),
+                homes.Select(x => x.ScaleTo(1) with { delay = rng.RangeFloat(0.2f) }).RunInParallel()
             );
         }
         
