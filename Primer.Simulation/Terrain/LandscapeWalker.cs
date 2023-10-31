@@ -11,9 +11,10 @@ namespace Primer.Simulation
         private const float DEFAULT_SPEED = 20;
         private const float DEFAULT_TURN_SPEED = DEFAULT_SPEED * 4;
 
-        public Tween WalkTo(Transform to, float stopDistance = 0, float forcedDuration = -1)
+        public Tween WalkTo(Transform to, float stopDistance = 0, float forcedDuration = -1, Vector3 offset = default)
         {
-            return WalkToImpl(landscape.GetGroundAtWorldPoint(to.position), stopDistance, forcedDuration);
+            offset = transform.parent.TransformVector(offset);
+            return WalkToImpl(landscape.GetGroundAtWorldPoint(to.position + offset), stopDistance, forcedDuration);
         }
 
         public Tween WalkToLocal(Vector2 to, float stopDistance = 0, float forcedDuration = -1)
@@ -21,9 +22,9 @@ namespace Primer.Simulation
             return WalkToImpl(landscape.GetGroundAtLocalPoint(to), stopDistance, forcedDuration);
         }
 
-        public Tween WalkTo(Component to, float stopDistance = 0, float forcedDuration = -1)
+        public Tween WalkTo(Component to, float stopDistance = 0, float forcedDuration = -1, Vector3 offset = default)
         {
-            return WalkToImpl(landscape.GetGroundAtWorldPoint(to.transform.position), stopDistance, forcedDuration);
+            return WalkTo(to.transform, stopDistance, forcedDuration, offset);
         }
 
         private Tween WalkToImpl(Vector3 to, float stopDistance, float forcedDuration)

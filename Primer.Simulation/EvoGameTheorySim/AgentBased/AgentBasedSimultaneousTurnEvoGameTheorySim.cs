@@ -232,15 +232,33 @@ namespace Simulation.GameTheory
         public Tween AgentsReturnHome()
         {
             ChooseHomes();
+            
+            // Hax
+            var offsets = new List<Vector3>()
+            {
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(-1, 0, 0),
+                new Vector3(0, 0, 1),
+                new Vector3(1, 0, 1),
+                new Vector3(-1, 0, 1),
+                new Vector3(0, 0, -1),
+                new Vector3(1, 0, -1),
+                new Vector3(-1, 0, -1),
+            };
+            offsets.Shuffle(rng);
+            
             var returnHomeTweens = new List<Tween>();
             var homesList = new List<Home>();
+            var i = 0;
             foreach (var creature in creatures)
             {
                 if (!homesList.Contains(creature.home))
                 {
                     homesList.Add(creature.home);
                 }
-                returnHomeTweens.Add(creature.ReturnHome(creature.home));
+                returnHomeTweens.Add(creature.ReturnHome(offset: offsets[i % offsets.Count]));
+                i++;
             }
 
             return Tween.Parallel(
@@ -248,10 +266,6 @@ namespace Simulation.GameTheory
                 returnHomeTweens.RunInParallel(),
                 homesList.Select(x => x.Close() with { delay = 0.5f }).RunInParallel()
             );
-            
-            // return creatures
-            //     .Zip(ChooseHomes(), (creature, home) => creature.ReturnHome(home))
-            //     .RunInParallel();
         }
 
         public Tween AgentsReproduceOrDie()

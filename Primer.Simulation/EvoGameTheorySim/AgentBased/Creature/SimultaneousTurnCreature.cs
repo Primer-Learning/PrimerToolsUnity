@@ -69,10 +69,9 @@ namespace Simulation.GameTheory
             return Tween.Parallel(moveToMouthTween, shrinkTween);
         }
 
-        public Tween ReturnHome(Home home)
+        public Tween ReturnHome(Vector3 offset = default)
         {
-            this.home = home;
-            return WalkTo(home.transform);
+            return WalkTo(home.transform, offset: offset);
         }
 
         private Transform DetachNearestFruit(FruitTree tree)
