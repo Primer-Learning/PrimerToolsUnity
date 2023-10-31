@@ -12,6 +12,8 @@ namespace Primer.Simulation
     [ExecuteAlways]
     public class PoissonPrefabPlacer : MonoBehaviour
     {
+        public Transform[] allChildren => transform.Find("Trees").GetChildren().Concat(transform.Find("Homes").GetChildren()).ToArray();
+        
         [SerializeField]
         private Landscape _landscape;
 
@@ -95,9 +97,13 @@ namespace Primer.Simulation
             
             points = PoissonDiscSampler.RectangularPointSet(numberToPlace1 + numberToPlace2, spawnSpace, minDistance,
                 overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint).ToList();
+            if (center)
+            {
+                offset = -points.Average();
+                points = points.Select(x => x + offset).ToList();
+            }
+                
             oldSize = size;
-
-            if (center) offset = -points.Average();
             // Old implementation of centering. This pays attention to geometry, but doesn't consider the actual points.
             // The above implementation could push things out of bounds, but is unlikely to. It otherwise 
             // produces better-looking results.
@@ -111,7 +117,7 @@ namespace Primer.Simulation
                 var pool = prefabAssignments[index++] ? prefab1Pool : prefab2Pool;
                 var instance = pool.Add();
                 
-                var pos = point + offset;
+                var pos = point;
 
                 if (hasLandscape) {
                     instance.position = landscape.GetGroundAtWorldPoint(landscape.transform.TransformPoint(new Vector3(pos.x, 0, pos.y)));
@@ -159,10 +165,11 @@ namespace Primer.Simulation
             prefab2Pool.prefab = prefab2.gameObject;
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             
-            offset = Vector2.one * distanceFromBorder;
-
-            if (center)
-                offset -= size / 2;
+            // offset = Vector2.one * distanceFromBorder;
+            //
+            // if (center)
+            //     offset -= size / 2;
+            // if (center) offset = -points.Average();
 
             var rng = new Rng(seed);
             
@@ -172,19 +179,21 @@ namespace Primer.Simulation
                 .Concat(Enumerable.Repeat(false, prefab2ToAdd)).Shuffle(rng: rng)).ToList();
             
             var index = 0;
-            
-            var oldPointCount = points.Count();
-            points = points.Select(x => x - oldSize / 2 + size / 2).ToList();
-            points = PoissonDiscSampler.RectangularPointSet(points,numberToPlace1 + numberToPlace2 - points.Count(), spawnSpace, minDistance,
+
+            var oldPointCount = points.Count;
+            var shift = - oldSize / 2 + size / 2;
+            var shiftedPoints = points.Select(x => x + shift).ToList();
+            points = PoissonDiscSampler.RectangularPointSet(shiftedPoints,numberToPlace1 + numberToPlace2 - points.Count(), spawnSpace, minDistance,
                 overflowMode: overflowMode, rng: rng, numSamplesBeforeRejection: maxAttemptsPerPoint).ToList();
+            points = points.Select(x => x - shift).ToList();
             oldSize = size;
-            foreach (var point in points)
+            foreach (var point in points.Skip(oldPointCount))
             {
                 // Start here
                 var pool = prefabAssignments[index++] ? prefab1Pool : prefab2Pool;
                 var instance = pool.Add();
                 
-                var pos = point + offset;
+                var pos = point;
 
                 if (hasLandscape) {
                     instance.localPosition = landscape.GetGroundAtLocalPoint(pos);
