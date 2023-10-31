@@ -32,7 +32,7 @@ namespace Simulation.GameTheory
 
         public override Tween Resolve(IEnumerable<SimultaneousTurnCreature> creature, FruitTree tree)
         {
-            var (first, second) = creature.Shuffle().ToList();
+            var (first, second) = creature.ToList();
 
             first.energy += rewardMatrix.Get( first.action,  second.action);
             second.energy += rewardMatrix.Get( second.action,  first.action);

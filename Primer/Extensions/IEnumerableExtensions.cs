@@ -23,7 +23,7 @@ namespace Primer
         }
 
         [Pure]
-        public static T RandomItem<T>(this IEnumerable<T> enumerable, Rng rng = null)
+        public static T RandomItem<T>(this IEnumerable<T> enumerable, Rng rng)
         {
             var list = enumerable as List<T> ?? enumerable.ToList();
             var index = rng.RangeInt(0, list.Count);

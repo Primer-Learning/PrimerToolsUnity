@@ -29,7 +29,7 @@ namespace Simulation.GameTheory
         public float energy;
         public FruitTree goingToEat;
         public SimultaneousTurnGenome strategyGenes;
-        public SimultaneousTurnAction action => strategyGenes.GetAction();
+        public SimultaneousTurnAction action => strategyGenes.GetAction(rng);
         public Home home;
 
         public SimpleGnome stomach => new ("Stomach", parent: transform);

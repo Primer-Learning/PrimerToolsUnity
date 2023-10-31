@@ -10,15 +10,15 @@ namespace Simulation.GameTheory
     {
         public SimultaneousTurnGenome() {}
         public SimultaneousTurnGenome(Homolog[] homologs) : base(homologs) {}
-        
-        public SimultaneousTurnGenome(params SimultaneousTurnStrategyGene[] genes) : base(genes) {}
+        public SimultaneousTurnGenome(Gene gene, Rng rng = null) : base(gene, rng) {}
+        public SimultaneousTurnGenome(Rng rng = null, params SimultaneousTurnStrategyGene[] genes) : base(rng, genes) {}
         public SimultaneousTurnGenome(SimultaneousTurnStrategyGene[,] genes) : base(genes) {}
         
-        public SimultaneousTurnAction GetAction()
+        public SimultaneousTurnAction GetAction(Rng rng)
         {
-            var homolog = homologs.RandomItem();
-            var chromosome = homolog.chromosomes.RandomItem();
-            var gene = (SimultaneousTurnStrategyGene) chromosome.genes.RandomItem();
+            var homolog = homologs.RandomItem(rng);
+            var chromosome = homolog.chromosomes.RandomItem(rng);
+            var gene = (SimultaneousTurnStrategyGene) chromosome.genes.RandomItem(rng);
             return gene.action;
         }
         public List<SimultaneousTurnStrategyGene> GetAlleles()

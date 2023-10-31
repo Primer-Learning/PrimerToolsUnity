@@ -73,8 +73,8 @@ namespace Primer.Simulation
         }
         
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;
-        public IEnumerable<Home> homes => placer.transform.GetComponentsInChildren<Home>();
-        public IEnumerable<FruitTree> trees => placer.transform.GetComponentsInChildren<FruitTree>(includeInactive: true);
+        public IEnumerable<Home> homes => placer.transform.Find("Homes").GetComponentsInChildren<Home>(includeInactive: true);
+        public IEnumerable<FruitTree> trees => placer.transform.Find("Trees").GetComponentsInChildren<FruitTree>(includeInactive: true);
         public IEnumerable<SimultaneousTurnCreature> creatures =>
             transform.Find("Blobs").GetComponentsInChildren<SimultaneousTurnCreature>();
         public PoissonPrefabPlacer placer => transform.GetComponentInChildren<PoissonPrefabPlacer>();
@@ -86,10 +86,10 @@ namespace Primer.Simulation
             var t = creaturePool.Add();
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             simultaneousTurnCreature.energy = initialEnergy ? 1 : 0;
-            simultaneousTurnCreature.home = home ? home : homes.RandomItem();
+            simultaneousTurnCreature.home = home ? home : homes.RandomItem(rng: rng);
             simultaneousTurnCreature.transform.position = simultaneousTurnCreature.home.transform.position;
             simultaneousTurnCreature.transform.localScale = Vector3.one;
-            simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(gene);
+            simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(rng, gene);
             simultaneousTurnGameAgentHandler.OnAgentCreated(simultaneousTurnCreature);
             return simultaneousTurnCreature;
         }
@@ -168,7 +168,7 @@ namespace Primer.Simulation
             creature.PurgeStomach();
                 
             gene ??= new SimultaneousTurnStrategyGenes.Dove();
-            creature.strategyGenes = new SimultaneousTurnGenome(gene);
+            creature.strategyGenes = new SimultaneousTurnGenome(rng, gene);
             return creature;
         }
     }

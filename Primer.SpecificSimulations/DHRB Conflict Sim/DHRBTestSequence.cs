@@ -52,7 +52,7 @@ namespace Scenes.Intro_Scene_Sources
                     for (var j = 0; j < count; j++) {
                         var creature = creaturePool.Add();
                         initialCreatures.Add(creature);
-                        creature.strategyGenes = new SimultaneousTurnGenome(strategy); 
+                        creature.strategyGenes = new SimultaneousTurnGenome(null, strategy); 
                         creature.home = _homes[i % _homes.Count];
                         simController.simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
                     }

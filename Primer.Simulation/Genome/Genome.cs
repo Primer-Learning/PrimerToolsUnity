@@ -7,14 +7,31 @@ namespace Primer.Simulation.EvoGameTheorySim.AgentBased
 {
     public class Genome<T> where T : Genome<T>
     {
+        private Rng rng;
         private int ploidy => homologs[0].chromosomes.Length;
         protected Homolog[] homologs;
 
-        public Genome() {}
+        public Genome(Rng rng = null)
+        {
+            this.rng = rng;
+        }
+        
+        // Simplest constructor for single-gene genomes.
+        public Genome(Gene gene, Rng rng = null)
+        {
+            this.rng = rng;
+            homologs = new Homolog[1];
+            homologs[0] = new Homolog();
+            homologs[0].chromosomes = new Chromosome[1];
+            homologs[0].chromosomes[0] = new Chromosome();
+            homologs[0].chromosomes[0].genes = new Gene[1];
+            homologs[0].chromosomes[0].genes[0] = gene;
+        }
 
         // Simple constructor for a haploid genome with single-gene chromosomes.
-        public Genome(params Gene[] genes)
+        public Genome(Rng rng = null, params Gene[] genes)
         {
+            this.rng = rng;
             var length = genes.Length;
             homologs = new Homolog[length];
             for (var i = 0; i < length; i++)
@@ -28,8 +45,9 @@ namespace Primer.Simulation.EvoGameTheorySim.AgentBased
         }
         
         // Slightly more complex constructor for an n-ploid genome with single-gene chromosomes.
-        public Genome(Gene[,] genes)
+        public Genome(Gene[,] genes, Rng rng = null)
         {
+            this.rng = rng;
             var numHomologs = genes.GetLength(0);
             var numChromosomes = genes.GetLength(1);
             
@@ -57,7 +75,7 @@ namespace Primer.Simulation.EvoGameTheorySim.AgentBased
             var gamete = new Chromosome[homologs.Length];
             for (var i = 0; i < homologs.Length; i++)
             {
-                gamete[i] = homologs[i].chromosomes[Rng.RangeIntStatic(0, ploidy)];
+                gamete[i] = homologs[i].chromosomes[rng.RangeInt(0, ploidy)];
             }
             return gamete;
         }
