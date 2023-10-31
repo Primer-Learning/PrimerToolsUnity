@@ -118,6 +118,7 @@ namespace Simulation.GameTheory
                 creature.rng = rng;
                 _simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
             }
+            ChooseHomes();
         }
 
         public Tween CreateFood()
@@ -136,29 +137,54 @@ namespace Simulation.GameTheory
             var trees1 = trees.ToList();
             var trees2 = trees.ToList();
 
+            // var goToTreesTweens = Tween.noop;
+            // var deathTweens = Tween.noop;
+            
+            var goToTreesTweenList = new List<Tween>();
+            var deathTweenList = new List<Tween>();
+            var currentHomes = new List<Home>();
+            
             switch (_treeSelectionOptions)
             {
                 case TreeSelectionOptions.Random:
                     // Make creatures each go to a random tree, but a maximum of two per tree
                     var treeSlots = trees.Concat(trees).Shuffle(rng);
                     var shuffledCreatures = creatures.Shuffle(rng);
-                    var goToTreesTweens = creatures
-                        .Take(treeSlots.Count)
-                        .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
-                        .RunInParallel();
-                    var deathTweens= shuffledCreatures
-                        .Skip(treeSlots.Count)
-                        .Select(creature => creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)))
-                        .RunInParallel();
-                    return Tween.Parallel(
-                        goToTreesTweens,
-                        deathTweens
-                    );
+                    goToTreesTweenList = new List<Tween>();
+                    
+                    for (var i = 0; i < shuffledCreatures.Count; i++)
+                    {
+                        var creature = shuffledCreatures[i];
+                        if (i < treeSlots.Count)
+                        {
+                            creature.GoToEat(treeSlots[i]);
+                            if (!currentHomes.Contains(creature.home))
+                            {
+                                currentHomes.Add(creature.home);
+                            }
+                        }
+                        else
+                        {
+                            deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)));
+                        }
+                    }
+                    
+                    // goToTreesTweens = creatures
+                    //     .Take(treeSlots.Count)
+                    //     .Zip(treeSlots, (creature, tree) => creature.GoToEat(tree))
+                    //     .RunInParallel();
+                    // deathTweens = shuffledCreatures
+                    //     .Skip(treeSlots.Count)
+                    //     .Select(creature => creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)))
+                    //     .RunInParallel();
+                    break;
                 case TreeSelectionOptions.PreferNearest:
-                    var goToTreesTweenList = new List<Tween>();
-                    var deathTweenList = new List<Tween>();
                     foreach (var creature in creatures.Shuffle(rng))
                     {
+                        if (!currentHomes.Contains(creature.home))
+                        {
+                            currentHomes.Add(creature.home);
+                        }
                         var foundTree = false;
                         foreach (var tree in creature.home.treesByDistance)
                         {
@@ -180,14 +206,17 @@ namespace Simulation.GameTheory
                         if (foundTree) continue;
                         deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)));
                     }
-                    return Tween.Parallel(
-                        goToTreesTweenList.RunInParallel(),
-                        deathTweenList.RunInParallel()
-                    );
+                    break;
                 default:
                     Debug.LogError("Tree selection option not implemented");
                     return null;
             }
+            return Tween.Parallel(
+                currentHomes.Select(x => x.Open()).RunInParallel(),
+                goToTreesTweenList.RunInParallel() with {delay = 0.25f},
+                deathTweenList.RunInParallel() with {delay = 0.25f},
+                currentHomes.Select(x => x.Close() with {delay = 0.5f}).RunInParallel()
+            );
         }
 
         public Tween AgentsEatFood()
@@ -202,9 +231,27 @@ namespace Simulation.GameTheory
 
         public Tween AgentsReturnHome()
         {
-            return creatures
-                .Zip(ChooseHomes(), (creature, home) => creature.ReturnHome(home))
-                .RunInParallel();
+            ChooseHomes();
+            var returnHomeTweens = new List<Tween>();
+            var homesList = new List<Home>();
+            foreach (var creature in creatures)
+            {
+                if (!homesList.Contains(creature.home))
+                {
+                    homesList.Add(creature.home);
+                }
+                returnHomeTweens.Add(creature.ReturnHome(creature.home));
+            }
+
+            return Tween.Parallel(
+                homesList.Select(x => x.Open()).RunInParallel(),
+                returnHomeTweens.RunInParallel(),
+                homesList.Select(x => x.Close() with { delay = 0.5f }).RunInParallel()
+            );
+            
+            // return creatures
+            //     .Zip(ChooseHomes(), (creature, home) => creature.ReturnHome(home))
+            //     .RunInParallel();
         }
 
         public Tween AgentsReproduceOrDie()
@@ -333,19 +380,22 @@ namespace Simulation.GameTheory
             }
         }
 
-        private IEnumerable<Home> ChooseHomes()
+        private void ChooseHomes()
         {
             switch (_homeOptions)
             {
                 case HomeOptions.Random:
-                    return creatures.Select(x => homes.RandomItem(rng));
+                    creatures.ForEach(x => x.home = homes.RandomItem(rng));
+                    break;
                 case HomeOptions.ChooseNearestEveryDay:
-                    return creatures.Select(x => homes.OrderBy(y => (x.transform.position - y.transform.position).sqrMagnitude).First());
+                    creatures.ForEach(x => x.home = homes.OrderBy(y => (x.transform.position - y.transform.position).sqrMagnitude).First());
+                    break;
                 case HomeOptions.Keep:
-                    return creatures.Select(x => x.home ?? homes.RandomItem(rng));
+                    creatures.ForEach(x => x.home ??= homes.RandomItem(rng));
+                    break;
                 default:
                     Debug.LogError("Home option not implemented");
-                    return null;
+                    break;
             }
         }
 
