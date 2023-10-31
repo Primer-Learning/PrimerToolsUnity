@@ -371,17 +371,17 @@ public class PrimerBlob : PrimerCharacter {
         color = newColor;
     }
 
-    public override void ChangeColor(Color newColor, float duration = 0.5f,
-        EaseMode ease = EaseMode.None)
-    {
-        Transform go = null;
-        go = transform.Find("blob_mesh");
-        if (go == null) go = transform.Find("blob_mball.022");
-        if (go == null) Debug.LogError("Couldn't find valid object for PrimerBlob.SetColor.");
-        var r = go.GetComponent<Renderer>();
-        base.ChangeColor(newColor, r, duration, ease);
-        color = newColor;
-    }
+    // public override void ChangeColor(Color newColor, float duration = 0.5f,
+    //     EaseMode ease = EaseMode.None)
+    // {
+    //     Transform go = null;
+    //     go = transform.Find("blob_mesh");
+    //     if (go == null) go = transform.Find("blob_mball.022");
+    //     if (go == null) Debug.LogError("Couldn't find valid object for PrimerBlob.SetColor.");
+    //     var r = go.GetComponent<Renderer>();
+    //     base.ChangeColor(newColor, r, duration, ease);
+    //     color = newColor;
+    // }
 
     public Tween ChangeColor(Color newColor)
     {
