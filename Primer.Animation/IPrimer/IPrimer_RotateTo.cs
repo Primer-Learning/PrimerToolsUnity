@@ -117,7 +117,7 @@ namespace Primer.Animation
 
             var initial = initialRotation.HasValue
                 ? Quaternion.Euler(initialRotation.Value)
-                : transform.rotation;
+                : transform.localRotation;
 
             var target = Quaternion.Euler(newRotation);
 
@@ -129,7 +129,7 @@ namespace Primer.Animation
         public static Tween RotateTo(this Component self, Quaternion newRotation, Quaternion? initialRotation = null)
         {
             var transform = self.transform;
-            var initial = initialRotation ?? transform.rotation;
+            var initial = initialRotation ?? transform.localRotation;
 
             return self is IPrimer_CustomRotateTo custom
                 ? custom.RotateTo(newRotation, initial)
@@ -179,7 +179,7 @@ namespace Primer.Animation
                         self.localRotation = newRotation;
                     }
                 },
-                () => initialRotation ?? self.localRotation,
+                () => self.localRotation,
                 () => newRotation
             );
         }
