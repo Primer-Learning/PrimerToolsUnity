@@ -45,11 +45,11 @@ namespace Primer
 
         public static List<Color> all = new() {
             blue,
-            orange,
-            yellow,
             red,
             green,
+            orange,
             purple,
+            yellow,
             gray,
             lightGray,
             white,
