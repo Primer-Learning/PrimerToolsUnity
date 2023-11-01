@@ -110,7 +110,7 @@ namespace Primer.Graph
             var linesCount = Math.Max(renderedLines.Count, targetData.Count);
             var lines = new List<(ILine from, ILine to)>(linesCount);
 
-            if (renderedLines.Count == 0)
+            if (renderedLines.Count == 0 || renderedLines.Any(x => x.numSegments == 0))
             {
                 return GrowFromStart();
             }

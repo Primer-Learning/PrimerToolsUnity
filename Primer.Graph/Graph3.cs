@@ -74,6 +74,7 @@ namespace Primer.Graph
         {
             var gnome = new SimpleGnome(transform);
             var area = gnome.Add<StackedArea>(name);
+            area.Reset(); // In case it already existed
             area.transformPointFromDataSpaceToPositionSpace = DataSpaceToPositionSpace;
             return area;
         }
