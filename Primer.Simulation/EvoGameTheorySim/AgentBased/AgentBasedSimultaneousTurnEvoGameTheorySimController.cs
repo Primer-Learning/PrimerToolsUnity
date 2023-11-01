@@ -157,7 +157,7 @@ namespace Primer.Simulation
             );
         }
         
-        public SimultaneousTurnCreature AddCreature(float energy = 0, SimultaneousTurnStrategyGene gene = null)
+        public SimultaneousTurnCreature AddCreature(float energy = 0, SimultaneousTurnStrategyGene gene = null, Home home = null)
         {
             var creature = creaturePool.Add();
             var t = creature.transform;
@@ -169,6 +169,18 @@ namespace Primer.Simulation
                 
             gene ??= new SimultaneousTurnStrategyGenes.Dove();
             creature.strategyGenes = new SimultaneousTurnGenome(rng, gene);
+            simultaneousTurnGameAgentHandler.OnAgentCreated(creature);
+
+            if (home != null)
+            {
+                creature.home = home;
+                creature.transform.position = home.transform.position;
+            }
+            else
+            {
+                creature.home = homes.RandomItem(rng: rng);
+            }
+            
             return creature;
         }
     }
