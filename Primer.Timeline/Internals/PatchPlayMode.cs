@@ -43,8 +43,8 @@ namespace Primer.Timeline
             director.Pause();
             isPreloading = true;
 
-            await PrimerTimeline.ScrubTo(director, director.duration);
-            await PrimerTimeline.ScrubTo(director, 0);
+            // await PrimerTimeline.ScrubTo(director, director.duration);
+            // await PrimerTimeline.ScrubTo(director, 0);
 
             // A little more time to let things settle before playing.
             await UniTask.Delay(100);
