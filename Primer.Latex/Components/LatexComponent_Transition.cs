@@ -108,7 +108,7 @@ namespace Primer.Latex
                 to
             );
 
-            var transition = gameObject.AddComponent<LatexTransition>();
+            var transition = gameObject.GetOrAddComponent<LatexTransition>();
             transition.Set(start, end, new TransitionList(transitions));
             transition.Deactivate();
             return transition.ToTween();

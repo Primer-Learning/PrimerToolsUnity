@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using Primer.Animation;
 using Primer.Timeline;
+using UnityEngine;
 
 namespace Primer.Latex
 {
@@ -27,7 +28,7 @@ namespace Primer.Latex
         protected TweenProvider Transition(LatexComponent stage, params GroupTransitionType[] transition)
             => Transition(Array.Empty<int>(), stage, Array.Empty<int>(), transition);
 
-        protected TweenProvider Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transitions)
+        protected Tween Transition(int[] groupIndexesBefore, LatexComponent stage, int[] groupIndexesAfter, params GroupTransitionType[] transitions)
         {
             stages.Add(new Stage(
                 latex: stage,
@@ -35,13 +36,20 @@ namespace Primer.Latex
                 groupIndexesBefore,
                 groupIndexesAfter
             ));
+            stage.gameObject.SetActive(false);
 
-            var prev = activeLatex ?? initial;
+            var prev = activeLatex ? activeLatex : initial;
 
-            return new TweenProvider(() => {
+            // return Tween.noop;
+            
+            return ((Tween)new TweenProvider(() => {
                 var transition = prev.Transition(groupIndexesBefore, stage.expression, groupIndexesAfter, transitions);
                 runningTransition = transition;
                 return transition;
+            })).Observe(onComplete: () =>
+            {
+                prev.gameObject.SetActive(false);
+                stages[stages.Count - 1].latex.gameObject.SetActive(true);
             });
         }
 
