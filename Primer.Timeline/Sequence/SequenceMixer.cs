@@ -39,7 +39,7 @@ namespace Primer.Timeline
 
             if (instances is 0) {
                 SequenceOrchestrator.Clear();
-                Debug.Log("SequenceMixer cleared");
+                // Debug.Log("SequenceMixer cleared");
             }
         }
 
