@@ -262,7 +262,7 @@ namespace Primer.Simulation
 
         [ShowInInspector]
         [Tooltip("A constant that's subtracted from the elevation value.")]
-        [PropertyRange(0, 10)]
+        [PropertyRange(-1, 10)]
         private float InspectorElevationOffset {
             get => elevationOffset;
             set {
