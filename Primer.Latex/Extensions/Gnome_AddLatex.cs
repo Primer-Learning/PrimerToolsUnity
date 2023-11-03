@@ -4,7 +4,7 @@ namespace Primer.Latex
     {
         public static LatexComponent AddLatex(this Gnome gnome, string formula, string name = null)
         {
-            var child = gnome.AddPrefab<LatexComponent>(LatexComponent.PREFAB_NAME, name ?? formula);
+            var child = gnome.Add(name ?? formula).GetOrAddComponent<LatexComponent>();
 
             child.Process(formula);
             child.transform.SetScale(0);

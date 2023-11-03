@@ -39,17 +39,16 @@ namespace Primer.Latex
             stage.gameObject.SetActive(false);
 
             var prev = activeLatex ? activeLatex : initial;
-
-            // return Tween.noop;
             
             return ((Tween)new TweenProvider(() => {
                 var transition = prev.Transition(groupIndexesBefore, stage.expression, groupIndexesAfter, transitions);
-                runningTransition = transition;
-                return transition;
+                runningTransition = transition.tween;
+                stage.transform.localPosition = prev.transform.localPosition + transition.destinationOffset;
+                return transition.tween;
             })).Observe(onComplete: () =>
             {
                 prev.gameObject.SetActive(false);
-                stages[stages.Count - 1].latex.gameObject.SetActive(true);
+                stage.gameObject.SetActive(true);
             });
         }
 

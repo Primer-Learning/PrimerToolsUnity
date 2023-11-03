@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Primer.Animation;
+using UnityEngine;
 
 namespace Primer.Latex
 {
     public partial class LatexComponent
     {
         #region Transition(string)
-        public UniTask<Tween> Transition(string to)
+        public UniTask<(Tween tween, Vector3 destinationOffset)> Transition(string to)
         {
             return Transition(Array.Empty<int>(), to, Array.Empty<int>(), GroupTransitionType.Replace);
         }
 
-        public UniTask<Tween> Transition(string from, string to)
+        public UniTask<(Tween tween, Vector3 destinationOffset)> Transition(string from, string to)
         {
             return Transition(from, Array.Empty<int>(), to, Array.Empty<int>(), GroupTransitionType.Replace);
         }
 
-        public async UniTask<Tween> Transition(
+        public async UniTask<(Tween tween, Vector3 destinationOffset)> Transition(
             IEnumerable<int> fromGroups,
             string to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
@@ -28,7 +29,7 @@ namespace Primer.Latex
             return Transition(fromGroups, toExpression, toGroups, transitions);
         }
 
-        public async UniTask<Tween> Transition(
+        public async UniTask<(Tween tween, Vector3 destinationOffset)> Transition(
             string from, IEnumerable<int> fromGroups,
             string to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
@@ -44,7 +45,7 @@ namespace Primer.Latex
 
 
         #region Transition(LatexComponent)
-        public Tween Transition(LatexComponent to)
+        public (Tween tween, Vector3 destinationOffset) Transition(LatexComponent to)
         {
             return Transition(
                 expression,
@@ -55,7 +56,7 @@ namespace Primer.Latex
             );
         }
 
-        public Tween Transition(
+        public (Tween tween, Vector3 destinationOffset) Transition(
             IEnumerable<int> fromGroups,
             LatexComponent to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
@@ -66,7 +67,7 @@ namespace Primer.Latex
 
 
         #region Transition(LatexExpression)
-        public Tween Transition(LatexExpression to)
+        public (Tween tween, Vector3 destinationOffset) Transition(LatexExpression to)
         {
             return Transition(
                 expression,
@@ -78,7 +79,7 @@ namespace Primer.Latex
         }
 
 
-        public Tween Transition(
+        public (Tween tween, Vector3 destinationOffset) Transition(
             IEnumerable<int> fromGroups,
             LatexExpression to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
@@ -89,7 +90,7 @@ namespace Primer.Latex
 
 
         // Actual implementation
-        public Tween Transition(
+        public (Tween tween, Vector3 destinationOffset) Transition(
             LatexExpression from, IEnumerable<int> fromGroups,
             LatexExpression to, IEnumerable<int> toGroups,
             params GroupTransitionType[] transitions)
@@ -109,9 +110,9 @@ namespace Primer.Latex
             );
 
             var transition = gameObject.GetOrAddComponent<LatexTransition>();
-            transition.Set(start, end, new TransitionList(transitions));
+            var offset = transition.Set(start, end, new TransitionList(transitions));
             transition.Deactivate();
-            return transition.ToTween();
+            return (transition.ToTween(), offset);
         }
 
 

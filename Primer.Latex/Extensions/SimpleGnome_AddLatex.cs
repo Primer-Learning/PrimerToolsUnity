@@ -7,7 +7,7 @@ namespace Primer.Latex
     {
         public static LatexComponent AddLatex(this Primer.SimpleGnome gnome, string formula, string name = null)
         {
-            var child = gnome.Add<LatexComponent>("LaTex", name ?? formula);
+            var child = gnome.Add(name ?? formula).GetOrAddComponent<LatexComponent>();
 
             child.Process(formula);
             child.SetActive(true);

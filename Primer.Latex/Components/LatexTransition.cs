@@ -55,7 +55,7 @@ namespace Primer.Latex
             return latex.ToCode() + ToCode();
         }
 
-        public LatexTransition Set(GroupedLatex start, GroupedLatex end, TransitionList transitions)
+        public Vector3 Set(GroupedLatex start, GroupedLatex end, TransitionList transitions)
         {
             this.start = start;
             this.end = end;
@@ -64,7 +64,7 @@ namespace Primer.Latex
             start.onGroupsChange += UpdateChildren;
             end.onGroupsChange += UpdateChildren;
             UpdateChildren();
-            return this;
+            return offset;
         }
         #endregion
 
