@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
 using Primer.Animation;
 using Primer.Timeline;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace Primer.Latex
@@ -96,6 +97,14 @@ namespace Primer.Latex
             if (!PrimerTimeline.isPreloading)
                 await EnsureIsInitialized();
 
+            transform.GetChildren().ForEach(
+                child =>
+                {
+                    child.DisableChildren();
+                    child.gameObject.SetActive(false);
+                } 
+            );
+            
             stages.Clear();
             initial = null;
 

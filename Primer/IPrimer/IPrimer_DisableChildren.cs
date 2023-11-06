@@ -30,7 +30,7 @@ namespace Primer
         public static void DisableChildren(this Transform self)
         {
             foreach (var child in self.GetChildren()) {
-                child.SetScale(0);
+                // child.SetScale(0);
                 child.SetActive(false);
             }
         }
