@@ -84,7 +84,7 @@ namespace Primer.Latex
 
             var isExpressionInvalid = expression is null || expression.Any(x => x.mesh is null);
 
-            if (isExpressionInvalid || transform == null || transform.gameObject.IsPreset())
+            if (isExpressionInvalid || transform == null)
                 return;
 
             var gnome = new Gnome(characters);
@@ -104,9 +104,6 @@ namespace Primer.Latex
 
         public void RegenerateChildren()
         {
-            if (gameObject.IsPreset())
-                return;
-
             transform.RemoveAllChildren();
             UpdateChildren();
         }

@@ -206,11 +206,18 @@ namespace Primer.Graph
 
         private (Tween removeLabel, Tween updateLabel, Tween addLabel) TransitionLabel()
         {
-            var gnome = new Primer.SimpleGnome(transform);
-            var labelTransform = gnome.AddLatex(label, "Label").transform;
+            var labelTransform = transform.Find("Label");
+            var newLabel = false;
+            
+            if (labelTransform == null)
+            {
+                newLabel = true;
+                var gnome = new SimpleGnome(transform);
+                labelTransform = gnome.AddLatex(label, "Label").transform;
+            }
 
             var pos = labelOffset + (labelPosition switch {
-                AxisLabelPosition.Along => new Vector3(length / 2, -0.55f, 0f),
+                AxisLabelPosition.Along => new Vector3(length / 2, -0.65f, 0f),
                 AxisLabelPosition.End => new Vector3(length - padding.x + X_OFFSET, 0f, 0f),
                 _ => Vector3.zero,
             });
@@ -219,6 +226,12 @@ namespace Primer.Graph
                 pos == labelTransform.localPosition ? Tween.noop : labelTransform.MoveTo(pos),
                 labelRotation == labelTransform.localRotation ? Tween.noop : labelTransform.RotateTo(labelRotation)
             );
+
+            if (newLabel)
+            {
+                updateLabel.Apply();
+                labelTransform.localScale = Vector3.zero;
+            }
 
             var addLabel = showLabel 
                 ? labelTransform.localScale == 0.2f * labelSize * Vector3.one ? Tween.noop : labelTransform.ScaleTo(0.2f * labelSize) 
@@ -231,8 +244,9 @@ namespace Primer.Graph
         }
         private Tween ScaleDownLabel()
         {
-            var labelTransform = transform.Find("Label");
-            return labelTransform is null ? Tween.noop : labelTransform.ScaleTo(0);
+            var gnome = new SimpleGnome(transform);
+            var labelTransform = gnome.AddLatex(label, "Label").transform;
+            return labelTransform.ScaleTo(0);
         }
 
         #endregion

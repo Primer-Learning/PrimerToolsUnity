@@ -15,10 +15,10 @@ namespace Primer.Latex.Editor
 
         public override void OnInspectorGUI()
         {
-            if (component.gameObject.IsPreset()) {
-                ShowPresetWarning();
-                return;
-            }
+            // if (component.gameObject.IsPreset()) {
+            //     ShowPresetWarning();
+            //     return;
+            // }
 
             base.OnInspectorGUI();
             CacheManagement();

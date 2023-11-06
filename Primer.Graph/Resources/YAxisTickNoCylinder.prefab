@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8357812543909439236}
   - component: {fileID: 149202112628198518}
+  - component: {fileID: -7583145840370259649}
   m_Layer: 0
   m_Name: YAxisTickNoCylinder
   m_TagString: Untagged
@@ -28,8 +29,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5641333707362595378}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -46,81 +46,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: 0
---- !u!1001 &3325305615184256715
-PrefabInstance:
+--- !u!114 &-7583145840370259649
+MonoBehaviour:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 8357812543909439236}
-    m_Modifications:
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6949002310091779323, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-      propertyPath: m_Name
-      value: Label
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
---- !u!4 &5641333707362595378 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6949002310091779321, guid: 8797d1152e8be4e509e85a482aaaaa0f, type: 3}
-  m_PrefabInstance: {fileID: 3325305615184256715}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187056146824139349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8219815f9854ee5b55ea8f92992bb95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeDisplay: {fileID: 0}
+  _latex: 
+  _headers:
+  - \documentclass[preview]{standalone}
+  - \usepackage[english]{babel}
+  - \usepackage[utf8]{inputenc}
+  - \usepackage[T1]{fontenc}
+  - \usepackage{amsmath}
+  - \usepackage{amssymb}
+  - \usepackage{dsfont}
+  - \usepackage{setspace}
+  - \usepackage{tipa}
+  - \usepackage{relsize}
+  - \usepackage{textcomp}
+  - \usepackage{mathrsfs}
+  - \usepackage{calligra}
+  - \usepackage{wasysym}
+  - \usepackage{ragged2e}
+  - \usepackage{physics}
+  - \usepackage{xcolor}
+  - \usepackage{microtype}
+  - \usepackage{pifont}
+  - \linespread{1}
+  - \usepackage{concmath-otf}
+  - \usepackage{enumitem}

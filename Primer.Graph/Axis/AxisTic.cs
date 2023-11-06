@@ -7,9 +7,8 @@ namespace Primer.Graph
     public class AxisTic : MonoBehaviour
     {
         public float value;
-
-        private LatexComponent latexCache;
-        public LatexComponent latex => transform.ChildComponent(ref latexCache);
+        
+        public LatexComponent latex => transform.Find("Label").GetOrAddComponent<LatexComponent>();
 
         [ShowInInspector]
         public string label {
