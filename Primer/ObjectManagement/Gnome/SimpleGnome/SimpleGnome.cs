@@ -75,6 +75,12 @@ namespace Primer
             transform.name = name;
             component = transform;
             transform.gameObject.SetActive(true);
+            
+            // In the case of a prefab, activate the children, since the prefab include children
+            foreach (var child in transform.GetChildren())
+            {
+                child.gameObject.SetActive(true);
+            }
         }
         
         // Overload for the above that takes a prefab name instead of a prefab.
