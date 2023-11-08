@@ -7,7 +7,7 @@ namespace Primer.Shapes
 {
     public class PrimerArrow3 : MonoBehaviour
     {
-        private const float shaftAdjustment = 0.1f;
+        private const float shaftAdjustment = 0.05f;
         
         [SerializeField, HideInInspector]
         private bool _showTailArrow;
@@ -18,6 +18,18 @@ namespace Primer.Shapes
             set
             {
                 _showTailArrow = value;
+                Update();
+            }
+        }
+        [SerializeField, HideInInspector]
+        private bool _showHeadArrow;
+        [ShowInInspector]
+        public bool showHeadArrow
+        {
+            get => _showHeadArrow;
+            set
+            {
+                _showHeadArrow = value;
                 Update();
             }
         }
@@ -63,7 +75,7 @@ namespace Primer.Shapes
         }
         
         // Length and rotation approach
-        [ShowInInspector, MinValue(0.1f)]
+        [ShowInInspector]
         public float length
         {
             get => _tailPoint.magnitude;
@@ -113,7 +125,7 @@ namespace Primer.Shapes
         [Button]
         internal void Update()
         {
-            if (transformThatHeadFollows != null) transform.position = transformThatTailFollows.position;
+            if (transformThatHeadFollows != null) transform.position = transformThatHeadFollows.position;
             if (transformThatTailFollows != null)
             {
                 if (transform.parent == null)
@@ -130,7 +142,7 @@ namespace Primer.Shapes
             headObject.localPosition = Vector3.right * headPadding;
             headObject.localScale = Vector3.one * _width;
 
-            var lengthToCutFromHead = shaftAdjustment * _width + headPadding;
+            var lengthToCutFromHead = showHeadArrow ? shaftAdjustment * _width + headPadding : headPadding;
             shaftObject.localPosition = Vector3.right * lengthToCutFromHead;
             
             var totalLength = _tailPoint.magnitude;
@@ -139,6 +151,16 @@ namespace Primer.Shapes
                 : tailPadding;
             shaftObject.localScale = new Vector3(totalLength - lengthToCutFromHead - lengthToCutFromTail, _width, 1);
             
+            if (showHeadArrow)
+            {
+                headObject.gameObject.SetActive(true);
+                headObject.localPosition = Vector3.zero;
+                headObject.localScale = Vector3.one * _width;
+            }
+            else
+            {
+                headObject.gameObject.SetActive(false);
+            }
             if (showTailArrow)
             {
                 tailObject.gameObject.SetActive(true);
