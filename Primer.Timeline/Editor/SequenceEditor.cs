@@ -33,7 +33,7 @@ namespace Primer.Timeline.Editor
 
             var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
             var runner = sequence.Run();
-            const float gap = 0.5f;
+            const float gap = 0.0f;
             var time = gap;
 
             while (runner.hasMoreClips) {
