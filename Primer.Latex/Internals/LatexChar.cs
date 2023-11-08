@@ -9,7 +9,7 @@ namespace Primer.Latex
     {
         public readonly Mesh mesh;
         public readonly Rect bounds;
-        public readonly Vector3 position;
+        public Vector3 position;
 
 
         internal LatexChar(VectorUtils.Geometry geometry, Vector2 offset)

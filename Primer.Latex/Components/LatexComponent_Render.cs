@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Primer.Animation;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
+using Unity.VectorGraphics;
 using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -112,5 +115,48 @@ namespace Primer.Latex
         {
             return transform.GetComponentsInChildren<MeshRenderer>();
         }
+
+        [SerializeField, HideInInspector]
+        private LatexAlignment _alignment = LatexAlignment.Center;
+        [ShowInInspector]
+        public LatexAlignment alignment {
+            get => _alignment;
+            set {
+                _alignment = value;
+                UpdateAlignment();
+            }
+        }
+
+        private void UpdateAlignment()
+        {
+            // For each character,
+            // get the position of the vertex in the parent's space as 2D
+            var allVertices2D = expression
+                .SelectMany(x => x.mesh.vertices.
+                Select(y => new Vector2(y.x + x.position.x, y.y + x.position.y))); 
+            var bounds = VectorUtils.Bounds(allVertices2D);
+            switch (_alignment)
+            {
+                case LatexAlignment.Left:
+                    expression.ForEach(x => x.position -= bounds.xMin * Vector3.right);
+                    break;
+                case LatexAlignment.Right:
+                    expression.ForEach(x => x.position -= bounds.xMax * Vector3.right);
+                    break;
+                case LatexAlignment.Center:
+                    expression.ForEach(x => x.position -= (Vector3)bounds.center);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            UpdateChildren();
+        }
+    }
+    
+    public enum LatexAlignment
+    {
+        Left,
+        Center,
+        Right
     }
 }
