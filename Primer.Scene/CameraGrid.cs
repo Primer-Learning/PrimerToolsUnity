@@ -9,12 +9,28 @@ namespace Primer.Scene
     [RequireComponent(typeof(Camera))]
     public class CameraGrid : MonoBehaviour
     {
-        [Min(0)] public int xDivisions = 3;
-        [Min(0)] public int yDivisions = 3;
         [Min(1)] public int lineWidth = 2;
-
+        
+        [Range(0, 1)]
+        public float xSpacingFraction = 0.25f;
+        [Range(0, 1)]
+        public float ySpacingFraction = 0.25f;
+        [Range(0, 1)]
+        public float xCenterFraction = 0.5f;
+        [Range(0, 1)]
+        public float yCenterFraction = 0.5f;
+        
+        // CellWidth here is the width of the line and the space together.
+        // In the GridLayout Group, the cell size is just the width of the line.
+        // Here, we calculate as if the line is zero thickness, then below we need to correct for the line thickness.
+        public int xCellWidth => (int) (canvas.GetComponent<RectTransform>().sizeDelta.x * xSpacingFraction);
+        public int yCellWidth => (int) (canvas.GetComponent<RectTransform>().sizeDelta.y * ySpacingFraction);
+        public int xDivisions => (int) (canvas.GetComponent<RectTransform>().sizeDelta.x / xCellWidth);
+        public int yDivisions => (int) (canvas.GetComponent<RectTransform>().sizeDelta.y / yCellWidth);
+        public int xCenter => (int) (canvas.GetComponent<RectTransform>().sizeDelta.x * xCenterFraction);
+        public int yCenter => (int)(canvas.GetComponent<RectTransform>().sizeDelta.y * yCenterFraction);
+        
         private Canvas canvas;
-
 
         private void OnDisable() => canvas.Dispose();
 
@@ -31,27 +47,29 @@ namespace Primer.Scene
 
             var sizeDelta = canvas.GetComponent<RectTransform>().sizeDelta;
 
+            // Draw the grid, correcting spacing and padding for the line thickness
             DrawGridLayout(
                 canvas,
                 "vGridGroup",
                 xDivisions,
-                GridLayoutGroup.Constraint.FixedRowCount,
                 new Vector2(lineWidth, sizeDelta.y),
-                new Vector3((sizeDelta.x - lineWidth) / xDivisions - lineWidth, 0)
+                new Vector3( xCellWidth - lineWidth, 0),
+                new Vector2Int(xCenter % xCellWidth - lineWidth / 2, 0)
             );
 
             DrawGridLayout(
                 canvas,
                 "hGridGroup",
                 yDivisions,
-                GridLayoutGroup.Constraint.FixedColumnCount,
                 new Vector2(sizeDelta.x, lineWidth),
-                new Vector3( 0, (sizeDelta.y - lineWidth) / yDivisions - lineWidth)
+                new Vector3( 0, yCellWidth - lineWidth),
+                new Vector2Int(0, yCenter % yCellWidth - lineWidth / 2)
             );
         }
 
-        private static void DrawGridLayout(Component parent, string name, int divisions,
-            GridLayoutGroup.Constraint constraint, Vector2 cellSize, Vector3 spacing)
+        private static void DrawGridLayout(Component parent, string name, int divisions, 
+            Vector2 cellSize, Vector3 spacing, Vector2Int padding
+            )
         {
             var group = GetOrCreate<GridLayoutGroup>(name, (component, go) => {
                 go.transform.parent = parent.transform;
@@ -61,14 +79,13 @@ namespace Primer.Scene
                 rect.anchorMax = Vector2.one;
                 rect.offsetMin = Vector2.zero;
                 rect.offsetMax = Vector2.zero;
-
-                component.childAlignment = TextAnchor.MiddleCenter;
-                component.constraint = constraint;
-                component.constraintCount = 1;
+                component.childAlignment = TextAnchor.LowerLeft;
             });
 
             group.cellSize = cellSize;
             group.spacing = spacing;
+            group.padding.left = padding.x;
+            group.padding.bottom = padding.y;
 
             var dividers = group.GetComponentsInChildren<Image>().ToList();
 
@@ -76,12 +93,15 @@ namespace Primer.Scene
                 dividers[0].gameObject.Dispose(defer: true);
                 dividers.RemoveAt(0);
             }
-
+            
             for (var i = dividers.Count; i < divisions + 1; i++) {
+                Debug.Log("Adding divider");
                 var image = new GameObject().AddComponent<Image>();
-                // image.gameObject.AddComponent<CanvasRenderer>();
-                image.transform.parent = group.transform;
+                image.transform.SetParent(group.transform);
             }
+            
+            // Make sure the layout is updated
+            LayoutRebuilder.MarkLayoutForRebuild(group.GetComponent<RectTransform>());
         }
 
         private static T GetOrCreate<T>(string name, Action<T, GameObject> initializer = null) where T : Component
