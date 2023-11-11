@@ -269,6 +269,9 @@ namespace Primer.Scene
 
         private bool ShouldEnd()
         {
+            if (endTimeInSeconds <= 0)
+                return false;
+            
             // If endTimeInSeconds is set, and we're past endTimeInSeconds 
             if (endTimeInSeconds > recordingStartTimeInSeconds && framesWatched > endTimeInSeconds * frameRate)
             {
