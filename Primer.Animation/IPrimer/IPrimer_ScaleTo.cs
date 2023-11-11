@@ -150,7 +150,7 @@ namespace Primer.Animation
         // Only in Transform, all other overloads redirect here
         public static Tween ScaleTo(this Transform self, Vector3 newScale, Vector3? initialScale = null)
         {
-            if (initialScale.HasValue) return new Tween(t => self.localScale = Vector3.Lerp(initialScale.Value, newScale, t));
+            // if (initialScale.HasValue) return new Tween(t => self.localScale = Vector3.Lerp(initialScale.Value, newScale, t));
             
             // If initialScale hasn't been given, allow the initial value to be determined later.
             return Tween.Value(
