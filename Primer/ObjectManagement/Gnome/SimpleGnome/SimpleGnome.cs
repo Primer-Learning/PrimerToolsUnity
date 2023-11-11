@@ -66,7 +66,7 @@ namespace Primer
         
         #region Constructors that take a prefab
         // Create a SimpleGnome from a prefab. Mostly useful for root objects you want to disable themselves.
-        public SimpleGnome(GameObject prefab, string name, Transform parent = null)
+        public SimpleGnome(GameObject prefab, string name, Transform parent = null, bool activateChildren = false)
         {
             transform = parent is null
                 ? ObjectManagementUtilities.GetRootTransform(prefab, name)
@@ -75,8 +75,8 @@ namespace Primer
             transform.name = name;
             component = transform;
             transform.gameObject.SetActive(true);
-            
-            // In the case of a prefab, activate the children, since the prefab include children
+
+            if (!activateChildren) return;
             foreach (var child in transform.GetChildren())
             {
                 child.gameObject.SetActive(true);
@@ -84,8 +84,8 @@ namespace Primer
         }
         
         // Overload for the above that takes a prefab name instead of a prefab.
-        public SimpleGnome(string prefabName, string name, Transform parent = null)
-        : this(Resources.Load<GameObject>(prefabName), name, parent)
+        public SimpleGnome(string prefabName, string name, Transform parent = null, bool activateChildren = false)
+        : this(Resources.Load<GameObject>(prefabName), name, parent, activateChildren)
         {
         }
         #endregion
