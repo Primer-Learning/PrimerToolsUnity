@@ -15,6 +15,7 @@ namespace Primer.Simulation
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
         public ReproductionType reproductionType;
+        public bool _lowRes = false;
 
         public Rng rng;
         
@@ -123,7 +124,8 @@ namespace Primer.Simulation
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
                 treeSelectionOptions: treeSelectionOptions,
-                reproductionType: reproductionType
+                reproductionType: reproductionType,
+                lowRes: _lowRes
             );
         }
         #endregion

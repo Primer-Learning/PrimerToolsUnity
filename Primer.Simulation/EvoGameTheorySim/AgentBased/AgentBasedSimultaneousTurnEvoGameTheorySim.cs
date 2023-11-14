@@ -35,6 +35,7 @@ namespace Simulation.GameTheory
         private HomeOptions _homeOptions;
         private TreeSelectionOptions _treeSelectionOptions;
         private ReproductionType _reproductionType;
+        private bool _lowRes;
         
         public int turn = 0;
         
@@ -77,7 +78,8 @@ namespace Simulation.GameTheory
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
             TreeSelectionOptions treeSelectionOptions = TreeSelectionOptions.Random,
-            ReproductionType reproductionType = ReproductionType.Asexual
+            ReproductionType reproductionType = ReproductionType.Asexual,
+            bool lowRes = false
             )
         {
             this.transform = transform;
@@ -86,6 +88,7 @@ namespace Simulation.GameTheory
             _homeOptions = homeOptions;
             _treeSelectionOptions = treeSelectionOptions;
             _reproductionType = reproductionType;
+            _lowRes = lowRes;
 
             this.rng = rng;
 
@@ -319,6 +322,9 @@ namespace Simulation.GameTheory
             // childGO.transform.parent = _creaturePool.transform;
 
             var child = _creaturePool.Add();
+            if (_lowRes) child.blob.SwapMesh();
+            else child.blob.SwapMesh(PrimerBlob.MeshType.HighPolySkinned);
+            
             child.home = firstParent.home;
             
             // Inheritance depends on reproduction type
