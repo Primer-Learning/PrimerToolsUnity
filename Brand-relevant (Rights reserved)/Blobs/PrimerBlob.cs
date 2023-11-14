@@ -167,22 +167,31 @@ public class PrimerBlob : PrimerCharacter {
     {
         GameObject meshGO = transform.Find("blob_mesh").gameObject;
         // This only implements the switch to static, since that's the one I intend to use rn.
-        var smr = meshGO.GetComponent<SkinnedMeshRenderer>();
+        var mat = meshGO.GetComponent<Renderer>().sharedMaterial;    
         switch (mType)
         {
             case MeshType.Static:
                 animator.SetTrigger("Still");
-                meshGO.AddComponent<MeshFilter>().mesh = staticMesh;
-                meshGO.AddComponent<MeshRenderer>().material = smr.material;
-                smr.enabled = false;
-                break;
-            case MeshType.LowPolySkinned:
-                smr.sharedMesh = lowPolyMesh;
-                smr.enabled = true;
+                
+                if (Application.isPlaying) Destroy(meshGO.GetComponent<SkinnedMeshRenderer>());
+                else DestroyImmediate(meshGO.GetComponent<SkinnedMeshRenderer>());
+                meshGO.GetOrAddComponent<MeshFilter>().sharedMesh = staticMesh;
+                meshGO.GetOrAddComponent<MeshRenderer>().material = mat;
                 break;
             case MeshType.HighPolySkinned:
+                var smr = meshGO.GetOrAddComponent<SkinnedMeshRenderer>();
                 smr.sharedMesh = highPolyMesh;
-                smr.enabled = true;
+                smr.sharedMaterial = mat;
+                if (Application.isPlaying)
+                {
+                    Destroy(meshGO.GetComponent<MeshFilter>());
+                    Destroy(meshGO.GetComponent<MeshRenderer>());
+                }
+                else
+                {
+                    DestroyImmediate(meshGO.GetComponent<MeshFilter>());
+                    DestroyImmediate(meshGO.GetComponent<MeshRenderer>());
+                }
                 break;
         }
     }

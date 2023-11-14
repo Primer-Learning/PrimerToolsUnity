@@ -40,7 +40,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open
+    path: blob_rig/bone_torso/bone_neck/bone_eye_l_open
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 24
@@ -51,7 +51,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1318014404
+      path: 2456709789
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -104,7 +104,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open
+    path: blob_rig/bone_torso/bone_neck/bone_eye_l_open
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -132,7 +132,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open
+    path: blob_rig/bone_torso/bone_neck/bone_eye_l_open
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -160,7 +160,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: blob_rig/bone_torso/bone_neck/bone_eye_l/bone_eye_l_open
+    path: blob_rig/bone_torso/bone_neck/bone_eye_l_open
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves: []
