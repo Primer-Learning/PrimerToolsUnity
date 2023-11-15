@@ -43,7 +43,8 @@ namespace Simulation.GameTheory
         public FruitTree[] trees => transform.GetComponentsInChildren<FruitTree>();
         public Home[] homes => transform.GetComponentsInChildren<Home>();
         
-        private Pool<SimultaneousTurnCreature> _creaturePool;
+        private Transform _creatureParent;
+        private static Pool creaturePool => Pool.GetPool(CommonPrefabs.Blob);
 
         private readonly SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
 
@@ -63,17 +64,17 @@ namespace Simulation.GameTheory
         public Component component => transform;
 
         public IEnumerable<SimultaneousTurnCreature> creatures =>
-            _creaturePool.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
+            _creatureParent.ChildComponents<SimultaneousTurnCreature>().Where(x => x.gameObject.activeSelf);
         public IEnumerable<SimultaneousTurnStrategyGene> alleles => creatures.SelectMany(x => x.strategyGenes.GetAlleles());
         public float GetFrequency(Type allele) => alleles.Count(x => x.GetType() == allele) / (float)alleles.Count();
-        public int currentCreatureCount => _creaturePool.activeChildCount;
+        public int currentCreatureCount => _creatureParent.GetActiveChildren().Count();
         
         // Constructor that accepts a list of creatures instead of a dictionary
         public AgentBasedSimultaneousTurnEvoGameTheorySim(
             Transform transform,
             List<SimultaneousTurnCreature> initialBlobs,
             SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler,
-            Pool<SimultaneousTurnCreature> creaturePool,
+            Transform creatureParent,
             Rng rng = null,
             bool skipAnimations = false,
             HomeOptions homeOptions = HomeOptions.Random,
@@ -83,7 +84,7 @@ namespace Simulation.GameTheory
             )
         {
             this.transform = transform;
-            _creaturePool = creaturePool;
+            _creatureParent = creatureParent;
             _simultaneousTurnGameAgentHandler = simultaneousTurnGameAgentHandler;
             _homeOptions = homeOptions;
             _treeSelectionOptions = treeSelectionOptions;
@@ -91,10 +92,6 @@ namespace Simulation.GameTheory
             _lowRes = lowRes;
 
             this.rng = rng;
-
-            creaturePool.GetChildren().Where(x => !initialBlobs.Contains(x.GetComponent<SimultaneousTurnCreature>())).ForEach(x => x.gameObject.SetActive(false));
-            creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
-            
             this.skipAnimations = skipAnimations;
 
             ConfigureInitialBlobs(initialBlobs);
@@ -111,11 +108,11 @@ namespace Simulation.GameTheory
 
         private void ConfigureInitialBlobs(List<SimultaneousTurnCreature> initialBlobs)
         {
-            _creaturePool.Reset();
+            _creatureParent.GetChildren().ForEach(x => creaturePool.Return(x));
             
             foreach (var creature in initialBlobs)
             {
-                creature.transform.SetParent(_creaturePool.transform);
+                creature.transform.SetParent(_creatureParent.transform);
                 creature.gameObject.SetActive(true);
                 creature.landscape = terrain;
                 creature.rng = rng;
@@ -168,7 +165,7 @@ namespace Simulation.GameTheory
                         }
                         else
                         {
-                            deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)));
+                            deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creaturePool.Return(creature.transform)));
                         }
                     }
                     
@@ -207,7 +204,7 @@ namespace Simulation.GameTheory
                             break;
                         }
                         if (foundTree) continue;
-                        deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creature.gameObject.SetActive(false)));
+                        deathTweenList.Add(creature.ScaleTo(0).Observe(onComplete: () => creaturePool.Return(creature.transform)));
                     }
                     break;
                 default:
@@ -278,7 +275,7 @@ namespace Simulation.GameTheory
             foreach (var creature in creatures)
             {
                 if (creature.canReproduce) willReproduce.Add(creature);
-                else if (!creature.canSurvive) creature.gameObject.SetActive(false);
+                else if (!creature.canSurvive) creaturePool.Return(creature.transform);
                 
                 creature.energy = 0;
                 creature.PurgeStomach();
@@ -318,10 +315,7 @@ namespace Simulation.GameTheory
 
         private SimultaneousTurnCreature CreateChild(SimultaneousTurnCreature firstParent, SimultaneousTurnCreature secondParent)
         {
-            // var childGO = PrefabUtility.InstantiatePrefab(Resources.Load<GameObject>("blob_skinned")) as GameObject;
-            // childGO.transform.parent = _creaturePool.transform;
-
-            var child = _creaturePool.Add();
+            var child = _creatureParent.GetPrefabInstance(CommonPrefabs.Blob).GetOrAddComponent<SimultaneousTurnCreature>();
             if (_lowRes) child.blob.SwapMesh();
             else child.blob.SwapMesh(PrimerBlob.MeshType.HighPolySkinned);
             
@@ -421,7 +415,7 @@ namespace Simulation.GameTheory
 
         public void Dispose()
         {
-            _creaturePool?.Reset();
+            _creatureParent.GetChildren().ForEach(x => creaturePool.Return(x));
             transform.gameObject.SetActive(false);
         }
     }

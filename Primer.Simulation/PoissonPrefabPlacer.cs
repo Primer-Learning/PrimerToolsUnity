@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -34,8 +35,8 @@ namespace Primer.Simulation
         public float minDistance = 2;
         public int numberToPlace1 = 30;
         public int numberToPlace2 = 0;
-        public Transform prefab1;
-        public Transform prefab2;
+        public CommonPrefabs prefab1;
+        public CommonPrefabs prefab2;
         public int maxAttemptsPerPoint = 30;
         public PoissonDiscSampler.OverflowMode overflowMode = PoissonDiscSampler.OverflowMode.None;
         public bool randomizeRotation = true;
@@ -78,12 +79,10 @@ namespace Primer.Simulation
 
             var hasLandscape = landscape != null;
             
-            var prefab1Pool = new Pool<Transform>("Trees", parent: transform);
-            prefab1Pool.prefab = prefab1.gameObject;
-            prefab1Pool.Reset();
-            var prefab2Pool = new Pool<Transform>("Homes", parent: transform);
-            prefab2Pool.prefab = prefab2.gameObject;
-            prefab2Pool.Reset();
+            var prefab1Parent = new SimpleGnome("Trees", parent: transform).transform;
+            var prefab2Parent = new SimpleGnome("Homes", parent: transform).transform;
+            prefab1Parent.GetChildren().ForEach(x => Pool.GetPool(prefab1).Return(x));
+            prefab2Parent.GetChildren().ForEach(x => Pool.GetPool(prefab2).Return(x));
             
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
 
@@ -112,10 +111,11 @@ namespace Primer.Simulation
             //     offset -= size / 2;
             // }
 
-            foreach (var point in points) {
-                // Start here
-                var pool = prefabAssignments[index++] ? prefab1Pool : prefab2Pool;
-                var instance = pool.Add();
+            foreach (var point in points)
+            {
+                var prefab = prefabAssignments[index] ? prefab1 : prefab2;
+                var prefabParent = prefabAssignments[index++] ? prefab1Parent : prefab2Parent;
+                var instance = prefabParent.GetPrefabInstance(prefab);
                 
                 var pos = point;
 
@@ -136,10 +136,10 @@ namespace Primer.Simulation
                     instance.localRotation = Quaternion.Euler(0, rng.RangeInt(0, 360), 0);
             }
 
-            if (prefab1Pool.activeChildCount < numberToPlace1)
-                Debug.LogWarning("Only " + prefab1Pool.activeChildCount + " trees were placed out of an attempted " + numberToPlace1 + ".");
-            if (prefab2Pool.activeChildCount < numberToPlace2)
-                Debug.LogWarning("Only " + prefab2Pool.activeChildCount + " homes were placed out of an attempted " + numberToPlace2 + ".");
+            if (prefab1Parent.GetActiveChildren().Count() < numberToPlace1)
+                Debug.LogWarning("Only " + prefab1Parent.GetActiveChildren().Count() + " trees were placed out of an attempted " + numberToPlace1 + ".");
+            if (prefab1Parent.GetActiveChildren().Count() < numberToPlace2)
+                Debug.LogWarning("Only " + prefab2Parent.GetActiveChildren().Count() + " homes were placed out of an attempted " + numberToPlace2 + ".");
         }
 
         [Button(ButtonSizes.Large)]
@@ -159,10 +159,10 @@ namespace Primer.Simulation
 #endif
 
             var hasLandscape = landscape != null;
-            var prefab1Pool = new Pool<Transform>("Trees", parent: transform);
-            prefab1Pool.prefab = prefab1.gameObject;
-            var prefab2Pool = new Pool<Transform>("Homes", parent: transform);
-            prefab2Pool.prefab = prefab2.gameObject;
+            var prefab1Parent = new SimpleGnome("Trees", parent: transform).transform;
+            var prefab2Parent = new SimpleGnome("Homes", parent: transform).transform;
+            prefab1Parent.GetChildren().ForEach(x => Pool.GetPool(prefab1).Return(x));
+            prefab2Parent.GetChildren().ForEach(x => Pool.GetPool(prefab2).Return(x));
             var spawnSpace = size - Vector2.one * distanceFromBorder * 2;
             
             // offset = Vector2.one * distanceFromBorder;
@@ -190,8 +190,9 @@ namespace Primer.Simulation
             foreach (var point in points.Skip(oldPointCount))
             {
                 // Start here
-                var pool = prefabAssignments[index++] ? prefab1Pool : prefab2Pool;
-                var instance = pool.Add();
+                var prefab = prefabAssignments[index++] ? prefab1 : prefab2;
+                var prefabParent = prefabAssignments[index++] ? prefab1Parent : prefab2Parent;
+                var instance = prefabParent.GetPrefabInstance(prefab);
                 
                 var pos = point;
 
@@ -212,10 +213,10 @@ namespace Primer.Simulation
                     instance.localRotation = Quaternion.Euler(0, rng.RangeInt(0, 360), 0);
             }
 
-            if (prefab1Pool.activeChildCount < numberToPlace1)
-                Debug.LogWarning("Only " + prefab1Pool.activeChildCount + " trees were placed out of an attempted " + numberToPlace1 + ".");
-            if (prefab2Pool.activeChildCount < numberToPlace2)
-                Debug.LogWarning("Only " + prefab2Pool.activeChildCount + " homes were placed out of an attempted " + numberToPlace2 + ".");
+            if (prefab1Parent.GetActiveChildren().Count() < numberToPlace1)
+                Debug.LogWarning("Only " + prefab1Parent.GetActiveChildren().Count() + " trees were placed out of an attempted " + numberToPlace1 + ".");
+            if (prefab1Parent.GetActiveChildren().Count() < numberToPlace2)
+                Debug.LogWarning("Only " + prefab2Parent.GetActiveChildren().Count() + " homes were placed out of an attempted " + numberToPlace2 + ".");
         }
 
 #if UNITY_EDITOR

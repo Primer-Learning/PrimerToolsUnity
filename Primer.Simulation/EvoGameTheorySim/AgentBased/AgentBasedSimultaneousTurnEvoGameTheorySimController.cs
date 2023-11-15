@@ -6,6 +6,7 @@ using Simulation.GameTheory;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Primer.Simulation
 {
@@ -15,7 +16,7 @@ namespace Primer.Simulation
         public HomeOptions homeOptions;
         public TreeSelectionOptions treeSelectionOptions;
         public ReproductionType reproductionType;
-        public bool _lowRes = false;
+        public bool lowRes = false;
 
         public Rng rng;
         
@@ -34,19 +35,7 @@ namespace Primer.Simulation
             }
         }
         
-        private Pool<SimultaneousTurnCreature> _creaturePool;
-        public Pool<SimultaneousTurnCreature> creaturePool
-        {
-            get
-            {
-                if (_creaturePool != null && _creaturePool.transform) return _creaturePool;
-
-                new SimpleGnome("Blobs", parent: transform);
-                _creaturePool = new Pool<SimultaneousTurnCreature>("Blobs", parent: transform);
-                _creaturePool.prefab = Resources.Load<GameObject>("blob_skinned");
-                return _creaturePool;
-            }
-        }
+        public Transform creatureParent => new SimpleGnome("Blobs", parent: transform).transform;
 
         private SimultaneousTurnGameAgentHandler _simultaneousTurnGameAgentHandler;
         public SimultaneousTurnGameAgentHandler simultaneousTurnGameAgentHandler
@@ -83,7 +72,7 @@ namespace Primer.Simulation
         
         public SimultaneousTurnCreature AddSimultaneousTurnCreature(string creatureName, SimultaneousTurnStrategyGene gene, bool initialEnergy = false, Home home = null)
         {
-            var t = creaturePool.Add();
+            var t = creatureParent.GetPrefabInstance(CommonPrefabs.Blob);
             var simultaneousTurnCreature = t.GetOrAddComponent<SimultaneousTurnCreature>();
             simultaneousTurnCreature.energy = initialEnergy ? 1 : 0;
             simultaneousTurnCreature.home = home ? home : homes.RandomItem(rng: rng);
@@ -91,6 +80,9 @@ namespace Primer.Simulation
             simultaneousTurnCreature.transform.localScale = Vector3.one;
             simultaneousTurnCreature.strategyGenes = new SimultaneousTurnGenome(rng, gene);
             simultaneousTurnGameAgentHandler.OnAgentCreated(simultaneousTurnCreature);
+            if (lowRes) simultaneousTurnCreature.blob.SwapMesh();
+            else simultaneousTurnCreature.blob.SwapMesh(PrimerBlob.MeshType.HighPolySkinned);
+            
             return simultaneousTurnCreature;
         }
 
@@ -100,8 +92,8 @@ namespace Primer.Simulation
         {
             var terrainAndObjectGnome = new SimpleGnome(transform);
             var newPlacer = terrainAndObjectGnome.Add<PoissonPrefabPlacer>("Trees");
-            newPlacer.prefab1 = Resources.Load<Transform>("mango tree medium");
-            newPlacer.prefab2 = Resources.Load<Transform>("home");
+            newPlacer.prefab1 = CommonPrefabs.MangoTree;
+            newPlacer.prefab2 = CommonPrefabs.RockHome;
             newPlacer.landscape = terrainAndObjectGnome.Add<Landscape>("Terrain");
         }
 
@@ -119,13 +111,13 @@ namespace Primer.Simulation
                 transform,
                 creatures,
                 simultaneousTurnGameAgentHandler,
-                creaturePool,
+                creatureParent,
                 rng: rng,
                 skipAnimations: skipAnimations,
                 homeOptions: homeOptions,
                 treeSelectionOptions: treeSelectionOptions,
                 reproductionType: reproductionType,
-                lowRes: _lowRes
+                lowRes: lowRes
             );
         }
         #endregion
@@ -151,7 +143,7 @@ namespace Primer.Simulation
         
         public SimultaneousTurnCreature AddCreature(float energy = 0, SimultaneousTurnStrategyGene gene = null, Home home = null)
         {
-            var creature = creaturePool.Add();
+            var creature = creatureParent.GetPrefabInstance(CommonPrefabs.Blob).GetOrAddComponent<SimultaneousTurnCreature>();
             var t = creature.transform;
             t.localScale = Vector3.one;
             t.localRotation = Quaternion.Euler(0, 180, 0);
