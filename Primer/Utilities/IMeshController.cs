@@ -25,7 +25,7 @@ namespace Primer
 
         public static Material GetMaterial(this IMeshController self)
         {
-            return self.GetMeshRenderers().GetMaterial();
+            return self.GetMeshRenderers().GetUniqueMaterial();
         }
 
         public static void SetMaterial(this IMeshController self, Material material)

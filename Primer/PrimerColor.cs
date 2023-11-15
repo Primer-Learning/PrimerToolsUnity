@@ -153,5 +153,18 @@ namespace Primer
         {
             return JuicyInterpolate(a, b, t, 0.5f);
         }
+        
+        public static Dictionary<Color, string> colorToMaterialName = new() {
+            {blue, "PrimerDiffuseBlue"},
+            {orange, "PrimerDiffuseOrange"},
+            {yellow, "PrimerDiffuseYellow"},
+            {red, "PrimerDiffuseRed"},
+            {green, "PrimerDiffuseGreen"},
+            {purple, "PrimerDiffusePurple"},
+            {gray, "PrimerDiffuseGray"},
+            {lightGray, "PrimerDiffuseLightGray"},
+            {white, "PrimerDiffuseWhite"},
+            {black, "PrimerDiffuseBlack"}
+        };
     }
 }

@@ -10,7 +10,7 @@ namespace Primer
     {
         private static Material defaultMaterialCache;
         public static Material defaultMaterial
-            => defaultMaterialCache ??= Resources.Load<Material>("BasicDiffuse");
+            => defaultMaterialCache ??= Resources.Load<Material>("PrimerDiffuseWhite");
 
         private static readonly Dictionary<WeakReference<Renderer>, Material> memory = new();
 
@@ -26,12 +26,17 @@ namespace Primer
 
         public static void SetColor(this Renderer renderer, Color color)
         {
-            GetMaterial(renderer).color = color;
+            if (PrimerColor.colorToMaterialName.TryGetValue(color, out var materialName))
+            {
+                renderer.sharedMaterial = Resources.Load<Material>(materialName);
+                return;
+            }
+            GetUniqueMaterial(renderer).color = color;
         }
 
         public static Color GetColor(this IEnumerable<Renderer> self)
         {
-            return self.GetMaterial()?.color ?? Color.white;
+            return self.GetUniqueMaterial()?.color ?? Color.white;
         }
 
         public static void SetColor(this IEnumerable<Renderer> self, Color color)
@@ -43,7 +48,7 @@ namespace Primer
         #endregion
 
         #region Get/Set material
-        public static Material GetMaterial(this Renderer renderer)
+        public static Material GetUniqueMaterial(this Renderer renderer)
         {
             var weak = new WeakReference<Renderer>(renderer);
 
@@ -60,7 +65,7 @@ namespace Primer
         }
         
 
-        public static Material GetMaterial(this IEnumerable<Renderer> self)
+        public static Material GetUniqueMaterial(this IEnumerable<Renderer> self)
         {
             var renderers = self.ToArray();
 
