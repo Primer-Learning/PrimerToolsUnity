@@ -1,6 +1,7 @@
 using System.Linq;
 using Primer.Animation;
 using Primer.Timeline.FakeUnityEngine;
+using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.Timeline;
@@ -11,15 +12,64 @@ namespace Primer.Timeline.Editor
     [CustomEditor(typeof(Sequence), editorForChildClasses: true)]
     public class SequenceEditor : OdinEditor
     {
+        // [SerializeField, ShowInInspector]
+        public int clipsToCreate = 1;
+        
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
             if (GUILayout.Button("Evaluate"))
                 Reevaluate();
-
+            
             if (GUILayout.Button("Create clips"))
                 CreateClips();
+            
+            // show clipsToCreate
+            clipsToCreate = EditorGUILayout.IntField("Clips to create", clipsToCreate);
+            
+            if (GUILayout.Button("Create clips (lite)"))
+                CreateClipsLite();
+        }
+
+        private async void CreateClipsLite()
+        {
+            var sequence = (Sequence)target;
+            var director = TimelineEditor.inspectedDirector;
+            var track = director?.GetOrCreateTrack<SequenceTrack>(sequence);
+
+            if (track == null)
+                return;
+
+            var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
+            const float gap = 0.0f;
+            var time = gap;
+
+            for (var i = 0; i < clipsToCreate; i++)
+            {
+                var clip = existingClips.FirstOrDefault(x => x.IsNameAutomated());
+
+                if (clip is null)
+                    clip = track.CreateClip<SequenceClip>();
+                else
+                    existingClips.Remove(clip);
+
+                if (!clip.IsLocked()) {
+                    clip.start = time;
+                    clip.duration = Tween.DEFAULT_DURATION;
+                    clip.displayName = "";
+
+                    if (clip.asset is PrimerClip primerClip)
+                        primerClip.clipColor = sequence.clipColor;
+                }
+
+                time = (float)clip.end + gap;
+            }
+
+            foreach (var clip in existingClips)
+                track.DeleteClip(clip);
+
+            TimelineEditor.Refresh(RefreshReason.ContentsModified);
         }
 
         private async void CreateClips()
