@@ -7,9 +7,12 @@ using UnityEngine;
 
 namespace Primer
 {
-    public class Pool<T> : IDisposable, IPrimer where T : Component
+    public class Pool : IDisposable
     {
-        public GameObject prefab;
+        private readonly GameObject _prefab;
+        private static SimpleGnome poolGnome => new ("Pools");
+    
+        private static readonly Dictionary<CommonPrefabs, Pool> pools = new();
         
         public void Dispose()
         {
@@ -28,66 +31,67 @@ namespace Primer
             }
         }
 
-        public Transform transform { get; }
-        public Component component { get; }
-        
-        public IEnumerable<Transform> activeChildren => transform.GetChildren().Where(x => x.gameObject.activeSelf);
-        public int activeChildCount => transform.GetChildren().Count(x => x.gameObject.activeSelf);
+        public Transform transform => poolGnome.Add($"Pool {_prefab.name}");
 
-        #region Add
+        #region Add and return
 
-        public T Add()
+        public Transform GiveToParent(Transform newParent)
         {
-            var inactiveChildren = transform.GetChildren().Where(x => x.gameObject.activeSelf == false && x.HasComponent<T>()).ToArray();
-            
+            var children = transform.GetChildren();
             GameObject newObject;
+            
             // Return unused pooled object if one exists
-            if (inactiveChildren.Length > 0)
-            { newObject = inactiveChildren.ToArray()[0].gameObject; }
-            // Instantiate a prefab if one is defined
-            else if (prefab != null)
+            if (children.Length > 0)
+            { newObject = children.ToArray()[0].gameObject; }
+            // Instantiate a prefab if no children exist
+            else
             {
-                newObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                newObject = PrefabUtility.InstantiatePrefab(_prefab) as GameObject;
             }
-            // Otherwise, just a new gameObject
-            else { newObject = new GameObject(); }
+            if (newObject == null)
+                throw new Exception("Failed to instantiate prefab");
 
             var t = newObject.transform;
-            t.SetParent(transform);
+            t.SetParent(newParent);
             newObject.gameObject.SetActive(true);
             // These will likely be overridden, but it's a nice default
             t.localPosition = Vector3.zero;
             t.localRotation = Quaternion.identity;
             t.localScale = Vector3.one;
-            return newObject.GetOrAddComponent<T>();
+            return t;
+        }
+        
+        public void Return(Transform child)
+        {
+            if (child.name != _prefab.name) Debug.LogWarning($"Returning {child.name} to {transform.name}");
+            child.SetParent(transform);
+            child.gameObject.SetActive(false);
         }
 
         #endregion
         
-        #region Constructors
-        public Pool(string name, Component parent = null)
+        #region Pool creation
+        public static Pool GetPool(CommonPrefabs prefab)
         {
-            transform = parent is null
-                ? ObjectManagementUtilities.GetRootTransform(name)
-                : ObjectManagementUtilities.GetDirectChild(parent.transform, name);
-
-            component = transform;
-            transform.gameObject.SetActive(true);
+            if (pools.TryGetValue(prefab, out var existingPool))
+                return existingPool;
+            
+            var pool = new Pool(Resources.Load<GameObject>(PrefabFinder.prefabNames[prefab]));
+            pools.Add(prefab, pool);
+            return pool;
         }
-
-        public Pool(Transform component)
+        private Pool(GameObject prefab)
         {
-            this.component = component;
-            transform = component;
-            transform.gameObject.SetActive(true);
-        }
-
-        protected Pool(Component component)
-        {
-            this.component = component;
-            transform = component.transform;
+            _prefab = prefab;
             transform.gameObject.SetActive(true);
         }
         #endregion
+    }
+    public static class PoolExtensions
+    {
+        public static Transform GetPrefabInstance(this Transform newParent, CommonPrefabs prefab)
+        {
+            return Pool.GetPool(prefab).GiveToParent(newParent);
+        }
     }
 }

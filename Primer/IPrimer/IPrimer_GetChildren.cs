@@ -36,5 +36,12 @@ namespace Primer
             return children;
         }
 
+        public static IEnumerable<Transform> GetActiveChildren(this Transform transform, bool active = true)
+        {
+            return active 
+                ? transform.GetChildren().Where(x => x.gameObject.activeSelf) 
+                : transform.GetChildren().Where(x => !x.gameObject.activeSelf);
+        } 
+            
     }
 }
