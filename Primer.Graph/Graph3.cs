@@ -12,6 +12,18 @@ namespace Primer.Graph
     {
         public bool enableZAxis;
         public bool isRightHanded = true;
+        
+        private bool _transitionTicsAllTogether = false;
+        public bool transitionTicsAllTogether
+        {
+            get => _transitionTicsAllTogether;
+            set
+            {
+                _transitionTicsAllTogether = value;
+                foreach (var axis in axes)
+                    axis.transitionTicsAllTogether = value;
+            }
+        }
 
         public Axis3 xAxis => transform.Find("X").GetComponent<Axis3>(); 
         public Axis3 yAxis => transform.Find("Y").GetComponent<Axis3>(); 

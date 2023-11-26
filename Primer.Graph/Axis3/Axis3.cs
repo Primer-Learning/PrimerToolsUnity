@@ -254,6 +254,7 @@ namespace Primer.Graph
         #region Tics
 
         [DisableIf("@manualTicks.Count != 0")]
+        internal bool transitionTicsAllTogether = false;
         public float ticStep = 2;
         public bool showZero;
         public int labelNumberOffset;
@@ -308,7 +309,7 @@ namespace Primer.Graph
                 AxisTic tic;
 
                 // If the tic exists and is active already
-                if (existingTic is not null && existingTic.gameObject.activeSelf)
+                if (existingTic is not null && existingTic.localScale.x > 0)
                 {
                     ticsToRemove.Remove(existingTic);
                     tic = existingTic.GetComponent<AxisTic>();
@@ -348,12 +349,24 @@ namespace Primer.Graph
                         return Tween.noop;
                     }
                 );
+
+            if (transitionTicsAllTogether) {
+                return (
+                    Tween.noop,
+                    Tween.Parallel(
+                        removeTweens.RunInParallel(),
+                        updateTweens.RunInParallel(),
+                        addTweens.RunInParallel()
+                    ),
+                    Tween.noop
+                );
+            }
             
             return (
-                removeTweens.RunInParallel(),
-                updateTweens.RunInParallel(),
-                addTweens.RunInParallel()
-            );
+                remove: removeTweens.RunInParallel(),
+                update: updateTweens.RunInParallel(),
+                add: addTweens.RunInParallel()
+            );  
         }
 
         private Tween ScaleDownTics()

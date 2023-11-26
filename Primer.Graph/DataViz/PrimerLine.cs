@@ -14,6 +14,7 @@ namespace Primer.Graph
     {
         private ILine renderedLine = new DiscreteLine(1);
         private Vector3[] rawPoints = Array.Empty<Vector3>();
+        public int pointCount => rawPoints.Length;
         private Vector3[] transformedPoints => rawPoints.Select( x => transformPointFromDataSpaceToPositionSpace(x)).ToArray();
 
         private MeshFilter meshFilterCache;
