@@ -28,49 +28,49 @@ namespace Primer.Timeline.Editor
             // show clipsToCreate
             clipsToCreate = EditorGUILayout.IntField("Clips to create", clipsToCreate);
             
-            if (GUILayout.Button("Create clips (lite)"))
-                CreateClipsLite();
+            // if (GUILayout.Button("Create clips (lite)"))
+            //     CreateClipsLite();
         }
 
-        private async void CreateClipsLite()
-        {
-            var sequence = (Sequence)target;
-            var director = TimelineEditor.inspectedDirector;
-            var track = director?.GetOrCreateTrack<SequenceTrack>(sequence);
-
-            if (track == null)
-                return;
-
-            var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
-            const float gap = 0.0f;
-            var time = gap;
-
-            for (var i = 0; i < clipsToCreate; i++)
-            {
-                var clip = existingClips.FirstOrDefault(x => x.IsNameAutomated());
-
-                if (clip is null)
-                    clip = track.CreateClip<SequenceClip>();
-                else
-                    existingClips.Remove(clip);
-
-                if (!clip.IsLocked()) {
-                    clip.start = time;
-                    clip.duration = Tween.DEFAULT_DURATION;
-                    clip.displayName = "";
-
-                    if (clip.asset is PrimerClip primerClip)
-                        primerClip.clipColor = sequence.clipColor;
-                }
-
-                time = (float)clip.end + gap;
-            }
-
-            foreach (var clip in existingClips)
-                track.DeleteClip(clip);
-
-            TimelineEditor.Refresh(RefreshReason.ContentsModified);
-        }
+        // private async void CreateClipsLite()
+        // {
+        //     var sequence = (Sequence)target;
+        //     var director = TimelineEditor.inspectedDirector;
+        //     var track = director?.GetOrCreateTrack<SequenceTrack>(sequence);
+        //
+        //     if (track == null)
+        //         return;
+        //
+        //     var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
+        //     const float gap = 0.0f;
+        //     var time = gap;
+        //
+        //     for (var i = 0; i < clipsToCreate; i++)
+        //     {
+        //         var clip = existingClips.FirstOrDefault(x => x.IsNameAutomated());
+        //
+        //         if (clip is null)
+        //             clip = track.CreateClip<SequenceClip>();
+        //         else
+        //             existingClips.Remove(clip);
+        //
+        //         if (!clip.IsLocked()) {
+        //             clip.start = time;
+        //             clip.duration = Tween.DEFAULT_DURATION;
+        //             clip.displayName = "";
+        //
+        //             if (clip.asset is PrimerClip primerClip)
+        //                 primerClip.clipColor = sequence.clipColor;
+        //         }
+        //
+        //         time = (float)clip.end + gap;
+        //     }
+        //
+        //     foreach (var clip in existingClips)
+        //         track.DeleteClip(clip);
+        //
+        //     TimelineEditor.Refresh(RefreshReason.ContentsModified);
+        // }
 
         private async void CreateClips()
         {
@@ -113,7 +113,10 @@ namespace Primer.Timeline.Editor
                     existingClips.Remove(clip);
 
                 if (!clip.IsLocked()) {
-                    clip.start = time;
+                    // Avoid changing timings of existing clips
+                    // but warn if the new clip starts before the previous one ends
+                    // that should be handled manually.
+                    if (clip.start < time) Debug.LogWarning($"Clip {clip.displayName} starts before previous clip ends");
                     clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
                     clip.displayName = tween?.name ?? "";
 
