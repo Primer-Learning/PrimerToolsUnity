@@ -63,11 +63,10 @@ namespace Primer
         
         public void Return(Transform child)
         {
-            if (child.name != _prefab.name) Debug.LogWarning($"Returning {child.name} to {transform.name}");
+            if (child.name != _prefab.name) Debug.LogError($"Returning {child.name} to {transform.name}");
             child.SetParent(transform);
             child.gameObject.SetActive(false);
         }
-
         #endregion
         
         #region Pool creation

@@ -6,7 +6,8 @@ namespace Primer
     {
         Blob,
         RockHome,
-        MangoTree
+        MangoTree,
+        Mango
     }
 
     public class PrefabFinder
@@ -15,7 +16,8 @@ namespace Primer
         {
             { CommonPrefabs.Blob , "blob_skinned"},
             { CommonPrefabs.RockHome , "home"},
-            { CommonPrefabs.MangoTree , "mango tree medium"}
+            { CommonPrefabs.MangoTree , "mango tree medium"},
+            { CommonPrefabs.Mango , "mango"}
         };
     } 
 }
