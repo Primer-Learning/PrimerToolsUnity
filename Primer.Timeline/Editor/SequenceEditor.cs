@@ -1,4 +1,5 @@
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Primer.Animation;
 using Primer.Timeline.FakeUnityEngine;
 using Sirenix.OdinInspector;
@@ -32,46 +33,6 @@ namespace Primer.Timeline.Editor
             //     CreateClipsLite();
         }
 
-        // private async void CreateClipsLite()
-        // {
-        //     var sequence = (Sequence)target;
-        //     var director = TimelineEditor.inspectedDirector;
-        //     var track = director?.GetOrCreateTrack<SequenceTrack>(sequence);
-        //
-        //     if (track == null)
-        //         return;
-        //
-        //     var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
-        //     const float gap = 0.0f;
-        //     var time = gap;
-        //
-        //     for (var i = 0; i < clipsToCreate; i++)
-        //     {
-        //         var clip = existingClips.FirstOrDefault(x => x.IsNameAutomated());
-        //
-        //         if (clip is null)
-        //             clip = track.CreateClip<SequenceClip>();
-        //         else
-        //             existingClips.Remove(clip);
-        //
-        //         if (!clip.IsLocked()) {
-        //             clip.start = time;
-        //             clip.duration = Tween.DEFAULT_DURATION;
-        //             clip.displayName = "";
-        //
-        //             if (clip.asset is PrimerClip primerClip)
-        //                 primerClip.clipColor = sequence.clipColor;
-        //         }
-        //
-        //         time = (float)clip.end + gap;
-        //     }
-        //
-        //     foreach (var clip in existingClips)
-        //         track.DeleteClip(clip);
-        //
-        //     TimelineEditor.Refresh(RefreshReason.ContentsModified);
-        // }
-
         private async void CreateClips()
         {
             var sequence = (Sequence)target;
@@ -83,7 +44,7 @@ namespace Primer.Timeline.Editor
 
             var existingClips = track.GetClips().Where(x => x.asset is SequenceClip).ToList();
             var runner = sequence.Run();
-            const float gap = 0.0f;
+            const float gap = 0.1f;
             var time = gap;
 
             while (runner.hasMoreClips) {
@@ -113,10 +74,7 @@ namespace Primer.Timeline.Editor
                     existingClips.Remove(clip);
 
                 if (!clip.IsLocked()) {
-                    // Avoid changing timings of existing clips
-                    // but warn if the new clip starts before the previous one ends
-                    // that should be handled manually.
-                    if (clip.start < time) Debug.LogWarning($"Clip {clip.displayName} starts before previous clip ends");
+                    clip.start = time;
                     clip.duration = tween?.duration ?? Tween.DEFAULT_DURATION;
                     clip.displayName = tween?.name ?? "";
 
@@ -126,6 +84,7 @@ namespace Primer.Timeline.Editor
 
                 time = (float)clip.end + gap;
                 tween?.Apply();
+                await UniTask.Delay(10);
             }
 
             foreach (var clip in existingClips)
