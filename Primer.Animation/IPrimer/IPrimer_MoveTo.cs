@@ -99,13 +99,18 @@ namespace Primer.Animation
         public static Tween MoveBy(this Component self, Vector3 displacement, Vector3? initialPosition = null,
             bool globalSpace = false)
         {
-            var transform = self.transform;
-            var initial = initialPosition ?? (globalSpace ? transform.position : transform.localPosition);
-            var target = initial + displacement;
-
-            return self is IPrimer_CustomMoveTo custom
-                ? custom.MoveTo(target, initial, globalSpace)
-                : transform.MoveTo(target, initial, globalSpace);
+            if (globalSpace)
+                return Tween.Value(
+                    v => self.transform.position = v,
+                    () => self.transform.position,
+                    () => self.transform.position + displacement
+                );
+            
+            return Tween.Value(
+                v => self.transform.localPosition = v,
+                () => self.transform.localPosition,
+                () => self.transform.localPosition + displacement
+            );
         }
 
         public static Tween MoveTo(this Component self, float? x = null, float? y = null, float? z = null,
