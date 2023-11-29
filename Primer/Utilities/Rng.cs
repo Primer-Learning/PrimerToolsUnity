@@ -32,7 +32,7 @@ namespace Primer
             return staticRandom.Next(minInclusive, maxExclusive);
         }
 
-        public static float RangeFloat(float maxInclusive) => RangeFloat(0, maxInclusive);
+        public static float RangeFloat(float maxExclusive) => RangeFloat(0, maxExclusive);
 
         public static float RangeFloat(float minInclusive, float maxExclusive)
         {
