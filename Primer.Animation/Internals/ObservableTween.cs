@@ -51,7 +51,7 @@ namespace Primer.Animation
                 return;
             }
 
-            base.Evaluate(t);
+            base.Evaluate(t, ignoreObserve: ignoreObserve);
             if (!ignoreObserve) onUpdate?.Invoke(t);
             
             if (t >= 1 && onComplete is not null && !ignoreObserve) {
