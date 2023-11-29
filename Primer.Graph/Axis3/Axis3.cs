@@ -17,6 +17,8 @@ namespace Primer.Graph
         public float max = 10;
         public float rangeSize => Mathf.Max(0.001f, max - min);
         
+        public int autoTicCount = 0;
+        
         public float length = 1;
         [SerializeField]
         private Vector2 _padding = new (0.2f, 0.2f);
@@ -272,8 +274,36 @@ namespace Primer.Graph
 
             return CalculateTics();
         }
+
+        private void UpdateTicStep()
+        {
+            if (autoTicCount <= 0)
+                return;
+            
+            // This looks at the existing tic step because it's meant to avoid destroying existing tics 
+            // as much as possible.
+            while (max / ticStep > autoTicCount)
+            {
+                switch (ticStep.ToString()[0])
+                {
+                    case '1':
+                        ticStep *= 2;
+                        break;
+                    case '2':
+                        ticStep = Mathf.RoundToInt(ticStep * 2.5f);
+                        break;
+                    case '5':
+                        ticStep *= 2;
+                        break;
+                }
+            }
+        }
+
+        
         private List<TicData> CalculateTics()
         {
+            UpdateTicStep(); // Looks at autoTicCount and adjusts ticStep accordingly.
+            
             var domain = this;
             var calculated = new List<TicData>();
 
