@@ -29,17 +29,17 @@ namespace Primer.Animation
             onDispose?.Invoke();
         }
 
-        public override void Evaluate(float t)
+        public override void Evaluate(float t, bool ignoreObserve = false)
         {
-            if (delay is not 0 && t < tStart)
+            if (delay is not 0 && t < tStart && !ignoreObserve)
                 return;
 
-            if (state != State.Playing) {
+            if (state != State.Playing && !ignoreObserve) {
                 beforeStart?.Invoke();
                 state = State.Playing;
             }
 
-            if (t <= 0 && onStart is not null) {
+            if (t <= 0 && onStart is not null && !ignoreObserve) {
                 onStart.Invoke();
 
                 if (t == 0)
@@ -52,9 +52,9 @@ namespace Primer.Animation
             }
 
             base.Evaluate(t);
-            onUpdate?.Invoke(t);
+            if (!ignoreObserve) onUpdate?.Invoke(t);
             
-            if (t >= 1 && onComplete is not null) {
+            if (t >= 1 && onComplete is not null && !ignoreObserve) {
                 onComplete?.Invoke();
 
                 if (state != State.Completed) {
@@ -65,7 +65,7 @@ namespace Primer.Animation
                 return;
             }
 
-            if (t >= 1) {
+            if (t >= 1 && !ignoreObserve) {
                 afterComplete?.Invoke();
                 state = State.Completed;
             }

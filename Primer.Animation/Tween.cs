@@ -58,10 +58,10 @@ namespace Primer.Animation
         internal float tStart => 1 / totalDuration * delay;
 
         /// <summary>Applies the final state of the animation.</summary>
-        public void Apply() => Evaluate(1);
+        public void Apply(bool ignoreObserve = false) => Evaluate(1, ignoreObserve: ignoreObserve);
         
         private bool durationInitialized;
-        public virtual void Evaluate(float t)
+        public virtual void Evaluate(float t, bool ignoreObserve = false)
         {
             if (!durationInitialized)
             {

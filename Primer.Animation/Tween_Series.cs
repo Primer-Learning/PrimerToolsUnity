@@ -39,12 +39,12 @@ namespace Primer.Animation
                 for (int i = 0; i < tweenList.Length; i++)
                 {
                     durationSoFar += tweenList[i].totalDuration;
-                    tweenList[i].Apply();
+                    tweenList[i].Apply(ignoreObserve: true);
                 }
                 // Rewind the tweens so the initial state is restored
                 for (int i = tweenList.Length - 1; i >= 0; i--)
                 {
-                    tweenList[i].Evaluate(0);
+                    tweenList[i].Evaluate(0, ignoreObserve: true);
                 }
 
                 return durationSoFar;
