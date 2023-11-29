@@ -10,6 +10,6 @@ namespace Simulation.GameTheory
         public RewardMatrix rewardMatrix { get; set; }
         public abstract void OnAgentCreated(SimultaneousTurnCreature agent);
 
-        public abstract Tween Resolve(IEnumerable<SimultaneousTurnCreature> agents, FruitTree tree);
+        public abstract IEnumerable<Tween> Resolve(IEnumerable<SimultaneousTurnCreature> agents, FruitTree tree);
     }
 }

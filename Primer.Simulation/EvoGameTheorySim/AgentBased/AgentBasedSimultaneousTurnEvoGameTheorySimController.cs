@@ -57,8 +57,11 @@ namespace Primer.Simulation
         
         public RewardMatrix rewardMatrix
         {
-            get => simultaneousTurnGameAgentHandler.rewardMatrix;
-            
+            get  {
+                if (_rewardMatrix != null) return _rewardMatrix;
+                _rewardMatrix = simultaneousTurnGameAgentHandler.rewardMatrix;
+                return _rewardMatrix;
+            }
         }
         
         public AgentBasedSimultaneousTurnEvoGameTheorySim sim;

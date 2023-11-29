@@ -25,48 +25,94 @@ namespace Simulation.GameTheory
 
         private PrimerBlob blobCache;
         public PrimerBlob blob => transform.GetOrAddComponent(ref blobCache);
-
+        private static Pool mangoPool => Pool.GetPool(CommonPrefabs.Mango);
+        
         public float energy;
         public FruitTree goingToEat;
-        public SimultaneousTurnGenome strategyGenes;
+        public SimultaneousTurnGenome strategyGenes = new SimultaneousTurnGenome();
         public SimultaneousTurnAction action => strategyGenes.GetAction(rng);
         public Home home;
-
+        
         public SimpleGnome stomach => new ("Stomach", parent: transform);
         
         public bool canSurvive => energy >= 1 || rng.rand.NextDouble() < energy;
         public bool canReproduce => energy >= 2 || rng.rand.NextDouble() < energy - 1;
         
-        public Tween GoToEat(FruitTree tree, int fruitIndex = 0)
+        public Tween GoToEat(FruitTree tree, int fruitIndex = 0, float forcedDuration = -1, bool high = false)
         {
             goingToEat = tree;
-            var tween = WalkTo(tree.fruits[fruitIndex], stopDistance: 1, forcedDuration: skipAnimations ? 0 : -1);
-            tween.duration /= 2;
+
+            var fruit = high
+                ? tree.highFruits[fruitIndex]
+                : tree.fruits[fruitIndex];
+            var fruitPos = fruit.GetChild(0).position;
+            var offset = (fruitPos.To2D() - tree.transform.position.To2D()).normalized;
+            var offset3D = new Vector3(offset.x, 0, offset.y);
+            
+            var tween = WalkTo(fruit.GetChild(0), offset: offset3D, forcedDuration: forcedDuration);
             return tween;
         }
 
-        public Tween EatAnimation(FruitTree tree)
+        public Tween EatAnimation(FruitTree tree, int fruitIndex, float eatDuration = 0.5f, float approachDuration = -1)
         {
             goingToEat = null;
-
-            var bite = DetachNearestFruit(tree);
-
-            var moveToMouthTween = bite.MoveToDynamic(
-                    () => transform.TransformPoint(new Vector3(0, 1.26f, 0.13f)),
-                    () => skipAnimations ? 0 : 0.5f, 
-                    globalSpace: true)
-                .Observe(onStart: () =>
+            var fruit = tree.fruits[fruitIndex];
+            var actualFruit = fruit.GetChild(0);
+            
+            // Put it back if it fell off during a tween calculation
+            actualFruit.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            actualFruit.localPosition = new Vector3(-0.012f, -0.444f, 0.006f);
+            actualFruit.localRotation = Quaternion.Euler(-11.966f, 0, -5.68f);
+            return Tween.Series(
+                GoToEat(tree, fruitIndex, forcedDuration: approachDuration)
+                    .Observe(afterComplete: () =>
                 {
-                    if (!skipAnimations && PrimerTimeline.isPlaying)
-                    {
-                        blob.animator.SetFloat("EatSpeed", 2);
-                        blob.animator.SetTrigger(scoop);
-                        blob.Chomp(hold:0.2f);
-                    }
-                }
+                    blob.StartLookingAt(actualFruit);
+                    tree.DetachFruit(fruit);
+                }),
+                (Tween.noop with {duration = eatDuration})
+                .Observe(afterComplete: () =>
+                {
+                    blob.Chew(eatDuration);
+                    blob.animator.SetBool("ArmsInFront", true);
+                }),
+                fruit.GetChild(0).ScaleTo(0)
+                    .Observe(afterComplete: () =>
+                {
+                    // mangoPool.Return(fruit);
+                    blob.animator.SetBool("ArmsInFront", false);
+                    blob.StopLooking(duration: 0.2f);
+                }) with { duration = eatDuration }
             );
-            var shrinkTween = bite.ScaleTo(0) with {duration = skipAnimations ? 0 : 0.5f};
-            return Tween.Parallel(moveToMouthTween, shrinkTween);
+        }
+        public Tween EatAnimationForGroundMango(FruitTree tree, int fruitIndex, float eatDuration = 0.5f, float approachDuration = -1, bool high = false)
+        {
+            goingToEat = null;
+            var fruit= high ? tree.highFruits[fruitIndex] : tree.fruits[fruitIndex];
+            var actualFruit = fruit.GetChild(0);
+            // // Put it back if it fell off during a tween calculation
+            // actualFruit.GetOrAddComponent<Rigidbody>().isKinematic = true;
+            // actualFruit.localPosition = new Vector3(-0.012f, -0.444f, 0.006f);
+            // actualFruit.localRotation = Quaternion.Euler(-11.966f, 0, -5.68f);
+            return Tween.Series(
+                GoToEat(tree, fruitIndex, forcedDuration: approachDuration, high: high)
+                    .Observe(afterComplete: () =>
+                    {
+                        blob.StartLookingAt(actualFruit);
+                        blob.Chew(eatDuration);
+                        blob.animator.SetBool("ArmsInFront", true);
+                    }),
+                fruit.GetChild(0).ScaleTo(0)
+                        .Observe(afterComplete: () =>
+                        {
+                            // mangoPool.Return(fruit);
+                            blob.animator.SetBool("ArmsInFront", false);
+                            blob.StopLooking(duration: 0.2f);
+                        }) with
+                    {
+                        duration = eatDuration
+                    }
+            );
         }
 
         public Tween ReturnHome(Vector3 offset = default)
@@ -74,34 +120,19 @@ namespace Simulation.GameTheory
             return WalkTo(home.transform, offset: offset);
         }
 
-        private Transform DetachNearestFruit(FruitTree tree)
-        {
-            // Look at flowers on the tree and return the nearest one
-            var distance = float.MaxValue;
-            Transform nearestFlowerWithFruit = null;
-            foreach (var flower in tree.flowers.Where(x => x.childCount > 0))
-            {
-                var flowerDistance = Vector3.Distance(transform.position, flower.position);
-                if (flowerDistance < distance)
-                {
-                    distance = flowerDistance;
-                    nearestFlowerWithFruit = flower;
-                }
-            }
-            
-            if (nearestFlowerWithFruit is null) {
-                Debug.LogError("No flower found on tree");
-            }
-
-            var fruit = nearestFlowerWithFruit.GetChild(0);
-            fruit.SetParent(stomach.transform, worldPositionStays: true);
-
-            return fruit;
-        }
-
         public void PurgeStomach()
         {
             stomach.Reset(hard: true);
+        }
+        public int[] OrderFruitByDistance(FruitTree tree)
+        {
+            return tree.fruits.OrderBy(x => Vector3.Distance(transform.position, x.position))
+                .Select(x => Array.IndexOf(tree.fruits, x)).ToArray();
+        }
+        public int[] OrderHighFruitByDistance(FruitTree tree)
+        {
+            return tree.highFruits.OrderBy(x => Vector3.Distance(transform.position, x.position))
+                .Select(x => Array.IndexOf(tree.highFruits, x)).ToArray();
         }
     }
 }

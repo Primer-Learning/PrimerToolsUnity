@@ -17,13 +17,13 @@ namespace Simulation.GameTheory
             // noop
         }
 
-        public override Tween Resolve(IEnumerable<SimultaneousTurnCreature> agents, FruitTree tree)
+        public override IEnumerable<Tween> Resolve(IEnumerable<SimultaneousTurnCreature> agents, FruitTree tree)
         {
             var (first, second) = agents.Shuffle().Take(2).ToList();
 
-            return Tween.Series(
-                first.EatAnimation(tree),
-                second.EatAnimation(tree)
+            yield return Tween.Series(
+                first.EatAnimation(tree, first.OrderFruitByDistance(tree)[0]),
+                second.EatAnimation(tree, second.OrderFruitByDistance(tree)[0])
             );
         }
     }

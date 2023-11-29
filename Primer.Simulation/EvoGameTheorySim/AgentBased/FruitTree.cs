@@ -15,31 +15,54 @@ public class FruitTree : MonoBehaviour
     public Rng rng;
 
     [HideInInspector] public bool skipAnimations = false;
-    
+    private static Pool mangoPool => Pool.GetPool(CommonPrefabs.Mango);
     
     public bool hasFruit => flowers.Any(x => x.childCount > 0);
-    public Transform[] fruits => flowers.Where(x => x.childCount > 0).Select(x => x.GetChild(0)).ToArray();
+    public Transform[] fruits => flowers.Where(x => x.childCount > 0 && x.GetChild(0).GetChild(0).localScale.x > 0).Select(x => x.GetChild(0)).ToArray();
+    public Transform[] highFruits => highFlowers.Where(x => x.childCount > 0 && x.GetChild(0).GetChild(0).localScale.x > 0).Select(x => x.GetChild(0)).ToArray();
     
     [Title("Flowers")]
     public List<Transform> flowers;
+    public List<Transform> highFlowers;
 
     public void Reset()
     {
         flowers.GetChildren().Dispose();
+        highFlowers.GetChildren().Dispose();
     }
     
     public Tween GrowFruit(int index)
     {
+        return GrowFruit(flowers[index]);
+    }
+    public Tween GrowFruit(Transform flower)
+    {
         Transform fruit;
-        if (flowers[index].childCount == 0)
+        
+        var noFruit = flower.childCount == 0;
+        var shrunkenFruit = flower.childCount > 0 && flower.GetChild(0).GetChild(0).localScale.x < 1;
+        
+        if (noFruit || shrunkenFruit)
         {
-            RandomlyRotateFlower(index);
-            fruit = Instantiate(fruitPrefab, flowers[index]);
+            RandomlyRotateFlower(flower);
+            
+            fruit = noFruit ? mangoPool.GiveToParent(flower) : flower.GetChild(0);
+            
+            // Set the transform of the fruit's child to match the prefab
+            // We need to do this because the child of the prefab may have been moved by physics.
+            // Because I corrected the pivot point by nesting the fruit under an empty game object.
+            // Which I don't think I should do going forward.
+            var actualFruit = fruit.GetChild(0);
+            actualFruit.GetComponent<Rigidbody>().isKinematic = true;
+            actualFruit.localRotation =
+                new Quaternion(-0.10410507f, -0.00516443793f, -0.0492771529f, 0.993331432f);
+            actualFruit.localPosition = new Vector3(-0.012f, -0.444f, 0.006f);
+            actualFruit.localScale = Vector3.one;
             fruit.localScale = Vector3.zero;
         }
         else
         {
-            fruit = flowers[index].GetChild(0);
+            fruit = flower.GetChild(0);
         }
 
         return fruit.ScaleTo(1) with {duration = skipAnimations ? 0 : 0.5f};
@@ -69,31 +92,26 @@ public class FruitTree : MonoBehaviour
     {
         // Create tweens, giving each a random delay between 0 and delayRange
         return indices
-            .Select((index, i) => GrowFruit(index) with {delay = skipAnimations ? 0 : rng.RangeFloat(delayRange)})
+            .Select(index => GrowFruit(index) with {delay = skipAnimations ? 0 : rng.RangeFloat(delayRange)})
+            .RunInParallel();
+    }
+    public Tween GrowHighFruits(float delayRange = 0)
+    {
+        return highFlowers
+            .Select(x => GrowFruit(x) with {delay = skipAnimations ? 0 : rng.RangeFloat(delayRange)})
             .RunInParallel();
     }
 
-    private void RandomlyRotateFlower(int index)
+    private void RandomlyRotateFlower(Transform flower)
     {
-        flowers[index].localRotation = Quaternion.Euler(rng.RangeFloat(xAngleMax), rng.RangeFloat(yAngleMax), rng.RangeFloat(zAngleMax));
+        flower.localRotation = Quaternion.Euler(rng.RangeFloat(xAngleMax), rng.RangeFloat(yAngleMax), rng.RangeFloat(zAngleMax));
     }
-
-    public Transform HarvestFruit(Component closestTo = null)
+    public Transform DetachFruit(Transform fruit)
     {
-        var candidates = flowers.Where(x => x.childCount > 0);
+        // fruit.SetParent(transform, worldPositionStays: true);
+        var actualFruit = fruit.GetChild(0);
+        actualFruit.GetComponent<Rigidbody>().isKinematic = false;
 
-        if (closestTo is not null) {
-            var target = closestTo.transform.position;
-            candidates = candidates.OrderBy(x => Vector3.Distance(x.position, target));
-        }
-
-        var flower = candidates.FirstOrDefault();
-        var fruit = flower != null ? flower.GetChild(0) : null;
-
-        if (fruit is null)
-            return null;
-
-        fruit.SetParent(null, worldPositionStays: true);
-        return fruit;
+        return actualFruit;
     }
 }
