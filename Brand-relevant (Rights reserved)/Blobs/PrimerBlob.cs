@@ -51,12 +51,20 @@ public class PrimerBlob : PrimerCharacter {
     private Quaternion baseNeckRot; //Calculate this because it's arranged all wonky in the model
     private Quaternion initialRot;
     private Vector3 lookCorrection;
-    private Transform neckBone;
+    private Transform _neckBone;
+    private Transform neckBone
+    {
+        get
+        {
+            if (_neckBone == null) _neckBone = transform.FindDeepChild("bone_neck");
+            return _neckBone;
+        }// _neckBone ??= transform.FindDeepChild("bone_neck");
+    }
 
     private Quaternion
         neckOverrideRotation; //For setting in LateUpdate, not the initial orientation
 
-    private bool overrideNeck;
+    public bool overrideNeck;
     private float overrideStartTime;
     private float releaseDuration;
     private float releaseStartTime;
@@ -79,7 +87,6 @@ public class PrimerBlob : PrimerCharacter {
     protected override void Awake()
     {
         base.Awake();
-        neckBone = transform.FindDeepChild("bone_neck").transform;
         //Undo whole blob rotation, then rotate to wherever the neck is in world space
         baseNeckRot = Quaternion.Inverse(transform.rotation) * neckBone.rotation;
 
@@ -206,7 +213,11 @@ public class PrimerBlob : PrimerCharacter {
     public override void StartLookingAt(Transform obj, float moveDuration = 0.5f,
         Vector3 correctionVector = new())
     {
-        overrideNeck = true;
+        if (Application.isPlaying)
+        {
+            if (overrideNeck) Debug.LogWarning("Overriding neck while already overriding neck.");
+            overrideNeck = true;
+        }
         // Debug.Log("Starting to look");
         // Debug.Log(releasing);
         StartCoroutine(lookAt(obj, moveDuration, correctionVector));
@@ -254,7 +265,7 @@ public class PrimerBlob : PrimerCharacter {
             goalRot = Quaternion.LookRotation(visualFocus.position - neckBone.position +
                                               lookCorrection);
             float t = (Time.time - overrideStartTime) / duration;
-            EaseMode.Cubic.Apply(t);
+            t = EaseMode.Cubic.Apply(t);
             neckOverrideRotation = Quaternion.Slerp(initialRot, goalRot * baseNeckRot, t);
             yield return null;
         }
@@ -452,6 +463,11 @@ public class PrimerBlob : PrimerCharacter {
         GetAnimator().SetTrigger("RightEyeStern");
     }
 
+    public void StartShakingObject()
+    {
+        
+    }
+
     public void EvilPose()
     {
         AngryEyes();
@@ -511,6 +527,19 @@ public class PrimerBlob : PrimerCharacter {
         animator.SetTrigger("MouthOpenWide");
         await UniTask.Delay((int)((hold + attack) * 1000));
         animator.SetTrigger("MouthClosed");
+    }
+
+    public async void Chew(float duration = 1)
+    {
+        // Mouth smile transition time is currently 0.25f
+        // So opening and closing will happen twice per second
+        for (var i = 0; i < (int) (duration * 2); i++)
+        {
+            animator.SetTrigger("MouthSmile");
+            await UniTask.Delay((int) (0.125f * 1000));
+            animator.SetTrigger("MouthClosed");
+            await UniTask.Delay((int) (0.125f * 1000));
+        }
     }
 
     public BlobAccessory AddAccessory(AccessoryType accessoryType, bool animate = false,
