@@ -40,5 +40,39 @@ namespace Primer.Animation
                 .RunInParallel()
                 with { easing = defaultEasing };
         }
+        
+        #region IEnumerable<IEnumerable<Tween>> Parallelize
+        public static IEnumerable<Tween> ParallelizeTweenLists(this IEnumerable<IEnumerable<Tween>> listOfListsOfTweens)
+        {
+            var enumerators = listOfListsOfTweens.Select(e => e.GetEnumerator())
+                .ToList();
+
+            var moreTweens = enumerators.Any();
+
+            while (moreTweens)
+            {
+                var parallelTweens = new List<Tween>();
+                moreTweens = false;
+                foreach (var enumerator in enumerators)
+                {
+                    if (enumerator.MoveNext())
+                    {
+                        parallelTweens.Add(enumerator.Current);
+                    }
+                }
+                if (parallelTweens.Any())
+                {
+                    moreTweens = true;
+                    yield return parallelTweens.RunInParallel();
+                }
+            }
+            // Dispose of the enumerators
+            foreach (var enumerator in enumerators)
+            {
+                enumerator.Dispose();
+            }
+        }
+        
+        #endregion
     }
 }
