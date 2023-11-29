@@ -46,10 +46,24 @@ namespace Primer.Animation
             set => milliseconds = (int)(value * 1000);
         }
 
+        private float _duration = -1;
         public Func<float> durationFunc = () => (float) DEFAULT_DURATION_MS / 1000;
-        public float duration {
-            get => durationFunc();
-            set => durationFunc = () => value;
+        public float duration
+        {
+            get
+            {
+                if (_duration == -1)
+                {
+                    _duration = durationFunc();
+                }
+                return _duration;
+            }
+            set
+            {
+                _duration = value;
+                // Just in case I call this somewhere else
+                durationFunc = () => value;
+            }
         }
 
         #endregion
