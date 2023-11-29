@@ -7,9 +7,14 @@ namespace Primer.Animation
 {
     public static class IMeshController_TweenColorExtensions
     {
-        public static Tween TweenColor(this Renderer self, Color newColor)
+        public static Tween TweenColor(this Renderer self, Color newColor, float juiciness = 0.5f)
         {
-            return Tween.Value(self.SetColor, self.GetColor, () => newColor);
+            return Tween.Value(
+                self.SetColor,
+                self.GetColor,
+                () => newColor,
+                (a, b, t) => PrimerColor.JuicyInterpolate(a, b, t, juiciness)
+            );
         }
 
         public static Tween TweenColor(this IEnumerable<Renderer> self, Color newColor)
